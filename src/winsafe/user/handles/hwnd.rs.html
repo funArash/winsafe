@@ -1413,6 +1413,14 @@
 <span id="1406">1406</span>
 <span id="1407">1407</span>
 <span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
@@ -2041,6 +2049,10 @@
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GetWindowLongPtr</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">co::GWLP</span>) -&gt; <span class="ident">isize</span> {
+		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
+		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetWindowLongW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="number">0</span>) }
+
+		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetWindowLongPtrW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="number">0</span>) }
 	}
 
@@ -2666,6 +2678,10 @@
 	<span class="doccomment">/// [`SetWindowLongPtr`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlongptrw)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="kw">fn</span> <span class="ident">SetWindowLongPtr</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">co::GWLP</span>, <span class="ident">new_long</span>: <span class="ident">isize</span>) -&gt; <span class="ident">isize</span> {
+		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
+		<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetWindowLongW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="number">0</span>, <span class="ident">new_long</span>) }
+
+		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetWindowLongPtrW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="number">0</span>, <span class="ident">new_long</span>) }
 	}
 
