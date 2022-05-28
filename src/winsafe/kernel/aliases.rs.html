@@ -18,17 +18,49 @@
 <span id="11">11</span>
 <span id="12">12</span>
 <span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 
 <span class="doccomment">/// A specialized</span>
 <span class="doccomment">/// [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) which</span>
 <span class="doccomment">/// returns a `Box&lt;dyn Error + Send + Sync&gt;` on failure.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is the most generic `Result` possible, and any other `Result` can be</span>
+<span class="doccomment">/// converted into it.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A specialized</span>
 <span class="doccomment">/// [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) for Win32</span>
 <span class="doccomment">/// operations, which returns an [`ERROR`](crate::co::ERROR) on failure.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Converting into the generic [`ErrResult`](crate::ErrResult):</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// use winsafe::{co, ErrResult, WinResult};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let win_result: WinResult&lt;()&gt; = Err(co::ERROR::SUCCESS);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let err_result: ErrResult&lt;()&gt; = win_result.map_err(|err| err.into());</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">co::ERROR</span><span class="op">&gt;</span>;
 </code></pre></div>
