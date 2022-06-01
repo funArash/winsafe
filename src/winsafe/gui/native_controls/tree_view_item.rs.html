@@ -183,6 +183,14 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{<span class="ident">HTREEITEM</span>, <span class="ident">TreeitemTvi</span>, <span class="ident">TVINSERTSTRUCT</span>, <span class="ident">TVITEMEX</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::tree_view_items</span>::{
@@ -283,12 +291,14 @@
 	}
 
 	<span class="doccomment">/// Returns the underlying handle of the item.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">htreeitem</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HTREEITEM</span> {
 		<span class="self">self</span>.<span class="ident">hitem</span>
 	}
 
 	<span class="doccomment">/// Tells if the item is expanded by sending a</span>
 	<span class="doccomment">/// [`tvm::GetItemState`](crate::msg::tvm::GetItemState) message.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_expanded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
 			.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetItemState</span> {
@@ -300,27 +310,32 @@
 
 	<span class="doccomment">/// Tells if the item is a root by sending a</span>
 	<span class="doccomment">/// [`tvm::GetNextItem`](crate::msg::tvm::GetNextItem) message.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">parent</span>().<span class="ident">is_none</span>()
 	}
 
 	<span class="doccomment">/// Returns an iterator over the child items.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_children</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
 		<span class="ident">TreeViewChildItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>))
 	}
 
 	<span class="doccomment">/// Returns an iterator over the next sibling items.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_next_siblings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
 		<span class="ident">TreeViewItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">co::TVGN::NEXT</span>)
 	}
 
 	<span class="doccomment">/// Returns an iterator over the previous sibling items.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_prev_siblings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
 		<span class="ident">TreeViewItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">co::TVGN::PREVIOUS</span>)
 	}
 
 	<span class="doccomment">/// Retrieves the parent of the item by sending a</span>
 	<span class="doccomment">/// [`tvm::GetNextItem`](crate::msg::tvm::GetNextItem) message.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
 			.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetNextItem</span> {
@@ -347,6 +362,7 @@
 
 	<span class="doccomment">/// Retrieves the text of the item by sending a</span>
 	<span class="doccomment">/// [`tvm::GetItem`](crate::msg::tvm::GetItem) message.</span>
+	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tvi</span> <span class="op">=</span> <span class="ident">TVITEMEX::default</span>();
 		<span class="ident">tvi</span>.<span class="ident">hItem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hitem</span>;
