@@ -125,6 +125,8 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -137,7 +139,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">ErrResult</span>, <span class="ident">HINSTANCE</span>, <span class="ident">IdStr</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::wm</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiEvents</span>, <span class="ident">KernelHinstance</span>, <span class="ident">UserHinstance</span>, <span class="ident">UserHwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">PostQuitMessage</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">IdOicStr</span>, <span class="ident">PostQuitMessage</span>, <span class="ident">SIZE</span>};
 
 <span class="kw">struct</span> <span class="ident">Obj</span> { <span class="comment">// actual fields of DlgMain</span>
 	<span class="ident">dlg_base</span>: <span class="ident">DlgBase</span>,
@@ -231,14 +233,16 @@
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">icon_id</span> {
 			<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(
 				<span class="ident">wm::SetIcon</span> {
-					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(<span class="ident">id</span>, <span class="number">16</span>, <span class="number">16</span>, <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
+					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(
+						<span class="ident">IdOicStr::Id</span>(<span class="ident">id</span>), <span class="ident">SIZE::new</span>(<span class="number">16</span>, <span class="number">16</span>), <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
 					<span class="ident">size</span>: <span class="ident">co::ICON_SZ::SMALL</span>,
 				},
 			);
 
 			<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(
 				<span class="ident">wm::SetIcon</span> {
-					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(<span class="ident">id</span>, <span class="number">32</span>, <span class="number">32</span>, <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
+					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(
+						<span class="ident">IdOicStr::Id</span>(<span class="ident">id</span>), <span class="ident">SIZE::new</span>(<span class="number">32</span>, <span class="number">32</span>), <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
 					<span class="ident">size</span>: <span class="ident">co::ICON_SZ::BIG</span>,
 				},
 			);

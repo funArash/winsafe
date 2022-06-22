@@ -219,6 +219,8 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
@@ -226,7 +228,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
 	<span class="ident">ATOM</span>, <span class="ident">DLGPROC</span>, <span class="ident">HACCEL</span>, <span class="ident">HBITMAP</span>, <span class="ident">HCURSOR</span>, <span class="ident">HICON</span>, <span class="ident">HMENU</span>, <span class="ident">HWND</span>, <span class="ident">IdIdcStr</span>,
-	<span class="ident">IdIdiStr</span>, <span class="ident">SIZE</span>, <span class="ident">WNDCLASSEX</span>,
+	<span class="ident">IdIdiStr</span>, <span class="ident">IdObmStr</span>, <span class="ident">IdOcrStr</span>, <span class="ident">IdOicStr</span>, <span class="ident">SIZE</span>, <span class="ident">WNDCLASSEX</span>,
 };
 
 <span class="kw">impl</span> <span class="ident">UserHinstance</span> <span class="kw">for</span> <span class="ident">HINSTANCE</span> {}
@@ -370,11 +372,11 @@
 	<span class="doccomment">/// method for [`HBITMAP`](crate::HBITMAP).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">LoadImageBitmap</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">u16</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span>
+		<span class="ident">name</span>: <span class="ident">IdObmStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span>
 	{
 		<span class="kw">unsafe</span> {
 			<span class="ident">user::ffi::LoadImageW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">0</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
+				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">0</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
 			).<span class="ident">as_mut</span>()
 		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBITMAP</span>(<span class="ident">ptr</span>))
 			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
@@ -384,11 +386,12 @@
 	<span class="doccomment">/// method for [`HCURSOR`](crate::HCURSOR).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">LoadImageCursor</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">u16</span>, <span class="ident">cx</span>: <span class="ident">i32</span>, <span class="ident">cy</span>: <span class="ident">i32</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HCURSOR</span><span class="op">&gt;</span>
+		<span class="ident">name</span>: <span class="ident">IdOcrStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HCURSOR</span><span class="op">&gt;</span>
 	{
 		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadImageW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">2</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>)
-				.<span class="ident">as_mut</span>()
+			<span class="ident">user::ffi::LoadImageW</span>(
+				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">2</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
+			).<span class="ident">as_mut</span>()
 		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HCURSOR</span>(<span class="ident">ptr</span>))
 			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
 	}
@@ -397,11 +400,12 @@
 	<span class="doccomment">/// method for [`HICON`](crate::HICON).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">LoadImageIcon</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">u16</span>, <span class="ident">cx</span>: <span class="ident">i32</span>, <span class="ident">cy</span>: <span class="ident">i32</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span>
+		<span class="ident">name</span>: <span class="ident">IdOicStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span>
 	{
 		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadImageW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">1</span>, <span class="ident">cx</span>, <span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>)
-				.<span class="ident">as_mut</span>()
+			<span class="ident">user::ffi::LoadImageW</span>(
+				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">1</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
+			).<span class="ident">as_mut</span>()
 		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HICON</span>(<span class="ident">ptr</span>))
 			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
 	}
