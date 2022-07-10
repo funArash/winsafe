@@ -166,7 +166,14 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
@@ -174,7 +181,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::OleIUnknown</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IShellItem</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
 
@@ -202,16 +209,23 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellItemArray</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IShellItemArray</span>, <span class="string">&quot;b63ea76d-1f85-456f-a19c-48159efa858b&quot;</span>);
-<span class="kw">impl</span> <span class="ident">ShellIShellItemArray</span> <span class="kw">for</span> <span class="ident">IShellItemArray</span> {}
+<span class="kw">impl</span> <span class="ident">shell_IShellItemArray</span> <span class="kw">for</span> <span class="ident">IShellItemArray</span> {}
 
-<span class="doccomment">/// [`IShellItemArray`](crate::IShellItemArray) methods from `shell` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
+<span class="doccomment">/// [`IShellItemArray`](crate::IShellItemArray).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ShellIShellItemArray</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IShellItemArray</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements</span>
 	<span class="doccomment">/// by calling</span>
-	<span class="doccomment">/// [`IShellItemArrayT::GetCount`](crate::prelude::ShellIShellItemArray::GetCount)</span>
+	<span class="doccomment">/// [`IShellItemArrayT::GetCount`](crate::prelude::shell_IShellItemArray::GetCount)</span>
 	<span class="doccomment">/// and</span>
-	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](crate::prelude::ShellIShellItemArray::GetItemAt)</span>
+	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](crate::prelude::shell_IShellItemArray::GetItemAt)</span>
 	<span class="doccomment">/// consecutively.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
@@ -274,7 +288,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Prefer using</span>
-	<span class="doccomment">/// [`IShellItemArrayT::iter`](crate::prelude::ShellIShellItemArray::iter).</span>
+	<span class="doccomment">/// [`IShellItemArrayT::iter`](crate::prelude::shell_IShellItemArray::iter).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GetItemAt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();

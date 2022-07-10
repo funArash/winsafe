@@ -79,14 +79,21 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl::IBaseFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::HRES</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs</span>::{<span class="ident">ok_to_hrresult</span>, <span class="ident">okfalse_to_hrresult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::OleIUnknown</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
 
 <span class="doccomment">/// [`IEnumFilters`](crate::IEnumFilters) virtual table.</span>
@@ -110,11 +117,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IEnumFilters</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IEnumFilters</span>, <span class="string">&quot;56a86893-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
-<span class="kw">impl</span> <span class="ident">DshowIEnumFilters</span> <span class="kw">for</span> <span class="ident">IEnumFilters</span> {}
+<span class="kw">impl</span> <span class="ident">dshow_IEnumFilters</span> <span class="kw">for</span> <span class="ident">IEnumFilters</span> {}
 
-<span class="doccomment">/// [`IEnumFilters`](crate::IEnumFilters) methods from `dshow` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
+<span class="doccomment">/// [`IEnumFilters`](crate::IEnumFilters).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DshowIEnumFilters</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IEnumFilters</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// [`IEnumFilters::Next`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ienumfilters-next)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>

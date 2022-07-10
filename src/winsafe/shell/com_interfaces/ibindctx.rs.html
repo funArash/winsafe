@@ -70,13 +70,20 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCSTR</span>, <span class="ident">PVOID</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::OleIUnknown</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
 
 <span class="doccomment">/// [`IBindCtx`](crate::IBindCtx) virtual table.</span>
@@ -106,11 +113,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IBindCtx</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IBindCtx</span>, <span class="string">&quot;0000000e-0000-0000-c000-000000000046&quot;</span>);
-<span class="kw">impl</span> <span class="ident">ShellIBindCtx</span> <span class="kw">for</span> <span class="ident">IBindCtx</span> {}
+<span class="kw">impl</span> <span class="ident">shell_IBindCtx</span> <span class="kw">for</span> <span class="ident">IBindCtx</span> {}
 
-<span class="doccomment">/// [`IBindCtx`](crate::IBindCtx) methods from `shell` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
+<span class="doccomment">/// [`IBindCtx`](crate::IBindCtx).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ShellIBindCtx</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IBindCtx</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// [`IBindCtx::ReleaseBoundObjects`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-ibindctx-releaseboundobjects)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="kw">fn</span> <span class="ident">ReleaseBoundObjects</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {

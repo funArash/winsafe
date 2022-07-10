@@ -103,7 +103,16 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
@@ -116,16 +125,24 @@
 	<span class="doccomment">/// Originally just a `HANDLE`.</span>
 }
 
-<span class="kw">impl</span> <span class="ident">KernelHglobal</span> <span class="kw">for</span> <span class="ident">HGLOBAL</span> {}
+<span class="kw">impl</span> <span class="ident">kernel_Hglobal</span> <span class="kw">for</span> <span class="ident">HGLOBAL</span> {}
 
-<span class="doccomment">/// [`HGLOBAL`](crate::HGLOBAL) methods from `kernel` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
+<span class="doccomment">/// [`HGLOBAL`](crate::HGLOBAL).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KernelHglobal</span>: <span class="ident">Handle</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hglobal</span>: <span class="ident">Handle</span> {
 	<span class="doccomment">/// [`GlobalAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc)</span>
 	<span class="doccomment">/// static method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::KernelHglobal::GlobalFree) call.</span>
+	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)</span>
+	<span class="doccomment">/// call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GlobalAlloc</span>(<span class="ident">flags</span>: <span class="ident">co::GMEM</span>, <span class="ident">num_bytes</span>: <span class="ident">u64</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalAlloc</span>(<span class="ident">flags</span>.<span class="number">0</span>, <span class="ident">num_bytes</span>).<span class="ident">as_mut</span>() }
@@ -155,11 +172,11 @@
 	<span class="doccomment">/// [`GlobalLock`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globallock)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Calls [`HGLOBAL::GlobalSize`](crate::prelude::KernelHglobal::GlobalSize)</span>
+	<span class="doccomment">/// Calls [`HGLOBAL::GlobalSize`](crate::prelude::kernel_Hglobal::GlobalSize)</span>
 	<span class="doccomment">/// to retrieve the size of the memory block.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalUnlock`](crate::prelude::KernelHglobal::GlobalUnlock)</span>
+	<span class="doccomment">/// [`HGLOBAL::GlobalUnlock`](crate::prelude::kernel_Hglobal::GlobalUnlock)</span>
 	<span class="doccomment">/// call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GlobalLock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
@@ -175,7 +192,8 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::KernelHglobal::GlobalFree) call.</span>
+	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)</span>
+	<span class="doccomment">/// call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GlobalReAlloc</span>(<span class="self">self</span>,
 		<span class="ident">num_bytes</span>: <span class="ident">u64</span>, <span class="ident">flags</span>: <span class="ident">co::GMEM</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span>

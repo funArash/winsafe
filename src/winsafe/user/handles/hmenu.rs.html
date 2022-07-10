@@ -524,12 +524,19 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">msg</span>, <span class="ident">user</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">NativeBitflag</span>, <span class="ident">UserHwnd</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">NativeBitflag</span>, <span class="ident">user_Hwnd</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
 	<span class="ident">BmpPtrStr</span>, <span class="ident">HBITMAP</span>, <span class="ident">HWND</span>, <span class="ident">IdMenu</span>, <span class="ident">IdPos</span>, <span class="ident">MenuEnum</span>, <span class="ident">MENUINFO</span>, <span class="ident">MENUITEMINFO</span>,
 	<span class="ident">POINT</span>,
@@ -540,16 +547,23 @@
 	<span class="doccomment">/// [menu](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hmenu).</span>
 }
 
-<span class="kw">impl</span> <span class="ident">UserHmenu</span> <span class="kw">for</span> <span class="ident">HMENU</span> {}
+<span class="kw">impl</span> <span class="ident">user_Hmenu</span> <span class="kw">for</span> <span class="ident">HMENU</span> {}
 
-<span class="doccomment">/// [`HMENU`](crate::HMENU) methods from `user` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
+<span class="doccomment">/// [`HMENU`](crate::HMENU).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UserHmenu</span>: <span class="ident">Handle</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hmenu</span>: <span class="ident">Handle</span> {
 	<span class="doccomment">/// [`AppendMenu`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-appendmenuw)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method is rather tricky, consider using</span>
-	<span class="doccomment">/// [`HMENU::AppendMenuEnum`](crate::prelude::UserHmenu::AppendMenuEnum).</span>
+	<span class="doccomment">/// [`HMENU::AppendMenuEnum`](crate::prelude::user_Hmenu::AppendMenuEnum).</span>
 	<span class="kw">fn</span> <span class="ident">AppendMenu</span>(<span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">co::MF</span>,
 		<span class="ident">new_item</span>: <span class="ident">IdMenu</span>, <span class="ident">content</span>: <span class="ident">BmpPtrStr</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 	{
@@ -566,7 +580,7 @@
 	}
 
 	<span class="doccomment">/// A more convenient</span>
-	<span class="doccomment">/// [`HMENU::AppendMenu`](crate::prelude::UserHmenu::AppendMenu).</span>
+	<span class="doccomment">/// [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -670,7 +684,7 @@
 	<span class="doccomment">/// static method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** If not attached to a window, must be paired with an</span>
-	<span class="doccomment">/// [`HMENU::DestroyMenu`](crate::prelude::UserHmenu::DestroyMenu) call.</span>
+	<span class="doccomment">/// [`HMENU::DestroyMenu`](crate::prelude::user_Hmenu::DestroyMenu) call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">CreateMenu</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::CreateMenu</span>().<span class="ident">as_mut</span>() }
@@ -682,7 +696,7 @@
 	<span class="doccomment">/// static method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** If not attached to a window, must be paired with an</span>
-	<span class="doccomment">/// [`HMENU::DestroyMenu`](crate::prelude::UserHmenu::DestroyMenu) call.</span>
+	<span class="doccomment">/// [`HMENU::DestroyMenu`](crate::prelude::user_Hmenu::DestroyMenu) call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">CreatePopupMenu</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::CreatePopupMenu</span>().<span class="ident">as_mut</span>() }
@@ -995,7 +1009,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** If you just want to display a popup menu, consider the simpler</span>
-	<span class="doccomment">/// [`HMENU::TrackPopupMenuAtPoint`](crate::prelude::UserHmenu::TrackPopupMenuAtPoint).</span>
+	<span class="doccomment">/// [`HMENU::TrackPopupMenuAtPoint`](crate::prelude::user_Hmenu::TrackPopupMenuAtPoint).</span>
 	<span class="kw">fn</span> <span class="ident">TrackPopupMenu</span>(<span class="self">self</span>,
 		<span class="ident">flags</span>: <span class="ident">co::TPM</span>, <span class="ident">location</span>: <span class="ident">POINT</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	{
@@ -1027,7 +1041,7 @@
 	}
 
 	<span class="doccomment">/// Shows the popup menu anchored at the given coordinates using</span>
-	<span class="doccomment">/// [`TrackPopupMenu`](crate::prelude::UserHmenu::TrackPopupMenu), and</span>
+	<span class="doccomment">/// [`TrackPopupMenu`](crate::prelude::user_Hmenu::TrackPopupMenu), and</span>
 	<span class="doccomment">/// performs other needed operations.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method will block until the menu disappears.</span>

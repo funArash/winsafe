@@ -269,14 +269,21 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">oleaut</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">BOOL</span>, <span class="ident">HANDLE</span>, <span class="ident">HRES</span>, <span class="ident">PCVOID</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">OleIUnknown</span>, <span class="ident">ShellIStream</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">ole_IUnknown</span>, <span class="ident">shell_IStream</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IStream</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">HBITMAP</span>, <span class="ident">HDC</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>, <span class="ident">SIZE</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
@@ -312,11 +319,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IPicture</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IPicture</span>, <span class="string">&quot;7bf80980-bf32-101a-8bbb-00aa00300cab&quot;</span>);
-<span class="kw">impl</span> <span class="ident">OleautIPicture</span> <span class="kw">for</span> <span class="ident">IPicture</span> {}
+<span class="kw">impl</span> <span class="ident">oleaut_IPicture</span> <span class="kw">for</span> <span class="ident">IPicture</span> {}
 
-<span class="doccomment">/// [`IPicture`](crate::IPicture) methods from `oleaut` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `oleaut` feature, and provides methods for</span>
+<span class="doccomment">/// [`IPicture`](crate::IPicture).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">OleautIPicture</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">oleaut_IPicture</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// Calls</span>
 	<span class="doccomment">/// [`OleLoadPicturePath`](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-oleloadpicturepath)</span>
 	<span class="doccomment">/// to load a picture from a file.</span>
@@ -343,9 +357,9 @@
 		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IPicture::from</span>(<span class="ident">ppv_queried</span>))
 	}
 
-	<span class="doccomment">/// Calls</span>
-	<span class="doccomment">/// [`IStream::from_slice`](crate::prelude::ShellIStream::from_slice) and</span>
-	<span class="doccomment">/// [`IPicture::from_stream`](crate::prelude::OleautIPicture::from_stream)</span>
+	<span class="doccomment">/// Calls [`IStream::from_slice`](crate::prelude::shell_IStream::from_slice)</span>
+	<span class="doccomment">/// and</span>
+	<span class="doccomment">/// [`IPicture::from_stream`](crate::prelude::oleaut_IPicture::from_stream)</span>
 	<span class="doccomment">/// to load a picture straight from a slice.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">from_slice</span>(
@@ -395,9 +409,9 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Returns a value in HIMETRIC units. To convert it to pixels,</span>
 	<span class="doccomment">/// prefer using the simpler</span>
-	<span class="doccomment">/// [`IPicture::size_px`](crate::prelude::GdiOleautIPicture::size_px), or</span>
+	<span class="doccomment">/// [`IPicture::size_px`](crate::prelude::gdi_oleaut_IPicture::size_px), or</span>
 	<span class="doccomment">/// use</span>
-	<span class="doccomment">/// [`HDC::HiMetricToPixel`](crate::prelude::GdiOleautHdc::HiMetricToPixel)</span>
+	<span class="doccomment">/// [`HDC::HiMetricToPixel`](crate::prelude::gdi_oleaut_Hdc::HiMetricToPixel)</span>
 	<span class="doccomment">/// to perform the conversion manually.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
@@ -445,9 +459,9 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Returns a value in HIMETRIC units. To convert it to pixels,</span>
 	<span class="doccomment">/// prefer using the simpler</span>
-	<span class="doccomment">/// [`IPicture::size_px`](crate::prelude::GdiOleautIPicture::size_px), or</span>
+	<span class="doccomment">/// [`IPicture::size_px`](crate::prelude::gdi_oleaut_IPicture::size_px), or</span>
 	<span class="doccomment">/// use</span>
-	<span class="doccomment">/// [`HDC::HiMetricToPixel`](crate::prelude::GdiOleautHdc::HiMetricToPixel)</span>
+	<span class="doccomment">/// [`HDC::HiMetricToPixel`](crate::prelude::gdi_oleaut_Hdc::HiMetricToPixel)</span>
 	<span class="doccomment">/// to perform the conversion manually.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>

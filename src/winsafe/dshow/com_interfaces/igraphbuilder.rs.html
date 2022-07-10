@@ -136,14 +136,20 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl</span>::{<span class="ident">IBaseFilter</span>, <span class="ident">IPin</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HANDLE</span>, <span class="ident">HRES</span>, <span class="ident">PCSTR</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HFILE</span>, <span class="ident">WString</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs</span>::{<span class="ident">ok_to_hrresult</span>, <span class="ident">okfalse_to_hrresult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">DshowIFilterGraph</span>, <span class="ident">OleIUnknown</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dshow_IFilterGraph</span>, <span class="ident">ole_IUnknown</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IFilterGraphVT</span>;
 
 <span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder) virtual table.</span>
@@ -184,13 +190,19 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IGraphBuilder</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IGraphBuilder</span>, <span class="string">&quot;56a868a9-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
-<span class="kw">impl</span> <span class="ident">DshowIFilterGraph</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
-<span class="kw">impl</span> <span class="ident">DshowIGraphBuilder</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
+<span class="kw">impl</span> <span class="ident">dshow_IFilterGraph</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
+<span class="kw">impl</span> <span class="ident">dshow_IGraphBuilder</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
 
-<span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder) methods methods from `dshow`</span>
-<span class="doccomment">/// feature.</span>
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
+<span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DshowIGraphBuilder</span>: <span class="ident">DshowIFilterGraph</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IGraphBuilder</span>: <span class="ident">dshow_IFilterGraph</span> {
 	<span class="doccomment">/// [`IGraphBuilder::Abort`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-abort)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="kw">fn</span> <span class="ident">Abort</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {

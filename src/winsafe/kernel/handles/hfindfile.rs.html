@@ -183,7 +183,14 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{
@@ -198,17 +205,24 @@
 	<span class="doccomment">/// Originally just a `HANDLE`.</span>
 }
 
-<span class="kw">impl</span> <span class="ident">KernelHfindfile</span> <span class="kw">for</span> <span class="ident">HFINDFILE</span> {}
+<span class="kw">impl</span> <span class="ident">kernel_Hfindfile</span> <span class="kw">for</span> <span class="ident">HFINDFILE</span> {}
 
-<span class="doccomment">/// [`HFILEMAPVIEW`](crate::HFILEMAPVIEW) methods from `kernel` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
+<span class="doccomment">/// [`HFINDFILE`](crate::HFINDFILE).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KernelHfindfile</span>: <span class="ident">Handle</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hfindfile</span>: <span class="ident">Handle</span> {
 	<span class="doccomment">/// Returns an iterator over the found items, by calling</span>
-	<span class="doccomment">/// [`HFINDFILE::FindFirstFile`](crate::prelude::KernelHfindfile::FindFirstFile),</span>
+	<span class="doccomment">/// [`HFINDFILE::FindFirstFile`](crate::prelude::kernel_Hfindfile::FindFirstFile),</span>
 	<span class="doccomment">/// then subsequent</span>
-	<span class="doccomment">/// [`HFINDFILE::FindNextFile`](crate::prelude::KernelHfindfile::FindNextFile),</span>
+	<span class="doccomment">/// [`HFINDFILE::FindNextFile`](crate::prelude::kernel_Hfindfile::FindNextFile),</span>
 	<span class="doccomment">/// and finally freeing the resource by calling</span>
-	<span class="doccomment">/// [`HFINDFILE::FindClose`](crate::prelude::KernelHfindfile::FindClose).</span>
+	<span class="doccomment">/// [`HFINDFILE::FindClose`](crate::prelude::kernel_Hfindfile::FindClose).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -253,11 +267,11 @@
 	<span class="doccomment">/// static method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HFINDFILE::FindClose`](crate::prelude::KernelHfindfile::FindClose)</span>
+	<span class="doccomment">/// [`HFINDFILE::FindClose`](crate::prelude::kernel_Hfindfile::FindClose)</span>
 	<span class="doccomment">/// call.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method is rather tricky, consider using</span>
-	<span class="doccomment">/// [`HFINDFILE::iter`](crate::prelude::KernelHfindfile::iter).</span>
+	<span class="doccomment">/// [`HFINDFILE::iter`](crate::prelude::kernel_Hfindfile::iter).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">FindFirstFile</span>(
 		<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -281,7 +295,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method is rather tricky, consider using</span>
-	<span class="doccomment">/// [`HFINDFILE::iter`](crate::prelude::KernelHfindfile::iter).</span>
+	<span class="doccomment">/// [`HFINDFILE::iter`](crate::prelude::kernel_Hfindfile::iter).</span>
 	<span class="kw">fn</span> <span class="ident">FindNextFile</span>(<span class="self">self</span>, <span class="ident">wfd</span>: <span class="kw-2">&amp;mut</span> <span class="ident">WIN32_FIND_DATA</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="kw">unsafe</span> {
 			<span class="ident">kernel::ffi::FindNextFileW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">wfd</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)

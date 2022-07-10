@@ -1420,7 +1420,14 @@
 <span id="1414">1414</span>
 <span id="1415">1415</span>
 <span id="1416">1416</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
@@ -1440,22 +1447,29 @@
 	<span class="doccomment">/// [window](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hwnd).</span>
 }
 
-<span class="kw">impl</span> <span class="ident">UserHwnd</span> <span class="kw">for</span> <span class="ident">HWND</span> {}
+<span class="kw">impl</span> <span class="ident">user_Hwnd</span> <span class="kw">for</span> <span class="ident">HWND</span> {}
 
-<span class="doccomment">/// [`HWND`](crate::HWND) methods from `user` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
+<span class="doccomment">/// [`HWND`](crate::HWND).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UserHwnd</span>: <span class="ident">Handle</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hwnd</span>: <span class="ident">Handle</span> {
 	<span class="doccomment">/// Represents all top-level windows in</span>
-	<span class="doccomment">/// [`HWND::PostMessage`](crate::prelude::UserHwnd::PostMessage) and</span>
-	<span class="doccomment">/// [`HWND::SendMessage`](crate::prelude::UserHwnd::SendMessage).</span>
+	<span class="doccomment">/// [`HWND::PostMessage`](crate::prelude::user_Hwnd::PostMessage) and</span>
+	<span class="doccomment">/// [`HWND::SendMessage`](crate::prelude::user_Hwnd::SendMessage).</span>
 	<span class="kw">const</span> <span class="ident">BROADCAST</span>: <span class="ident">HWND</span> <span class="op">=</span> <span class="ident">HWND</span>(<span class="number">0xffff</span> <span class="kw">as</span> <span class="kw">_</span>);
 
 	<span class="doccomment">/// Represents the desktop window in</span>
-	<span class="doccomment">/// [`HWND::GetDC`](crate::prelude::UserHwnd::GetDC).</span>
+	<span class="doccomment">/// [`HWND::GetDC`](crate::prelude::user_Hwnd::GetDC).</span>
 	<span class="kw">const</span> <span class="ident">DESKTOP</span>: <span class="ident">HWND</span> <span class="op">=</span> <span class="ident">HWND</span>(<span class="ident">std::ptr::null_mut</span>());
 
-	<span class="doccomment">/// [`GetWindowLongPtr`](crate::prelude::UserHwnd::GetWindowLongPtr) wrapper</span>
-	<span class="doccomment">/// to retrieve the window [`HINSTANCE`](crate::HINSTANCE).</span>
+	<span class="doccomment">/// [`GetWindowLongPtr`](crate::prelude::user_Hwnd::GetWindowLongPtr)</span>
+	<span class="doccomment">/// wrapper to retrieve the window [`HINSTANCE`](crate::HINSTANCE).</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">hinstance</span>(<span class="self">self</span>) -&gt; <span class="ident">HINSTANCE</span> {
 		<span class="ident">HINSTANCE</span>(<span class="self">self</span>.<span class="ident">GetWindowLongPtr</span>(<span class="ident">co::GWLP::HINSTANCE</span>) <span class="kw">as</span> <span class="kw">_</span>)
@@ -1474,7 +1488,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HWND::EndPaint`](crate::prelude::UserHwnd::EndPaint) call.</span>
+	<span class="doccomment">/// [`HWND::EndPaint`](crate::prelude::user_Hwnd::EndPaint) call.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -1523,7 +1537,7 @@
 		)
 	}
 
-	<span class="doccomment">/// [`ClientToScreen`](crate::prelude::UserHwnd::ClientToScreen) method for</span>
+	<span class="doccomment">/// [`ClientToScreen`](crate::prelude::user_Hwnd::ClientToScreen) method for</span>
 	<span class="doccomment">/// a [`RECT`](crate::RECT).</span>
 	<span class="kw">fn</span> <span class="ident">ClientToScreenRc</span>(<span class="self">self</span>, <span class="ident">rc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RECT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="ident">bool_to_winresult</span>(
@@ -1791,10 +1805,10 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// To get the device context of the desktop window, use the predefined</span>
-	<span class="doccomment">/// [`HWND::DESKTOP`](crate::prelude::UserHwnd::DESKTOP).</span>
+	<span class="doccomment">/// [`HWND::DESKTOP`](crate::prelude::user_Hwnd::DESKTOP).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HWND::ReleaseDC`](crate::prelude::UserHwnd::ReleaseDC) call.</span>
+	<span class="doccomment">/// [`HWND::ReleaseDC`](crate::prelude::user_Hwnd::ReleaseDC) call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GetDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HDC</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() }
@@ -2012,7 +2026,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HWND::ReleaseDC`](crate::prelude::UserHwnd::ReleaseDC) call.</span>
+	<span class="doccomment">/// [`HWND::ReleaseDC`](crate::prelude::user_Hwnd::ReleaseDC) call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GetWindowDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HDC</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetWindowDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() }
@@ -2297,7 +2311,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Consider using the more modern</span>
-	<span class="doccomment">/// [`TaskDialog`](crate::prelude::ComctlOleHwnd::TaskDialog) method.</span>
+	<span class="doccomment">/// [`TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2456,7 +2470,7 @@
 		)
 	}
 
-	<span class="doccomment">/// [`ScreenToClient`](crate::prelude::UserHwnd::ScreenToClient) method for</span>
+	<span class="doccomment">/// [`ScreenToClient`](crate::prelude::user_Hwnd::ScreenToClient) method for</span>
 	<span class="doccomment">/// a [`RECT`](crate::RECT).</span>
 	<span class="kw">fn</span> <span class="ident">ScreenToClientRc</span>(<span class="self">self</span>, <span class="ident">rc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RECT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="ident">bool_to_winresult</span>(

@@ -161,14 +161,21 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PSTR</span>, <span class="ident">PVOID</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">CoTaskMemFree</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">ComInterface</span>, <span class="ident">OleIUnknown</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">ComInterface</span>, <span class="ident">ole_IUnknown</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IBindCtx</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
 
@@ -211,11 +218,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellItem</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IShellItem</span>, <span class="string">&quot;43826d1e-e718-42ee-bc55-a1e261c37bfe&quot;</span>);
-<span class="kw">impl</span> <span class="ident">ShellIShellItem</span> <span class="kw">for</span> <span class="ident">IShellItem</span> {}
+<span class="kw">impl</span> <span class="ident">shell_IShellItem</span> <span class="kw">for</span> <span class="ident">IShellItem</span> {}
 
-<span class="doccomment">/// [`IShellItem`](crate::IShellItem) methods from `shell` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
+<span class="doccomment">/// [`IShellItem`](crate::IShellItem).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ShellIShellItem</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IShellItem</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// [`IShellItem::BindToHandler`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-bindtohandler)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>

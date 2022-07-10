@@ -230,13 +230,19 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::OleIUnknown</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
 
 <span class="doccomment">/// [`IMediaSeeking`](crate::IMediaSeeking) virtual table.</span>
@@ -289,12 +295,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IMediaSeeking</span>(<span class="ident">ComPtr</span>);
 
 <span class="macro">impl_iunknown!</span>(<span class="ident">IMediaSeeking</span>, <span class="string">&quot;36b73880-c2c8-11cf-8b46-00805f6cef60&quot;</span>);
-<span class="kw">impl</span> <span class="ident">DshowIMediaSeeking</span> <span class="kw">for</span> <span class="ident">IMediaSeeking</span> {}
+<span class="kw">impl</span> <span class="ident">dshow_IMediaSeeking</span> <span class="kw">for</span> <span class="ident">IMediaSeeking</span> {}
 
-<span class="doccomment">/// [`IMediaSeeking`](crate::IMediaSeeking) methods methods from `dshow`</span>
-<span class="doccomment">/// feature.</span>
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
+<span class="doccomment">/// [`IMediaSeeking`](crate::IMediaSeeking).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DshowIMediaSeeking</span>: <span class="ident">OleIUnknown</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IMediaSeeking</span>: <span class="ident">ole_IUnknown</span> {
 	<span class="doccomment">/// [`IMediaSeeking::ConvertTimeFormat`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-converttimeformat)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
