@@ -161,7 +161,14 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
@@ -176,15 +183,22 @@
 	<span class="doccomment">/// [internal drop structure](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdrop).</span>
 }
 
-<span class="kw">impl</span> <span class="ident">ShellHdrop</span> <span class="kw">for</span> <span class="ident">HDROP</span> {}
+<span class="kw">impl</span> <span class="ident">shell_Hdrop</span> <span class="kw">for</span> <span class="ident">HDROP</span> {}
 
-<span class="doccomment">/// [`HDROP`](crate::HDROP) methods from `shell` feature.</span>
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
+<span class="doccomment">/// [`HDROP`](crate::HDROP).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use winsafe::prelude::*;</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ShellHdrop</span>: <span class="ident">Handle</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_Hdrop</span>: <span class="ident">Handle</span> {
 	<span class="doccomment">/// Returns an iterator over the dropped files by calling</span>
-	<span class="doccomment">/// [`HDROP::DragQueryFile`](crate::prelude::ShellHdrop::DragQueryFile)</span>
+	<span class="doccomment">/// [`HDROP::DragQueryFile`](crate::prelude::shell_Hdrop::DragQueryFile)</span>
 	<span class="doccomment">/// consecutively, then frees the handle by calling</span>
-	<span class="doccomment">/// [`HDROP::DragFinish`](crate::prelude::ShellHdrop::DragFinish).</span>
+	<span class="doccomment">/// [`HDROP::DragFinish`](crate::prelude::shell_Hdrop::DragFinish).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -226,7 +240,7 @@
 	<span class="doccomment">/// [`DragFinish`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragfinish)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer using [`HDROP::iter`](crate::prelude::ShellHdrop::iter), which</span>
+	<span class="doccomment">/// Prefer using [`HDROP::iter`](crate::prelude::shell_Hdrop::iter), which</span>
 	<span class="doccomment">/// calls `DragFinish` automatically.</span>
 	<span class="kw">fn</span> <span class="ident">DragFinish</span>(<span class="self">self</span>) {
 		<span class="kw">unsafe</span> { <span class="ident">shell::ffi::DragFinish</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
@@ -236,7 +250,7 @@
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method is rather tricky, consider using</span>
-	<span class="doccomment">/// [`HDROP::iter`](crate::prelude::ShellHdrop::iter).</span>
+	<span class="doccomment">/// [`HDROP::iter`](crate::prelude::shell_Hdrop::iter).</span>
 	<span class="kw">fn</span> <span class="ident">DragQueryFile</span>(<span class="self">self</span>,
 		<span class="ident">ifile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">buf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">WString</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
 	{
