@@ -143,6 +143,8 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -195,7 +197,8 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Iterating over the [`IShellItem`](crate::IShellItem) objects:</span>
+	<span class="doccomment">/// Enumerating the items in a folder by iterating over the</span>
+	<span class="doccomment">/// [`IShellItem`](crate::IShellItem) objects:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
@@ -219,20 +222,19 @@
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">Next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fetched</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
+		<span class="kw">unsafe</span> {
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
 			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IEnumShellItemsVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
+			<span class="kw">match</span> <span class="ident">ok_to_hrresult</span>(
 				(<span class="ident">vt</span>.<span class="ident">Next</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="number">1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>, <span class="kw-2">&amp;mut</span> <span class="ident">fetched</span>),
-			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IShellItem::from</span>(<span class="ident">ppv_queried</span>)) {
-			<span class="prelude-val">Ok</span>(<span class="ident">filter</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">filter</span>)),
-			<span class="prelude-val">Err</span>(<span class="ident">hr</span>) =&gt; <span class="kw">match</span> <span class="ident">hr</span> {
-				<span class="ident">co::HRESULT::S_FALSE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no item found</span>
+			) {
+				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">IShellItem::from</span>(<span class="ident">ppv_queried</span>))),
+				<span class="prelude-val">Err</span>(<span class="ident">hr</span>) =&gt; <span class="kw">match</span> <span class="ident">hr</span> {
+					<span class="ident">co::HRESULT::S_FALSE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no item found</span>
 				<span class="ident">hr</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">hr</span>), <span class="comment">// actual error</span>
-			},
+				},
+			}
 		}
 	}
 
@@ -278,10 +280,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EnumShellItemsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">com_ptr</span>: <span class="ident">ComPtr</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">IEnumShellItems</span>(<span class="ident">com_ptr</span>));
-		<span class="self">Self</span> { <span class="ident">array</span>, <span class="ident">_owner</span>: <span class="ident">PhantomData</span> }
+		<span class="self">Self</span> {
+			<span class="ident">array</span>: <span class="ident">ManuallyDrop::new</span>(<span class="ident">IEnumShellItems</span>(<span class="ident">com_ptr</span>)),
+			<span class="ident">_owner</span>: <span class="ident">PhantomData</span>,
+		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (7b46aa594 2022-07-05)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (c396bb3b8 2022-07-10)" ></div>
 </body></html>
