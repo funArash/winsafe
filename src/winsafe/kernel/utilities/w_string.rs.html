@@ -524,54 +524,12 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">MultiByteToWideChar</span>, <span class="ident">WinResult</span>};
-
-<span class="doccomment">/// String encodings that can be guessed by</span>
-<span class="doccomment">/// [`WString::guess_encoding`](crate::WString::guess_encoding).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Encoding</span> {
-	<span class="doccomment">/// Unknown encoding.</span>
-	<span class="ident">Unknown</span>,
-	<span class="doccomment">/// Common [US_ASCII](https://en.wikipedia.org/wiki/ASCII) encoding.</span>
-	<span class="ident">Ansi</span>,
-	<span class="doccomment">/// [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252) encoding.</span>
-	<span class="ident">Win1252</span>,
-	<span class="doccomment">/// [UTF-8](https://en.wikipedia.org/wiki/UTF-8) encoding.</span>
-	<span class="ident">Utf8</span>,
-	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, big-endian.</span>
-	<span class="ident">Utf16be</span>,
-	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, little-endian.</span>
-	<span class="ident">Utf16le</span>,
-	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, big-endian.</span>
-	<span class="ident">Utf32be</span>,
-	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, little-endian.</span>
-	<span class="ident">Utf32le</span>,
-	<span class="doccomment">/// [Standard Compression Scheme for Unicode](https://en.wikipedia.org/wiki/Standard_Compression_Scheme_for_Unicode).</span>
-	<span class="ident">Scsu</span>,
-	<span class="doccomment">/// [Binary Ordered Compression for Unicode](https://en.wikipedia.org/wiki/Binary_Ordered_Compression_for_Unicode).</span>
-	<span class="ident">Bocu1</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Encoding</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;Unknown&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Ansi</span> =&gt; <span class="string">&quot;ANSI&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Win1252</span> =&gt; <span class="string">&quot;Windows 1252&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf8</span> =&gt; <span class="string">&quot;UTF-8&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf16be</span> =&gt; <span class="string">&quot;UTF-16 BE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf16le</span> =&gt; <span class="string">&quot;UTF-16 LE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf32be</span> =&gt; <span class="string">&quot;UTF-32 BE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf32le</span> =&gt; <span class="string">&quot;UTF-32 LE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Scsu</span> =&gt; <span class="string">&quot;SCSU&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Bocu1</span> =&gt; <span class="string">&quot;BOCU1&quot;</span>,
-		})
-	}
-}
 
 <span class="doccomment">/// Stores a `Vec&lt;u16&gt;` buffer for a null-terminated</span>
 <span class="doccomment">/// [Unicode UTF-16](https://docs.microsoft.com/en-us/windows/win32/intl/unicode-in-the-windows-api)</span>
@@ -1044,6 +1002,52 @@
 		<span class="ident">str16</span>
 	}
 }
+
+<span class="comment">//------------------------------------------------------------------------------</span>
+
+<span class="doccomment">/// String encodings that can be guessed by</span>
+<span class="doccomment">/// [`WString::guess_encoding`](crate::WString::guess_encoding).</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Encoding</span> {
+	<span class="doccomment">/// Unknown encoding.</span>
+	<span class="ident">Unknown</span>,
+	<span class="doccomment">/// Common [US_ASCII](https://en.wikipedia.org/wiki/ASCII) encoding.</span>
+	<span class="ident">Ansi</span>,
+	<span class="doccomment">/// [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252) encoding.</span>
+	<span class="ident">Win1252</span>,
+	<span class="doccomment">/// [UTF-8](https://en.wikipedia.org/wiki/UTF-8) encoding.</span>
+	<span class="ident">Utf8</span>,
+	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, big-endian.</span>
+	<span class="ident">Utf16be</span>,
+	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, little-endian.</span>
+	<span class="ident">Utf16le</span>,
+	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, big-endian.</span>
+	<span class="ident">Utf32be</span>,
+	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, little-endian.</span>
+	<span class="ident">Utf32le</span>,
+	<span class="doccomment">/// [Standard Compression Scheme for Unicode](https://en.wikipedia.org/wiki/Standard_Compression_Scheme_for_Unicode).</span>
+	<span class="ident">Scsu</span>,
+	<span class="doccomment">/// [Binary Ordered Compression for Unicode](https://en.wikipedia.org/wiki/Binary_Ordered_Compression_for_Unicode).</span>
+	<span class="ident">Bocu1</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Encoding</span> {
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">match</span> <span class="self">self</span> {
+			<span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;Unknown&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Ansi</span> =&gt; <span class="string">&quot;ANSI&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Win1252</span> =&gt; <span class="string">&quot;Windows 1252&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Utf8</span> =&gt; <span class="string">&quot;UTF-8&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Utf16be</span> =&gt; <span class="string">&quot;UTF-16 BE&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Utf16le</span> =&gt; <span class="string">&quot;UTF-16 LE&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Utf32be</span> =&gt; <span class="string">&quot;UTF-32 BE&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Utf32le</span> =&gt; <span class="string">&quot;UTF-32 LE&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Scsu</span> =&gt; <span class="string">&quot;SCSU&quot;</span>,
+			<span class="ident"><span class="self">Self</span>::Bocu1</span> =&gt; <span class="string">&quot;BOCU1&quot;</span>,
+		})
+	}
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (c396bb3b8 2022-07-10)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (1c7b36d4d 2022-07-12)" ></div>
 </body></html>
