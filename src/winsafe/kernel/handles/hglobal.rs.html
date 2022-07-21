@@ -144,7 +144,7 @@
 	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)</span>
 	<span class="doccomment">/// call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalAlloc</span>(<span class="ident">flags</span>: <span class="ident">co::GMEM</span>, <span class="ident">num_bytes</span>: <span class="ident">u64</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">GlobalAlloc</span>(<span class="ident">flags</span>: <span class="ident">co::GMEM</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalAlloc</span>(<span class="ident">flags</span>.<span class="number">0</span>, <span class="ident">num_bytes</span>).<span class="ident">as_mut</span>() }
 			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HGLOBAL</span>(<span class="ident">ptr</span>))
 			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
@@ -196,7 +196,7 @@
 	<span class="doccomment">/// call.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">fn</span> <span class="ident">GlobalReAlloc</span>(<span class="self">self</span>,
-		<span class="ident">num_bytes</span>: <span class="ident">u64</span>, <span class="ident">flags</span>: <span class="ident">co::GMEM</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span>
+		<span class="ident">num_bytes</span>: <span class="ident">usize</span>, <span class="ident">flags</span>: <span class="ident">co::GMEM</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span>
 	{
 		<span class="kw">unsafe</span> {
 			<span class="ident">kernel::ffi::GlobalReAlloc</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">num_bytes</span>, <span class="ident">flags</span>.<span class="number">0</span>).<span class="ident">as_mut</span>()
@@ -207,7 +207,7 @@
 	<span class="doccomment">/// [`GlobalSize`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalSize</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">GlobalSize</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalSize</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
 			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
 			<span class="ident">sz</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">sz</span>),
