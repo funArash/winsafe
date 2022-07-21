@@ -107,8 +107,6 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl::AM_MEDIA_TYPE</span>;
@@ -153,18 +151,16 @@
 	<span class="doccomment">/// [`IFileSinkFilter::GetCurFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-getcurfile)</span>
 	<span class="doccomment">/// method.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// If you pass an [`AM_MEDIA_TYPE`](crate::AM_MEDIA_TYPE) reference to</span>
-	<span class="doccomment">/// `pmt`, its `pbFormat` field may return a valid reference to a format</span>
-	<span class="doccomment">/// block. If so, you must free it with</span>
+	<span class="doccomment">/// **Note:** If you pass an [`AM_MEDIA_TYPE`](crate::AM_MEDIA_TYPE)</span>
+	<span class="doccomment">/// reference to `pmt`, its `pbFormat` field may return a valid reference to</span>
+	<span class="doccomment">/// a format block. If so, you must free it with</span>
 	<span class="doccomment">/// [`CoTaskMemFree`](crate::CoTaskMemFree), or you&#39;ll have a memory leak.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{</span>
-	<span class="doccomment">///     AM_MEDIA_TYPE, CoTaskMemFree, DVINFO, IFileSinkFilter,</span>
-	<span class="doccomment">/// };</span>
+	<span class="doccomment">/// use winsafe::{AM_MEDIA_TYPE, CoTaskMemFree, DVINFO, IFileSinkFilter};</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let sinkf: IFileSinkFilter; // initialized somewhere</span>
 	<span class="doccomment">/// # let sinkf = IFileSinkFilter::from(unsafe { winsafe::ComPtr::null() });</span>
@@ -172,8 +168,8 @@
 	<span class="doccomment">/// let mut ammt = AM_MEDIA_TYPE::default();</span>
 	<span class="doccomment">/// unsafe {</span>
 	<span class="doccomment">///     sinkf.GetCurFile(Some(&amp;mut ammt))?;</span>
-	<span class="doccomment">///     if let Some(pb_format) = ammt.pbFormat::&lt;DVINFO&gt;() {</span>
-	<span class="doccomment">///         CoTaskMemFree(pb_format);</span>
+	<span class="doccomment">///     if let Some(pb_format) = ammt.pbFormat::&lt;DVINFO&gt;() { // valid reference?</span>
+	<span class="doccomment">///         CoTaskMemFree(pb_format as *mut _ as _);</span>
 	<span class="doccomment">///     }</span>
 	<span class="doccomment">/// }</span>
 	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())</span>
