@@ -3360,6 +3360,23 @@
 <span id="3360">3360</span>
 <span id="3361">3361</span>
 <span id="3362">3362</span>
+<span id="3363">3363</span>
+<span id="3364">3364</span>
+<span id="3365">3365</span>
+<span id="3366">3366</span>
+<span id="3367">3367</span>
+<span id="3368">3368</span>
+<span id="3369">3369</span>
+<span id="3370">3370</span>
+<span id="3371">3371</span>
+<span id="3372">3372</span>
+<span id="3373">3373</span>
+<span id="3374">3374</span>
+<span id="3375">3375</span>
+<span id="3376">3376</span>
+<span id="3377">3377</span>
+<span id="3378">3378</span>
+<span id="3379">3379</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::FormattedError</span>;
 
@@ -3367,7 +3384,10 @@
 	<span class="doccomment">/// A native COM</span>
 	<span class="doccomment">/// [error code](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/0642cb2f-2075-4469-918c-4441e69c548a)</span>
 	<span class="doccomment">/// (`u32`), which can be considered a superset of</span>
-	<span class="doccomment">/// [`co::ERROR`](crate::co::ERROR).</span>
+	<span class="doccomment">/// [`ERROR`](crate::co::ERROR).</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// The [`Result` alias](crate#errors-and-result-aliases) for this type is</span>
+	<span class="doccomment">/// [`HrResult`](crate::HrResult).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Implements the standard</span>
 	<span class="doccomment">/// [`Error`](https://doc.rust-lang.org/beta/std/error/trait.Error.html)</span>
@@ -3391,6 +3411,20 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```text</span>
 	<span class="doccomment">/// [0x80070057 2147942487] The parameter is incorrect.</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// An [`ERROR`](crate::co::ERROR) can be seamlessly converted into an</span>
+	<span class="doccomment">/// `HRESULT`. This operation is equivalent to the</span>
+	<span class="doccomment">/// [`HRESULT_FROM_WIN32`](https://docs.microsoft.com/en-us/windows/win32/api/winerror/nf-winerror-hresult_from_win32)</span>
+	<span class="doccomment">/// macro:</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust,no_run</span>
+	<span class="doccomment">/// use winsafe::prelude::*;</span>
+	<span class="doccomment">/// use winsafe::{co::ERROR, co::HRESULT};</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let err = ERROR::FILE_NOT_FOUND;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let hr = err.to_hresult();</span>
 	<span class="doccomment">/// ```</span>
 }
 
@@ -3448,8 +3482,8 @@
 
 	<span class="doccomment">/// [`HRESULT_SEVERITY`](https://docs.microsoft.com/en-us/windows/win32/api/winerror/nf-winerror-hresult_severity)</span>
 	<span class="doccomment">/// method. Originally a macro.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">severity</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>) <span class="op">&amp;</span> <span class="number">0x1</span>) <span class="kw">as</span> <span class="ident">u8</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">severity</span>(<span class="self">self</span>) -&gt; <span class="ident">co::SEVERITY</span> {
+		<span class="ident">co::SEVERITY</span>(((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>) <span class="op">&amp;</span> <span class="number">0x1</span>) <span class="kw">as</span> <span class="kw">_</span>)
 	}
 }
 
@@ -6723,4 +6757,4 @@
 	<span class="ident">WINML_ERR_SIZE_MISMATCH</span> <span class="number">0x8890_0004</span>
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f03ce3096 2022-08-08)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>

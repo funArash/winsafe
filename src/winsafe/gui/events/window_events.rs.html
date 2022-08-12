@@ -823,7 +823,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl::HFONT</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::func_store::FuncStore</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::ErrResult</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">wm</span>, <span class="ident">WndMsg</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSendRecv</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HICON</span>, <span class="ident">HMENU</span>};
@@ -849,7 +849,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WindowEvents</span> {
 	<span class="ident">msgs</span>: <span class="ident">FuncStore</span><span class="op">&lt;</span> <span class="comment">// ordinary WM messages</span>
 		<span class="ident">co::WM</span>,
-		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value may be meaningful</span>
+		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value may be meaningful</span>
 	<span class="op">&gt;</span>,
 }
 
@@ -865,7 +865,7 @@
 	<span class="doccomment">/// Searches for the last added user function for the given message, and</span>
 	<span class="doccomment">/// runs if it exists, returning the result.</span>
 	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_one_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">ProcessResult</span><span class="op">&gt;</span>
+		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">ProcessResult</span><span class="op">&gt;</span>
 	{
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">find</span>(<span class="ident">wm_any</span>.<span class="ident">msg_id</span>) {
 			<span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; { <span class="comment">// we have a stored function to handle this message</span>
@@ -881,7 +881,7 @@
 	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of</span>
 	<span class="doccomment">/// them, discarding the results.</span>
 	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_all_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 	{
 		<span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">find_all</span>(<span class="ident">wm_any</span>.<span class="ident">msg_id</span>) {
 			<span class="ident">func</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>; <span class="comment">// execute each stored function</span>
@@ -894,7 +894,7 @@
 
 <span class="kw">impl</span> <span class="ident">GuiEvents</span> <span class="kw">for</span> <span class="ident">WindowEvents</span> {
 	<span class="kw">fn</span> <span class="ident">wm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">co::WM</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">push</span>(<span class="ident">ident</span>, <span class="ident">Box::new</span>(<span class="ident">func</span>));
 	}
@@ -917,7 +917,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, gui, msg, ErrResult};</span>
+	<span class="doccomment">/// use winsafe::{co, gui, msg, AnyResult};</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
@@ -926,14 +926,14 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// wnd.on().wm(CUSTOM_MSG, {</span>
 	<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-	<span class="doccomment">///     move |p: msg::WndMsg| -&gt; ErrResult&lt;Option&lt;isize&gt;&gt; {</span>
+	<span class="doccomment">///     move |p: msg::WndMsg| -&gt; AnyResult&lt;Option&lt;isize&gt;&gt; {</span>
 	<span class="doccomment">///         println!(&quot;HWND: {}, msg ID: {}&quot;, wnd.hwnd(), p.msg_id);</span>
 	<span class="doccomment">///         Ok(Some(0))</span>
 	<span class="doccomment">///     }</span>
 	<span class="doccomment">/// });</span>
 	<span class="doccomment">/// ```</span>
 	<span class="kw">fn</span> <span class="ident">wm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">co::WM</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
 	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_activate</span>, <span class="ident">co::WM::ACTIVATE</span>, <span class="ident">wm::Activate</span>,
 		<span class="doccomment">/// [`WM_ACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-activate)</span>
@@ -954,7 +954,7 @@
 	<span class="doccomment">/// [`WM_APPCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-appcommand)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_app_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::AppCommand</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::AppCommand</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::APPCOMMAND</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
 			<span class="ident">func</span>(<span class="ident">wm::AppCommand::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>;
@@ -1009,14 +1009,14 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+	<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// wnd.on().wm_create({</span>
 	<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-	<span class="doccomment">///     move |p: msg::wm::Create| -&gt; ErrResult&lt;i32&gt; {</span>
+	<span class="doccomment">///     move |p: msg::wm::Create| -&gt; AnyResult&lt;i32&gt; {</span>
 	<span class="doccomment">///         println!(&quot;HWND: {}, client area: {}x{}&quot;,</span>
 	<span class="doccomment">///             wnd.hwnd(),</span>
 	<span class="doccomment">///             p.createstruct.cx,</span>
@@ -1027,7 +1027,7 @@
 	<span class="doccomment">/// });</span>
 	<span class="doccomment">/// ```</span>
 	<span class="kw">fn</span> <span class="ident">wm_create</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::Create</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::Create</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::CREATE</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::Create::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
@@ -1080,12 +1080,12 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_destroy(move || -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">/// wnd.on().wm_destroy(move || -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///     println!(&quot;Window is gone, goodbye!&quot;);</span>
 		<span class="doccomment">///     Ok(())</span>
 		<span class="doccomment">/// });</span>
@@ -1105,12 +1105,12 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_drop_files(move |p: msg::wm::DropFiles| -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">/// wnd.on().wm_drop_files(move |p: msg::wm::DropFiles| -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///     for dropped_file in p.hdrop.iter()? {</span>
 		<span class="doccomment">///         let dropped_file = dropped_file?;</span>
 		<span class="doccomment">///         println!(&quot;Dropped: {}&quot;, dropped_file);</span>
@@ -1148,7 +1148,7 @@
 	<span class="doccomment">/// [`WM_ERASEBKGND`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-erasebkgnd)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_erase_bkgnd</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::EraseBkgnd</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::EraseBkgnd</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::ERASEBKGND</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::EraseBkgnd::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
@@ -1172,7 +1172,7 @@
 	<span class="doccomment">/// [`WM_GETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getfont)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_get_font</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETFONT</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or_default</span>())));
@@ -1181,7 +1181,7 @@
 	<span class="doccomment">/// [`WM_GETHMENU`](https://docs.microsoft.com/en-us/windows/win32/winmsg/mn-gethmenu)</span>
 	<span class="doccomment">/// message. Originally has `MN` prefix.</span>
 	<span class="kw">fn</span> <span class="ident">wm_get_hmenu</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::MN_GETHMENU</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or_default</span>())));
@@ -1195,7 +1195,7 @@
 	<span class="doccomment">/// [`WM_GETTEXT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettext)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_get_text</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::GetText</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::GetText</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETTEXT</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::GetText::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
@@ -1204,7 +1204,7 @@
 	<span class="doccomment">/// [`WM_GETTEXTLENGTH`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettextlength)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_get_text_length</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETTEXTLENGTH</span>,
 			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
@@ -1235,14 +1235,14 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// wnd.on().wm_init_dialog({</span>
 		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::InitDialog| -&gt; ErrResult&lt;bool&gt; {</span>
+		<span class="doccomment">///     move |p: msg::wm::InitDialog| -&gt; AnyResult&lt;bool&gt; {</span>
 		<span class="doccomment">///         println!(&quot;Focused HWND: {}&quot;, p.hwnd_focus);</span>
 		<span class="doccomment">///         Ok(true)</span>
 		<span class="doccomment">///     }</span>
@@ -1278,14 +1278,14 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// wnd.on().wm_l_button_dbl_clk({</span>
 		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::LButtonDblClk| -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">///     move |p: msg::wm::LButtonDblClk| -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);</span>
 		<span class="doccomment">///         Ok(())</span>
 		<span class="doccomment">///     }</span>
@@ -1301,14 +1301,14 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// wnd.on().wm_l_button_down({</span>
 		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::LButtonDown| -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">///     move |p: msg::wm::LButtonDown| -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);</span>
 		<span class="doccomment">///         Ok(())</span>
 		<span class="doccomment">///     }</span>
@@ -1433,14 +1433,14 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, ErrResult, PAINTSTRUCT};</span>
+		<span class="doccomment">/// use winsafe::{gui, AnyResult, PAINTSTRUCT};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// wnd.on().wm_paint({</span>
 		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move || -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///         let mut ps = PAINTSTRUCT::default();</span>
 		<span class="doccomment">///         let hdc = wnd.hwnd().BeginPaint(&amp;mut ps)?;</span>
 		<span class="doccomment">///</span>
@@ -1500,7 +1500,7 @@
 	<span class="doccomment">/// [`WM_SETICON`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-seticon)</span>
 	<span class="doccomment">/// message.</span>
 	<span class="kw">fn</span> <span class="ident">wm_set_icon</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::SetIcon</span>) -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::SetIcon</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::SETICON</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span>
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
@@ -1533,14 +1533,14 @@
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// ```rust,no_run</span>
 		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, ErrResult};</span>
+		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// wnd.on().wm_size({</span>
 		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::Size| -&gt; ErrResult&lt;()&gt; {</span>
+		<span class="doccomment">///     move |p: msg::wm::Size| -&gt; AnyResult&lt;()&gt; {</span>
 		<span class="doccomment">///         println!(&quot;HWND: {}, client area: {}x{}&quot;,</span>
 		<span class="doccomment">///             wnd.hwnd(),</span>
 		<span class="doccomment">///             p.client_area.cx,</span>
@@ -1643,4 +1643,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f03ce3096 2022-08-08)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>

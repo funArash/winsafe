@@ -64,64 +64,62 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-<span id="67">67</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::WndMsg</span>;
 
-<span class="doccomment">/// A specialized</span>
-<span class="doccomment">/// [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) for</span>
-<span class="doccomment">/// runtime, which returns an [`RuntimeError`](crate::gui::RuntimeError) on</span>
-<span class="doccomment">/// failure.</span>
+<span class="doccomment">/// A [`Result` alias](crate#errors-and-result-aliases) for runtime, which</span>
+<span class="doccomment">/// returns a [`MsgError`](crate::gui::MsgError) on failure.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Converting into the generic [`ErrResult`](crate::ErrResult):</span>
+<span class="doccomment">/// Converting into the generic [`AnyResult`](crate::AnyResult):</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, ErrResult, gui::RunResult};</span>
+<span class="doccomment">/// use winsafe::{co, AnyResult, gui::MsgResult};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let run_result: RunResult&lt;()&gt; = Ok(());</span>
+<span class="doccomment">/// let run_result: MsgResult&lt;()&gt; = Ok(());</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let err_result: ErrResult&lt;()&gt; = run_result.map_err(|err| err.into());</span>
+<span class="doccomment">/// let err_result: AnyResult&lt;()&gt; = run_result.map_err(|err| err.into());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RunResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RuntimeError</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MsgResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">MsgError</span><span class="op">&gt;</span>;
 
-<span class="doccomment">/// An user error that occurred within a closure of a window message handling.</span>
+<span class="doccomment">/// An error that occurred within a closure of a window message handling.</span>
+<span class="doccomment">/// Usually these errors are thrown by the user closures.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This error types wraps the actual user error along with the parameters of</span>
 <span class="doccomment">/// the message where the error happened.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RuntimeError</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MsgError</span> {
 	<span class="ident">src_msg</span>: <span class="ident">WndMsg</span>,
 	<span class="ident">source</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">RuntimeError</span> {
+<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">MsgError</span> {
 	<span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
 		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">source</span>.<span class="ident">as_ref</span>())
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RuntimeError</span> {
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">MsgError</span> {
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
 		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;WM {} - {}&quot;</span>,
 			<span class="self">self</span>.<span class="ident">src_msg</span>.<span class="ident">msg_id</span>, <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">to_string</span>())
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">RuntimeError</span> {
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">MsgError</span> {
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
 		<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>) <span class="comment">// delegate to Debug trait</span>
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">RuntimeError</span> {
-	<span class="doccomment">/// Constructs a new `RuntimeError` by wrapping the given error.</span>
+<span class="kw">impl</span> <span class="ident">MsgError</span> {
+	<span class="doccomment">/// Constructs a new `MsgError` by wrapping the given error.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(
 		<span class="ident">src_msg</span>: <span class="ident">WndMsg</span>,
-		<span class="ident">source</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>) -&gt; <span class="ident">RuntimeError</span>
+		<span class="ident">source</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>) -&gt; <span class="ident">MsgError</span>
 	{
 		<span class="self">Self</span> { <span class="ident">src_msg</span>, <span class="ident">source</span> }
 	}
@@ -133,4 +131,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f03ce3096 2022-08-08)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>

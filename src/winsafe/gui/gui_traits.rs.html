@@ -278,7 +278,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any::Any</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events</span>::{<span class="ident">WindowEvents</span>, <span class="ident">WindowEventsAll</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::ErrResult</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::wm</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::user_Hwnd</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">HwndFocus</span>};
@@ -384,7 +384,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, ErrResult, GetCurrentThreadId};</span>
+	<span class="doccomment">/// use winsafe::{gui, AnyResult, GetCurrentThreadId};</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
@@ -393,7 +393,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// btn.on().bn_clicked({</span>
 	<span class="doccomment">///     let wnd = wnd.clone();</span>
-	<span class="doccomment">///     move || -&gt; ErrResult&lt;()&gt; {</span>
+	<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
 	<span class="doccomment">///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">///         wnd.spawn_new_thread({</span>
@@ -413,7 +413,7 @@
 	<span class="doccomment">/// });</span>
 	<span class="doccomment">/// ```</span>
 	<span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
 	<span class="doccomment">/// Runs a closure synchronously in the window&#39;s original UI thread,</span>
 	<span class="doccomment">/// allowing UI updates without the risk of a deadlock.</span>
@@ -447,7 +447,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,no_run</span>
 	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, ErrResult, GetCurrentThreadId, Sleep};</span>
+	<span class="doccomment">/// use winsafe::{gui, AnyResult, GetCurrentThreadId, Sleep};</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
 	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
@@ -456,7 +456,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// btn.on().bn_clicked({</span>
 	<span class="doccomment">///     let wnd = wnd.clone();</span>
-	<span class="doccomment">///     move || -&gt; ErrResult&lt;()&gt; {</span>
+	<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
 	<span class="doccomment">///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">///         std::thread::spawn({</span>
@@ -467,7 +467,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">///                 wnd.run_ui_thread({</span>
 	<span class="doccomment">///                     let wnd = wnd.clone();</span>
-	<span class="doccomment">///                     move || -&gt; ErrResult&lt;()&gt; {</span>
+	<span class="doccomment">///                     move || -&gt; AnyResult&lt;()&gt; {</span>
 	<span class="doccomment">///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());</span>
 	<span class="doccomment">///                         wnd.hwnd().SetWindowText(&quot;Status... 50%&quot;)?;</span>
 	<span class="doccomment">///                         Ok(())</span>
@@ -479,7 +479,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">///                 wnd.run_ui_thread({</span>
 	<span class="doccomment">///                     let wnd = wnd.clone();</span>
-	<span class="doccomment">///                     move || -&gt; ErrResult&lt;()&gt; {</span>
+	<span class="doccomment">///                     move || -&gt; AnyResult&lt;()&gt; {</span>
 	<span class="doccomment">///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());</span>
 	<span class="doccomment">///                         wnd.hwnd().SetWindowText(&quot;Status... 100%&quot;)?;</span>
 	<span class="doccomment">///                         Ok(())</span>
@@ -493,7 +493,7 @@
 	<span class="doccomment">/// });</span>
 	<span class="doccomment">/// ```</span>
 	<span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 }
 
 <span class="doccomment">/// Any child window.</span>
@@ -553,4 +553,4 @@
 	<span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">E</span>;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f03ce3096 2022-08-08)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>

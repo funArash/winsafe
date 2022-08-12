@@ -149,10 +149,10 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::dlg_main::DlgMain</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::WindowEventsAll</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::msg_error::MsgResult</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::privs</span>::{<span class="ident">create_ui_font</span>, <span class="ident">delete_ui_font</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::raw_main</span>::{<span class="ident">RawMain</span>, <span class="ident">WindowMainOpts</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::runtime_error::RunResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">ErrResult</span>, <span class="ident">HPROCESS</span>, <span class="ident">IsWindowsVistaOrGreater</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">AnyResult</span>, <span class="ident">HPROCESS</span>, <span class="ident">IsWindowsVistaOrGreater</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{
 	<span class="ident">GuiParent</span>, <span class="ident">GuiThread</span>, <span class="ident">GuiWindow</span>, <span class="ident">GuiWindowText</span>, <span class="ident">kernel_Hprocess</span>,
 	<span class="ident">user_Hprocess</span>,
@@ -207,7 +207,7 @@
 
 <span class="kw">impl</span> <span class="ident">GuiThread</span> <span class="kw">for</span> <span class="ident">WindowMain</span> {
 	<span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	{
 		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
 			<span class="ident">RawDlg::Raw</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">spawn_new_thread</span>(<span class="ident">func</span>),
@@ -216,7 +216,7 @@
 	}
 
 	<span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">ErrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
 	{
 		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
 			<span class="ident">RawDlg::Raw</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">run_ui_thread</span>(<span class="ident">func</span>),
@@ -262,7 +262,7 @@
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Panics if the window is already created.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_main</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">co::SW</span><span class="op">&gt;</span>) -&gt; <span class="ident">RunResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_main</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">co::SW</span><span class="op">&gt;</span>) -&gt; <span class="ident">MsgResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
 		<span class="kw">if</span> <span class="ident">IsWindowsVistaOrGreater</span>().<span class="ident">unwrap</span>() {
 			<span class="ident">SetProcessDPIAware</span>().<span class="ident">unwrap</span>();
 		}
@@ -287,4 +287,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (f03ce3096 2022-08-08)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
