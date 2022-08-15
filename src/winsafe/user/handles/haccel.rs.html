@@ -45,52 +45,52 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::ACCEL</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::ACCEL;
 
-<span class="macro">impl_handle!</span> { <span class="ident">HACCEL</span>: <span class="string">&quot;user&quot;</span>;
-	<span class="doccomment">/// Handle to an</span>
-	<span class="doccomment">/// [accelerator table](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#haccel).</span>
-}
+<span class="macro">impl_handle!</span> { HACCEL: <span class="string">&quot;user&quot;</span>;
+	<span class="doccomment">/// Handle to an
+	/// [accelerator table](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#haccel).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">user_Haccel</span> <span class="kw">for</span> <span class="ident">HACCEL</span> {}
+<span class="kw">impl </span>user_Haccel <span class="kw">for </span>HACCEL {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HACCEL`](crate::HACCEL).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Haccel</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CreateAcceleratorTable`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createacceleratortablew)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HACCEL::DestroyAcceleratorTable`](crate::prelude::user_Haccel::DestroyAcceleratorTable)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateAcceleratorTable</span>(<span class="ident">accel</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">ACCEL</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HACCEL</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::CreateAcceleratorTableW</span>(
-				<span class="ident">accel</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">accel</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HACCEL</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HACCEL`](crate::HACCEL).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Haccel: Handle {
+	<span class="doccomment">/// [`CreateAcceleratorTable`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createacceleratortablew)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HACCEL::DestroyAcceleratorTable`](crate::prelude::user_Haccel::DestroyAcceleratorTable)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateAcceleratorTable(accel: <span class="kw-2">&amp;mut </span>[ACCEL]) -&gt; SysResult&lt;HACCEL&gt; {
+		<span class="kw">unsafe </span>{
+			user::ffi::CreateAcceleratorTableW(
+				accel.as_mut_ptr() <span class="kw">as _</span>,
+				accel.len() <span class="kw">as _</span>,
+			).as_mut()
+		}.map(|ptr| HACCEL(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`DestroyAcceleratorTable`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroyacceleratortable)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DestroyAcceleratorTable</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::DestroyAcceleratorTable</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+	<span class="doccomment">/// [`DestroyAcceleratorTable`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroyacceleratortable)
+	/// method.
+	</span><span class="kw">fn </span>DestroyAcceleratorTable(<span class="self">self</span>) -&gt; bool {
+		<span class="kw">unsafe </span>{ user::ffi::DestroyAcceleratorTable(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

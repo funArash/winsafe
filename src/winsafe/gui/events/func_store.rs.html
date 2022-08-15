@@ -50,57 +50,57 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 
-<span class="doccomment">/// An identifier and a closure.</span>
-<span class="kw">struct</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">id</span>: <span class="ident">K</span>,
-	<span class="ident">func</span>: <span class="ident">F</span>,
+<span class="doccomment">/// An identifier and a closure.
+</span><span class="kw">struct </span>Pair&lt;K: Copy + Eq, F&gt; {
+	id: K,
+	func: F,
 }
 
-<span class="doccomment">/// Stores closures, associating them with an identifier.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">FuncStore</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">elems</span>: <span class="ident">VeryUnsafeCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Stores closures, associating them with an identifier.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>FuncStore&lt;K: Copy + Eq, F&gt; {
+	elems: VeryUnsafeCell&lt;Vec&lt;Pair&lt;K, F&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">FuncStore</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Creates a new, empty store.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">elems</span>: <span class="ident">VeryUnsafeCell::new</span>(<span class="ident">Vec::default</span>()) }
+<span class="kw">impl</span>&lt;K: Copy + Eq, F&gt; FuncStore&lt;K, F&gt; {
+	<span class="doccomment">/// Creates a new, empty store.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ elems: VeryUnsafeCell::new(Vec::default()) }
 	}
 
-	<span class="doccomment">/// Adds a new function into the store, associated to the given identifier.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">K</span>, <span class="ident">func</span>: <span class="ident">F</span>) {
-		<span class="kw">let</span> <span class="ident">elems</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">elems</span>.<span class="ident">as_mut</span>();
-		<span class="kw">if</span> <span class="ident">elems</span>.<span class="ident">is_empty</span>() {
-			<span class="ident">elems</span>.<span class="ident">reserve</span>(<span class="number">16</span>); <span class="comment">// arbitrary, prealloc for speed</span>
-		}
-		<span class="ident">elems</span>.<span class="ident">push</span>(<span class="ident">Pair</span> { <span class="ident">id</span>, <span class="ident">func</span> });
+	<span class="doccomment">/// Adds a new function into the store, associated to the given identifier.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, id: K, func: F) {
+		<span class="kw">let </span>elems = <span class="self">self</span>.elems.as_mut();
+		<span class="kw">if </span>elems.is_empty() {
+			elems.reserve(<span class="number">16</span>); <span class="comment">// arbitrary, prealloc for speed
+		</span>}
+		elems.push(Pair { id, func });
 	}
 
-	<span class="doccomment">/// Finds the last added function associated to the given identifier, if</span>
-	<span class="doccomment">/// any.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">F</span><span class="op">&gt;</span> {
-		<span class="comment">// Linear search, more performant for small collections.</span>
-		<span class="comment">// Searches backwards, so the function added last will be chosen.</span>
-		<span class="self">self</span>.<span class="ident">elems</span>.<span class="ident">iter</span>().<span class="ident">rev</span>()
-			.<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">elem</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>)
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">elem</span>.<span class="ident">func</span>)
+	<span class="doccomment">/// Finds the last added function associated to the given identifier, if
+	/// any.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>find(<span class="kw-2">&amp;</span><span class="self">self</span>, id: K) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>F&gt; {
+		<span class="comment">// Linear search, more performant for small collections.
+		// Searches backwards, so the function added last will be chosen.
+		</span><span class="self">self</span>.elems.iter().rev()
+			.find(<span class="kw">move </span>|elem| elem.id == id)
+			.map(|elem| <span class="kw-2">&amp;</span>elem.func)
 	}
 
-	<span class="doccomment">/// Finds all the functions associated to the given identifier, if any, and</span>
-	<span class="doccomment">/// returns an iterator to it.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">find_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">K</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">F</span><span class="op">&gt;</span> {
-		<span class="comment">// https://depth-first.com/articles/2020/06/22/returning-rust-iterators</span>
-		<span class="self">self</span>.<span class="ident">elems</span>.<span class="ident">iter</span>()
-			.<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">elem</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>)
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">elem</span>.<span class="ident">func</span>)
+	<span class="doccomment">/// Finds all the functions associated to the given identifier, if any, and
+	/// returns an iterator to it.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>find_all(<span class="kw-2">&amp;</span><span class="self">self</span>, id: K) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>F&gt; {
+		<span class="comment">// https://depth-first.com/articles/2020/06/22/returning-rust-iterators
+		</span><span class="self">self</span>.elems.iter()
+			.filter(<span class="kw">move </span>|elem| elem.id == id)
+			.map(|elem| <span class="kw-2">&amp;</span>elem.func)
 	}
 
-	<span class="doccomment">/// Tells whether no functions have been added.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">elems</span>.<span class="ident">is_empty</span>()
+	<span class="doccomment">/// Tells whether no functions have been added.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.elems.is_empty()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

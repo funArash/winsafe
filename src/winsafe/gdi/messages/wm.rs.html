@@ -209,216 +209,216 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HIWORD</span>, <span class="ident">LOWORD</span>, <span class="ident">MAKEDWORD</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LOWORD, MAKEDWORD};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl::HFONT</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::WndMsg</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">MsgSend</span>, <span class="ident">MsgSendRecv</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HRGN</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs::zero_as_none</span>;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::HFONT;
+<span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{MsgSend, MsgSendRecv};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HRGN;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_none;
 
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorBtn</span>: <span class="ident">co::WM::CTLCOLORBTN</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLORBTN`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorbtn)</span>
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorBtn: co::WM::CTLCOLORBTN; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLORBTN`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorbtn)
+</span>}
+
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorDlg: co::WM::CTLCOLORDLG; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLORDLG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-ctlcolordlg)
+</span>}
+
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorEdit: co::WM::CTLCOLOREDIT; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLOREDIT`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcoloredit)
+</span>}
+
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorListBox: co::WM::CTLCOLORLISTBOX; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLORLISTBOX`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorlistbox)
+</span>}
+
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorScrollBar: co::WM::CTLCOLORSCROLLBAR; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLORSCROLLBAR`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorscrollbar)
+</span>}
+
+<span class="macro">pub_struct_msg_ctlcolor!</span> { CtlColorStatic: co::WM::CTLCOLORSTATIC; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_CTLCOLORSTATIC`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)
+</span>}
+
+<span class="macro">pub_struct_msg_char!</span> { DeadChar: co::WM::DEADCHAR; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_DEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-deadchar)
+</span>}
+
+<span class="doccomment">/// [`WM_DISPLAYCHANGE`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-displaychange)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub struct </span>DisplayChange {
+	<span class="kw">pub </span>depth_bpp: u32,
+	<span class="kw">pub </span>horz_res: u16,
+	<span class="kw">pub </span>vert_res: u16,
 }
 
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorDlg</span>: <span class="ident">co::WM::CTLCOLORDLG</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLORDLG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-ctlcolordlg)</span>
-}
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>DisplayChange {
+	<span class="kw">type </span>RetType = ();
 
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorEdit</span>: <span class="ident">co::WM::CTLCOLOREDIT</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLOREDIT`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcoloredit)</span>
-}
-
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorListBox</span>: <span class="ident">co::WM::CTLCOLORLISTBOX</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLORLISTBOX`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorlistbox)</span>
-}
-
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorScrollBar</span>: <span class="ident">co::WM::CTLCOLORSCROLLBAR</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLORSCROLLBAR`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorscrollbar)</span>
-}
-
-<span class="macro">pub_struct_msg_ctlcolor!</span> { <span class="ident">CtlColorStatic</span>: <span class="ident">co::WM::CTLCOLORSTATIC</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_CTLCOLORSTATIC`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)</span>
-}
-
-<span class="macro">pub_struct_msg_char!</span> { <span class="ident">DeadChar</span>: <span class="ident">co::WM::DEADCHAR</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_DEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-deadchar)</span>
-}
-
-<span class="doccomment">/// [`WM_DISPLAYCHANGE`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-displaychange)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DisplayChange</span> {
-	<span class="kw">pub</span> <span class="ident">depth_bpp</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">horz_res</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">vert_res</span>: <span class="ident">u16</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">DisplayChange</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::WM::DISPLAYCHANGE</span>,
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">depth_bpp</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="ident">MAKEDWORD</span>(<span class="self">self</span>.<span class="ident">horz_res</span>, <span class="self">self</span>.<span class="ident">vert_res</span>) <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::WM::DISPLAYCHANGE,
+			wparam: <span class="self">self</span>.depth_bpp <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.horz_res, <span class="self">self</span>.vert_res) <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSendRecv</span> <span class="kw">for</span> <span class="ident">DisplayChange</span> {
-	<span class="kw">fn</span> <span class="ident">from_generic_wm</span>(<span class="ident">p</span>: <span class="ident">WndMsg</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">depth_bpp</span>: <span class="ident">p</span>.<span class="ident">wparam</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">horz_res</span>: <span class="ident">LOWORD</span>(<span class="ident">p</span>.<span class="ident">lparam</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">vert_res</span>: <span class="ident">HIWORD</span>(<span class="ident">p</span>.<span class="ident">lparam</span> <span class="kw">as</span> <span class="kw">_</span>),
+<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>DisplayChange {
+	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			depth_bpp: p.wparam <span class="kw">as _</span>,
+			horz_res: LOWORD(p.lparam <span class="kw">as _</span>),
+			vert_res: HIWORD(p.lparam <span class="kw">as _</span>),
 		}
 	}
 }
 
-<span class="doccomment">/// [`WM_GETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getfont)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;HFONT&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetFont</span> {}
+<span class="doccomment">/// [`WM_GETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getfont)
+/// message, which has no parameters.
+///
+/// Return type: `Option&lt;HFONT&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetFont {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetFont</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetFont {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;HFONT&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_none</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">HFONT</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_none(v).map(|p| HFONT(p <span class="kw">as _</span>))
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::WM::GETFONT</span>,
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::WM::GETFONT,
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSendRecv</span> <span class="kw">for</span> <span class="ident">GetFont</span> {
-	<span class="kw">fn</span> <span class="ident">from_generic_wm</span>(<span class="kw">_</span>: <span class="ident">WndMsg</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {}
+<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>GetFont {
+	<span class="kw">fn </span>from_generic_wm(<span class="kw">_</span>: WndMsg) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{}
 	}
 }
 
-<span class="doccomment">/// [`WM_NCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-ncpaint)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NcPaint</span> {
-	<span class="kw">pub</span> <span class="ident">updated_hrgn</span>: <span class="ident">HRGN</span>,
+<span class="doccomment">/// [`WM_NCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-ncpaint)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub struct </span>NcPaint {
+	<span class="kw">pub </span>updated_hrgn: HRGN,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">NcPaint</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>NcPaint {
+	<span class="kw">type </span>RetType = ();
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::WM::NCPAINT</span>,
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">updated_hrgn</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::WM::NCPAINT,
+			wparam: <span class="self">self</span>.updated_hrgn.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSendRecv</span> <span class="kw">for</span> <span class="ident">NcPaint</span> {
-	<span class="kw">fn</span> <span class="ident">from_generic_wm</span>(<span class="ident">p</span>: <span class="ident">WndMsg</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">updated_hrgn</span>: <span class="ident">HRGN</span>(<span class="ident">p</span>.<span class="ident">wparam</span> <span class="kw">as</span> <span class="kw">_</span>),
+<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>NcPaint {
+	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			updated_hrgn: HRGN(p.wparam <span class="kw">as _</span>),
 		}
 	}
 }
 
-<span class="macro">pub_struct_msg_empty_handleable!</span> { <span class="ident">Paint</span>: <span class="ident">co::WM::PAINT</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_PAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-paint)</span>
+<span class="macro">pub_struct_msg_empty_handleable!</span> { Paint: co::WM::PAINT; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_PAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-paint)
+</span>}
+
+<span class="doccomment">/// [`WM_SETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-setfont)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetFont {
+	<span class="kw">pub </span>hfont: HFONT,
+	<span class="kw">pub </span>redraw: bool,
 }
 
-<span class="doccomment">/// [`WM_SETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-setfont)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetFont</span> {
-	<span class="kw">pub</span> <span class="ident">hfont</span>: <span class="ident">HFONT</span>,
-	<span class="kw">pub</span> <span class="ident">redraw</span>: <span class="ident">bool</span>,
-}
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetFont {
+	<span class="kw">type </span>RetType = ();
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetFont</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::WM::SETFONT</span>,
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">hfont</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="ident">MAKEDWORD</span>(<span class="self">self</span>.<span class="ident">redraw</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">0</span>) <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::WM::SETFONT,
+			wparam: <span class="self">self</span>.hfont.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.redraw <span class="kw">as _</span>, <span class="number">0</span>) <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSendRecv</span> <span class="kw">for</span> <span class="ident">SetFont</span> {
-	<span class="kw">fn</span> <span class="ident">from_generic_wm</span>(<span class="ident">p</span>: <span class="ident">WndMsg</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">hfont</span>: <span class="ident">HFONT</span>(<span class="ident">p</span>.<span class="ident">wparam</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">redraw</span>: <span class="ident">LOWORD</span>(<span class="ident">p</span>.<span class="ident">lparam</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>SetFont {
+	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			hfont: HFONT(p.wparam <span class="kw">as _</span>),
+			redraw: LOWORD(p.lparam <span class="kw">as _</span>) != <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`WM_SETREDRAW`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-setredraw)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetRedraw</span> {
-	<span class="kw">pub</span> <span class="ident">can_redraw</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// [`WM_SETREDRAW`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-setredraw)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetRedraw {
+	<span class="kw">pub </span>can_redraw: bool,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetRedraw</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetRedraw {
+	<span class="kw">type </span>RetType = ();
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::WM::SETREDRAW</span>,
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">can_redraw</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::WM::SETREDRAW,
+			wparam: <span class="self">self</span>.can_redraw <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSendRecv</span> <span class="kw">for</span> <span class="ident">SetRedraw</span> {
-	<span class="kw">fn</span> <span class="ident">from_generic_wm</span>(<span class="ident">p</span>: <span class="ident">WndMsg</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">can_redraw</span>: <span class="ident">p</span>.<span class="ident">wparam</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>SetRedraw {
+	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			can_redraw: p.wparam != <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="macro">pub_struct_msg_empty_handleable!</span> { <span class="ident">SyncPaint</span>: <span class="ident">co::WM::SYNCPAINT</span>; <span class="string">&quot;gdi&quot;</span>;
-	<span class="doccomment">/// [`WM_SYNCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-syncpaint)</span>
-}
+<span class="macro">pub_struct_msg_empty_handleable!</span> { SyncPaint: co::WM::SYNCPAINT; <span class="string">&quot;gdi&quot;</span>;
+	<span class="doccomment">/// [`WM_SYNCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-syncpaint)
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

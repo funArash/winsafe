@@ -160,167 +160,167 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events</span>::{<span class="ident">ProcessResult</span>, <span class="ident">WindowEventsAll</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::privs</span>::{<span class="ident">post_quit_error</span>, <span class="ident">ui_font</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">AnyResult</span>, <span class="ident">IdStr</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">wm</span>, <span class="ident">WndMsg</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">MsgSendRecv</span>, <span class="ident">user_Hinstance</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
+<span class="kw">use </span><span class="kw">crate</span>::gui::privs::{post_quit_error, ui_font};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, IdStr};
+<span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSendRecv, user_Hinstance, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 
-<span class="doccomment">/// Base to all dialog windows.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">DlgBase</span> {
-	<span class="ident">base</span>: <span class="ident">Base</span>,
-	<span class="ident">dialog_id</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// Base to all dialog windows.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>DlgBase {
+	base: Base,
+	dialog_id: u16,
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DlgBase</span> {
-	<span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">is_null</span>() {
-			<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">SetWindowLongPtr</span>(<span class="ident">co::GWLP::DWLP_USER</span>, <span class="number">0</span>); <span class="comment">// clear passed pointer</span>
-		}
+<span class="kw">impl </span>Drop <span class="kw">for </span>DlgBase {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if </span>!<span class="self">self</span>.base.hwnd().is_null() {
+			<span class="self">self</span>.base.hwnd().SetWindowLongPtr(co::GWLP::DWLP_USER, <span class="number">0</span>); <span class="comment">// clear passed pointer
+		</span>}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">DlgBase</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Base</span><span class="op">&gt;</span>, <span class="ident">dialog_id</span>: <span class="ident">u16</span>) -&gt; <span class="ident">DlgBase</span> {
-		<span class="self">Self</span> {
-			<span class="ident">base</span>: <span class="ident">Base::new</span>(<span class="bool-val">true</span>, <span class="ident">parent</span>),
-			<span class="ident">dialog_id</span>,
+<span class="kw">impl </span>DlgBase {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Base&gt;, dialog_id: u16) -&gt; DlgBase {
+		<span class="self">Self </span>{
+			base: Base::new(<span class="bool-val">true</span>, parent),
+			dialog_id,
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="comment">// At this moment, the parent struct is already created and pinned.</span>
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">base</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">unsafe fn </span>as_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="comment">// At this moment, the parent struct is already created and pinned.
+		</span><span class="kw-2">&amp;</span><span class="self">self</span>.base <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _
+	</span>}
+
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HWND {
+		<span class="self">self</span>.base.hwnd()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hwnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HWND</span> {
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.base.on()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEventsAll</span> {
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">on</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>privileged_on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.base.privileged_on()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">privileged_on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEventsAll</span> {
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">privileged_on</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Base&gt; {
+		<span class="self">self</span>.base.parent()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Base</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">parent</span>()
-	}
-
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">create_dialog_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">is_null</span>() {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create_dialog_param(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="kw">if </span>!<span class="self">self</span>.base.hwnd().is_null() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create dialog twice.&quot;</span>);
 		}
 
-		<span class="comment">// Our hwnd member is set during WM_INITDIALOG processing; already set</span>
-		<span class="comment">// when CreateDialogParam returns.</span>
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">parent_hinstance</span>().<span class="ident">CreateDialogParam</span>(
-			<span class="ident">IdStr::Id</span>(<span class="self">self</span>.<span class="ident">dialog_id</span>),
-			<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">parent</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">parent</span><span class="op">|</span> <span class="ident">parent</span>.<span class="ident">hwnd</span>()),
-			<span class="ident"><span class="self">Self</span>::dialog_proc</span>,
-			<span class="comment">// Pass pointer to Self.</span>
-			<span class="comment">// At this moment, the parent struct is already created and pinned.</span>
-			<span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-		).<span class="ident">unwrap</span>();
+		<span class="comment">// Our hwnd member is set during WM_INITDIALOG processing; already set
+		// when CreateDialogParam returns.
+		</span><span class="self">self</span>.base.parent_hinstance().CreateDialogParam(
+			IdStr::Id(<span class="self">self</span>.dialog_id),
+			<span class="self">self</span>.base.parent().map(|parent| parent.hwnd()),
+			<span class="self">Self</span>::dialog_proc,
+			<span class="comment">// Pass pointer to Self.
+			// At this moment, the parent struct is already created and pinned.
+			</span><span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+		).unwrap();
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">dialog_box_param</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">is_null</span>() {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>dialog_box_param(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+		<span class="kw">if </span>!<span class="self">self</span>.base.hwnd().is_null() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create dialog twice.&quot;</span>);
 		}
 
-		<span class="comment">// Our hwnd member is set during WM_INITDIALOG processing; already set</span>
-		<span class="comment">// when DialogBoxParam returns.</span>
-		<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base</span>.<span class="ident">parent_hinstance</span>().<span class="ident">DialogBoxParam</span>(
-			<span class="ident">IdStr::Id</span>(<span class="self">self</span>.<span class="ident">dialog_id</span>),
-			<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">parent</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">parent</span><span class="op">|</span> <span class="ident">parent</span>.<span class="ident">hwnd</span>()),
-			<span class="ident"><span class="self">Self</span>::dialog_proc</span>,
-			<span class="comment">// Pass pointer to Self.</span>
-			<span class="comment">// At this moment, the parent struct is already created and pinned.</span>
-			<span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-		).<span class="ident">unwrap</span>();
+		<span class="comment">// Our hwnd member is set during WM_INITDIALOG processing; already set
+		// when DialogBoxParam returns.
+		</span><span class="kw">let </span>ret = <span class="self">self</span>.base.parent_hinstance().DialogBoxParam(
+			IdStr::Id(<span class="self">self</span>.dialog_id),
+			<span class="self">self</span>.base.parent().map(|parent| parent.hwnd()),
+			<span class="self">Self</span>::dialog_proc,
+			<span class="comment">// Pass pointer to Self.
+			// At this moment, the parent struct is already created and pinned.
+			</span><span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+		).unwrap();
 
-		<span class="ident">ret</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+		ret <span class="kw">as _
+	</span>}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>spawn_new_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">spawn_new_thread</span>(<span class="ident">func</span>);
+		<span class="self">self</span>.base.spawn_new_thread(func);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>run_ui_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static
+	</span>{
+		<span class="self">self</span>.base.run_ui_thread(func);
+	}
+
+	<span class="kw">extern </span><span class="string">&quot;system&quot; </span><span class="kw">fn </span>dialog_proc(
+		hwnd: HWND, msg: co::WM, wparam: usize, lparam: isize) -&gt; isize
 	{
-		<span class="self">self</span>.<span class="ident">base</span>.<span class="ident">run_ui_thread</span>(<span class="ident">func</span>);
+		<span class="kw">let </span>wm_any = WndMsg::new(msg, wparam, lparam);
+		<span class="self">Self</span>::dialog_proc_proc(hwnd, wm_any)
+			.unwrap_or_else(|err| { post_quit_error(wm_any, err); <span class="bool-val">true </span><span class="kw">as _ </span>})
 	}
 
-	<span class="kw">extern</span> <span class="string">&quot;system&quot;</span> <span class="kw">fn</span> <span class="ident">dialog_proc</span>(
-		<span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">msg</span>: <span class="ident">co::WM</span>, <span class="ident">wparam</span>: <span class="ident">usize</span>, <span class="ident">lparam</span>: <span class="ident">isize</span>) -&gt; <span class="ident">isize</span>
-	{
-		<span class="kw">let</span> <span class="ident">wm_any</span> <span class="op">=</span> <span class="ident">WndMsg::new</span>(<span class="ident">msg</span>, <span class="ident">wparam</span>, <span class="ident">lparam</span>);
-		<span class="ident"><span class="self">Self</span>::dialog_proc_proc</span>(<span class="ident">hwnd</span>, <span class="ident">wm_any</span>)
-			.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> { <span class="ident">post_quit_error</span>(<span class="ident">wm_any</span>, <span class="ident">err</span>); <span class="bool-val">true</span> <span class="kw">as</span> <span class="kw">_</span> })
-	}
-
-	<span class="kw">fn</span> <span class="ident">dialog_proc_proc</span>(<span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">ptr_self</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">wm_any</span>.<span class="ident">msg_id</span> {
-			<span class="ident">co::WM::INITDIALOG</span> =&gt; { <span class="comment">// first message being handled</span>
-				<span class="kw">let</span> <span class="ident">wm_idlg</span> <span class="op">=</span> <span class="ident">wm::InitDialog::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">let</span> <span class="ident">ptr_self</span> <span class="op">=</span> <span class="ident">wm_idlg</span>.<span class="ident">additional_data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="self">Self</span>;
-				<span class="ident">hwnd</span>.<span class="ident">SetWindowLongPtr</span>(<span class="ident">co::GWLP::DWLP_USER</span>, <span class="ident">ptr_self</span> <span class="kw">as</span> <span class="kw">_</span>); <span class="comment">// store</span>
-				<span class="kw">let</span> <span class="ident">ref_self</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr_self</span> };
-				<span class="kw">unsafe</span> { <span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">set_hwnd</span>(<span class="ident">hwnd</span>); } <span class="comment">// store HWND in struct field</span>
-				<span class="ident">ptr_self</span>
+	<span class="kw">fn </span>dialog_proc_proc(hwnd: HWND, wm_any: WndMsg) -&gt; AnyResult&lt;isize&gt; {
+		<span class="kw">let </span>ptr_self = <span class="kw">match </span>wm_any.msg_id {
+			co::WM::INITDIALOG =&gt; { <span class="comment">// first message being handled
+				</span><span class="kw">let </span>wm_idlg = wm::InitDialog::from_generic_wm(wm_any);
+				<span class="kw">let </span>ptr_self = wm_idlg.additional_data <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>;
+				hwnd.SetWindowLongPtr(co::GWLP::DWLP_USER, ptr_self <span class="kw">as _</span>); <span class="comment">// store
+				</span><span class="kw">let </span>ref_self = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr_self };
+				<span class="kw">unsafe </span>{ ref_self.base.set_hwnd(hwnd); } <span class="comment">// store HWND in struct field
+				</span>ptr_self
 			},
-			<span class="kw">_</span> =&gt; <span class="ident">hwnd</span>.<span class="ident">GetWindowLongPtr</span>(<span class="ident">co::GWLP::DWLP_USER</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="self">Self</span>, <span class="comment">// retrieve</span>
-		};
+			<span class="kw">_ </span>=&gt; hwnd.GetWindowLongPtr(co::GWLP::DWLP_USER) <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>, <span class="comment">// retrieve
+		</span>};
 
-		<span class="comment">// If no pointer stored, then no processing is done.</span>
-		<span class="comment">// Prevents processing before WM_INITDIALOG and after WM_NCDESTROY.</span>
-		<span class="kw">if</span> <span class="ident">ptr_self</span>.<span class="ident">is_null</span>() {
-			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">hwnd</span>.<span class="ident">DefWindowProc</span>(<span class="ident">wm_any</span>));
+		<span class="comment">// If no pointer stored, then no processing is done.
+		// Prevents processing before WM_INITDIALOG and after WM_NCDESTROY.
+		</span><span class="kw">if </span>ptr_self.is_null() {
+			<span class="kw">return </span><span class="prelude-val">Ok</span>(hwnd.DefWindowProc(wm_any));
 		}
 
-		<span class="comment">// Execute privileged closures.</span>
-		<span class="kw">let</span> <span class="ident">ref_self</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr_self</span> };
-		<span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">process_privileged_messages</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>;
+		<span class="comment">// Execute privileged closures.
+		</span><span class="kw">let </span>ref_self = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr_self };
+		ref_self.base.process_privileged_messages(wm_any)<span class="question-mark">?</span>;
 
-		<span class="kw">if</span> <span class="ident">wm_any</span>.<span class="ident">msg_id</span> <span class="op">==</span> <span class="ident">co::WM::INITDIALOG</span> {
-			<span class="comment">// Child controls are created in privileged closures, so we set the</span>
-			<span class="comment">// system font only now.</span>
-			<span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(<span class="ident">wm::SetFont</span> { <span class="comment">// on the window itself</span>
-				<span class="ident">hfont</span>: <span class="ident">ui_font</span>(),
-				<span class="ident">redraw</span>: <span class="bool-val">false</span>,
+		<span class="kw">if </span>wm_any.msg_id == co::WM::INITDIALOG {
+			<span class="comment">// Child controls are created in privileged closures, so we set the
+			// system font only now.
+			</span>ref_self.base.hwnd().SendMessage(wm::SetFont { <span class="comment">// on the window itself
+				</span>hfont: ui_font(),
+				redraw: <span class="bool-val">false</span>,
 			});
-			<span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>().<span class="ident">EnumChildWindows</span>(<span class="op">|</span><span class="ident">hchild</span><span class="op">|</span> {
-				<span class="ident">hchild</span>.<span class="ident">SendMessage</span>(<span class="ident">wm::SetFont</span> { <span class="comment">// on each child control</span>
-					<span class="ident">hfont</span>: <span class="ident">ui_font</span>(),
-					<span class="ident">redraw</span>: <span class="bool-val">false</span>,
+			ref_self.base.hwnd().EnumChildWindows(|hchild| {
+				hchild.SendMessage(wm::SetFont { <span class="comment">// on each child control
+					</span>hfont: ui_font(),
+					redraw: <span class="bool-val">false</span>,
 				});
-				<span class="bool-val">true</span>
-			});
+				<span class="bool-val">true
+			</span>});
 		}
 
-		<span class="comment">// Execute user closure, if any.</span>
-		<span class="kw">let</span> <span class="ident">process_result</span> <span class="op">=</span> <span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">process_user_message</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>;
+		<span class="comment">// Execute user closure, if any.
+		</span><span class="kw">let </span>process_result = ref_self.base.process_user_message(wm_any)<span class="question-mark">?</span>;
 
-		<span class="kw">if</span> <span class="ident">wm_any</span>.<span class="ident">msg_id</span> <span class="op">==</span> <span class="ident">co::WM::NCDESTROY</span> { <span class="comment">// always check</span>
-			<span class="ident">hwnd</span>.<span class="ident">SetWindowLongPtr</span>(<span class="ident">co::GWLP::DWLP_USER</span>, <span class="number">0</span>); <span class="comment">// clear passed pointer</span>
-			<span class="kw">unsafe</span> { <span class="ident">ref_self</span>.<span class="ident">base</span>.<span class="ident">set_hwnd</span>(<span class="ident">HWND::NULL</span>); } <span class="comment">// clear stored HWND</span>
-		}
+		<span class="kw">if </span>wm_any.msg_id == co::WM::NCDESTROY { <span class="comment">// always check
+			</span>hwnd.SetWindowLongPtr(co::GWLP::DWLP_USER, <span class="number">0</span>); <span class="comment">// clear passed pointer
+			</span><span class="kw">unsafe </span>{ ref_self.base.set_hwnd(HWND::NULL); } <span class="comment">// clear stored HWND
+		</span>}
 
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">process_result</span> {
-			<span class="ident">ProcessResult::HandledWithRet</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
-			<span class="ident">ProcessResult::HandledWithoutRet</span> =&gt; <span class="number">1</span>, <span class="comment">// TRUE</span>
-			<span class="ident">ProcessResult::NotHandled</span> =&gt; <span class="number">0</span>, <span class="comment">// FALSE</span>
-		})
+		<span class="prelude-val">Ok</span>(<span class="kw">match </span>process_result {
+			ProcessResult::HandledWithRet(res) =&gt; res,
+			ProcessResult::HandledWithoutRet =&gt; <span class="number">1</span>, <span class="comment">// TRUE
+			</span>ProcessResult::NotHandled =&gt; <span class="number">0</span>, <span class="comment">// FALSE
+		</span>})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -53,60 +53,60 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl::BITMAP</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::gdi_Hgdiobj</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HBITMAP</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::gdi;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::BITMAP;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::gdi_Hgdiobj;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, SIZE};
 
-<span class="kw">impl</span> <span class="ident">gdi_Hgdiobj</span> <span class="kw">for</span> <span class="ident">HBITMAP</span> {}
-<span class="kw">impl</span> <span class="ident">gdi_Hbitmap</span> <span class="kw">for</span> <span class="ident">HBITMAP</span> {}
+<span class="kw">impl </span>gdi_Hgdiobj <span class="kw">for </span>HBITMAP {}
+<span class="kw">impl </span>gdi_Hbitmap <span class="kw">for </span>HBITMAP {}
 
-<span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for</span>
-<span class="doccomment">/// [`HBITMAP`](crate::HBITMAP).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">gdi_Hbitmap</span>: <span class="ident">gdi_Hgdiobj</span> {
-	<span class="doccomment">/// [`CreateBitmap`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateBitmap</span>(
-		<span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">num_planes</span>: <span class="ident">u32</span>,
-		<span class="ident">bit_count</span>: <span class="ident">u32</span>, <span class="ident">bits</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
+/// [`HBITMAP`](crate::HBITMAP).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub trait </span>gdi_Hbitmap: gdi_Hgdiobj {
+	<span class="doccomment">/// [`CreateBitmap`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateBitmap(
+		sz: SIZE, num_planes: u32,
+		bit_count: u32, bits: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;HBITMAP&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">gdi::ffi::CreateBitmap</span>(
-				<span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">num_planes</span>, <span class="ident">bit_count</span>, <span class="ident">bits</span> <span class="kw">as</span> <span class="kw">_</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBITMAP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			gdi::ffi::CreateBitmap(
+				sz.cx, sz.cy, num_planes, bit_count, bits <span class="kw">as _</span>,
+			).as_mut()
+		}.map(|ptr| HBITMAP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GetObject</span>(<span class="self">self</span>, <span class="ident">pv</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BITMAP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">gdi::ffi::GetObjectW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BITMAP</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">pv</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw)
+	/// method.
+	</span><span class="kw">fn </span>GetObject(<span class="self">self</span>, pv: <span class="kw-2">&amp;mut </span>BITMAP) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">match unsafe </span>{
+			gdi::ffi::GetObjectW(
+				<span class="self">self</span>.as_ptr(),
+				std::mem::size_of::&lt;BITMAP&gt;() <span class="kw">as _</span>,
+				pv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			)
 		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

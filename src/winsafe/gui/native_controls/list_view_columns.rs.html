@@ -171,178 +171,178 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::LVCOLUMN</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::list_view::ListView</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::privs::multiply_dpi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">hdm</span>, <span class="ident">lvm</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiWindow</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::SIZE</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::LVCOLUMN;
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::list_view::ListView;
+<span class="kw">use </span><span class="kw">crate</span>::gui::privs::multiply_dpi;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::msg::{hdm, lvm};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::SIZE;
 
-<span class="doccomment">/// Exposes column methods of a [`ListView`](crate::gui::ListView) control.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListViewColumns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListView</span>,
+<span class="doccomment">/// Exposes column methods of a [`ListView`](crate::gui::ListView) control.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ListViewColumns&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListView,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ListViewColumns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListView</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">owner</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ListViewColumns&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListView) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ owner }
 	}
 
-	<span class="doccomment">/// Adds many columns at once by sending an</span>
-	<span class="doccomment">/// [`lvm::InsertColumn`](crate::msg::lvm::InsertColumn) message.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Widths will be adjusted to match current system DPI.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let my_list: gui::ListView; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// # let my_list = gui::ListView::new(&amp;wnd, gui::ListViewOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// my_list.columns().add(&amp;[</span>
-	<span class="doccomment">///     (&quot;Name&quot;, 300),</span>
-	<span class="doccomment">///     (&quot;Address&quot;, 500),</span>
-	<span class="doccomment">/// ]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">texts_and_widths</span>: <span class="kw-2">&amp;</span>[(<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">u32</span>)]) {
-		<span class="kw">for</span> (<span class="ident">text</span>, <span class="ident">width</span>) <span class="kw">in</span> <span class="ident">texts_and_widths</span>.<span class="ident">iter</span>() {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">col_cx</span> <span class="op">=</span> <span class="ident">SIZE::new</span>(<span class="kw-2">*</span><span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">0</span>);
-			<span class="ident">multiply_dpi</span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">col_cx</span>));
+	<span class="doccomment">/// Adds many columns at once by sending an
+	/// [`lvm::InsertColumn`](crate::msg::lvm::InsertColumn) message.
+	///
+	/// Widths will be adjusted to match current system DPI.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let my_list: gui::ListView; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// # let my_list = gui::ListView::new(&amp;wnd, gui::ListViewOpts::default());
+	///
+	/// my_list.columns().add(&amp;[
+	///     (&quot;Name&quot;, 300),
+	///     (&quot;Address&quot;, 500),
+	/// ]);
+	/// ```
+	</span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;</span><span class="self">self</span>, texts_and_widths: <span class="kw-2">&amp;</span>[(<span class="kw">impl </span>AsRef&lt;str&gt;, u32)]) {
+		<span class="kw">for </span>(text, width) <span class="kw">in </span>texts_and_widths.iter() {
+			<span class="kw">let </span><span class="kw-2">mut </span>col_cx = SIZE::new(<span class="kw-2">*</span>width <span class="kw">as _</span>, <span class="number">0</span>);
+			multiply_dpi(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>col_cx));
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvc</span> <span class="op">=</span> <span class="ident">LVCOLUMN::default</span>();
-			<span class="ident">lvc</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVCF::TEXT</span> <span class="op">|</span> <span class="ident">co::LVCF::WIDTH</span>;
-			<span class="ident">lvc</span>.<span class="ident">cx</span> <span class="op">=</span> <span class="ident">col_cx</span>.<span class="ident">cx</span>;
+			<span class="kw">let </span><span class="kw-2">mut </span>lvc = LVCOLUMN::default();
+			lvc.mask = co::LVCF::TEXT | co::LVCF::WIDTH;
+			lvc.cx = col_cx.cx;
 
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wtext</span> <span class="op">=</span> <span class="ident">WString::from_str</span>(<span class="ident">text</span>.<span class="ident">as_ref</span>());
-			<span class="ident">lvc</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">wtext</span>));
+			<span class="kw">let </span><span class="kw-2">mut </span>wtext = WString::from_str(text.as_ref());
+			lvc.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wtext));
 
-			<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">lvm::InsertColumn</span> {
-					<span class="ident">index</span>: <span class="number">0xffff</span>, <span class="comment">// insert as the last columns</span>
-					<span class="ident">lvcolumn</span>: <span class="kw-2">&amp;</span><span class="ident">lvc</span>,
+			<span class="self">self</span>.owner.hwnd()
+				.SendMessage(lvm::InsertColumn {
+					index: <span class="number">0xffff</span>, <span class="comment">// insert as the last columns
+					</span>lvcolumn: <span class="kw-2">&amp;</span>lvc,
 				})
-				.<span class="ident">unwrap</span>();
+				.unwrap();
 		}
 	}
 
-	<span class="doccomment">/// Retrieves the number of columns by sending an</span>
-	<span class="doccomment">/// [`hdm::GetItemCount`](crate::msg::hdm::GetItemCount) message to the</span>
-	<span class="doccomment">/// handle returned by [`lvm::GetHeader`](crate::msg::lvm::GetHeader).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetHeader</span> {})
-			.<span class="ident">unwrap</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">hdm::GetItemCount</span> {})
-			.<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Retrieves the number of columns by sending an
+	/// [`hdm::GetItemCount`](crate::msg::hdm::GetItemCount) message to the
+	/// handle returned by [`lvm::GetHeader`](crate::msg::lvm::GetHeader).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetHeader {})
+			.unwrap()
+			.SendMessage(hdm::GetItemCount {})
+			.unwrap()
 	}
 
-	<span class="doccomment">/// Retrieves information about the column by sending an</span>
-	<span class="doccomment">/// [`lvm::GetColumn`](crate::msg::lvm::GetColumn) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>, <span class="ident">lvc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LVCOLUMN</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetColumn</span> {
-				<span class="ident">index</span>: <span class="ident">column_index</span>,
-				<span class="ident">lvcolumn</span>: <span class="ident">lvc</span>,
+	<span class="doccomment">/// Retrieves information about the column by sending an
+	/// [`lvm::GetColumn`](crate::msg::lvm::GetColumn) message.
+	</span><span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32, lvc: <span class="kw-2">&amp;mut </span>LVCOLUMN) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetColumn {
+				index: column_index,
+				lvcolumn: lvc,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets information of the column by sending an</span>
-	<span class="doccomment">/// [`lvm::SetColumn`](crate::msg::lvm::SetColumn) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>, <span class="ident">lvc</span>: <span class="kw-2">&amp;</span><span class="ident">LVCOLUMN</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetColumn</span> {
-				<span class="ident">index</span>: <span class="ident">column_index</span>,
-				<span class="ident">lvcolumn</span>: <span class="ident">lvc</span>,
+	<span class="doccomment">/// Sets information of the column by sending an
+	/// [`lvm::SetColumn`](crate::msg::lvm::SetColumn) message.
+	</span><span class="kw">pub fn </span>set_info(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32, lvc: <span class="kw-2">&amp;</span>LVCOLUMN) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetColumn {
+				index: column_index,
+				lvcolumn: lvc,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the title of the column by calling</span>
-	<span class="doccomment">/// [`set_info`](crate::gui::spec::ListViewColumns::set_info).</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_title</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvc</span> <span class="op">=</span> <span class="ident">LVCOLUMN::default</span>();
-		<span class="ident">lvc</span>.<span class="ident">iSubItem</span> <span class="op">=</span> <span class="ident">column_index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvc</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVCF::TEXT</span>;
+	<span class="doccomment">/// Sets the title of the column by calling
+	/// [`set_info`](crate::gui::spec::ListViewColumns::set_info).
+	</span><span class="kw">pub fn </span>set_title(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32, text: <span class="kw-2">&amp;</span>str) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvc = LVCOLUMN::default();
+		lvc.iSubItem = column_index <span class="kw">as _</span>;
+		lvc.mask = co::LVCF::TEXT;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::from_str</span>(<span class="ident">text</span>);
-		<span class="ident">lvc</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>));
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::from_str(text);
+		lvc.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>buf));
 
-		<span class="self">self</span>.<span class="ident">set_info</span>(<span class="ident">column_index</span>, <span class="kw-2">&amp;</span><span class="ident">lvc</span>);
+		<span class="self">self</span>.set_info(column_index, <span class="kw-2">&amp;</span>lvc);
 	}
 
-	<span class="doccomment">/// Sets the width of the column by sending an</span>
-	<span class="doccomment">/// [`lvm::SetColumnWidth`](crate::msg::lvm::SetColumnWidth) message.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Width will be adjusted to match current system DPI.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>, <span class="ident">width</span>: <span class="ident">u32</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">col_cx</span> <span class="op">=</span> <span class="ident">SIZE::new</span>(<span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">0</span>);
-		<span class="ident">multiply_dpi</span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">col_cx</span>));
+	<span class="doccomment">/// Sets the width of the column by sending an
+	/// [`lvm::SetColumnWidth`](crate::msg::lvm::SetColumnWidth) message.
+	///
+	/// Width will be adjusted to match current system DPI.
+	</span><span class="kw">pub fn </span>set_width(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32, width: u32) {
+		<span class="kw">let </span><span class="kw-2">mut </span>col_cx = SIZE::new(width <span class="kw">as _</span>, <span class="number">0</span>);
+		multiply_dpi(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>col_cx));
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetColumnWidth</span> {
-				<span class="ident">index</span>: <span class="ident">column_index</span>,
-				<span class="ident">width</span>: <span class="ident">col_cx</span>.<span class="ident">cx</span> <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetColumnWidth {
+				index: column_index,
+				width: col_cx.cx <span class="kw">as _</span>,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the width of the column by sending an</span>
-	<span class="doccomment">/// [`lvm::SetColumnWidth`](crate::msg::lvm::SetColumnWidth) message. The</span>
-	<span class="doccomment">/// width will be calculated to fill the remaining space.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_width_to_fill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>) {
-		<span class="kw">let</span> <span class="ident">num_cols</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx_used</span> <span class="op">=</span> <span class="number">0</span>;
+	<span class="doccomment">/// Sets the width of the column by sending an
+	/// [`lvm::SetColumnWidth`](crate::msg::lvm::SetColumnWidth) message. The
+	/// width will be calculated to fill the remaining space.
+	</span><span class="kw">pub fn </span>set_width_to_fill(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32) {
+		<span class="kw">let </span>num_cols = <span class="self">self</span>.count();
+		<span class="kw">let </span><span class="kw-2">mut </span>cx_used = <span class="number">0</span>;
 
-		<span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_cols</span> {
-			<span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">column_index</span> {
-				<span class="ident">cx_used</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">width</span>(<span class="ident">i</span>); <span class="comment">// retrieve cx of each column, but us</span>
-			}
+		<span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..num_cols {
+			<span class="kw">if </span>i != column_index {
+				cx_used += <span class="self">self</span>.width(i); <span class="comment">// retrieve cx of each column, but us
+			</span>}
 		}
 
-		<span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>().<span class="ident">GetClientRect</span>().<span class="ident">unwrap</span>(); <span class="comment">// list view client area</span>
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetColumnWidth</span> {
-				<span class="ident">index</span>: <span class="ident">column_index</span>,
-				<span class="ident">width</span>: <span class="ident">rc</span>.<span class="ident">right</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="ident">cx_used</span>,
+		<span class="kw">let </span>rc = <span class="self">self</span>.owner.hwnd().GetClientRect().unwrap(); <span class="comment">// list view client area
+		</span><span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetColumnWidth {
+				index: column_index,
+				width: rc.right <span class="kw">as </span>u32 - cx_used,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the title of the column by calling</span>
-	<span class="doccomment">/// [`info`](crate::gui::spec::ListViewColumns::info).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">String</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvc</span> <span class="op">=</span> <span class="ident">LVCOLUMN::default</span>();
-		<span class="ident">lvc</span>.<span class="ident">iSubItem</span> <span class="op">=</span> <span class="ident">column_index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvc</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVCF::TEXT</span>;
+	<span class="doccomment">/// Retrieves the title of the column by calling
+	/// [`info`](crate::gui::spec::ListViewColumns::info).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>title(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32) -&gt; String {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvc = LVCOLUMN::default();
+		lvc.iSubItem = column_index <span class="kw">as _</span>;
+		lvc.mask = co::LVCF::TEXT;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="number">128</span>); <span class="comment">// arbitrary</span>
-		<span class="ident">lvc</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>));
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(<span class="number">128</span>); <span class="comment">// arbitrary
+		</span>lvc.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>buf));
 
-		<span class="self">self</span>.<span class="ident">info</span>(<span class="ident">column_index</span>, <span class="kw-2">&amp;mut</span> <span class="ident">lvc</span>);
-		<span class="ident">buf</span>.<span class="ident">to_string</span>()
+		<span class="self">self</span>.info(column_index, <span class="kw-2">&amp;mut </span>lvc);
+		buf.to_string()
 	}
 
-	<span class="doccomment">/// Retrieves the width of the column by sending an</span>
-	<span class="doccomment">/// [`lvm::GetColumnWidth`](crate::msg::lvm::GetColumnWidth) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetColumnWidth</span> { <span class="ident">index</span>: <span class="ident">column_index</span> })
-			.<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Retrieves the width of the column by sending an
+	/// [`lvm::GetColumnWidth`](crate::msg::lvm::GetColumnWidth) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetColumnWidth { index: column_index })
+			.unwrap()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

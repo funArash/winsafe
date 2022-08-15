@@ -35,42 +35,42 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HPROCESS</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HPROCESS, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="kw">impl</span> <span class="ident">user_Hprocess</span> <span class="kw">for</span> <span class="ident">HPROCESS</span> {}
+<span class="kw">impl </span>user_Hprocess <span class="kw">for </span>HPROCESS {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HPROCESS`](crate::HPROCESS).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hprocess</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`SetUserObjectInformation`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setuserobjectinformationw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** The `pv_info` type varies according to `index`. If you set it</span>
-	<span class="doccomment">/// wrong, you&#39;re likely to cause a buffer overrun.</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">SetUserObjectInformation</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>,
-		<span class="ident">index</span>: <span class="ident">co::UOI</span>, <span class="ident">pv_info</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HPROCESS`](crate::HPROCESS).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hprocess: Handle {
+	<span class="doccomment">/// [`SetUserObjectInformation`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setuserobjectinformationw)
+	/// method.
+	///
+	/// **Note:** The `pv_info` type varies according to `index`. If you set it
+	/// wrong, you&#39;re likely to cause a buffer overrun.
+	</span><span class="kw">unsafe fn </span>SetUserObjectInformation&lt;T&gt;(<span class="self">self</span>,
+		index: co::UOI, pv_info: <span class="kw-2">&amp;mut </span>T) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="ident">user::ffi::SetUserObjectInformationW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">index</span>.<span class="number">0</span>,
-				<span class="ident">pv_info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>,
+		bool_to_sysresult(
+			user::ffi::SetUserObjectInformationW(
+				<span class="self">self</span>.as_ptr(),
+				index.<span class="number">0</span>,
+				pv_info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				std::mem::size_of::&lt;T&gt;() <span class="kw">as _</span>,
 			),
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

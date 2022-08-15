@@ -109,116 +109,116 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PSTR</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">CoTaskMemFree</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IPin`](crate::IPin) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IPinVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">Connect</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">ReceiveConnection</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Disconnect</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">ConnectedTo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">ConnectionMediaType</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryPinInfo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryDirection</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryId</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">PSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryAccept</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">EnumMediaTypes</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryInternalConnections</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">EndOfStream</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">BeginFlush</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">EndFlush</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">NewSegment</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">i64</span>, <span class="ident">i64</span>, <span class="ident">f64</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IPin`](crate::IPin) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IPinVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>ReceiveConnection: <span class="kw">fn</span>(ComPtr, ComPtr, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>ConnectedTo: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>ConnectionMediaType: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryPinInfo: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryDirection: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryId: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>QueryAccept: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>EnumMediaTypes: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>QueryInternalConnections: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>EndOfStream: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>BeginFlush: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>EndFlush: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>NewSegment: <span class="kw">fn</span>(ComPtr, i64, i64, f64) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IPin`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ipin)</span>
-<span class="doccomment">/// COM interface over [`IPinVT`](crate::vt::IPinVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IPin</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IPin`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ipin)
+/// COM interface over [`IPinVT`](crate::vt::IPinVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IPin(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IPin</span>, <span class="string">&quot;56a86891-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
-<span class="kw">impl</span> <span class="ident">dshow_IPin</span> <span class="kw">for</span> <span class="ident">IPin</span> {}
+<span class="macro">impl_iunknown!</span>(IPin, <span class="string">&quot;56a86891-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
+<span class="kw">impl </span>dshow_IPin <span class="kw">for </span>IPin {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IPin`](crate::IPin).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IPin</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IPin::BeginFlush`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-beginflush)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">BeginFlush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">BeginFlush</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IPin`](crate::IPin).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IPin: ole_IUnknown {
+	<span class="doccomment">/// [`IPin::BeginFlush`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-beginflush)
+	/// method.
+	</span><span class="kw">fn </span>BeginFlush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.BeginFlush)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IPin::ConnectedTo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectedto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">ConnectedTo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IPin</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">ConnectedTo</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IPin::from</span>(<span class="ident">ppv_queried</span>))
+	<span class="doccomment">/// [`IPin::ConnectedTo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectedto)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>ConnectedTo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IPin&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult(
+				(vt.ConnectedTo)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried),
+			).map(|<span class="kw">_</span>| IPin::from(ppv_queried))
 		}
 	}
 
-	<span class="doccomment">/// [`IPin::Disconnect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-disconnect)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Disconnect</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IPin::Disconnect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-disconnect)
+	/// method.
+	</span><span class="kw">fn </span>Disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.Disconnect)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IPin::EndFlush`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endflush)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">EndFlush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">EndFlush</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IPin::EndFlush`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endflush)
+	/// method.
+	</span><span class="kw">fn </span>EndFlush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.EndFlush)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IPin::EndOfStream`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endofstream)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">EndOfStream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">EndOfStream</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IPin::EndOfStream`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endofstream)
+	/// method.
+	</span><span class="kw">fn </span>EndOfStream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.EndOfStream)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IPin::QueryId`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryid)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">QueryId</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pstr</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IPinVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">QueryId</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">pstr</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">WString::from_wchars_nullt</span>(<span class="ident">pstr</span>);
-			<span class="ident">CoTaskMemFree</span>(<span class="ident">pstr</span> <span class="kw">as</span> <span class="kw">_</span>);
-			<span class="ident">name</span>.<span class="ident">to_string</span>()
+	<span class="doccomment">/// [`IPin::QueryId`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryid)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>QueryId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.QueryId)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
+		}.map(|<span class="kw">_</span>| {
+			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
+			CoTaskMemFree(pstr <span class="kw">as _</span>);
+			name.to_string()
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

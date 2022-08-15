@@ -51,58 +51,58 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(unused_macros)]</span>
 
-<span class="doccomment">/// Declares a handle.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_handle</span> {
+<span class="doccomment">/// Declares a handle.
+</span><span class="macro">macro_rules!</span> impl_handle {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">feature</span>:<span class="ident">literal</span>;
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$feature</span>:literal;
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">feature</span>)))]</span>
-		<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-		<span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>);
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]</span>
+		<span class="attribute">#[repr(transparent)]</span>
+		<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]</span>
+		<span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">*mut </span>std::ffi::c_void);
 
-		<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {}
+		<span class="kw">unsafe impl </span>Send <span class="kw">for </span><span class="macro-nonterminal">$name </span>{}
 
-		<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-				<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {:#010x}&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>), <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
+		<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+				<span class="macro">write!</span>(f, <span class="string">&quot;{} {:#010x}&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize)
 			}
 		}
 
-		<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-				<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:#010x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
+		<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+				<span class="macro">write!</span>(f, <span class="string">&quot;{:#010x}&quot;</span>, <span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize)
 			}
 		}
 
-		<span class="kw">impl</span> <span class="ident">std::fmt::LowerHex</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-				<span class="ident">std::fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>), <span class="ident">f</span>)
+		<span class="kw">impl </span>std::fmt::LowerHex <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+				std::fmt::LowerHex::fmt(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize), f)
 			}
 		}
 
-		<span class="kw">impl</span> <span class="ident">std::fmt::UpperHex</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-				<span class="ident">std::fmt::UpperHex::fmt</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>), <span class="ident">f</span>)
+		<span class="kw">impl </span>std::fmt::UpperHex <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+				std::fmt::UpperHex::fmt(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize), f)
 			}
 		}
 
-		<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-			<span class="kw">const</span> <span class="ident">NULL</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>(<span class="ident">std::ptr::null_mut</span>());
+		<span class="kw">impl </span><span class="kw">crate</span>::prelude::Handle <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">const </span>NULL: <span class="self">Self </span>= <span class="self">Self</span>(std::ptr::null_mut());
 
-			<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">p</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-				<span class="self">Self</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">_</span>)
+			<span class="kw">unsafe fn </span>from_ptr&lt;T&gt;(p: <span class="kw-2">*mut </span>T) -&gt; <span class="self">Self </span>{
+				<span class="self">Self</span>(p <span class="kw">as _</span>)
 			}
 
-			<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-				<span class="self">self</span>.<span class="number">0</span>
-			}
+			<span class="kw">unsafe fn </span>as_ptr(<span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+				<span class="self">self</span>.<span class="number">0
+			</span>}
 		}
 	};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

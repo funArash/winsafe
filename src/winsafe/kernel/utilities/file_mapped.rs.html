@@ -99,106 +99,106 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">File</span>, <span class="ident">FileAccess</span>, <span class="ident">HFILEMAP</span>, <span class="ident">HFILEMAPVIEW</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{
-	<span class="ident">Handle</span>, <span class="ident">HandleClose</span>, <span class="ident">kernel_Hfile</span>, <span class="ident">kernel_Hfilemap</span>, <span class="ident">kernel_Hfilemapview</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, HFILEMAP, HFILEMAPVIEW, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{
+	Handle, HandleClose, kernel_Hfile, kernel_Hfilemap, kernel_Hfilemapview,
 };
 
-<span class="doccomment">/// Manages a memory-mapped file, which can be read/written through slices. It</span>
-<span class="doccomment">/// is closed automatically when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileMapped</span> {
-	<span class="ident">access</span>: <span class="ident">FileAccess</span>,
-	<span class="ident">file</span>: <span class="ident">File</span>,
-	<span class="ident">hmap</span>: <span class="ident">HFILEMAP</span>,
-	<span class="ident">hview</span>: <span class="ident">HFILEMAPVIEW</span>,
-	<span class="ident">size</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Manages a memory-mapped file, which can be read/written through slices. It
+/// is closed automatically when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub struct </span>FileMapped {
+	access: FileAccess,
+	file: File,
+	hmap: HFILEMAP,
+	hview: HFILEMAPVIEW,
+	size: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FileMapped</span> {
-	<span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">hview</span>.<span class="ident">is_null</span>() { <span class="self">self</span>.<span class="ident">hview</span>.<span class="ident">UnmapViewOfFile</span>().<span class="ident">ok</span>(); } <span class="comment">// ignore errors</span>
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">hmap</span>.<span class="ident">is_null</span>() { <span class="self">self</span>.<span class="ident">hmap</span>.<span class="ident">CloseHandle</span>().<span class="ident">ok</span>(); }
+<span class="kw">impl </span>Drop <span class="kw">for </span>FileMapped {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if </span>!<span class="self">self</span>.hview.is_null() { <span class="self">self</span>.hview.UnmapViewOfFile().ok(); } <span class="comment">// ignore errors
+		</span><span class="kw">if </span>!<span class="self">self</span>.hmap.is_null() { <span class="self">self</span>.hmap.CloseHandle().ok(); }
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">FileMapped</span> {
-	<span class="doccomment">/// Opens a file with the desired access, then map its contents in memory.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>(
-		<span class="ident">file_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">access</span>: <span class="ident">FileAccess</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">FileMapped</span><span class="op">&gt;</span>
+<span class="kw">impl </span>FileMapped {
+	<span class="doccomment">/// Opens a file with the desired access, then map its contents in memory.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>open(
+		file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;FileMapped&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_self</span> <span class="op">=</span> <span class="self">Self</span> {
-			<span class="ident">access</span>,
-			<span class="ident">file</span>: <span class="ident">File::open</span>(<span class="ident">file_path</span>, <span class="ident">access</span>)<span class="question-mark">?</span>,
-			<span class="ident">hmap</span>: <span class="ident">HFILEMAP::NULL</span>,
-			<span class="ident">hview</span>: <span class="ident">HFILEMAPVIEW::NULL</span>,
-			<span class="ident">size</span>: <span class="number">0</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{
+			access,
+			file: File::open(file_path, access)<span class="question-mark">?</span>,
+			hmap: HFILEMAP::NULL,
+			hview: HFILEMAPVIEW::NULL,
+			size: <span class="number">0</span>,
 		};
 
-		<span class="ident">new_self</span>.<span class="ident">map_in_memory</span>()<span class="question-mark">?</span>;
-		<span class="prelude-val">Ok</span>(<span class="ident">new_self</span>)
+		new_self.map_in_memory()<span class="question-mark">?</span>;
+		<span class="prelude-val">Ok</span>(new_self)
 	}
 
-	<span class="kw">fn</span> <span class="ident">map_in_memory</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">hmap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">hfile</span>().<span class="ident">CreateFileMapping</span>(
+	<span class="kw">fn </span>map_in_memory(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		<span class="self">self</span>.hmap = <span class="self">self</span>.file.hfile().CreateFileMapping(
 			<span class="prelude-val">None</span>,
-			<span class="kw">match</span> <span class="self">self</span>.<span class="ident">access</span> {
-				<span class="ident">FileAccess::ExistingReadOnly</span> =&gt; <span class="ident">co::PAGE::READONLY</span>,
-				<span class="ident">FileAccess::ExistingReadWrite</span>
-					<span class="op">|</span> <span class="ident">FileAccess::OpenOrCreateReadWrite</span> =&gt; <span class="ident">co::PAGE::READWRITE</span>,
+			<span class="kw">match </span><span class="self">self</span>.access {
+				FileAccess::ExistingReadOnly =&gt; co::PAGE::READONLY,
+				FileAccess::ExistingReadWrite
+					| FileAccess::OpenOrCreateReadWrite =&gt; co::PAGE::READWRITE,
 			},
 			<span class="prelude-val">None</span>,
 			<span class="prelude-val">None</span>,
 		)<span class="question-mark">?</span>;
 
-		<span class="self">self</span>.<span class="ident">hview</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hmap</span>.<span class="ident">MapViewOfFile</span>(
-			<span class="kw">match</span> <span class="self">self</span>.<span class="ident">access</span> {
-				<span class="ident">FileAccess::ExistingReadOnly</span> =&gt; <span class="ident">co::FILE_MAP::READ</span>,
-				<span class="ident">FileAccess::ExistingReadWrite</span>
-					<span class="op">|</span> <span class="ident">FileAccess::OpenOrCreateReadWrite</span> =&gt; <span class="ident">co::FILE_MAP::READ</span> <span class="op">|</span> <span class="ident">co::FILE_MAP::WRITE</span>,
+		<span class="self">self</span>.hview = <span class="self">self</span>.hmap.MapViewOfFile(
+			<span class="kw">match </span><span class="self">self</span>.access {
+				FileAccess::ExistingReadOnly =&gt; co::FILE_MAP::READ,
+				FileAccess::ExistingReadWrite
+					| FileAccess::OpenOrCreateReadWrite =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
 			},
 			<span class="number">0</span>,
 			<span class="prelude-val">None</span>,
 		)<span class="question-mark">?</span>;
 
-		<span class="self">self</span>.<span class="ident">size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">hfile</span>().<span class="ident">GetFileSizeEx</span>()<span class="question-mark">?</span>; <span class="comment">// cache</span>
+		<span class="self">self</span>.size = <span class="self">self</span>.file.hfile().GetFileSizeEx()<span class="question-mark">?</span>; <span class="comment">// cache
+		</span><span class="prelude-val">Ok</span>(())
+	}
+
+	<span class="doccomment">/// Returns a mutable slice to the mapped memory.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
+		<span class="self">self</span>.hview.as_mut_slice(<span class="self">self</span>.size)
+	}
+
+	<span class="doccomment">/// Returns a slice to the mapped memory.
+	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+		<span class="self">self</span>.hview.as_slice(<span class="self">self</span>.size)
+	}
+
+	<span class="doccomment">/// Resizes the file, which will be remapped in memory.
+	///
+	/// **Note:** Since the mapping pointers will change, any existing slices
+	/// must be recreated. The following functions must be called again:
+	/// * [`as_mut_slice`](crate::FileMapped::as_mut_slice);
+	/// * [`as_slice`](crate::FileMapped::as_slice).
+	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: usize) -&gt; SysResult&lt;()&gt; {
+		<span class="self">self</span>.hview.UnmapViewOfFile()<span class="question-mark">?</span>;
+		<span class="self">self</span>.hmap.CloseHandle()<span class="question-mark">?</span>;
+
+		<span class="self">self</span>.file.resize(num_bytes)<span class="question-mark">?</span>;
+
+		<span class="self">self</span>.map_in_memory()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}
 
-	<span class="doccomment">/// Returns a mutable slice to the mapped memory.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-		<span class="self">self</span>.<span class="ident">hview</span>.<span class="ident">as_mut_slice</span>(<span class="self">self</span>.<span class="ident">size</span>)
-	}
-
-	<span class="doccomment">/// Returns a slice to the mapped memory.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-		<span class="self">self</span>.<span class="ident">hview</span>.<span class="ident">as_slice</span>(<span class="self">self</span>.<span class="ident">size</span>)
-	}
-
-	<span class="doccomment">/// Resizes the file, which will be remapped in memory.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Since the mapping pointers will change, any existing slices</span>
-	<span class="doccomment">/// must be recreated. The following functions must be called again:</span>
-	<span class="doccomment">/// * [`as_mut_slice`](crate::FileMapped::as_mut_slice);</span>
-	<span class="doccomment">/// * [`as_slice`](crate::FileMapped::as_slice).</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">hview</span>.<span class="ident">UnmapViewOfFile</span>()<span class="question-mark">?</span>;
-		<span class="self">self</span>.<span class="ident">hmap</span>.<span class="ident">CloseHandle</span>()<span class="question-mark">?</span>;
-
-		<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">resize</span>(<span class="ident">num_bytes</span>)<span class="question-mark">?</span>;
-
-		<span class="self">self</span>.<span class="ident">map_in_memory</span>()<span class="question-mark">?</span>;
-		<span class="prelude-val">Ok</span>(())
-	}
-
-	<span class="doccomment">/// Returns the size of the file. This value is cached.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">size</span>
+	<span class="doccomment">/// Returns the size of the file. This value is cached.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.size
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

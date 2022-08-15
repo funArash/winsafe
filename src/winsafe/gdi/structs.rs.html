@@ -214,221 +214,221 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::privs::LF_FACESIZE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::IsWindowsVistaOrGreater</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">POINT</span>};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::privs::LF_FACESIZE;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::IsWindowsVistaOrGreater;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, POINT};
 
-<span class="doccomment">/// [`BITMAP`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BITMAP</span> {
-	<span class="kw">pub</span> <span class="ident">bmType</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">bmWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">bmHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">bmWidthBytes</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">bmPlanes</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">bmBitsPixel</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">bmBits</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
+<span class="doccomment">/// [`BITMAP`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>BITMAP {
+	<span class="kw">pub </span>bmType: i32,
+	<span class="kw">pub </span>bmWidth: i32,
+	<span class="kw">pub </span>bmHeight: i32,
+	<span class="kw">pub </span>bmWidthBytes: i32,
+	<span class="kw">pub </span>bmPlanes: u16,
+	<span class="kw">pub </span>bmBitsPixel: u16,
+	<span class="kw">pub </span>bmBits: <span class="kw-2">*mut </span>u8,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">BITMAP</span>);
+<span class="macro">impl_default!</span>(BITMAP);
 
-<span class="doccomment">/// [`BITMAPFILEHEADER`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapfileheader)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>(<span class="number">2</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BITMAPFILEHEADER</span> {
-	<span class="ident">bfType</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">bfSize</span>: <span class="ident">u32</span>,
-	<span class="ident">bfReserved1</span>: <span class="ident">u16</span>,
-	<span class="ident">bfReserved2</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">bfOffBits</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`BITMAPFILEHEADER`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapfileheader)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C, packed(<span class="number">2</span>))]</span>
+<span class="kw">pub struct </span>BITMAPFILEHEADER {
+	bfType: u16,
+	<span class="kw">pub </span>bfSize: u32,
+	bfReserved1: u16,
+	bfReserved2: u16,
+	<span class="kw">pub </span>bfOffBits: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BITMAPFILEHEADER</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::mem::zeroed</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() };
-		<span class="ident">obj</span>.<span class="ident">bfType</span> <span class="op">=</span> <span class="number">0x4d42</span>; <span class="comment">// BM</span>
-		<span class="ident">obj</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>BITMAPFILEHEADER {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;<span class="self">Self</span>&gt;() };
+		obj.bfType = <span class="number">0x4d42</span>; <span class="comment">// BM
+		</span>obj
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">BITMAPFILEHEADER</span> {
+<span class="kw">impl </span>BITMAPFILEHEADER {
 	<span class="macro">pub_fn_serialize!</span>();
 }
 
-<span class="doccomment">/// [`BITMAPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BITMAPINFO</span> {
-	<span class="kw">pub</span> <span class="ident">bmiHeader</span>: <span class="ident">BITMAPINFOHEADER</span>,
-	<span class="kw">pub</span> <span class="ident">bmiColors</span>: [<span class="ident">RGBQUAD</span>; <span class="number">1</span>],
+<span class="doccomment">/// [`BITMAPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>BITMAPINFO {
+	<span class="kw">pub </span>bmiHeader: BITMAPINFOHEADER,
+	<span class="kw">pub </span>bmiColors: [RGBQUAD; <span class="number">1</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BITMAPINFO</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">bmiHeader</span>: <span class="ident">BITMAPINFOHEADER::default</span>(),
-			<span class="ident">bmiColors</span>: [<span class="ident">RGBQUAD::default</span>()],
+<span class="kw">impl </span>Default <span class="kw">for </span>BITMAPINFO {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			bmiHeader: BITMAPINFOHEADER::default(),
+			bmiColors: [RGBQUAD::default()],
 		}
 	}
 }
 
-<span class="doccomment">/// [`BITMAPINFOHEADER`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BITMAPINFOHEADER</span> {
-	<span class="ident">biSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">biWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">biHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">biPlanes</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">biBitCount</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">biCompression</span>: <span class="ident">co::BI</span>,
-	<span class="kw">pub</span> <span class="ident">biSizeImage</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">biXPelsPerMeter</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">biYPelsPerMeter</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">biClrUsed</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">biClrImportant</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`BITMAPINFOHEADER`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>BITMAPINFOHEADER {
+	biSize: u32,
+	<span class="kw">pub </span>biWidth: i32,
+	<span class="kw">pub </span>biHeight: i32,
+	<span class="kw">pub </span>biPlanes: u16,
+	<span class="kw">pub </span>biBitCount: u16,
+	<span class="kw">pub </span>biCompression: co::BI,
+	<span class="kw">pub </span>biSizeImage: u32,
+	<span class="kw">pub </span>biXPelsPerMeter: i32,
+	<span class="kw">pub </span>biYPelsPerMeter: i32,
+	<span class="kw">pub </span>biClrUsed: u32,
+	<span class="kw">pub </span>biClrImportant: u32,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">BITMAPINFOHEADER</span>, <span class="ident">biSize</span>);
+<span class="macro">impl_default_with_size!</span>(BITMAPINFOHEADER, biSize);
 
-<span class="kw">impl</span> <span class="ident">BITMAPINFOHEADER</span> {
+<span class="kw">impl </span>BITMAPINFOHEADER {
 	<span class="macro">pub_fn_serialize!</span>();
 }
 
-<span class="doccomment">/// [`LOGBRUSH`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logbrush)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LOGBRUSH</span> {
-	<span class="kw">pub</span> <span class="ident">lbStyle</span>: <span class="ident">co::BSS</span>,
-	<span class="kw">pub</span> <span class="ident">lbColor</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">lbHatch</span>: <span class="ident">usize</span>, <span class="comment">// weird field</span>
+<span class="doccomment">/// [`LOGBRUSH`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logbrush)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LOGBRUSH {
+	<span class="kw">pub </span>lbStyle: co::BSS,
+	<span class="kw">pub </span>lbColor: COLORREF,
+	<span class="kw">pub </span>lbHatch: usize, <span class="comment">// weird field
+</span>}
+
+<span class="macro">impl_default!</span>(LOGBRUSH);
+
+<span class="doccomment">/// [`LOGFONT`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>LOGFONT {
+	<span class="kw">pub </span>lfHeight: i32,
+	<span class="kw">pub </span>lfWidth: i32,
+	<span class="kw">pub </span>lfEscapement: i32,
+	<span class="kw">pub </span>lfOrientation: i32,
+	<span class="kw">pub </span>lfWeight: co::FW,
+	<span class="kw">pub </span>lfItalic: u8,
+	<span class="kw">pub </span>lfUnderline: u8,
+	<span class="kw">pub </span>lfStrikeOut: u8,
+	<span class="kw">pub </span>lfCharSet: co::CHARSET,
+	<span class="kw">pub </span>lfOutPrecision: co::OUT_PRECIS,
+	<span class="kw">pub </span>lfClipPrecision: co::CLIP,
+	<span class="kw">pub </span>lfQuality: co::QUALITY,
+	<span class="kw">pub </span>lfPitchAndFamily: co::PITCH,
+	lfFaceName: [u16; LF_FACESIZE],
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">LOGBRUSH</span>);
-
-<span class="doccomment">/// [`LOGFONT`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LOGFONT</span> {
-	<span class="kw">pub</span> <span class="ident">lfHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfEscapement</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfOrientation</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfWeight</span>: <span class="ident">co::FW</span>,
-	<span class="kw">pub</span> <span class="ident">lfItalic</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">lfUnderline</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">lfStrikeOut</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">lfCharSet</span>: <span class="ident">co::CHARSET</span>,
-	<span class="kw">pub</span> <span class="ident">lfOutPrecision</span>: <span class="ident">co::OUT_PRECIS</span>,
-	<span class="kw">pub</span> <span class="ident">lfClipPrecision</span>: <span class="ident">co::CLIP</span>,
-	<span class="kw">pub</span> <span class="ident">lfQuality</span>: <span class="ident">co::QUALITY</span>,
-	<span class="kw">pub</span> <span class="ident">lfPitchAndFamily</span>: <span class="ident">co::PITCH</span>,
-	<span class="ident">lfFaceName</span>: [<span class="ident">u16</span>; <span class="ident">LF_FACESIZE</span>],
+<span class="kw">impl </span>LOGFONT {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(lfFaceName, set_lfFaceName);
 }
 
-<span class="kw">impl</span> <span class="ident">LOGFONT</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">lfFaceName</span>, <span class="ident">set_lfFaceName</span>);
+<span class="doccomment">/// [`LOGPEN`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logpen)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LOGPEN {
+	<span class="kw">pub </span>lopnStyle: co::PS,
+	<span class="kw">pub </span>lopnWidth: POINT,
+	<span class="kw">pub </span>lopnColor: COLORREF,
 }
 
-<span class="doccomment">/// [`LOGPEN`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logpen)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LOGPEN</span> {
-	<span class="kw">pub</span> <span class="ident">lopnStyle</span>: <span class="ident">co::PS</span>,
-	<span class="kw">pub</span> <span class="ident">lopnWidth</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">lopnColor</span>: <span class="ident">COLORREF</span>,
+<span class="macro">impl_default!</span>(LOGPEN);
+
+<span class="doccomment">/// [`NONCLIENTMETRICS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nonclientmetricsw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NONCLIENTMETRICS {
+	cbSize: u32,
+	<span class="kw">pub </span>iBorderWidth: i32,
+	<span class="kw">pub </span>iScrollWidth: i32,
+	<span class="kw">pub </span>iScrollHeight: i32,
+	<span class="kw">pub </span>iCaptionWidth: i32,
+	<span class="kw">pub </span>iCaptionHeight: i32,
+	<span class="kw">pub </span>lfCaptionFont: LOGFONT,
+	<span class="kw">pub </span>iSmCaptionWidth: i32,
+	<span class="kw">pub </span>iSmCaptionHeight: i32,
+	<span class="kw">pub </span>lfSmCaptionFont: LOGFONT,
+	<span class="kw">pub </span>iMenuWidth: i32,
+	<span class="kw">pub </span>iMenuHeight: i32,
+	<span class="kw">pub </span>lfMenuFont: LOGFONT,
+	<span class="kw">pub </span>lfStatusFont: LOGFONT,
+	<span class="kw">pub </span>lfMessageFont: LOGFONT,
+	<span class="kw">pub </span>iPaddedBorderWidth: i32,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">LOGPEN</span>);
+<span class="kw">impl </span>Default <span class="kw">for </span>NONCLIENTMETRICS {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;<span class="self">Self</span>&gt;() };
+		obj.cbSize = std::mem::size_of::&lt;<span class="self">Self</span>&gt;() <span class="kw">as _</span>;
 
-<span class="doccomment">/// [`NONCLIENTMETRICS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nonclientmetricsw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NONCLIENTMETRICS</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">iBorderWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iScrollWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iScrollHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iCaptionWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iCaptionHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfCaptionFont</span>: <span class="ident">LOGFONT</span>,
-	<span class="kw">pub</span> <span class="ident">iSmCaptionWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSmCaptionHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfSmCaptionFont</span>: <span class="ident">LOGFONT</span>,
-	<span class="kw">pub</span> <span class="ident">iMenuWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iMenuHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lfMenuFont</span>: <span class="ident">LOGFONT</span>,
-	<span class="kw">pub</span> <span class="ident">lfStatusFont</span>: <span class="ident">LOGFONT</span>,
-	<span class="kw">pub</span> <span class="ident">lfMessageFont</span>: <span class="ident">LOGFONT</span>,
-	<span class="kw">pub</span> <span class="ident">iPaddedBorderWidth</span>: <span class="ident">i32</span>,
-}
+		<span class="kw">let </span>is_vista = IsWindowsVistaOrGreater()
+			.unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, err)); <span class="comment">// should never happen
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NONCLIENTMETRICS</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::mem::zeroed</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() };
-		<span class="ident">obj</span>.<span class="ident">cbSize</span> <span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>;
-
-		<span class="kw">let</span> <span class="ident">is_vista</span> <span class="op">=</span> <span class="ident">IsWindowsVistaOrGreater</span>()
-			.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)); <span class="comment">// should never happen</span>
-
-		<span class="kw">if</span> <span class="op">!</span><span class="ident">is_vista</span> {
-			<span class="ident">obj</span>.<span class="ident">cbSize</span> <span class="op">-</span><span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span>
+		</span><span class="kw">if </span>!is_vista {
+			obj.cbSize -= std::mem::size_of::&lt;i32&gt;() <span class="kw">as </span>u32
 		}
-		<span class="ident">obj</span>
+		obj
 	}
 }
 
-<span class="doccomment">/// [`RGBQUAD`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-rgbquad)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RGBQUAD</span> {
-	<span class="kw">pub</span> <span class="ident">rgbBlue</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">rgbGreen</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">rgbRed</span>: <span class="ident">u8</span>,
-	<span class="ident">rgbReserved</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// [`RGBQUAD`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-rgbquad)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>RGBQUAD {
+	<span class="kw">pub </span>rgbBlue: u8,
+	<span class="kw">pub </span>rgbGreen: u8,
+	<span class="kw">pub </span>rgbRed: u8,
+	rgbReserved: u8,
 }
 
-<span class="doccomment">/// [`TEXTMETRIC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-textmetricw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TEXTMETRIC</span> {
-	<span class="kw">pub</span> <span class="ident">tmHeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmAscent</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmDescent</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmInternalLeading</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmExternalLeading</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmAveCharWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmMaxCharWidth</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmWeight</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmOverhang</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmDigitizedAspectX</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmDigitizedAspectY</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">tmFirstChar</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">tmLastChar</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">tmDefaultChar</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">tmBreakChar</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">tmItalic</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">tmUnderlined</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">tmStruckOut</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">tmPitchAndFamily</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">tmCharSet</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// [`TEXTMETRIC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-textmetricw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone)]</span>
+<span class="kw">pub struct </span>TEXTMETRIC {
+	<span class="kw">pub </span>tmHeight: i32,
+	<span class="kw">pub </span>tmAscent: i32,
+	<span class="kw">pub </span>tmDescent: i32,
+	<span class="kw">pub </span>tmInternalLeading: i32,
+	<span class="kw">pub </span>tmExternalLeading: i32,
+	<span class="kw">pub </span>tmAveCharWidth: i32,
+	<span class="kw">pub </span>tmMaxCharWidth: i32,
+	<span class="kw">pub </span>tmWeight: i32,
+	<span class="kw">pub </span>tmOverhang: i32,
+	<span class="kw">pub </span>tmDigitizedAspectX: i32,
+	<span class="kw">pub </span>tmDigitizedAspectY: i32,
+	<span class="kw">pub </span>tmFirstChar: u16,
+	<span class="kw">pub </span>tmLastChar: u16,
+	<span class="kw">pub </span>tmDefaultChar: u16,
+	<span class="kw">pub </span>tmBreakChar: u16,
+	<span class="kw">pub </span>tmItalic: u8,
+	<span class="kw">pub </span>tmUnderlined: u8,
+	<span class="kw">pub </span>tmStruckOut: u8,
+	<span class="kw">pub </span>tmPitchAndFamily: u8,
+	<span class="kw">pub </span>tmCharSet: u8,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

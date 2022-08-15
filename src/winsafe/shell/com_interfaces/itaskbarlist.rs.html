@@ -100,107 +100,107 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HANDLE</span>, <span class="ident">HRES</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HANDLE, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`ITaskbarList`](crate::ITaskbarList) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ITaskbarListVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">HrInit</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">AddTab</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">DeleteTab</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">ActivateTab</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetActiveAlt</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`ITaskbarList`](crate::ITaskbarList) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>ITaskbarListVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>HrInit: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>AddTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>DeleteTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>ActivateTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SetActiveAlt: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`ITaskbarList`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-itaskbarlist)</span>
-<span class="doccomment">/// COM interface over [`ITaskbarListVT`](crate::vt::ITaskbarListVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, CoCreateInstance, ITaskbarList};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let obj = CoCreateInstance::&lt;ITaskbarList&gt;(</span>
-<span class="doccomment">///     &amp;co::CLSID::TaskbarList,</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     co::CLSCTX::INPROC_SERVER,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ITaskbarList</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`ITaskbarList`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-itaskbarlist)
+/// COM interface over [`ITaskbarListVT`](crate::vt::ITaskbarListVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, CoCreateInstance, ITaskbarList};
+///
+/// let obj = CoCreateInstance::&lt;ITaskbarList&gt;(
+///     &amp;co::CLSID::TaskbarList,
+///     None,
+///     co::CLSCTX::INPROC_SERVER,
+/// )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ITaskbarList(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">ITaskbarList</span>, <span class="string">&quot;56fdf342-fd6d-11d0-958a-006097c9a090&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_ITaskbarList</span> <span class="kw">for</span> <span class="ident">ITaskbarList</span> {}
+<span class="macro">impl_iunknown!</span>(ITaskbarList, <span class="string">&quot;56fdf342-fd6d-11d0-958a-006097c9a090&quot;</span>);
+<span class="kw">impl </span>shell_ITaskbarList <span class="kw">for </span>ITaskbarList {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`ITaskbarList`](crate::ITaskbarList).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_ITaskbarList</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`ITaskbarList::ActivateTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-activatetab)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">ActivateTab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ITaskbarListVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">ActivateTab</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd</span>.<span class="number">0</span>))
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`ITaskbarList`](crate::ITaskbarList).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_ITaskbarList: ole_IUnknown {
+	<span class="doccomment">/// [`ITaskbarList::ActivateTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-activatetab)
+	/// method.
+	</span><span class="kw">fn </span>ActivateTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: HWND) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>ITaskbarListVT);
+			ok_to_hrresult((vt.ActivateTab)(<span class="self">self</span>.ptr(), hwnd.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`ITaskbarList::AddTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-addtab)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">AddTab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ITaskbarListVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">AddTab</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`ITaskbarList::AddTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-addtab)
+	/// method.
+	</span><span class="kw">fn </span>AddTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: HWND) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>ITaskbarListVT);
+			ok_to_hrresult((vt.AddTab)(<span class="self">self</span>.ptr(), hwnd.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`ITaskbarList::DeleteTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-deletetab)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DeleteTab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ITaskbarListVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">DeleteTab</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`ITaskbarList::DeleteTab`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-deletetab)
+	/// method.
+	</span><span class="kw">fn </span>DeleteTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: HWND) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>ITaskbarListVT);
+			ok_to_hrresult((vt.DeleteTab)(<span class="self">self</span>.ptr(), hwnd.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`ITaskbarList::HrInit`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-hrinit)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">HrInit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ITaskbarListVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">HrInit</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`ITaskbarList::HrInit`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-hrinit)
+	/// method.
+	</span><span class="kw">fn </span>HrInit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>ITaskbarListVT);
+			ok_to_hrresult((vt.HrInit)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`ITaskbarList::SetActiveAlt`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-setactivealt)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetActiveAlt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ITaskbarListVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetActiveAlt</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`ITaskbarList::SetActiveAlt`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-setactivealt)
+	/// method.
+	</span><span class="kw">fn </span>SetActiveAlt(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: HWND) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>ITaskbarListVT);
+			ok_to_hrresult((vt.SetActiveAlt)(<span class="self">self</span>.ptr(), hwnd.<span class="number">0</span>))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

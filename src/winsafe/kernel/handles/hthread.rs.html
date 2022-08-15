@@ -144,151 +144,151 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{
-	<span class="ident">FILETIME</span>, <span class="ident">GetLastError</span>, <span class="ident">HACCESSTOKEN</span>, <span class="ident">SECURITY_ATTRIBUTES</span>, <span class="ident">WinResult</span>,
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	FILETIME, GetLastError, HACCESSTOKEN, SECURITY_ATTRIBUTES, SysResult,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">HandleClose</span>};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HTHREAD</span>: <span class="string">&quot;kernel&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [thread](https://docs.microsoft.com/en-us/windows/win32/procthread/processes-and-threads).</span>
-	<span class="doccomment">/// Originally just a `HANDLE`.</span>
-}
+<span class="macro">impl_handle!</span> { HTHREAD: <span class="string">&quot;kernel&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [thread](https://docs.microsoft.com/en-us/windows/win32/procthread/processes-and-threads).
+	/// Originally just a `HANDLE`.
+</span>}
 
-<span class="kw">impl</span> <span class="ident">HandleClose</span> <span class="kw">for</span> <span class="ident">HTHREAD</span> {}
-<span class="kw">impl</span> <span class="ident">kernel_Hthread</span> <span class="kw">for</span> <span class="ident">HTHREAD</span> {}
+<span class="kw">impl </span>HandleClose <span class="kw">for </span>HTHREAD {}
+<span class="kw">impl </span>kernel_Hthread <span class="kw">for </span>HTHREAD {}
 
-<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
-<span class="doccomment">/// [`HTHREAD`](crate::HTHREAD).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hthread</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CreateThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the thread handle and ID.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HTHREAD::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateThread</span>(
-		<span class="ident">thread_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">SECURITY_ATTRIBUTES</span><span class="op">&gt;</span>,
-		<span class="ident">stack_size</span>: <span class="ident">usize</span>,
-		<span class="ident">start_addr</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-		<span class="ident">parameter</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-		<span class="ident">flags</span>: <span class="ident">co::THREAD_CREATE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>(<span class="ident">HTHREAD</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
+/// [`HTHREAD`](crate::HTHREAD).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>kernel_Hthread: Handle {
+	<span class="doccomment">/// [`CreateThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread)
+	/// static method.
+	///
+	/// Returns the thread handle and ID.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HTHREAD::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateThread(
+		thread_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
+		stack_size: usize,
+		start_addr: <span class="kw-2">*mut </span>std::ffi::c_void,
+		parameter: <span class="kw-2">*mut </span>std::ffi::c_void,
+		flags: co::THREAD_CREATE) -&gt; SysResult&lt;(HTHREAD, u32)&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread_id</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::CreateThread</span>(
-				<span class="ident">thread_attrs</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-				<span class="ident">stack_size</span>,
-				<span class="ident">start_addr</span>,
-				<span class="ident">parameter</span>,
-				<span class="ident">flags</span>.<span class="number">0</span>,
-				<span class="kw-2">&amp;mut</span> <span class="ident">thread_id</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> (<span class="ident">HTHREAD</span>(<span class="ident">ptr</span>), <span class="ident">thread_id</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">let </span><span class="kw-2">mut </span>thread_id = u32::default();
+		<span class="kw">unsafe </span>{
+			kernel::ffi::CreateThread(
+				thread_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				stack_size,
+				start_addr,
+				parameter,
+				flags.<span class="number">0</span>,
+				<span class="kw-2">&amp;mut </span>thread_id,
+			).as_mut()
+		}.map(|ptr| (HTHREAD(ptr), thread_id))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`ExitThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitthread)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="kw">fn</span> <span class="ident">ExitThread</span>(<span class="ident">exit_code</span>: <span class="ident">u32</span>) {
-		<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::ExitThread</span>(<span class="ident">exit_code</span>) }
+	<span class="doccomment">/// [`ExitThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitthread)
+	/// static method.
+	</span><span class="kw">fn </span>ExitThread(exit_code: u32) {
+		<span class="kw">unsafe </span>{ kernel::ffi::ExitThread(exit_code) }
 	}
 
-	<span class="doccomment">/// [`GetCurrentThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthread)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetCurrentThread</span>() -&gt; <span class="ident">HTHREAD</span> {
-		<span class="ident">HTHREAD</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetCurrentThread</span>() })
+	<span class="doccomment">/// [`GetCurrentThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthread)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetCurrentThread() -&gt; HTHREAD {
+		HTHREAD(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThread() })
 	}
 
-	<span class="doccomment">/// [`GetExitCodeThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodethread)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetExitCodeThread</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exit_code</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::GetExitCodeThread</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">exit_code</span>)
+	<span class="doccomment">/// [`GetExitCodeThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodethread)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetExitCodeThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::GetExitCodeThread(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>exit_code)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">exit_code</span>)
+		).map(|<span class="kw">_</span>| exit_code)
 	}
 
-	<span class="doccomment">/// [`GetProcessIdOfThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessidofthread)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetProcessIdOfThread</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetProcessIdOfThread</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">id</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">id</span>),
+	<span class="doccomment">/// [`GetProcessIdOfThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessidofthread)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetProcessIdOfThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessIdOfThread(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
 	}
 
-	<span class="doccomment">/// [`GetThreadId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadid)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThreadId</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetThreadId</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">id</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">id</span>),
+	<span class="doccomment">/// [`GetThreadId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadid)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThreadId(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetThreadId(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
 	}
 
-	<span class="doccomment">/// [`GetThreadTimes`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GetThreadTimes</span>(<span class="self">self</span>,
-		<span class="ident">creation</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FILETIME</span>,
-		<span class="ident">exit</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FILETIME</span>,
-		<span class="ident">kernel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FILETIME</span>,
-		<span class="ident">user</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FILETIME</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetThreadTimes`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes)
+	/// method.
+	</span><span class="kw">fn </span>GetThreadTimes(<span class="self">self</span>,
+		creation: <span class="kw-2">&amp;mut </span>FILETIME,
+		exit: <span class="kw-2">&amp;mut </span>FILETIME,
+		kernel: <span class="kw-2">&amp;mut </span>FILETIME,
+		user: <span class="kw-2">&amp;mut </span>FILETIME) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::GetThreadTimes</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">creation</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">exit</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">kernel</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">user</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::GetThreadTimes(
+					<span class="self">self</span>.as_ptr(),
+					creation <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					exit <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					kernel <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					user <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`OpenThreadToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openthreadtoken)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">OpenThreadToken</span>(<span class="self">self</span>,
-		<span class="ident">desired_access</span>: <span class="ident">co::TOKEN</span>, <span class="ident">open_as_self</span>: <span class="ident">bool</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HACCESSTOKEN</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`OpenThreadToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openthreadtoken)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>OpenThreadToken(<span class="self">self</span>,
+		desired_access: co::TOKEN, open_as_self: bool) -&gt; SysResult&lt;HACCESSTOKEN&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">HACCESSTOKEN::NULL</span>;
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::OpenThreadToken</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">desired_access</span>.<span class="number">0</span>,
-					<span class="ident">open_as_self</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">handle</span>.<span class="number">0</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::OpenThreadToken(
+					<span class="self">self</span>.as_ptr(),
+					desired_access.<span class="number">0</span>,
+					open_as_self <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">handle</span>)
+		).map(|<span class="kw">_</span>| handle)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

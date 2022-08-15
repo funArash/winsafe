@@ -69,76 +69,76 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HMONITOR</span>, <span class="ident">RECT</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HMONITOR, RECT};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HDC</span>: <span class="string">&quot;user&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [device context](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdc).</span>
-}
+<span class="macro">impl_handle!</span> { HDC: <span class="string">&quot;user&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [device context](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdc).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">user_Hdc</span> <span class="kw">for</span> <span class="ident">HDC</span> {}
+<span class="kw">impl </span>user_Hdc <span class="kw">for </span>HDC {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HDC`](crate::HDC).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hdc</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`EnumDisplayMonitors`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{HDC, HMONITOR, RECT};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let hdc: HDC; // initialized somewhere</span>
-	<span class="doccomment">/// # let hdc = HDC::NULL;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hdc.EnumDisplayMonitors(</span>
-	<span class="doccomment">///     None,</span>
-	<span class="doccomment">///     |hmon: HMONITOR, hdc: HDC, rc: &amp;RECT| -&gt; bool {</span>
-	<span class="doccomment">///         println!(&quot;HMONITOR: {}, &quot;, hmon);</span>
-	<span class="doccomment">///         true</span>
-	<span class="doccomment">///     },</span>
-	<span class="doccomment">/// )?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">EnumDisplayMonitors</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>,
-		<span class="ident">rc_clip</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RECT</span><span class="op">&gt;</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">HMONITOR</span>, <span class="ident">HDC</span>, <span class="kw-2">&amp;</span><span class="ident">RECT</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HDC`](crate::HDC).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hdc: Handle {
+	<span class="doccomment">/// [`EnumDisplayMonitors`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{HDC, HMONITOR, RECT};
+	///
+	/// let hdc: HDC; // initialized somewhere
+	/// # let hdc = HDC::NULL;
+	///
+	/// hdc.EnumDisplayMonitors(
+	///     None,
+	///     |hmon: HMONITOR, hdc: HDC, rc: &amp;RECT| -&gt; bool {
+	///         println!(&quot;HMONITOR: {}, &quot;, hmon);
+	///         true
+	///     },
+	/// )?;
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>EnumDisplayMonitors&lt;F&gt;(<span class="self">self</span>,
+		rc_clip: <span class="prelude-ty">Option</span>&lt;RECT&gt;, func: F) -&gt; SysResult&lt;()&gt;
+		<span class="kw">where </span>F: Fn(HMONITOR, HDC, <span class="kw-2">&amp;</span>RECT) -&gt; bool,
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">user::ffi::EnumDisplayMonitors</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">rc_clip</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">rc</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-					<span class="ident">enum_display_monitors_proc</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;</span><span class="ident">func</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::EnumDisplayMonitors(
+					<span class="self">self</span>.as_ptr(),
+					rc_clip.map_or(std::ptr::null_mut(), |rc| <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+					enum_display_monitors_proc::&lt;F&gt; <span class="kw">as _</span>,
+					<span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				)
 			},
 		)
 	}
 }
 
-<span class="kw">extern</span> <span class="string">&quot;system&quot;</span> <span class="kw">fn</span> <span class="ident">enum_display_monitors_proc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-	<span class="ident">hmon</span>: <span class="ident">HMONITOR</span>, <span class="ident">hdc</span>: <span class="ident">HDC</span>, <span class="ident">rc</span>: <span class="kw-2">*const</span> <span class="ident">RECT</span>, <span class="ident">lparam</span>: <span class="ident">isize</span>) -&gt; <span class="ident">BOOL</span>
-	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">HMONITOR</span>, <span class="ident">HDC</span>, <span class="kw-2">&amp;</span><span class="ident">RECT</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">extern </span><span class="string">&quot;system&quot; </span><span class="kw">fn </span>enum_display_monitors_proc&lt;F&gt;(
+	hmon: HMONITOR, hdc: HDC, rc: <span class="kw-2">*const </span>RECT, lparam: isize) -&gt; BOOL
+	<span class="kw">where </span>F: Fn(HMONITOR, HDC, <span class="kw-2">&amp;</span>RECT) -&gt; bool,
 {
-	<span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">lparam</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">F</span>) };
-	<span class="ident">func</span>(<span class="ident">hmon</span>, <span class="ident">hdc</span>, <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">rc</span> }) <span class="kw">as</span> <span class="kw">_</span>
-}
+	<span class="kw">let </span>func = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(lparam <span class="kw">as </span><span class="kw-2">*const </span>F) };
+	func(hmon, hdc, <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>rc }) <span class="kw">as _
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

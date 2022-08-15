@@ -238,245 +238,245 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Global objects used within `gui` module.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Global objects used within `gui` module.
 
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+</span><span class="kw">use </span>std::error::Error;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl</span>::{<span class="ident">HFONT</span>, <span class="ident">NONCLIENTMETRICS</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::msg_error::MsgError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::MulDiv</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">wm</span>, <span class="ident">WndMsg</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{
-	<span class="ident">gdi_Hdc</span>, <span class="ident">gdi_Hfont</span>, <span class="ident">gdi_Hgdiobj</span>, <span class="ident">Handle</span>, <span class="ident">NativeBitflag</span>, <span class="ident">user_Hwnd</span>,
-	<span class="ident">uxtheme_Htheme</span>, <span class="ident">uxtheme_Hwnd</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{HFONT, NONCLIENTMETRICS};
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::msg_error::MsgError;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::MulDiv;
+<span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{
+	gdi_Hdc, gdi_Hfont, gdi_Hgdiobj, Handle, NativeBitflag, user_Hwnd,
+	uxtheme_Htheme, uxtheme_Hwnd,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">GetSystemMetrics</span>, <span class="ident">HWND</span>, <span class="ident">POINT</span>, <span class="ident">PostQuitMessage</span>, <span class="ident">RECT</span>, <span class="ident">SIZE</span>,
-	<span class="ident">SystemParametersInfo</span>,
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	GetSystemMetrics, HWND, POINT, PostQuitMessage, RECT, SIZE,
+	SystemParametersInfo,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::uxtheme::decl</span>::{<span class="ident">IsAppThemed</span>, <span class="ident">IsThemeActive</span>};
+<span class="kw">use </span><span class="kw">crate</span>::uxtheme::decl::{IsAppThemed, IsThemeActive};
 
-<span class="doccomment">/// Global return error originated from an event handling closure; will be taken</span>
-<span class="doccomment">/// in main loop.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">QUIT_ERROR</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MsgError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="doccomment">/// Global return error originated from an event handling closure; will be taken
+/// in main loop.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">static </span><span class="kw-2">mut </span>QUIT_ERROR: <span class="prelude-ty">Option</span>&lt;MsgError&gt; = <span class="prelude-val">None</span>;
 
-<span class="doccomment">/// Terminates the program with the given error.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">post_quit_error</span>(
-	<span class="ident">src_msg</span>: <span class="ident">WndMsg</span>, <span class="ident">err</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)
+<span class="doccomment">/// Terminates the program with the given error.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>post_quit_error(
+	src_msg: WndMsg, err: Box&lt;<span class="kw">dyn </span>Error + Send + Sync&gt;)
 {
-	<span class="kw">unsafe</span> { <span class="ident">QUIT_ERROR</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MsgError::new</span>(<span class="ident">src_msg</span>, <span class="ident">err</span>)); } <span class="comment">// store the error, so the main window/dialog can grab it</span>
-	<span class="ident">PostQuitMessage</span>(<span class="op">-</span><span class="number">1</span>); <span class="comment">// this -1 will be discarded in the main loop, anyway</span>
-}
+	<span class="kw">unsafe </span>{ QUIT_ERROR = <span class="prelude-val">Some</span>(MsgError::new(src_msg, err)); } <span class="comment">// store the error, so the main window/dialog can grab it
+	</span>PostQuitMessage(-<span class="number">1</span>); <span class="comment">// this -1 will be discarded in the main loop, anyway
+</span>}
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// Global UI font object.</span>
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">UI_HFONT</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+</span><span class="doccomment">/// Global UI font object.
+</span><span class="kw">static </span><span class="kw-2">mut </span>UI_HFONT: <span class="prelude-ty">Option</span>&lt;HFONT&gt; = <span class="prelude-val">None</span>;
 
-<span class="doccomment">/// Creates the global UI font object.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">create_ui_font</span>() {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ncm</span> <span class="op">=</span> <span class="ident">NONCLIENTMETRICS::default</span>();
-	<span class="kw">unsafe</span> {
-		<span class="ident">SystemParametersInfo</span>(
-			<span class="ident">co::SPI::GETNONCLIENTMETRICS</span>,
-			<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">NONCLIENTMETRICS</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="kw-2">&amp;mut</span> <span class="ident">ncm</span>, <span class="ident">co::SPIF::NoValue</span>,
-		).<span class="ident">unwrap</span>();
-		<span class="ident">UI_HFONT</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HFONT::CreateFontIndirect</span>(<span class="kw-2">&amp;</span><span class="ident">ncm</span>.<span class="ident">lfMenuFont</span>).<span class="ident">unwrap</span>());
+<span class="doccomment">/// Creates the global UI font object.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create_ui_font() {
+	<span class="kw">let </span><span class="kw-2">mut </span>ncm = NONCLIENTMETRICS::default();
+	<span class="kw">unsafe </span>{
+		SystemParametersInfo(
+			co::SPI::GETNONCLIENTMETRICS,
+			std::mem::size_of::&lt;NONCLIENTMETRICS&gt;() <span class="kw">as _</span>,
+			<span class="kw-2">&amp;mut </span>ncm, co::SPIF::NoValue,
+		).unwrap();
+		UI_HFONT = <span class="prelude-val">Some</span>(HFONT::CreateFontIndirect(<span class="kw-2">&amp;</span>ncm.lfMenuFont).unwrap());
 	}
 }
 
-<span class="doccomment">/// Frees the global UI font object.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">delete_ui_font</span>() {
-	<span class="kw">unsafe</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hfont</span>) <span class="op">=</span> <span class="ident">UI_HFONT</span> {
-			<span class="ident">hfont</span>.<span class="ident">DeleteObject</span>().<span class="ident">unwrap</span>();
-			<span class="ident">UI_HFONT</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="doccomment">/// Frees the global UI font object.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>delete_ui_font() {
+	<span class="kw">unsafe </span>{
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(hfont) = UI_HFONT {
+			hfont.DeleteObject().unwrap();
+			UI_HFONT = <span class="prelude-val">None</span>;
 		}
 	}
 }
 
-<span class="doccomment">/// Retrieves the global UI font object, or panics if not created yet.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">ui_font</span>() -&gt; <span class="ident">HFONT</span> {
-	<span class="kw">unsafe</span> {
-		<span class="kw">match</span> <span class="ident">UI_HFONT</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">hfont</span>) =&gt; <span class="ident">hfont</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Global UI font not created.&quot;</span>),
+<span class="doccomment">/// Retrieves the global UI font object, or panics if not created yet.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>ui_font() -&gt; HFONT {
+	<span class="kw">unsafe </span>{
+		<span class="kw">match </span>UI_HFONT {
+			<span class="prelude-val">Some</span>(hfont) =&gt; hfont,
+			<span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Global UI font not created.&quot;</span>),
 		}
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">BASE_CTRL_ID</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">20_000</span>; <span class="comment">// in-between Visual Studio Resource Editor values</span>
+</span><span class="kw">static </span><span class="kw-2">mut </span>BASE_CTRL_ID: u16 = <span class="number">20_000</span>; <span class="comment">// in-between Visual Studio Resource Editor values
 
-<span class="doccomment">/// Returns the next sequential control ID.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">auto_ctrl_id</span>() -&gt; <span class="ident">u16</span> {
-	<span class="kw">unsafe</span> {
-		<span class="kw">let</span> <span class="ident">new_id</span> <span class="op">=</span> <span class="ident">BASE_CTRL_ID</span>;
-		<span class="ident">BASE_CTRL_ID</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-		<span class="ident">new_id</span>
+</span><span class="doccomment">/// Returns the next sequential control ID.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>auto_ctrl_id() -&gt; u16 {
+	<span class="kw">unsafe </span>{
+		<span class="kw">let </span>new_id = BASE_CTRL_ID;
+		BASE_CTRL_ID += <span class="number">1</span>;
+		new_id
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DPI</span>: <span class="ident">POINT</span> <span class="op">=</span> <span class="ident">POINT::new</span>(<span class="number">0</span>, <span class="number">0</span>);
+</span><span class="kw">static </span><span class="kw-2">mut </span>DPI: POINT = POINT::new(<span class="number">0</span>, <span class="number">0</span>);
 
-<span class="doccomment">/// Multiplies the given coordinates by current system DPI.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">multiply_dpi</span>(
-	<span class="ident">pt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">POINT</span><span class="op">&gt;</span>, <span class="ident">sz</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">SIZE</span><span class="op">&gt;</span>)
+<span class="doccomment">/// Multiplies the given coordinates by current system DPI.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>multiply_dpi(
+	pt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>POINT&gt;, sz: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SIZE&gt;)
 {
-	<span class="kw">unsafe</span> {
-		<span class="kw">if</span> (<span class="ident">pt</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">sz</span>.<span class="ident">is_some</span>()) <span class="op">&amp;&amp;</span> <span class="ident">DPI</span>.<span class="ident">x</span> <span class="op">==</span> <span class="number">0</span> { <span class="comment">// DPI not cached yet?</span>
-			<span class="kw">let</span> <span class="ident">screen_dc</span> <span class="op">=</span> <span class="ident">HWND::NULL</span>.<span class="ident">GetDC</span>().<span class="ident">unwrap</span>();
-			<span class="ident">DPI</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">screen_dc</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSX</span>); <span class="comment">// cache</span>
-			<span class="ident">DPI</span>.<span class="ident">y</span> <span class="op">=</span> <span class="ident">screen_dc</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSY</span>);
-			<span class="ident">HWND::NULL</span>.<span class="ident">ReleaseDC</span>(<span class="ident">screen_dc</span>).<span class="ident">unwrap</span>();
+	<span class="kw">unsafe </span>{
+		<span class="kw">if </span>(pt.is_some() || sz.is_some()) &amp;&amp; DPI.x == <span class="number">0 </span>{ <span class="comment">// DPI not cached yet?
+			</span><span class="kw">let </span>screen_dc = HWND::NULL.GetDC().unwrap();
+			DPI.x = screen_dc.GetDeviceCaps(co::GDC::LOGPIXELSX); <span class="comment">// cache
+			</span>DPI.y = screen_dc.GetDeviceCaps(co::GDC::LOGPIXELSY);
+			HWND::NULL.ReleaseDC(screen_dc).unwrap();
 		}
 
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pt</span>) <span class="op">=</span> <span class="ident">pt</span> {
-			<span class="ident">pt</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">MulDiv</span>(<span class="ident">pt</span>.<span class="ident">x</span>, <span class="ident">DPI</span>.<span class="ident">x</span>, <span class="number">96</span>);
-			<span class="ident">pt</span>.<span class="ident">y</span> <span class="op">=</span> <span class="ident">MulDiv</span>(<span class="ident">pt</span>.<span class="ident">y</span>, <span class="ident">DPI</span>.<span class="ident">y</span>, <span class="number">96</span>);
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(pt) = pt {
+			pt.x = MulDiv(pt.x, DPI.x, <span class="number">96</span>);
+			pt.y = MulDiv(pt.y, DPI.y, <span class="number">96</span>);
 		}
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sz</span>) <span class="op">=</span> <span class="ident">sz</span> {
-			<span class="ident">sz</span>.<span class="ident">cx</span> <span class="op">=</span> <span class="ident">MulDiv</span>(<span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">DPI</span>.<span class="ident">x</span>, <span class="number">96</span>);
-			<span class="ident">sz</span>.<span class="ident">cy</span> <span class="op">=</span> <span class="ident">MulDiv</span>(<span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">DPI</span>.<span class="ident">y</span>, <span class="number">96</span>);
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(sz) = sz {
+			sz.cx = MulDiv(sz.cx, DPI.x, <span class="number">96</span>);
+			sz.cy = MulDiv(sz.cy, DPI.y, <span class="number">96</span>);
 		}
 	}
 }
 
-<span class="doccomment">/// If parent is a dialog, converts Dialog Template Units to pixels; otherwise</span>
-<span class="doccomment">/// multiplies by current DPI factor.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">multiply_dpi_or_dtu</span>(
-	<span class="ident">parent_base</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>, <span class="ident">pt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">POINT</span><span class="op">&gt;</span>, <span class="ident">sz</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">SIZE</span><span class="op">&gt;</span>)
+<span class="doccomment">/// If parent is a dialog, converts Dialog Template Units to pixels; otherwise
+/// multiplies by current DPI factor.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>multiply_dpi_or_dtu(
+	parent_base: <span class="kw-2">&amp;</span>Base, pt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>POINT&gt;, sz: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SIZE&gt;)
 {
-	<span class="kw">if</span> <span class="ident">parent_base</span>.<span class="ident">is_dialog</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
-		<span class="ident">pt</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pt</span><span class="op">|</span> {
-			<span class="ident">rc</span>.<span class="ident">left</span> <span class="op">=</span> <span class="ident">pt</span>.<span class="ident">x</span>;
-			<span class="ident">rc</span>.<span class="ident">top</span> <span class="op">=</span> <span class="ident">pt</span>.<span class="ident">y</span>;
+	<span class="kw">if </span>parent_base.is_dialog() {
+		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
+		pt.as_ref().map(|pt| {
+			rc.left = pt.x;
+			rc.top = pt.y;
 		});
-		<span class="ident">sz</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sz</span><span class="op">|</span> {
-			<span class="ident">rc</span>.<span class="ident">right</span> <span class="op">=</span> <span class="ident">sz</span>.<span class="ident">cx</span>;
-			<span class="ident">rc</span>.<span class="ident">bottom</span> <span class="op">=</span> <span class="ident">sz</span>.<span class="ident">cy</span>;
-		});
-
-		<span class="ident">parent_base</span>.<span class="ident">hwnd</span>().<span class="ident">MapDialogRect</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rc</span>).<span class="ident">unwrap</span>();
-		<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">pt</span>, <span class="kw-2">mut</span> <span class="ident">sz</span>) <span class="op">=</span> (<span class="ident">pt</span>, <span class="ident">sz</span>);
-		<span class="ident">pt</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pt</span><span class="op">|</span> {
-			<span class="ident">pt</span>.<span class="ident">x</span> <span class="op">=</span> <span class="ident">rc</span>.<span class="ident">left</span>;
-			<span class="ident">pt</span>.<span class="ident">y</span> <span class="op">=</span> <span class="ident">rc</span>.<span class="ident">top</span>;
-		});
-		<span class="ident">sz</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sz</span><span class="op">|</span> {
-			<span class="ident">sz</span>.<span class="ident">cx</span> <span class="op">=</span> <span class="ident">rc</span>.<span class="ident">right</span>;
-			<span class="ident">sz</span>.<span class="ident">cy</span> <span class="op">=</span> <span class="ident">rc</span>.<span class="ident">bottom</span>;
+		sz.as_ref().map(|sz| {
+			rc.right = sz.cx;
+			rc.bottom = sz.cy;
 		});
 
-	} <span class="kw">else</span> {
-		<span class="ident">multiply_dpi</span>(<span class="ident">pt</span>, <span class="ident">sz</span>)
+		parent_base.hwnd().MapDialogRect(<span class="kw-2">&amp;mut </span>rc).unwrap();
+		<span class="kw">let </span>(<span class="kw-2">mut </span>pt, <span class="kw-2">mut </span>sz) = (pt, sz);
+		pt.as_mut().map(|pt| {
+			pt.x = rc.left;
+			pt.y = rc.top;
+		});
+		sz.as_mut().map(|sz| {
+			sz.cx = rc.right;
+			sz.cy = rc.bottom;
+		});
+
+	} <span class="kw">else </span>{
+		multiply_dpi(pt, sz)
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// Calculates the bound rectangle to fit the text with current system font.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">calc_text_bound_box</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">SIZE</span> {
-	<span class="kw">let</span> <span class="ident">desktop_hwnd</span> <span class="op">=</span> <span class="ident">HWND::GetDesktopWindow</span>();
-	<span class="kw">let</span> <span class="ident">desktop_hdc</span> <span class="op">=</span> <span class="ident">desktop_hwnd</span>.<span class="ident">GetDC</span>().<span class="ident">unwrap</span>();
-	<span class="kw">let</span> <span class="ident">clone_dc</span> <span class="op">=</span> <span class="ident">desktop_hdc</span>.<span class="ident">CreateCompatibleDC</span>().<span class="ident">unwrap</span>();
-	<span class="kw">let</span> <span class="ident">prev_hfont</span> <span class="op">=</span> <span class="ident">clone_dc</span>.<span class="ident">SelectObjectFont</span>(<span class="ident">ui_font</span>()).<span class="ident">unwrap</span>();
+</span><span class="doccomment">/// Calculates the bound rectangle to fit the text with current system font.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>calc_text_bound_box(text: <span class="kw-2">&amp;</span>str) -&gt; SIZE {
+	<span class="kw">let </span>desktop_hwnd = HWND::GetDesktopWindow();
+	<span class="kw">let </span>desktop_hdc = desktop_hwnd.GetDC().unwrap();
+	<span class="kw">let </span>clone_dc = desktop_hdc.CreateCompatibleDC().unwrap();
+	<span class="kw">let </span>prev_hfont = clone_dc.SelectObjectFont(ui_font()).unwrap();
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bounds</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">text</span>.<span class="ident">is_empty</span>() {
-		<span class="ident">clone_dc</span>.<span class="ident">GetTextExtentPoint32</span>(<span class="string">&quot;Pj&quot;</span>).<span class="ident">unwrap</span>() <span class="comment">// just a placeholder to get the text height</span>
-	} <span class="kw">else</span> {
-		<span class="ident">clone_dc</span>.<span class="ident">GetTextExtentPoint32</span>(<span class="kw-2">&amp;</span><span class="ident">remove_accelerator_ampersands</span>(<span class="ident">text</span>)).<span class="ident">unwrap</span>()
+	<span class="kw">let </span><span class="kw-2">mut </span>bounds = <span class="kw">if </span>text.is_empty() {
+		clone_dc.GetTextExtentPoint32(<span class="string">&quot;Pj&quot;</span>).unwrap() <span class="comment">// just a placeholder to get the text height
+	</span>} <span class="kw">else </span>{
+		clone_dc.GetTextExtentPoint32(<span class="kw-2">&amp;</span>remove_accelerator_ampersands(text)).unwrap()
 	};
 
-	<span class="kw">if</span> <span class="ident">text</span>.<span class="ident">is_empty</span>() {
-		<span class="ident">bounds</span>.<span class="ident">cx</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// if no text was given, return just the height</span>
-	}
+	<span class="kw">if </span>text.is_empty() {
+		bounds.cx = <span class="number">0</span>; <span class="comment">// if no text was given, return just the height
+	</span>}
 
-	<span class="ident">clone_dc</span>.<span class="ident">SelectObjectFont</span>(<span class="ident">prev_hfont</span>).<span class="ident">unwrap</span>();
-	<span class="ident">clone_dc</span>.<span class="ident">DeleteDC</span>().<span class="ident">unwrap</span>();
-	<span class="ident">desktop_hwnd</span>.<span class="ident">ReleaseDC</span>(<span class="ident">desktop_hdc</span>).<span class="ident">unwrap</span>();
-	<span class="ident">bounds</span>
+	clone_dc.SelectObjectFont(prev_hfont).unwrap();
+	clone_dc.DeleteDC().unwrap();
+	desktop_hwnd.ReleaseDC(desktop_hdc).unwrap();
+	bounds
 }
 
-<span class="doccomment">/// Calculates the bound rectangle to fit the text with current system font,</span>
-<span class="doccomment">/// adding a check box.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">calc_text_bound_box_check</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">SIZE</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bound_box</span> <span class="op">=</span> <span class="ident">calc_text_bound_box</span>(<span class="ident">text</span>);
-	<span class="ident">bound_box</span>.<span class="ident">cx</span> <span class="op">+</span><span class="op">=</span> <span class="ident">GetSystemMetrics</span>(<span class="ident">co::SM::CXMENUCHECK</span>) <span class="comment">// https://stackoverflow.com/a/1165052/6923555</span>
-		<span class="op">+</span> <span class="ident">GetSystemMetrics</span>(<span class="ident">co::SM::CXEDGE</span>);
+<span class="doccomment">/// Calculates the bound rectangle to fit the text with current system font,
+/// adding a check box.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>calc_text_bound_box_check(text: <span class="kw-2">&amp;</span>str) -&gt; SIZE {
+	<span class="kw">let </span><span class="kw-2">mut </span>bound_box = calc_text_bound_box(text);
+	bound_box.cx += GetSystemMetrics(co::SM::CXMENUCHECK) <span class="comment">// https://stackoverflow.com/a/1165052/6923555
+		</span>+ GetSystemMetrics(co::SM::CXEDGE);
 
-	<span class="kw">let</span> <span class="ident">cy_check</span> <span class="op">=</span> <span class="ident">GetSystemMetrics</span>(<span class="ident">co::SM::CYMENUCHECK</span>);
-	<span class="kw">if</span> <span class="ident">cy_check</span> <span class="op">&gt;</span> <span class="ident">bound_box</span>.<span class="ident">cy</span> {
-		<span class="ident">bound_box</span>.<span class="ident">cy</span> <span class="op">=</span> <span class="ident">cy_check</span>; <span class="comment">// if the check is taller than the font, use its height</span>
-	}
+	<span class="kw">let </span>cy_check = GetSystemMetrics(co::SM::CYMENUCHECK);
+	<span class="kw">if </span>cy_check &gt; bound_box.cy {
+		bound_box.cy = cy_check; <span class="comment">// if the check is taller than the font, use its height
+	</span>}
 
-	<span class="ident">bound_box</span>
+	bound_box
 }
 
-<span class="kw">fn</span> <span class="ident">remove_accelerator_ampersands</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">txt_no_ampersands</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">text</span>.<span class="ident">len</span>());
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_ch</span> <span class="op">=</span> <span class="string">&#39;a&#39;</span>; <span class="comment">// initial value will be skipped</span>
+<span class="kw">fn </span>remove_accelerator_ampersands(text: <span class="kw-2">&amp;</span>str) -&gt; String {
+	<span class="kw">let </span><span class="kw-2">mut </span>txt_no_ampersands = String::with_capacity(text.len());
+	<span class="kw">let </span><span class="kw-2">mut </span>last_ch = <span class="string">&#39;a&#39;</span>; <span class="comment">// initial value will be skipped
 
-	<span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">text</span>.<span class="ident">char_indices</span>() {
-		<span class="kw">if</span> <span class="ident">idx</span> <span class="op">==</span> <span class="number">0</span> { <span class="comment">// first char</span>
-			<span class="kw">if</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;&amp;&#39;</span> {
-				<span class="ident">txt_no_ampersands</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+	</span><span class="kw">for </span>(idx, ch) <span class="kw">in </span>text.char_indices() {
+		<span class="kw">if </span>idx == <span class="number">0 </span>{ <span class="comment">// first char
+			</span><span class="kw">if </span>ch != <span class="string">&#39;&amp;&#39; </span>{
+				txt_no_ampersands.push(ch);
 			}
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;&amp;&#39;</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;&amp;&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">last_ch</span> <span class="op">==</span> <span class="string">&#39;&amp;&#39;</span>) {
-			<span class="ident">txt_no_ampersands</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+		} <span class="kw">else if </span>ch != <span class="string">&#39;&amp;&#39; </span>|| (ch == <span class="string">&#39;&amp;&#39; </span>&amp;&amp; last_ch == <span class="string">&#39;&amp;&#39;</span>) {
+			txt_no_ampersands.push(ch);
 		}
-		<span class="ident">last_ch</span> <span class="op">=</span> <span class="ident">ch</span>;
+		last_ch = ch;
 	}
 
-	<span class="ident">txt_no_ampersands</span>
+	txt_no_ampersands
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// Paints the themed border of an user control, if it has the proper styles.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">paint_control_borders</span>(<span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">wm_ncp</span>: <span class="ident">wm::NcPaint</span>) {
-	<span class="ident">hwnd</span>.<span class="ident">DefWindowProc</span>(<span class="ident">wm_ncp</span>); <span class="comment">// let the system draw the scrollbar for us</span>
+</span><span class="doccomment">/// Paints the themed border of an user control, if it has the proper styles.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>paint_control_borders(hwnd: HWND, wm_ncp: wm::NcPaint) {
+	hwnd.DefWindowProc(wm_ncp); <span class="comment">// let the system draw the scrollbar for us
 
-	<span class="kw">let</span> <span class="ident">ex_style</span> <span class="op">=</span> <span class="ident">co::WS_EX</span>(<span class="ident">hwnd</span>.<span class="ident">GetWindowLongPtr</span>(<span class="ident">co::GWLP::EXSTYLE</span>) <span class="kw">as</span> <span class="kw">_</span>);
-	<span class="kw">if</span> <span class="op">!</span><span class="ident">ex_style</span>.<span class="ident">has</span>(<span class="ident">co::WS_EX::CLIENTEDGE</span>) <span class="comment">// no border</span>
-		<span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">IsThemeActive</span>()
-		<span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">IsAppThemed</span>()
+	</span><span class="kw">let </span>ex_style = co::WS_EX(hwnd.GetWindowLongPtr(co::GWLP::EXSTYLE) <span class="kw">as _</span>);
+	<span class="kw">if </span>!ex_style.has(co::WS_EX::CLIENTEDGE) <span class="comment">// no border
+		</span>|| !IsThemeActive()
+		|| !IsAppThemed()
 	{
 		<span class="kw">return</span>;
 	}
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span> <span class="op">=</span> <span class="ident">hwnd</span>.<span class="ident">GetWindowRect</span>().<span class="ident">unwrap</span>(); <span class="comment">// window outmost coordinates, including margins</span>
-	<span class="ident">hwnd</span>.<span class="ident">ScreenToClientRc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rc</span>).<span class="ident">unwrap</span>();
-	<span class="ident">rc</span>.<span class="ident">left</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>; <span class="ident">rc</span>.<span class="ident">top</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>; <span class="ident">rc</span>.<span class="ident">right</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>; <span class="ident">rc</span>.<span class="ident">bottom</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>; <span class="comment">// because it comes up anchored at -2,-2</span>
+	<span class="kw">let </span><span class="kw-2">mut </span>rc = hwnd.GetWindowRect().unwrap(); <span class="comment">// window outmost coordinates, including margins
+	</span>hwnd.ScreenToClientRc(<span class="kw-2">&amp;mut </span>rc).unwrap();
+	rc.left += <span class="number">2</span>; rc.top += <span class="number">2</span>; rc.right += <span class="number">2</span>; rc.bottom += <span class="number">2</span>; <span class="comment">// because it comes up anchored at -2,-2
 
-	<span class="kw">let</span> <span class="ident">hdc</span> <span class="op">=</span> <span class="ident">hwnd</span>.<span class="ident">GetWindowDC</span>().<span class="ident">unwrap</span>();
+	</span><span class="kw">let </span>hdc = hwnd.GetWindowDC().unwrap();
 
-	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">htheme</span>) <span class="op">=</span> <span class="ident">hwnd</span>.<span class="ident">OpenThemeData</span>(<span class="string">&quot;LISTVIEW&quot;</span>) {
-		<span class="comment">// Draw only the borders to avoid flickering.</span>
-		<span class="ident">htheme</span>.<span class="ident">DrawThemeBackground</span>(<span class="ident">hdc</span>,
-			<span class="ident">co::VS::LISTVIEW_LISTGROUP</span>, <span class="ident">rc</span>,
-			<span class="ident">RECT</span> { <span class="ident">left</span>: <span class="ident">rc</span>.<span class="ident">left</span>, <span class="ident">top</span>: <span class="ident">rc</span>.<span class="ident">top</span>, <span class="ident">right</span>: <span class="ident">rc</span>.<span class="ident">left</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">bottom</span>: <span class="ident">rc</span>.<span class="ident">bottom</span> }).<span class="ident">unwrap</span>();
-		<span class="ident">htheme</span>.<span class="ident">DrawThemeBackground</span>(<span class="ident">hdc</span>,
-			<span class="ident">co::VS::LISTVIEW_LISTGROUP</span>, <span class="ident">rc</span>,
-			<span class="ident">RECT</span> { <span class="ident">left</span>: <span class="ident">rc</span>.<span class="ident">left</span>, <span class="ident">top</span>: <span class="ident">rc</span>.<span class="ident">top</span>, <span class="ident">right</span>: <span class="ident">rc</span>.<span class="ident">right</span>, <span class="ident">bottom</span>: <span class="ident">rc</span>.<span class="ident">top</span> <span class="op">+</span> <span class="number">2</span> }).<span class="ident">unwrap</span>();
-		<span class="ident">htheme</span>.<span class="ident">DrawThemeBackground</span>(<span class="ident">hdc</span>,
-			<span class="ident">co::VS::LISTVIEW_LISTGROUP</span>, <span class="ident">rc</span>,
-			<span class="ident">RECT</span> { <span class="ident">left</span>: <span class="ident">rc</span>.<span class="ident">right</span> <span class="op">-</span> <span class="number">2</span>, <span class="ident">top</span>: <span class="ident">rc</span>.<span class="ident">top</span>, <span class="ident">right</span>: <span class="ident">rc</span>.<span class="ident">right</span>, <span class="ident">bottom</span>: <span class="ident">rc</span>.<span class="ident">bottom</span> }).<span class="ident">unwrap</span>();
-		<span class="ident">htheme</span>.<span class="ident">DrawThemeBackground</span>(<span class="ident">hdc</span>,
-			<span class="ident">co::VS::LISTVIEW_LISTGROUP</span>, <span class="ident">rc</span>,
-			<span class="ident">RECT</span> { <span class="ident">left</span>: <span class="ident">rc</span>.<span class="ident">left</span>, <span class="ident">top</span>: <span class="ident">rc</span>.<span class="ident">bottom</span> <span class="op">-</span> <span class="number">2</span>, <span class="ident">right</span>: <span class="ident">rc</span>.<span class="ident">right</span>, <span class="ident">bottom</span>: <span class="ident">rc</span>.<span class="ident">bottom</span> }).<span class="ident">unwrap</span>();
+	<span class="kw">if let </span><span class="prelude-val">Some</span>(htheme) = hwnd.OpenThemeData(<span class="string">&quot;LISTVIEW&quot;</span>) {
+		<span class="comment">// Draw only the borders to avoid flickering.
+		</span>htheme.DrawThemeBackground(hdc,
+			co::VS::LISTVIEW_LISTGROUP, rc,
+			RECT { left: rc.left, top: rc.top, right: rc.left + <span class="number">2</span>, bottom: rc.bottom }).unwrap();
+		htheme.DrawThemeBackground(hdc,
+			co::VS::LISTVIEW_LISTGROUP, rc,
+			RECT { left: rc.left, top: rc.top, right: rc.right, bottom: rc.top + <span class="number">2 </span>}).unwrap();
+		htheme.DrawThemeBackground(hdc,
+			co::VS::LISTVIEW_LISTGROUP, rc,
+			RECT { left: rc.right - <span class="number">2</span>, top: rc.top, right: rc.right, bottom: rc.bottom }).unwrap();
+		htheme.DrawThemeBackground(hdc,
+			co::VS::LISTVIEW_LISTGROUP, rc,
+			RECT { left: rc.left, top: rc.bottom - <span class="number">2</span>, right: rc.right, bottom: rc.bottom }).unwrap();
 
-		<span class="ident">htheme</span>.<span class="ident">CloseThemeData</span>().<span class="ident">unwrap</span>();
+		htheme.CloseThemeData().unwrap();
 	}
 
-	<span class="ident">hwnd</span>.<span class="ident">ReleaseDC</span>(<span class="ident">hdc</span>).<span class="ident">unwrap</span>();
+	hwnd.ReleaseDC(hdc).unwrap();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

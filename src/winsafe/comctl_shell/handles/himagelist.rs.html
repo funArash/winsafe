@@ -53,60 +53,60 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::HIMAGELIST</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">comctl_Himagelist</span>, <span class="ident">user_Hicon</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl</span>::{<span class="ident">SHFILEINFO</span>, <span class="ident">SHGetFileInfo</span>};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HIMAGELIST;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{comctl_Himagelist, user_Hicon};
+<span class="kw">use </span><span class="kw">crate</span>::shell::decl::{SHFILEINFO, SHGetFileInfo};
 
-<span class="kw">impl</span> <span class="ident">comctl_shell_Himagelist</span> <span class="kw">for</span> <span class="ident">HIMAGELIST</span> {}
+<span class="kw">impl </span>comctl_shell_Himagelist <span class="kw">for </span>HIMAGELIST {}
 
-<span class="doccomment">/// This trait is enabled with `comctl` and `shell` features, and provides</span>
-<span class="doccomment">/// methods for [`HIMAGELIST`](crate::HIMAGELIST).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">comctl_shell_Himagelist</span>: <span class="ident">comctl_Himagelist</span> {
-	<span class="doccomment">/// Calls [`SHGetFileInfo`](crate::SHGetFileInfo) to retrieve one or more</span>
-	<span class="doccomment">/// shell file icons, then passes them to</span>
-	<span class="doccomment">/// [`AddIcon`](crate::prelude::comctl_Himagelist::AddIcon).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HIMAGELIST, SIZE};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let himgl = HIMAGELIST::Create(</span>
-	<span class="doccomment">///     SIZE::new(16, 16), co::ILC::COLOR32, 1, 1)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// himgl.add_icon_from_shell(&amp;[&quot;mp3&quot;, &quot;wav&quot;])?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// himgl.Destroy()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">add_icon_from_shell</span>(<span class="self">self</span>, <span class="ident">file_extensions</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">GetIconSize</span>()<span class="question-mark">?</span>;
-		<span class="kw">if</span> <span class="op">!</span><span class="ident">sz</span>.<span class="ident">is</span>(<span class="number">16</span>, <span class="number">16</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sz</span>.<span class="ident">is</span>(<span class="number">32</span>, <span class="number">32</span>) {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_SUPPORTED</span>); <span class="comment">// only 16x16 or 32x32 icons can be loaded</span>
-		}
+<span class="doccomment">/// This trait is enabled with `comctl` and `shell` features, and provides
+/// methods for [`HIMAGELIST`](crate::HIMAGELIST).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))))]</span>
+<span class="kw">pub trait </span>comctl_shell_Himagelist: comctl_Himagelist {
+	<span class="doccomment">/// Calls [`SHGetFileInfo`](crate::SHGetFileInfo) to retrieve one or more
+	/// shell file icons, then passes them to
+	/// [`AddIcon`](crate::prelude::comctl_Himagelist::AddIcon).
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HIMAGELIST, SIZE};
+	///
+	/// let himgl = HIMAGELIST::Create(
+	///     SIZE::new(16, 16), co::ILC::COLOR32, 1, 1)?;
+	///
+	/// himgl.add_icon_from_shell(&amp;[&quot;mp3&quot;, &quot;wav&quot;])?;
+	///
+	/// himgl.Destroy()?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>add_icon_from_shell(<span class="self">self</span>, file_extensions: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span>sz = <span class="self">self</span>.GetIconSize()<span class="question-mark">?</span>;
+		<span class="kw">if </span>!sz.is(<span class="number">16</span>, <span class="number">16</span>) &amp;&amp; !sz.is(<span class="number">32</span>, <span class="number">32</span>) {
+			<span class="kw">return </span><span class="prelude-val">Err</span>(co::ERROR::NOT_SUPPORTED); <span class="comment">// only 16x16 or 32x32 icons can be loaded
+		</span>}
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shfi</span> <span class="op">=</span> <span class="ident">SHFILEINFO::default</span>();
-		<span class="kw">for</span> <span class="ident">file_extension</span> <span class="kw">in</span> <span class="ident">file_extensions</span>.<span class="ident">iter</span>() {
-			<span class="ident">SHGetFileInfo</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;*.{}&quot;</span>, <span class="ident">file_extension</span>), <span class="ident">co::FILE_ATTRIBUTE::NORMAL</span>,
-				<span class="kw-2">&amp;mut</span> <span class="ident">shfi</span>, <span class="ident">co::SHGFI::USEFILEATTRIBUTES</span> <span class="op">|</span> <span class="ident">co::SHGFI::ICON</span> <span class="op">|</span>
-				<span class="kw">if</span> <span class="ident">sz</span>.<span class="ident">is</span>(<span class="number">16</span>, <span class="number">16</span>) { <span class="ident">co::SHGFI::SMALLICON</span> } <span class="kw">else</span> { <span class="ident">co::SHGFI::LARGEICON</span> })<span class="question-mark">?</span>;
-			<span class="self">self</span>.<span class="ident">AddIcon</span>(<span class="ident">shfi</span>.<span class="ident">hIcon</span>)<span class="question-mark">?</span>;
-			<span class="ident">shfi</span>.<span class="ident">hIcon</span>.<span class="ident">DestroyIcon</span>()<span class="question-mark">?</span>;
+		<span class="kw">let </span><span class="kw-2">mut </span>shfi = SHFILEINFO::default();
+		<span class="kw">for </span>file_extension <span class="kw">in </span>file_extensions.iter() {
+			SHGetFileInfo(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;*.{}&quot;</span>, file_extension), co::FILE_ATTRIBUTE::NORMAL,
+				<span class="kw-2">&amp;mut </span>shfi, co::SHGFI::USEFILEATTRIBUTES | co::SHGFI::ICON |
+				<span class="kw">if </span>sz.is(<span class="number">16</span>, <span class="number">16</span>) { co::SHGFI::SMALLICON } <span class="kw">else </span>{ co::SHGFI::LARGEICON })<span class="question-mark">?</span>;
+			<span class="self">self</span>.AddIcon(shfi.hIcon)<span class="question-mark">?</span>;
+			shfi.hIcon.DestroyIcon()<span class="question-mark">?</span>;
 		}
 		<span class="prelude-val">Ok</span>(())
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

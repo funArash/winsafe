@@ -61,48 +61,48 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::ops</span>;
+<span class="kw">use </span>std::ops;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">HLOCAL</span>, <span class="ident">LANGID</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::kernel_Hlocal</span>;
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HLOCAL, LANGID, WString};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::kernel_Hlocal;
 
-<span class="doccomment">/// A system error which can be formatted with</span>
-<span class="doccomment">/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FormattedError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Returns the textual description of the system error, by calling</span>
-	<span class="doccomment">/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)</span>
-	<span class="doccomment">/// function.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">FormatMessage</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-		<span class="kw">let</span> <span class="ident">err_code</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ptr_buf</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-			<span class="kw">match</span> <span class="ident">kernel::ffi::FormatMessageW</span>(
-				<span class="ident">co::FORMAT_MESSAGE::ALLOCATE_BUFFER</span>.<span class="number">0</span>
-					<span class="op">|</span> <span class="ident">co::FORMAT_MESSAGE::FROM_SYSTEM</span>.<span class="number">0</span>
-					<span class="op">|</span> <span class="ident">co::FORMAT_MESSAGE::IGNORE_INSERTS</span>.<span class="number">0</span>,
-				<span class="ident">std::ptr::null</span>(),
-				<span class="ident">err_code</span>,
-				<span class="ident">LANGID::USER_DEFAULT</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-				(<span class="kw-2">&amp;mut</span> <span class="ident">ptr_buf</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">u16</span>) <span class="kw">as</span> <span class="kw">_</span>, <span class="comment">// pass pointer to pointer</span>
-				<span class="number">0</span>,
-				<span class="ident">std::ptr::null_mut</span>(),
+<span class="doccomment">/// A system error which can be formatted with
+/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>FormattedError: Into&lt;u32&gt; {
+	<span class="doccomment">/// Returns the textual description of the system error, by calling
+	/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)
+	/// function.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>FormatMessage(<span class="self">self</span>) -&gt; String {
+		<span class="kw">let </span>err_code: u32 = <span class="self">self</span>.into();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ptr_buf: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
+			<span class="kw">match </span>kernel::ffi::FormatMessageW(
+				co::FORMAT_MESSAGE::ALLOCATE_BUFFER.<span class="number">0
+					</span>| co::FORMAT_MESSAGE::FROM_SYSTEM.<span class="number">0
+					</span>| co::FORMAT_MESSAGE::IGNORE_INSERTS.<span class="number">0</span>,
+				std::ptr::null(),
+				err_code,
+				LANGID::USER_DEFAULT.<span class="number">0 </span><span class="kw">as _</span>,
+				(<span class="kw-2">&amp;mut </span>ptr_buf <span class="kw">as </span><span class="kw-2">*mut *mut </span>u16) <span class="kw">as _</span>, <span class="comment">// pass pointer to pointer
+				</span><span class="number">0</span>,
+				std::ptr::null_mut(),
 			) {
-				<span class="number">0</span> =&gt; <span class="macro">format!</span>( <span class="comment">// never fails, returns a message instead</span>
-					<span class="string">&quot;FormatMessage failed to format error {:#06x}: error {:#06x}.&quot;</span>,
-					<span class="ident">err_code</span>, <span class="ident">GetLastError</span>(),
+				<span class="number">0 </span>=&gt; <span class="macro">format!</span>( <span class="comment">// never fails, returns a message instead
+					</span><span class="string">&quot;FormatMessage failed to format error {:#06x}: error {:#06x}.&quot;</span>,
+					err_code, GetLastError(),
 				),
-				<span class="ident">nchars</span> =&gt; {
-					<span class="kw">let</span> <span class="ident">final_str</span> <span class="op">=</span> <span class="ident">WString::from_wchars_count</span>(<span class="ident">ptr_buf</span>, <span class="ident">nchars</span> <span class="kw">as</span> <span class="kw">_</span>);
-					<span class="kw">match</span> (<span class="ident">HLOCAL</span>(<span class="ident">ptr_buf</span> <span class="kw">as</span> <span class="kw">_</span>)).<span class="ident">LocalFree</span>() {
-						<span class="prelude-val">Ok</span>(()) =&gt; <span class="ident">final_str</span>.<span class="ident">to_string</span>(),
-						<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">format!</span>(
+				nchars =&gt; {
+					<span class="kw">let </span>final_str = WString::from_wchars_count(ptr_buf, nchars <span class="kw">as _</span>);
+					<span class="kw">match </span>(HLOCAL(ptr_buf <span class="kw">as _</span>)).LocalFree() {
+						<span class="prelude-val">Ok</span>(()) =&gt; final_str.to_string(),
+						<span class="prelude-val">Err</span>(e) =&gt; <span class="macro">format!</span>(
 							<span class="string">&quot;LocalFree failed after formatting error {:#06x}: error {:#06x}.&quot;</span>,
-							<span class="ident">err_code</span>, <span class="ident">e</span>.<span class="number">0</span>),
+							err_code, e.<span class="number">0</span>),
 					}
 				},
 			}
@@ -110,19 +110,19 @@
 	}
 }
 
-<span class="doccomment">/// A native bitflag constant.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NativeBitflag</span>: <span class="ident">Sized</span>
-	<span class="op">+</span> <span class="ident">ops::BitAnd</span> <span class="op">+</span> <span class="ident">ops::BitAndAssign</span>
-	<span class="op">+</span> <span class="ident">ops::BitOr</span> <span class="op">+</span> <span class="ident">ops::BitOrAssign</span>
-	<span class="op">+</span> <span class="ident">ops::BitXor</span> <span class="op">+</span> <span class="ident">ops::BitXorAssign</span>
-	<span class="op">+</span> <span class="ident">ops::Not</span>
+<span class="doccomment">/// A native bitflag constant.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>NativeBitflag: Sized
+	+ ops::BitAnd + ops::BitAndAssign
+	+ ops::BitOr + ops::BitOrAssign
+	+ ops::BitXor + ops::BitXorAssign
+	+ ops::Not
 {
-	<span class="doccomment">/// Tells whether other bitflag style is present.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Equivalent to `(val &amp; other) != 0`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">has</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident">bool</span>;
+	<span class="doccomment">/// Tells whether other bitflag style is present.
+	///
+	/// Equivalent to `(val &amp; other) != 0`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>has(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

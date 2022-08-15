@@ -175,182 +175,182 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">FileAccess</span>, <span class="ident">FileMapped</span>, <span class="ident">HFILE</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">HandleClose</span>, <span class="ident">kernel_Hfile</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FileAccess, FileMapped, HFILE, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{HandleClose, kernel_Hfile};
 
-<span class="doccomment">/// Keeps sections and key/value pairs of a `.ini` file, also doing parsing and</span>
-<span class="doccomment">/// serialization of the data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::Ini;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let fini = Ini::parse_from_file(&quot;C:\\Temp\\my_file.ini&quot;)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for section in fini.sections.iter() {</span>
-<span class="doccomment">///     println!(&quot;Section: {}&quot;, section.name);</span>
-<span class="doccomment">///     for entry in section.entries.iter() {</span>
-<span class="doccomment">///         println!(&quot;Key: {}; Value: {}&quot;, entry.key, entry.val);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ini</span> {
-	<span class="doccomment">/// All the sections of the file. The values can be modified at will.</span>
-	<span class="kw">pub</span> <span class="ident">sections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IniSection</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Keeps sections and key/value pairs of a `.ini` file, also doing parsing and
+/// serialization of the data.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::Ini;
+///
+/// let fini = Ini::parse_from_file(&quot;C:\\Temp\\my_file.ini&quot;)?;
+///
+/// for section in fini.sections.iter() {
+///     println!(&quot;Section: {}&quot;, section.name);
+///     for entry in section.entries.iter() {
+///         println!(&quot;Key: {}; Value: {}&quot;, entry.key, entry.val);
+///     }
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub struct </span>Ini {
+	<span class="doccomment">/// All the sections of the file. The values can be modified at will.
+	</span><span class="kw">pub </span>sections: Vec&lt;IniSection&gt;,
 }
 
-<span class="doccomment">/// A single section of an [`Ini`](crate::Ini).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IniSection</span> {
-	<span class="doccomment">/// The name of this section.</span>
-	<span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-	<span class="doccomment">/// All key/value pairs of this section.</span>
-	<span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IniEntry</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A single section of an [`Ini`](crate::Ini).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IniSection {
+	<span class="doccomment">/// The name of this section.
+	</span><span class="kw">pub </span>name: String,
+	<span class="doccomment">/// All key/value pairs of this section.
+	</span><span class="kw">pub </span>entries: Vec&lt;IniEntry&gt;,
 }
 
-<span class="doccomment">/// A single key/value pair of an [`IniSection`](crate::IniSection) of an</span>
-<span class="doccomment">/// [`Ini`](crate::Ini).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IniEntry</span> {
-	<span class="doccomment">/// Key of this entry.</span>
-	<span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">String</span>,
-	<span class="doccomment">/// Value of this entry.</span>
-	<span class="kw">pub</span> <span class="ident">val</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A single key/value pair of an [`IniSection`](crate::IniSection) of an
+/// [`Ini`](crate::Ini).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IniEntry {
+	<span class="doccomment">/// Key of this entry.
+	</span><span class="kw">pub </span>key: String,
+	<span class="doccomment">/// Value of this entry.
+	</span><span class="kw">pub </span>val: String,
 }
 
-<span class="kw">impl</span> <span class="ident">Ini</span> {
-	<span class="doccomment">/// Parses an `Ini` from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">contents</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Ini</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">Vec::default</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_section</span> <span class="op">=</span> <span class="ident">IniSection</span> {
-			<span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">entries</span>: <span class="ident">Vec::default</span>(),
+<span class="kw">impl </span>Ini {
+	<span class="doccomment">/// Parses an `Ini` from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>parse_str(contents: <span class="kw-2">&amp;</span>str) -&gt; Ini {
+		<span class="kw">let </span><span class="kw-2">mut </span>sections = Vec::default();
+		<span class="kw">let </span><span class="kw-2">mut </span>cur_section = IniSection {
+			name: <span class="string">&quot;&quot;</span>.to_owned(),
+			entries: Vec::default(),
 		};
 
-		<span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">contents</span>.<span class="ident">lines</span>() {
-			<span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">trim</span>();
+		<span class="kw">for </span>line <span class="kw">in </span>contents.lines() {
+			<span class="kw">let </span>line = line.trim();
 
-			<span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;[&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">line</span>.<span class="ident">ends_with</span>(<span class="string">&#39;]&#39;</span>) {
-				<span class="kw">if</span> <span class="ident">cur_section</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">cur_section</span>.<span class="ident">entries</span>.<span class="ident">is_empty</span>() {
-					<span class="ident">sections</span>.<span class="ident">push</span>(<span class="ident">cur_section</span>);
+			<span class="kw">if </span>line.starts_with(<span class="string">&#39;[&#39;</span>) &amp;&amp; line.ends_with(<span class="string">&#39;]&#39;</span>) {
+				<span class="kw">if </span>cur_section.name != <span class="string">&quot;&quot; </span>|| !cur_section.entries.is_empty() {
+					sections.push(cur_section);
 				}
-				<span class="ident">cur_section</span> <span class="op">=</span> <span class="ident">IniSection</span> {
-					<span class="ident">name</span>: <span class="ident">line</span>[<span class="number">1</span>..<span class="ident">line</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">to_owned</span>(),
-					<span class="ident">entries</span>: <span class="ident">Vec::default</span>(),
+				cur_section = IniSection {
+					name: line[<span class="number">1</span>..line.len() - <span class="number">1</span>].to_owned(),
+					entries: Vec::default(),
 				};
 				<span class="kw">continue</span>;
 			}
 
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">eq_idx</span>) <span class="op">=</span> <span class="ident">line</span>.<span class="ident">find</span>(<span class="string">&#39;=&#39;</span>) {
-				<span class="ident">cur_section</span>.<span class="ident">entries</span>.<span class="ident">push</span>(<span class="ident">IniEntry</span> {
-					<span class="ident">key</span>: <span class="ident">line</span>[..<span class="ident">eq_idx</span>].<span class="ident">to_owned</span>(),
-					<span class="ident">val</span>: <span class="ident">line</span>[<span class="ident">eq_idx</span> <span class="op">+</span> <span class="number">1</span>..].<span class="ident">to_owned</span>(),
+			<span class="kw">if let </span><span class="prelude-val">Some</span>(eq_idx) = line.find(<span class="string">&#39;=&#39;</span>) {
+				cur_section.entries.push(IniEntry {
+					key: line[..eq_idx].to_owned(),
+					val: line[eq_idx + <span class="number">1</span>..].to_owned(),
 				});
 			}
 		}
-		<span class="kw">if</span> <span class="ident">cur_section</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">cur_section</span>.<span class="ident">entries</span>.<span class="ident">is_empty</span>() {
-			<span class="ident">sections</span>.<span class="ident">push</span>(<span class="ident">cur_section</span>);
+		<span class="kw">if </span>cur_section.name != <span class="string">&quot;&quot; </span>|| !cur_section.entries.is_empty() {
+			sections.push(cur_section);
 		}
 
-		<span class="self">Self</span> { <span class="ident">sections</span> }
+		<span class="self">Self </span>{ sections }
 	}
 
-	<span class="doccomment">/// Parses an `Ini` from raw bytes. The [`Encoding`](crate::Encoding) will</span>
-	<span class="doccomment">/// be guessed with</span>
-	<span class="doccomment">/// [`WString::guess_encoding`](crate::WString::guess_encoding).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">Ini</span><span class="op">&gt;</span> {
+	<span class="doccomment">/// Parses an `Ini` from raw bytes. The [`Encoding`](crate::Encoding) will
+	/// be guessed with
+	/// [`WString::guess_encoding`](crate::WString::guess_encoding).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;Ini&gt; {
 		<span class="prelude-val">Ok</span>(
-			<span class="ident"><span class="self">Self</span>::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">WString::parse_str</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>()),
+			<span class="self">Self</span>::parse_str(<span class="kw-2">&amp;</span>WString::parse_str(bytes)<span class="question-mark">?</span>.to_string()),
 		)
 	}
 
-	<span class="doccomment">/// Parses an `Ini` directly from a file.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_from_file</span>(<span class="ident">ini_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">Ini</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">fin</span> <span class="op">=</span> <span class="ident">FileMapped::open</span>(<span class="ident">ini_path</span>, <span class="ident">FileAccess::ExistingReadOnly</span>)<span class="question-mark">?</span>;
-		<span class="ident"><span class="self">Self</span>::parse_bytes</span>(<span class="ident">fin</span>.<span class="ident">as_slice</span>())
+	<span class="doccomment">/// Parses an `Ini` directly from a file.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Ini&gt; {
+		<span class="kw">let </span>fin = FileMapped::open(ini_path, FileAccess::ExistingReadOnly)<span class="question-mark">?</span>;
+		<span class="self">Self</span>::parse_bytes(fin.as_slice())
 	}
 
-	<span class="doccomment">/// Serializes the data to a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tot_size</span> <span class="op">=</span> <span class="number">0</span>;
-		<span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">section</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-			<span class="ident">tot_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">section</span>.<span class="ident">name</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>;
-			<span class="kw">for</span> <span class="ident">entry</span> <span class="kw">in</span> <span class="ident">section</span>.<span class="ident">entries</span>.<span class="ident">iter</span>() {
-				<span class="ident">tot_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">entry</span>.<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">entry</span>.<span class="ident">val</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">2</span>;
+	<span class="doccomment">/// Serializes the data to a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>serialize_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+		<span class="kw">let </span><span class="kw-2">mut </span>tot_size = <span class="number">0</span>;
+		<span class="kw">for </span>(idx, section) <span class="kw">in </span><span class="self">self</span>.sections.iter().enumerate() {
+			tot_size += section.name.len() + <span class="number">2 </span>+ <span class="number">2</span>;
+			<span class="kw">for </span>entry <span class="kw">in </span>section.entries.iter() {
+				tot_size += entry.key.len() + <span class="number">1 </span>+ entry.val.len() + <span class="number">2</span>;
 			}
-			<span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-				<span class="ident">tot_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+			<span class="kw">if </span>idx &lt; <span class="self">self</span>.sections.len() - <span class="number">1 </span>{
+				tot_size += <span class="number">2</span>;
 			}
 		}
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">tot_size</span>);
-		<span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">section</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-			<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;[&#39;</span>);
-			<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">section</span>.<span class="ident">name</span>);
-			<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;]\r\n&quot;</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = String::with_capacity(tot_size);
+		<span class="kw">for </span>(idx, section) <span class="kw">in </span><span class="self">self</span>.sections.iter().enumerate() {
+			buf.push(<span class="string">&#39;[&#39;</span>);
+			buf.push_str(<span class="kw-2">&amp;</span>section.name);
+			buf.push_str(<span class="string">&quot;]\r\n&quot;</span>);
 
-			<span class="kw">for</span> <span class="ident">entry</span> <span class="kw">in</span> <span class="ident">section</span>.<span class="ident">entries</span>.<span class="ident">iter</span>() {
-				<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">entry</span>.<span class="ident">key</span>);
-				<span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;=&#39;</span>);
-				<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">entry</span>.<span class="ident">val</span>);
-				<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;\r\n&quot;</span>);
+			<span class="kw">for </span>entry <span class="kw">in </span>section.entries.iter() {
+				buf.push_str(<span class="kw-2">&amp;</span>entry.key);
+				buf.push(<span class="string">&#39;=&#39;</span>);
+				buf.push_str(<span class="kw-2">&amp;</span>entry.val);
+				buf.push_str(<span class="string">&quot;\r\n&quot;</span>);
 			}
 
-			<span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-				<span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;\r\n&quot;</span>);
+			<span class="kw">if </span>idx &lt; <span class="self">self</span>.sections.len() - <span class="number">1 </span>{
+				buf.push_str(<span class="string">&quot;\r\n&quot;</span>);
 			}
 		}
-		<span class="ident">buf</span>
+		buf
 	}
 
-	<span class="doccomment">/// Serializes the data to raw bytes with</span>
-	<span class="doccomment">/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">serialize_to_str</span>().<span class="ident">into_bytes</span>()
+	<span class="doccomment">/// Serializes the data to raw bytes with
+	/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>serialize_to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+		<span class="self">self</span>.serialize_to_str().into_bytes()
 	}
 
-	<span class="doccomment">/// Serializes the data directly to a file.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_to_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ini_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="ident">fout</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">HFILE::CreateFile</span>(<span class="ident">ini_path</span>, <span class="ident">co::GENERIC::WRITE</span>,
-			<span class="ident">co::FILE_SHARE::NoValue</span>, <span class="prelude-val">None</span>, <span class="ident">co::DISPOSITION::CREATE_ALWAYS</span>,
-			<span class="ident">co::FILE_ATTRIBUTE::NORMAL</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+	<span class="doccomment">/// Serializes the data directly to a file.
+	</span><span class="kw">pub fn </span>serialize_to_file(<span class="kw-2">&amp;</span><span class="self">self</span>, ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span>(fout, <span class="kw">_</span>) = HFILE::CreateFile(ini_path, co::GENERIC::WRITE,
+			co::FILE_SHARE::NoValue, <span class="prelude-val">None</span>, co::DISPOSITION::CREATE_ALWAYS,
+			co::FILE_ATTRIBUTE::NORMAL, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-		<span class="ident">fout</span>.<span class="ident">WriteFile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">serialize_to_bytes</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-		<span class="ident">fout</span>.<span class="ident">CloseHandle</span>()<span class="question-mark">?</span>;
+		fout.WriteFile(<span class="kw-2">&amp;</span><span class="self">self</span>.serialize_to_bytes(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+		fout.CloseHandle()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}
 
-	<span class="doccomment">/// Returns a reference to the specified value, if any.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">iter</span>()
-			.<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">section</span>)
-			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">entries</span>.<span class="ident">iter</span>()
-				.<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">key</span> <span class="op">==</span> <span class="ident">key</span>)
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">val</span>.<span class="ident">as_ref</span>())
+	<span class="doccomment">/// Returns a reference to the specified value, if any.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+		<span class="self">self</span>.sections.iter()
+			.find(|s| s.name == section)
+			.and_then(|s| s.entries.iter()
+				.find(|e| e.key == key)
+				.map(|e| e.val.as_ref())
 			)
 	}
 
-	<span class="doccomment">/// Returns a mutable reference to the specified value, if any.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">str</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">iter_mut</span>()
-			.<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">section</span>)
-			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">entries</span>.<span class="ident">iter_mut</span>()
-				.<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">key</span> <span class="op">==</span> <span class="ident">key</span>)
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">val</span>.<span class="ident">as_mut</span>())
+	<span class="doccomment">/// Returns a mutable reference to the specified value, if any.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>str&gt; {
+		<span class="self">self</span>.sections.iter_mut()
+			.find(|s| s.name == section)
+			.and_then(|s| s.entries.iter_mut()
+				.find(|e| e.key == key)
+				.map(|e| e.val.as_mut())
 			)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -72,79 +72,79 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{
-	<span class="ident">HIDWORD</span>, <span class="ident">HIWORD</span>, <span class="ident">LODWORD</span>, <span class="ident">LOWORD</span>, <span class="ident">MAKEDWORD</span>, <span class="ident">MAKEQWORD</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	HIDWORD, HIWORD, LODWORD, LOWORD, MAKEDWORD, MAKEQWORD,
 };
 
-<span class="doccomment">/// [`VS_FIXEDFILEINFO`](https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VS_FIXEDFILEINFO</span> {
-	<span class="ident">dwSignature</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwStrucVersion</span>: <span class="ident">u32</span>,
-	<span class="ident">dwFileVersionMS</span>: <span class="ident">u32</span>,
-	<span class="ident">dwFileVersionLS</span>: <span class="ident">u32</span>,
-	<span class="ident">dwProductVersionMS</span>: <span class="ident">u32</span>,
-	<span class="ident">dwProductVersionLS</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFileFlagsMask</span>: <span class="ident">co::VS_FF</span>,
-	<span class="kw">pub</span> <span class="ident">dwFileFlags</span>: <span class="ident">co::VS_FF</span>,
-	<span class="kw">pub</span> <span class="ident">dwFileOS</span>: <span class="ident">co::VOS</span>,
-	<span class="kw">pub</span> <span class="ident">dwFileType</span>: <span class="ident">co::VFT</span>,
-	<span class="kw">pub</span> <span class="ident">dwFileSubtype</span>: <span class="ident">co::VFT2</span>,
-	<span class="ident">dwFileDateMS</span>: <span class="ident">u32</span>,
-	<span class="ident">dwFileDateLS</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`VS_FIXEDFILEINFO`](https://docs.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>VS_FIXEDFILEINFO {
+	dwSignature: u32,
+	<span class="kw">pub </span>dwStrucVersion: u32,
+	dwFileVersionMS: u32,
+	dwFileVersionLS: u32,
+	dwProductVersionMS: u32,
+	dwProductVersionLS: u32,
+	<span class="kw">pub </span>dwFileFlagsMask: co::VS_FF,
+	<span class="kw">pub </span>dwFileFlags: co::VS_FF,
+	<span class="kw">pub </span>dwFileOS: co::VOS,
+	<span class="kw">pub </span>dwFileType: co::VFT,
+	<span class="kw">pub </span>dwFileSubtype: co::VFT2,
+	dwFileDateMS: u32,
+	dwFileDateLS: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">VS_FIXEDFILEINFO</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::mem::zeroed</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() };
-		<span class="ident">obj</span>.<span class="ident">dwSignature</span> <span class="op">=</span> <span class="number">0xfeef_04bd</span>;
-		<span class="ident">obj</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>VS_FIXEDFILEINFO {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;<span class="self">Self</span>&gt;() };
+		obj.dwSignature = <span class="number">0xfeef_04bd</span>;
+		obj
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">VS_FIXEDFILEINFO</span> {
-	<span class="doccomment">/// Returns the `dwFileVersionMS` and `dwFileVersionLS` fields.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dwFileVersion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u16</span>; <span class="number">4</span>] {
-		[<span class="ident">HIWORD</span>(<span class="self">self</span>.<span class="ident">dwFileVersionMS</span>), <span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="ident">dwFileVersionMS</span>),
-			<span class="ident">HIWORD</span>(<span class="self">self</span>.<span class="ident">dwFileVersionLS</span>), <span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="ident">dwFileVersionLS</span>)]
+<span class="kw">impl </span>VS_FIXEDFILEINFO {
+	<span class="doccomment">/// Returns the `dwFileVersionMS` and `dwFileVersionLS` fields.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dwFileVersion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u16; <span class="number">4</span>] {
+		[HIWORD(<span class="self">self</span>.dwFileVersionMS), LOWORD(<span class="self">self</span>.dwFileVersionMS),
+			HIWORD(<span class="self">self</span>.dwFileVersionLS), LOWORD(<span class="self">self</span>.dwFileVersionLS)]
 	}
 
-	<span class="doccomment">/// Sets the `dwFileVersionMS` and `dwFileVersionLS` fields.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dwFileVersion</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: [<span class="ident">u16</span>; <span class="number">4</span>]) {
-		<span class="self">self</span>.<span class="ident">dwFileVersionMS</span> <span class="op">=</span> <span class="ident">MAKEDWORD</span>(<span class="ident">val</span>[<span class="number">1</span>], <span class="ident">val</span>[<span class="number">0</span>]);
-		<span class="self">self</span>.<span class="ident">dwFileVersionLS</span> <span class="op">=</span> <span class="ident">MAKEDWORD</span>(<span class="ident">val</span>[<span class="number">3</span>], <span class="ident">val</span>[<span class="number">2</span>]);
+	<span class="doccomment">/// Sets the `dwFileVersionMS` and `dwFileVersionLS` fields.
+	</span><span class="kw">pub fn </span>set_dwFileVersion(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: [u16; <span class="number">4</span>]) {
+		<span class="self">self</span>.dwFileVersionMS = MAKEDWORD(val[<span class="number">1</span>], val[<span class="number">0</span>]);
+		<span class="self">self</span>.dwFileVersionLS = MAKEDWORD(val[<span class="number">3</span>], val[<span class="number">2</span>]);
 	}
 
-	<span class="doccomment">/// Returns the `dwProductVersionMS` and `dwProductVersionLS` fields.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dwProductVersion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u16</span>; <span class="number">4</span>] {
-		[<span class="ident">HIWORD</span>(<span class="self">self</span>.<span class="ident">dwProductVersionMS</span>), <span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="ident">dwProductVersionMS</span>),
-			<span class="ident">HIWORD</span>(<span class="self">self</span>.<span class="ident">dwProductVersionLS</span>), <span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="ident">dwProductVersionLS</span>)]
+	<span class="doccomment">/// Returns the `dwProductVersionMS` and `dwProductVersionLS` fields.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dwProductVersion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u16; <span class="number">4</span>] {
+		[HIWORD(<span class="self">self</span>.dwProductVersionMS), LOWORD(<span class="self">self</span>.dwProductVersionMS),
+			HIWORD(<span class="self">self</span>.dwProductVersionLS), LOWORD(<span class="self">self</span>.dwProductVersionLS)]
 	}
 
-	<span class="doccomment">/// Sets the `dwProductVersionMS` and `dwProductVersionLS` fields.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dwProductVersion</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: [<span class="ident">u16</span>; <span class="number">4</span>]) {
-		<span class="self">self</span>.<span class="ident">dwProductVersionMS</span> <span class="op">=</span> <span class="ident">MAKEDWORD</span>(<span class="ident">val</span>[<span class="number">1</span>], <span class="ident">val</span>[<span class="number">0</span>]);
-		<span class="self">self</span>.<span class="ident">dwProductVersionLS</span> <span class="op">=</span> <span class="ident">MAKEDWORD</span>(<span class="ident">val</span>[<span class="number">3</span>], <span class="ident">val</span>[<span class="number">2</span>]);
+	<span class="doccomment">/// Sets the `dwProductVersionMS` and `dwProductVersionLS` fields.
+	</span><span class="kw">pub fn </span>set_dwProductVersion(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: [u16; <span class="number">4</span>]) {
+		<span class="self">self</span>.dwProductVersionMS = MAKEDWORD(val[<span class="number">1</span>], val[<span class="number">0</span>]);
+		<span class="self">self</span>.dwProductVersionLS = MAKEDWORD(val[<span class="number">3</span>], val[<span class="number">2</span>]);
 	}
 
-	<span class="doccomment">/// Returns the `dwFileDateMS` and `dwFileDateLS` fields.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dwFileDate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-		<span class="ident">MAKEQWORD</span>(<span class="self">self</span>.<span class="ident">dwFileDateLS</span>, <span class="self">self</span>.<span class="ident">dwFileDateMS</span>)
+	<span class="doccomment">/// Returns the `dwFileDateMS` and `dwFileDateLS` fields.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dwFileDate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+		MAKEQWORD(<span class="self">self</span>.dwFileDateLS, <span class="self">self</span>.dwFileDateMS)
 	}
 
-	<span class="doccomment">/// Sets the `dwFileDateMS` and `dwFileDateLS` fields.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dwFileDate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u64</span>) {
-		<span class="self">self</span>.<span class="ident">dwFileDateLS</span> <span class="op">=</span> <span class="ident">LODWORD</span>(<span class="ident">val</span>);
-		<span class="self">self</span>.<span class="ident">dwFileDateMS</span> <span class="op">=</span> <span class="ident">HIDWORD</span>(<span class="ident">val</span>);
+	<span class="doccomment">/// Sets the `dwFileDateMS` and `dwFileDateLS` fields.
+	</span><span class="kw">pub fn </span>set_dwFileDate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u64) {
+		<span class="self">self</span>.dwFileDateLS = LODWORD(val);
+		<span class="self">self</span>.dwFileDateMS = HIDWORD(val);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">uxtheme</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl::HrResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">HDC</span>, <span class="ident">HRGN</span>, <span class="ident">RECT</span>};
+<span class="kw">use crate</span>::{co, uxtheme};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HDC, HRGN, RECT};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HTHEME</span>: <span class="string">&quot;uxtheme&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [theme](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/).</span>
-}
+<span class="macro">impl_handle!</span> { HTHEME: <span class="string">&quot;uxtheme&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [theme](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">uxtheme_Htheme</span> <span class="kw">for</span> <span class="ident">HTHEME</span> {}
+<span class="kw">impl </span>uxtheme_Htheme <span class="kw">for </span>HTHEME {}
 
-<span class="doccomment">/// This trait is enabled with the `uxtheme` feature, and provides methods for</span>
-<span class="doccomment">/// [`HTHEME`](crate::HTHEME).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uxtheme&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">uxtheme_Htheme</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CloseThemeData`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-closethemedata)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">CloseThemeData</span>(<span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">ok_to_hrresult</span>(<span class="kw">unsafe</span> { <span class="ident">uxtheme::ffi::CloseThemeData</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+<span class="doccomment">/// This trait is enabled with the `uxtheme` feature, and provides methods for
+/// [`HTHEME`](crate::HTHEME).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)))]</span>
+<span class="kw">pub trait </span>uxtheme_Htheme: Handle {
+	<span class="doccomment">/// [`CloseThemeData`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-closethemedata)
+	/// method.
+	</span><span class="kw">fn </span>CloseThemeData(<span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		ok_to_hrresult(<span class="kw">unsafe </span>{ uxtheme::ffi::CloseThemeData(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`DrawThemeBackground`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemebackground)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DrawThemeBackground</span>(<span class="self">self</span>,
-		<span class="ident">hdc</span>: <span class="ident">HDC</span>, <span class="ident">part_state</span>: <span class="ident">co::VS</span>,
-		<span class="ident">rc</span>: <span class="ident">RECT</span>, <span class="ident">rc_clip</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`DrawThemeBackground`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-drawthemebackground)
+	/// method.
+	</span><span class="kw">fn </span>DrawThemeBackground(<span class="self">self</span>,
+		hdc: HDC, part_state: co::VS,
+		rc: RECT, rc_clip: RECT) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">uxtheme::ffi::DrawThemeBackground</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">hdc</span>.<span class="number">0</span>,
-					<span class="ident">part_state</span>.<span class="ident">part</span>,
-					<span class="ident">part_state</span>.<span class="ident">state</span>,
-					<span class="kw-2">&amp;</span><span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;</span><span class="ident">rc_clip</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				uxtheme::ffi::DrawThemeBackground(
+					<span class="self">self</span>.as_ptr(),
+					hdc.<span class="number">0</span>,
+					part_state.part,
+					part_state.state,
+					<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;</span>rc_clip <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`GetThemeAppProperties`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeappproperties)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThemeAppProperties</span>() -&gt; <span class="ident">co::STAP</span> {
-		<span class="ident">co::STAP</span>(<span class="kw">unsafe</span> { <span class="ident">uxtheme::ffi::GetThemeAppProperties</span>() })
+	<span class="doccomment">/// [`GetThemeAppProperties`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemeappproperties)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThemeAppProperties() -&gt; co::STAP {
+		co::STAP(<span class="kw">unsafe </span>{ uxtheme::ffi::GetThemeAppProperties() })
 	}
 
-	<span class="doccomment">/// [`GetThemeBackgroundContentRect`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundcontentrect)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThemeBackgroundContentRect</span>(<span class="self">self</span>,
-		<span class="ident">hdc</span>: <span class="ident">HDC</span>, <span class="ident">part_state</span>: <span class="ident">co::VS</span>, <span class="ident">bounds</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">RECT</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetThemeBackgroundContentRect`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundcontentrect)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThemeBackgroundContentRect(<span class="self">self</span>,
+		hdc: HDC, part_state: co::VS, bounds: RECT) -&gt; HrResult&lt;RECT&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc_content</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>rc_content = RECT::default();
 
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">uxtheme::ffi::GetThemeBackgroundContentRect</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">hdc</span>.<span class="number">0</span>,
-					<span class="ident">part_state</span>.<span class="ident">part</span>,
-					<span class="ident">part_state</span>.<span class="ident">state</span>,
-					<span class="kw-2">&amp;</span><span class="ident">bounds</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">rc_content</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				uxtheme::ffi::GetThemeBackgroundContentRect(
+					<span class="self">self</span>.as_ptr(),
+					hdc.<span class="number">0</span>,
+					part_state.part,
+					part_state.state,
+					<span class="kw-2">&amp;</span>bounds <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>rc_content <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">rc_content</span>)
+		).map(|<span class="kw">_</span>| rc_content)
 	}
 
-	<span class="doccomment">/// [`GetThemeBackgroundExtent`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundextent)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThemeBackgroundExtent</span>(<span class="self">self</span>,
-		<span class="ident">hdc</span>: <span class="ident">HDC</span>, <span class="ident">part_state</span>: <span class="ident">co::VS</span>, <span class="ident">rc_content</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">RECT</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetThemeBackgroundExtent`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundextent)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThemeBackgroundExtent(<span class="self">self</span>,
+		hdc: HDC, part_state: co::VS, rc_content: RECT) -&gt; HrResult&lt;RECT&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc_extent</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>rc_extent = RECT::default();
 
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">uxtheme::ffi::GetThemeBackgroundExtent</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">hdc</span>.<span class="number">0</span>,
-					<span class="ident">part_state</span>.<span class="ident">part</span>,
-					<span class="ident">part_state</span>.<span class="ident">state</span>,
-					<span class="kw-2">&amp;</span><span class="ident">rc_content</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">rc_extent</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				uxtheme::ffi::GetThemeBackgroundExtent(
+					<span class="self">self</span>.as_ptr(),
+					hdc.<span class="number">0</span>,
+					part_state.part,
+					part_state.state,
+					<span class="kw-2">&amp;</span>rc_content <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>rc_extent <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		 ).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">rc_extent</span>)
+		 ).map(|<span class="kw">_</span>| rc_extent)
 	}
 
-	<span class="doccomment">/// [`GetThemeBackgroundRegion`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundregion)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThemeBackgroundRegion</span>(<span class="self">self</span>,
-		<span class="ident">hdc</span>: <span class="ident">HDC</span>, <span class="ident">part_state</span>: <span class="ident">co::VS</span>, <span class="ident">rc</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">HRGN</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetThemeBackgroundRegion`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundregion)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThemeBackgroundRegion(<span class="self">self</span>,
+		hdc: HDC, part_state: co::VS, rc: RECT) -&gt; HrResult&lt;HRGN&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hrgn</span> <span class="op">=</span> <span class="ident">HRGN::NULL</span>;
+		<span class="kw">let </span><span class="kw-2">mut </span>hrgn = HRGN::NULL;
 
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">uxtheme::ffi::GetThemeBackgroundRegion</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">hdc</span>.<span class="number">0</span>,
-					<span class="ident">part_state</span>.<span class="ident">part</span>,
-					<span class="ident">part_state</span>.<span class="ident">state</span>,
-					<span class="kw-2">&amp;</span><span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">hrgn</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				uxtheme::ffi::GetThemeBackgroundRegion(
+					<span class="self">self</span>.as_ptr(),
+					hdc.<span class="number">0</span>,
+					part_state.part,
+					part_state.state,
+					<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>hrgn <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">hrgn</span>)
+		).map(|<span class="kw">_</span>| hrgn)
 	}
 
-	<span class="doccomment">/// [`GetThemeColor`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemecolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetThemeColor</span>(<span class="self">self</span>,
-		<span class="ident">part_state</span>: <span class="ident">co::VS</span>, <span class="ident">prop</span>: <span class="ident">co::TMT</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetThemeColor`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemecolor)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetThemeColor(<span class="self">self</span>,
+		part_state: co::VS, prop: co::TMT) -&gt; HrResult&lt;COLORREF&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color</span> <span class="op">=</span> <span class="ident">COLORREF</span>(<span class="number">0</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>color = COLORREF(<span class="number">0</span>);
 
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">uxtheme::ffi::GetThemeColor</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">part_state</span>.<span class="ident">part</span>,
-					<span class="ident">part_state</span>.<span class="ident">state</span>,
-					<span class="ident">prop</span>.<span class="number">0</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">color</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				uxtheme::ffi::GetThemeColor(
+					<span class="self">self</span>.as_ptr(),
+					part_state.part,
+					part_state.state,
+					prop.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>color <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">color</span>)
+		).map(|<span class="kw">_</span>| color)
 	}
 
-	<span class="doccomment">/// [`IsThemeBackgroundPartiallyTransparent`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-isthemebackgroundpartiallytransparent)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">IsThemeBackgroundPartiallyTransparent</span>(<span class="self">self</span>,
-		<span class="ident">part_state</span>: <span class="ident">co::VS</span>) -&gt; <span class="ident">bool</span>
+	<span class="doccomment">/// [`IsThemeBackgroundPartiallyTransparent`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-isthemebackgroundpartiallytransparent)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>IsThemeBackgroundPartiallyTransparent(<span class="self">self</span>,
+		part_state: co::VS) -&gt; bool
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">uxtheme::ffi::IsThemeBackgroundPartiallyTransparent</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">part_state</span>.<span class="ident">part</span>, <span class="ident">part_state</span>.<span class="ident">state</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-		}
+		<span class="kw">unsafe </span>{
+			uxtheme::ffi::IsThemeBackgroundPartiallyTransparent(
+				<span class="self">self</span>.as_ptr(), part_state.part, part_state.state) != <span class="number">0
+		</span>}
 	}
 
-	<span class="doccomment">/// [`IsThemePartDefined`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-isthemepartdefined)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">IsThemePartDefined</span>(<span class="self">self</span>, <span class="ident">part_state</span>: <span class="ident">co::VS</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">uxtheme::ffi::IsThemePartDefined</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">part_state</span>.<span class="ident">part</span>, <span class="ident">part_state</span>.<span class="ident">state</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-		}
+	<span class="doccomment">/// [`IsThemePartDefined`](https://docs.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-isthemepartdefined)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>IsThemePartDefined(<span class="self">self</span>, part_state: co::VS) -&gt; bool {
+		<span class="kw">unsafe </span>{
+			uxtheme::ffi::IsThemePartDefined(
+				<span class="self">self</span>.as_ptr(), part_state.part, part_state.state) != <span class="number">0
+		</span>}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

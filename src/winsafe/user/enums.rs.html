@@ -515,522 +515,522 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">ATOM</span>, <span class="ident">HBITMAP</span>, <span class="ident">HICON</span>, <span class="ident">HMENU</span>, <span class="ident">HWND</span>, <span class="ident">NCCALCSIZE_PARAMS</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	ATOM, HBITMAP, HICON, HMENU, HWND, NCCALCSIZE_PARAMS, POINT, RECT,
 };
 
-<span class="doccomment">/// Variant parameters of a [`wm::Command`](crate::msg::wm::Command) message.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AccelMenuCtrl</span> {
-	<span class="doccomment">/// Accelerator event. Contains the accelerator command ID.</span>
-	<span class="ident">Accel</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// Menu item click event. Contains the menu item command ID.</span>
-	<span class="ident">Menu</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// Some child control event. Contains</span>
-	<span class="doccomment">/// [`AccelMenuCtrlData`](crate::AccelMenuCtrlData) data.</span>
-	<span class="ident">Ctrl</span>(<span class="ident">AccelMenuCtrlData</span>),
+<span class="doccomment">/// Variant parameters of a [`wm::Command`](crate::msg::wm::Command) message.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>AccelMenuCtrl {
+	<span class="doccomment">/// Accelerator event. Contains the accelerator command ID.
+	</span>Accel(u16),
+	<span class="doccomment">/// Menu item click event. Contains the menu item command ID.
+	</span>Menu(u16),
+	<span class="doccomment">/// Some child control event. Contains
+	/// [`AccelMenuCtrlData`](crate::AccelMenuCtrlData) data.
+	</span>Ctrl(AccelMenuCtrlData),
 }
 
-<span class="kw">impl</span> <span class="ident">AccelMenuCtrl</span> {
-	<span class="doccomment">/// Returns the notification code and the control ID pair.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">code_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">co::CMD</span>, <span class="ident">u16</span>) {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">AccelMenuCtrl::Accel</span>(<span class="ident">id</span>) =&gt; (<span class="ident">co::CMD::Accelerator</span>, <span class="kw-2">*</span><span class="ident">id</span>),
-			<span class="ident">AccelMenuCtrl::Menu</span>(<span class="ident">id</span>) =&gt; (<span class="ident">co::CMD::Menu</span>, <span class="kw-2">*</span><span class="ident">id</span>),
-			<span class="ident">AccelMenuCtrl::Ctrl</span>(<span class="ident">data</span>) =&gt; (<span class="ident">data</span>.<span class="ident">notif_code</span>, <span class="ident">data</span>.<span class="ident">ctrl_id</span>),
+<span class="kw">impl </span>AccelMenuCtrl {
+	<span class="doccomment">/// Returns the notification code and the control ID pair.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>code_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (co::CMD, u16) {
+		<span class="kw">match </span><span class="self">self </span>{
+			AccelMenuCtrl::Accel(id) =&gt; (co::CMD::Accelerator, <span class="kw-2">*</span>id),
+			AccelMenuCtrl::Menu(id) =&gt; (co::CMD::Menu, <span class="kw-2">*</span>id),
+			AccelMenuCtrl::Ctrl(data) =&gt; (data.notif_code, data.ctrl_id),
 		}
 	}
 }
 
-<span class="doccomment">/// The data of the [`AccelMenuCtrl`](crate::AccelMenuCtrl) `Ctrl` option.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AccelMenuCtrlData</span> {
-	<span class="kw">pub</span> <span class="ident">notif_code</span>: <span class="ident">co::CMD</span>,
-	<span class="kw">pub</span> <span class="ident">ctrl_id</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">ctrl_hwnd</span>: <span class="ident">HWND</span>,
+<span class="doccomment">/// The data of the [`AccelMenuCtrl`](crate::AccelMenuCtrl) `Ctrl` option.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub struct </span>AccelMenuCtrlData {
+	<span class="kw">pub </span>notif_code: co::CMD,
+	<span class="kw">pub </span>ctrl_id: u16,
+	<span class="kw">pub </span>ctrl_hwnd: HWND,
 }
 
-<span class="doccomment">/// Variant parameter used in</span>
-<span class="doccomment">/// [window class](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-classes)</span>
-<span class="doccomment">/// functions:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `lpClassName`;</span>
-<span class="doccomment">/// * [`HWND::FindWindowEx`](crate::prelude::user_Hwnd::FindWindowEx) `lpszClass`;</span>
-<span class="doccomment">/// * [`UnregisterClass`](crate::UnregisterClass) `lpClassName`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AtomStr</span> {
-	<span class="doccomment">/// An [`ATOM`](crate::ATOM) returned by</span>
-	<span class="doccomment">/// [`RegisterClassEx`](crate::RegisterClassEx).</span>
-	<span class="ident">Atom</span>(<span class="ident">ATOM</span>),
-	<span class="doccomment">/// A string.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter used in
+/// [window class](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-classes)
+/// functions:
+///
+/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `lpClassName`;
+/// * [`HWND::FindWindowEx`](crate::prelude::user_Hwnd::FindWindowEx) `lpszClass`;
+/// * [`UnregisterClass`](crate::UnregisterClass) `lpClassName`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>AtomStr {
+	<span class="doccomment">/// An [`ATOM`](crate::ATOM) returned by
+	/// [`RegisterClassEx`](crate::RegisterClassEx).
+	</span>Atom(ATOM),
+	<span class="doccomment">/// A string.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">AtomStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>AtomStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Atom</span>(<span class="ident">atom</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">atom</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Atom(atom) =&gt; MAKEINTRESOURCE(atom.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`bm::GetImage`](crate::msg::bm::GetImage) `image`;</span>
-<span class="doccomment">/// * [`bm::GetImage`](crate::msg::bm::SetImage) `image`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BmpIcon</span> {
-	<span class="ident">Bmp</span>(<span class="ident">HBITMAP</span>),
-	<span class="ident">Icon</span>(<span class="ident">HICON</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`bm::GetImage`](crate::msg::bm::GetImage) `image`;
+/// * [`bm::GetImage`](crate::msg::bm::SetImage) `image`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>BmpIcon {
+	Bmp(HBITMAP),
+	Icon(HICON),
 }
 
-<span class="kw">impl</span> <span class="ident">BmpIcon</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">isize</span> {
-		(<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Bmp</span>(<span class="ident">hbmp</span>) =&gt; <span class="ident">hbmp</span>.<span class="number">0</span>,
-			<span class="ident"><span class="self">Self</span>::Icon</span>(<span class="ident">hicon</span>) =&gt; <span class="ident">hicon</span>.<span class="number">0</span>,
-		}) <span class="kw">as</span> <span class="ident">isize</span>
+<span class="kw">impl </span>BmpIcon {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		(<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
+			<span class="self">Self</span>::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
+		}) <span class="kw">as </span>isize
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `lpNewItem`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BmpPtrStr</span> {
-	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).</span>
-	<span class="ident">Bmp</span>(<span class="ident">HBITMAP</span>),
-	<span class="doccomment">/// A pointer to anything.</span>
-	<span class="ident">Ptr</span>(<span class="kw-2">*const</span> <span class="ident">std::ffi::c_void</span>),
-	<span class="doccomment">/// A string.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
-	<span class="doccomment">/// Nothing.</span>
-	<span class="prelude-val">None</span>,
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `lpNewItem`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>BmpPtrStr {
+	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).
+	</span>Bmp(HBITMAP),
+	<span class="doccomment">/// A pointer to anything.
+	</span>Ptr(<span class="kw-2">*const </span>std::ffi::c_void),
+	<span class="doccomment">/// A string.
+	</span>Str(WString),
+	<span class="doccomment">/// Nothing.
+	</span><span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">BmpPtrStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>BmpPtrStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Bmp</span>(<span class="ident">hbmp</span>) =&gt; <span class="ident">hbmp</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Ptr</span>(<span class="ident">lp</span>) =&gt; <span class="kw-2">*</span><span class="ident">lp</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">std::ptr::null</span>(),
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Bmp(hbmp) =&gt; hbmp.<span class="number">0 </span><span class="kw">as _</span>,
+			<span class="self">Self</span>::Ptr(lp) =&gt; <span class="kw-2">*</span>lp <span class="kw">as _</span>,
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
+			<span class="self">Self</span>::None =&gt; std::ptr::null(),
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`DEVMODE`](crate::DEVMODE) `dmDisplayFlags`;</span>
-<span class="doccomment">/// * [`DEVMODE`](crate::DEVMODE) `dmNup`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DispfNup</span> {
-	<span class="doccomment">/// Used for displays.</span>
-	<span class="ident">Dispf</span>(<span class="ident">co::DMDISPLAYFLAGS</span>),
-	<span class="doccomment">/// Used for printers.</span>
-	<span class="ident">Nup</span>(<span class="ident">co::DMNUP</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`DEVMODE`](crate::DEVMODE) `dmDisplayFlags`;
+/// * [`DEVMODE`](crate::DEVMODE) `dmNup`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>DispfNup {
+	<span class="doccomment">/// Used for displays.
+	</span>Dispf(co::DMDISPLAYFLAGS),
+	<span class="doccomment">/// Used for printers.
+	</span>Nup(co::DMNUP),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`EnumDisplaySettings`](crate::EnumDisplaySettings) `mode_num`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GmidxEnum</span> {
-	<span class="doccomment">/// Graphics mode index.</span>
-	<span class="ident">Gmidx</span>(<span class="ident">u32</span>),
-	<span class="doccomment">/// Predefined enumeration.</span>
-	<span class="ident">Enum</span>(<span class="ident">co::ENUM_SETTINGS</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`EnumDisplaySettings`](crate::EnumDisplaySettings) `mode_num`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>GmidxEnum {
+	<span class="doccomment">/// Graphics mode index.
+	</span>Gmidx(u32),
+	<span class="doccomment">/// Predefined enumeration.
+	</span>Enum(co::ENUM_SETTINGS),
 }
 
-<span class="kw">impl</span> <span class="ident">GmidxEnum</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Gmidx</span>(<span class="ident">idx</span>) =&gt; <span class="kw-2">*</span><span class="ident">idx</span>,
-			<span class="ident"><span class="self">Self</span>::Enum</span>(<span class="ident">es</span>) =&gt; <span class="ident">es</span>.<span class="number">0</span>,
+<span class="kw">impl </span>GmidxEnum {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>as_u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Gmidx(idx) =&gt; <span class="kw-2">*</span>idx,
+			<span class="self">Self</span>::Enum(es) =&gt; es.<span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) `hwnd_focus`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HwndFocus</span> {
-	<span class="doccomment">/// Handle to the control to receive the focus.</span>
-	<span class="ident">Hwnd</span>(<span class="ident">HWND</span>),
-	<span class="doccomment">/// If `true`, the next control with [`WS::TABSTOP`](crate::co::WS::TABSTOP)</span>
-	<span class="doccomment">/// receives the focus; if `false`, the previous.</span>
-	<span class="ident">FocusNext</span>(<span class="ident">bool</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) `hwnd_focus`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>HwndFocus {
+	<span class="doccomment">/// Handle to the control to receive the focus.
+	</span>Hwnd(HWND),
+	<span class="doccomment">/// If `true`, the next control with [`WS::TABSTOP`](crate::co::WS::TABSTOP)
+	/// receives the focus; if `false`, the previous.
+	</span>FocusNext(bool),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`wm::EnterIdle`](crate::msg::wm::EnterIdle) reason;</span>
-<span class="doccomment">/// * [`HELPINFO`](crate::HELPINFO) `hItemHandle`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HwndHmenu</span> {
-	<span class="ident">Hwnd</span>(<span class="ident">HWND</span>),
-	<span class="ident">Hmenu</span>(<span class="ident">HMENU</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`wm::EnterIdle`](crate::msg::wm::EnterIdle) reason;
+/// * [`HELPINFO`](crate::HELPINFO) `hItemHandle`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>HwndHmenu {
+	Hwnd(HWND),
+	Hmenu(HMENU),
 }
 
-<span class="kw">impl</span> <span class="ident">HwndHmenu</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">isize</span> {
-		(<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Hwnd</span>(<span class="ident">hwnd</span>) =&gt; <span class="ident">hwnd</span>.<span class="number">0</span>,
-			<span class="ident"><span class="self">Self</span>::Hmenu</span>(<span class="ident">hmenu</span>) =&gt; <span class="ident">hmenu</span>.<span class="number">0</span>,
-		}) <span class="kw">as</span> <span class="kw">_</span>
-	}
+<span class="kw">impl </span>HwndHmenu {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		(<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Hwnd(hwnd) =&gt; hwnd.<span class="number">0</span>,
+			<span class="self">Self</span>::Hmenu(hmenu) =&gt; hmenu.<span class="number">0</span>,
+		}) <span class="kw">as _
+	</span>}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HWND::SetWindowPos`](crate::prelude::user_Hwnd::SetWindowPos) `hwnd_insert_after`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HwndPlace</span> {
-	<span class="doccomment">/// A handle to the window to precede the positioned window in the Z order.</span>
-	<span class="ident">Hwnd</span>(<span class="ident">HWND</span>),
-	<span class="doccomment">/// A constant specifying where the window will be placed.</span>
-	<span class="ident">Place</span>(<span class="ident">co::HWND_PLACE</span>),
-	<span class="doccomment">/// Nothing.</span>
-	<span class="prelude-val">None</span>,
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HWND::SetWindowPos`](crate::prelude::user_Hwnd::SetWindowPos) `hwnd_insert_after`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>HwndPlace {
+	<span class="doccomment">/// A handle to the window to precede the positioned window in the Z order.
+	</span>Hwnd(HWND),
+	<span class="doccomment">/// A constant specifying where the window will be placed.
+	</span>Place(co::HWND_PLACE),
+	<span class="doccomment">/// Nothing.
+	</span><span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">HwndPlace</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Hwnd</span>(<span class="ident">hwnd</span>) =&gt; <span class="ident">hwnd</span>.<span class="number">0</span>,
-			<span class="ident"><span class="self">Self</span>::Place</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">std::ptr::null_mut</span>(),
+<span class="kw">impl </span>HwndPlace {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Hwnd(hwnd) =&gt; hwnd.<span class="number">0</span>,
+			<span class="self">Self</span>::Place(v) =&gt; v.<span class="number">0 </span><span class="kw">as _</span>,
+			<span class="self">Self</span>::None =&gt; std::ptr::null_mut(),
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`wm::ParentNotify`](crate::msg::wm::ParentNotify) `data32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HwndPointId</span> {
-	<span class="doccomment">/// Handle to the child window.</span>
-	<span class="ident">Hwnd</span>(<span class="ident">HWND</span>),
-	<span class="doccomment">/// Cursor coordinates.</span>
-	<span class="ident">Point</span>(<span class="ident">POINT</span>),
-	<span class="doccomment">/// Pointer identifier.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`wm::ParentNotify`](crate::msg::wm::ParentNotify) `data32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>HwndPointId {
+	<span class="doccomment">/// Handle to the child window.
+	</span>Hwnd(HWND),
+	<span class="doccomment">/// Cursor coordinates.
+	</span>Point(POINT),
+	<span class="doccomment">/// Pointer identifier.
+	</span>Id(u16),
 }
 
-<span class="kw">impl</span> <span class="ident">HwndPointId</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">isize</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Hwnd</span>(<span class="ident">hwnd</span>) =&gt; <span class="ident">hwnd</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Point</span>(<span class="ident">pt</span>) =&gt; <span class="ident">pt</span>.<span class="ident">into_u32</span>() <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>,
+<span class="kw">impl </span>HwndPointId {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Hwnd(hwnd) =&gt; hwnd.<span class="number">0 </span><span class="kw">as _</span>,
+			<span class="self">Self</span>::Point(pt) =&gt; pt.into_u32() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Id(id) =&gt; <span class="kw-2">*</span>id <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HINSTANCE::LoadCursor`](crate::prelude::user_Hinstance::LoadCursor) `resource_id`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdIdcStr</span> {
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A [`co::IDC`](crate::co::IDC) constant for a stock system cursor.</span>
-	<span class="ident">Idc</span>(<span class="ident">co::IDC</span>),
-	<span class="doccomment">/// A resource string identifier.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HINSTANCE::LoadCursor`](crate::prelude::user_Hinstance::LoadCursor) `resource_id`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdIdcStr {
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A [`co::IDC`](crate::co::IDC) constant for a stock system cursor.
+	</span>Idc(co::IDC),
+	<span class="doccomment">/// A resource string identifier.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdIdcStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>IdIdcStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Idc</span>(<span class="ident">idc</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">idc</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Idc(idc) =&gt; MAKEINTRESOURCE(idc.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HINSTANCE::LoadIcon`](crate::prelude::user_Hinstance::LoadIcon) `icon_id`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdIdiStr</span> {
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A [`co::IDI`](crate::co::IDI) constant for a stock system icon.</span>
-	<span class="ident">Idi</span>(<span class="ident">co::IDI</span>),
-	<span class="doccomment">/// A resource string identifier.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HINSTANCE::LoadIcon`](crate::prelude::user_Hinstance::LoadIcon) `icon_id`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdIdiStr {
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A [`co::IDI`](crate::co::IDI) constant for a stock system icon.
+	</span>Idi(co::IDI),
+	<span class="doccomment">/// A resource string identifier.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdIdiStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>IdIdiStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Idi</span>(<span class="ident">idi</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">idi</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Idi(idi) =&gt; MAKEINTRESOURCE(idi.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter used in [menu](crate::HMENU) methods:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `uIDNewItem`;</span>
-<span class="doccomment">/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `hMenu`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdMenu</span> {
-	<span class="doccomment">/// A command ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// An [`HMENU`](crate::HMENU).</span>
-	<span class="ident">Menu</span>(<span class="ident">HMENU</span>),
-	<span class="doccomment">/// Nothing.</span>
-	<span class="prelude-val">None</span>,
+<span class="doccomment">/// Variant parameter used in [menu](crate::HMENU) methods:
+///
+/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `uIDNewItem`;
+/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `hMenu`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>IdMenu {
+	<span class="doccomment">/// A command ID.
+	</span>Id(u16),
+	<span class="doccomment">/// An [`HMENU`](crate::HMENU).
+	</span>Menu(HMENU),
+	<span class="doccomment">/// Nothing.
+	</span><span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">IdMenu</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Menu</span>(<span class="ident">hMenu</span>) =&gt; <span class="ident">hMenu</span>.<span class="number">0</span>,
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">std::ptr::null_mut</span>(),
+<span class="kw">impl </span>IdMenu {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; <span class="kw-2">*</span>id <span class="kw">as _</span>,
+			<span class="self">Self</span>::Menu(hMenu) =&gt; hMenu.<span class="number">0</span>,
+			<span class="self">Self</span>::None =&gt; std::ptr::null_mut(),
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">IdMenu::Id</span>(<span class="ident">id</span>) =&gt; <span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IdMenu::Menu</span>(<span class="ident">hMenu</span>) =&gt; <span class="ident">hMenu</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IdMenu::None</span> =&gt; <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HINSTANCE::LoadImageBitmap`](crate::prelude::user_Hinstance::LoadImageBitmap) `name`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdObmStr</span> {
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A [`co::OBM`](crate::co::OBM) constant for an OEM bitmap.</span>
-	<span class="ident">Obm</span>(<span class="ident">co::OBM</span>),
-	<span class="doccomment">/// A resource string identifier or file path.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">IdObmStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
-	}
-
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Obm</span>(<span class="ident">obm</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">obm</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="kw">match </span><span class="self">self </span>{
+			IdMenu::Id(id) =&gt; <span class="kw-2">*</span>id <span class="kw">as _</span>,
+			IdMenu::Menu(hMenu) =&gt; hMenu.<span class="number">0 </span><span class="kw">as _</span>,
+			IdMenu::None =&gt; <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HINSTANCE::LoadImageCursor`](crate::prelude::user_Hinstance::LoadImageCursor) `name`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdOcrStr</span> {
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A [`co::OCR`](crate::co::OCR) constant for an OEM cursor.</span>
-	<span class="ident">Ocr</span>(<span class="ident">co::OCR</span>),
-	<span class="doccomment">/// A resource string identifier or file path.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HINSTANCE::LoadImageBitmap`](crate::prelude::user_Hinstance::LoadImageBitmap) `name`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdObmStr {
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A [`co::OBM`](crate::co::OBM) constant for an OEM bitmap.
+	</span>Obm(co::OBM),
+	<span class="doccomment">/// A resource string identifier or file path.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdOcrStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>IdObmStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Ocr</span>(<span class="ident">ocr</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">ocr</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Obm(obm) =&gt; MAKEINTRESOURCE(obm.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HINSTANCE::LoadImageIcon`](crate::prelude::user_Hinstance::LoadImageIcon) `name`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdOicStr</span> {
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A [`co::OIC`](crate::co::OIC) constant for an OEM icon.</span>
-	<span class="ident">Oic</span>(<span class="ident">co::OIC</span>),
-	<span class="doccomment">/// A resource string identifier or file path.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HINSTANCE::LoadImageCursor`](crate::prelude::user_Hinstance::LoadImageCursor) `name`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdOcrStr {
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A [`co::OCR`](crate::co::OCR) constant for an OEM cursor.
+	</span>Ocr(co::OCR),
+	<span class="doccomment">/// A resource string identifier or file path.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdOicStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>IdOcrStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Oic</span>(<span class="ident">oic</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">oic</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Ocr(ocr) =&gt; MAKEINTRESOURCE(ocr.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HMENU::CheckMenuItem`](crate::prelude::user_Hmenu::CheckMenuItem) `uIDCheckItem`;</span>
-<span class="doccomment">/// * [`HMENU::CheckMenuRadioItem`](crate::prelude::user_Hmenu::CheckMenuRadioItem) `first`, `last`, `check`;</span>
-<span class="doccomment">/// * [`HMENU::DeleteMenu`](crate::prelude::user_Hmenu::DeleteMenu) `uPosition`;</span>
-<span class="doccomment">/// * [`HMENU::EnableMenuItem`](crate::prelude::user_Hmenu::EnableMenuItem) `uIDEnableItem`;</span>
-<span class="doccomment">/// * [`HMENU::GetMenuDefaultItem`](crate::prelude::user_Hmenu::GetMenuDefaultItem) return value;</span>
-<span class="doccomment">/// * [`HMENU::GetMenuItemInfo`](crate::prelude::user_Hmenu::GetMenuItemInfo) `item`;</span>
-<span class="doccomment">/// * [`HMENU::GetMenuState`](crate::prelude::user_Hmenu::GetMenuState) `uId`;</span>
-<span class="doccomment">/// * [`HMENU::GetMenuString`](crate::prelude::user_Hmenu::GetMenuString) `uIDItem`;</span>
-<span class="doccomment">/// * [`HMENU::InsertMenuItem`](crate::prelude::user_Hmenu::InsertMenuItem) `item`;</span>
-<span class="doccomment">/// * [`HMENU::RemoveMenu`](crate::prelude::user_Hmenu::RemoveMenu) `uPosition`;</span>
-<span class="doccomment">/// * [`HMENU::SetMenuItemBitmaps`](crate::prelude::user_Hmenu::SetMenuItemBitmaps) `uPosition`;</span>
-<span class="doccomment">/// * [`HMENU::SetMenuItemInfo`](crate::prelude::user_Hmenu::SetMenuItemInfo) `item`;</span>
-<span class="doccomment">/// * [`HWND::HiliteMenuItem`](crate::prelude::user_Hwnd::HiliteMenuItem) `uIDHiliteItem`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdPos</span> {
-	<span class="doccomment">/// A command ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// Zero-based position.</span>
-	<span class="ident">Pos</span>(<span class="ident">u32</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HINSTANCE::LoadImageIcon`](crate::prelude::user_Hinstance::LoadImageIcon) `name`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdOicStr {
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A [`co::OIC`](crate::co::OIC) constant for an OEM icon.
+	</span>Oic(co::OIC),
+	<span class="doccomment">/// A resource string identifier or file path.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdPos</span> {
-	<span class="doccomment">/// Returns whether value is `Pos`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_by_pos</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">IdPos::Id</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-			<span class="ident">IdPos::Pos</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-		}
+<span class="kw">impl </span>IdOicStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="doccomment">/// Returns the ID or the position as a plain `u32`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">id_or_pos_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">IdPos::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IdPos::Pos</span>(<span class="ident">pos</span>) =&gt; <span class="ident">pos</span>,
-		}
-	}
-
-	<span class="doccomment">/// Returns [`MF::BYCOMMAND`](crate::co::MF::BYCOMMAND) if value is `Id`, or</span>
-	<span class="doccomment">/// [`MF::BYPOSITION`](crate::co::MF::BYPOSITION) if value is `Pos`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mf_flag</span>(<span class="self">self</span>) -&gt; <span class="ident">co::MF</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">IdPos::Id</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::MF::BYCOMMAND</span>,
-			<span class="ident">IdPos::Pos</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::MF::BYPOSITION</span>,
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Oic(oic) =&gt; MAKEINTRESOURCE(oic.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HMENU::AppendMenuEnum`](crate::prelude::user_Hmenu::AppendMenuEnum) `entry`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MenuEnum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// A selectable entry item, with command ID and text.</span>
-	<span class="ident">Entry</span>(<span class="ident">u16</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-	<span class="doccomment">/// A separator.</span>
-	<span class="ident">Separator</span>,
-	<span class="doccomment">/// A submenu, with its entry text.</span>
-	<span class="ident">Submenu</span>(<span class="ident">HMENU</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HMENU::CheckMenuItem`](crate::prelude::user_Hmenu::CheckMenuItem) `uIDCheckItem`;
+/// * [`HMENU::CheckMenuRadioItem`](crate::prelude::user_Hmenu::CheckMenuRadioItem) `first`, `last`, `check`;
+/// * [`HMENU::DeleteMenu`](crate::prelude::user_Hmenu::DeleteMenu) `uPosition`;
+/// * [`HMENU::EnableMenuItem`](crate::prelude::user_Hmenu::EnableMenuItem) `uIDEnableItem`;
+/// * [`HMENU::GetMenuDefaultItem`](crate::prelude::user_Hmenu::GetMenuDefaultItem) return value;
+/// * [`HMENU::GetMenuItemInfo`](crate::prelude::user_Hmenu::GetMenuItemInfo) `item`;
+/// * [`HMENU::GetMenuState`](crate::prelude::user_Hmenu::GetMenuState) `uId`;
+/// * [`HMENU::GetMenuString`](crate::prelude::user_Hmenu::GetMenuString) `uIDItem`;
+/// * [`HMENU::InsertMenuItem`](crate::prelude::user_Hmenu::InsertMenuItem) `item`;
+/// * [`HMENU::RemoveMenu`](crate::prelude::user_Hmenu::RemoveMenu) `uPosition`;
+/// * [`HMENU::SetMenuItemBitmaps`](crate::prelude::user_Hmenu::SetMenuItemBitmaps) `uPosition`;
+/// * [`HMENU::SetMenuItemInfo`](crate::prelude::user_Hmenu::SetMenuItemInfo) `item`;
+/// * [`HWND::HiliteMenuItem`](crate::prelude::user_Hwnd::HiliteMenuItem) `uIDHiliteItem`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>IdPos {
+	<span class="doccomment">/// A command ID.
+	</span>Id(u16),
+	<span class="doccomment">/// Zero-based position.
+	</span>Pos(u32),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`wm::NcCalcSize`](crate::msg::wm::NcCalcSize) `data`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NccspRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Mutable reference to [`NCCALCSIZE_PARAMS`](crate::NCCALCSIZE_PARAMS).</span>
-	<span class="ident">Nccsp</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">NCCALCSIZE_PARAMS</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// Mutable reference to [`RECT`](crate::RECT).</span>
-	<span class="ident">Rect</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>),
+<span class="kw">impl </span>IdPos {
+	<span class="doccomment">/// Returns whether value is `Pos`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>is_by_pos(<span class="self">self</span>) -&gt; bool {
+		<span class="kw">match </span><span class="self">self </span>{
+			IdPos::Id(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+			IdPos::Pos(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+		}
+	}
+
+	<span class="doccomment">/// Returns the ID or the position as a plain `u32`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>id_or_pos_u32(<span class="self">self</span>) -&gt; u32 {
+		<span class="kw">match </span><span class="self">self </span>{
+			IdPos::Id(id) =&gt; id <span class="kw">as _</span>,
+			IdPos::Pos(pos) =&gt; pos,
+		}
+	}
+
+	<span class="doccomment">/// Returns [`MF::BYCOMMAND`](crate::co::MF::BYCOMMAND) if value is `Id`, or
+	/// [`MF::BYPOSITION`](crate::co::MF::BYPOSITION) if value is `Pos`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>mf_flag(<span class="self">self</span>) -&gt; co::MF {
+		<span class="kw">match </span><span class="self">self </span>{
+			IdPos::Id(<span class="kw">_</span>) =&gt; co::MF::BYCOMMAND,
+			IdPos::Pos(<span class="kw">_</span>) =&gt; co::MF::BYPOSITION,
+		}
+	}
+}
+
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HMENU::AppendMenuEnum`](crate::prelude::user_Hmenu::AppendMenuEnum) `entry`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub enum </span>MenuEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="doccomment">/// A selectable entry item, with command ID and text.
+	</span>Entry(u16, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+	<span class="doccomment">/// A separator.
+	</span>Separator,
+	<span class="doccomment">/// A submenu, with its entry text.
+	</span>Submenu(HMENU, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+}
+
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`wm::NcCalcSize`](crate::msg::wm::NcCalcSize) `data`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub enum </span>NccspRect&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="doccomment">/// Mutable reference to [`NCCALCSIZE_PARAMS`](crate::NCCALCSIZE_PARAMS).
+	</span>Nccsp(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>NCCALCSIZE_PARAMS&lt;<span class="lifetime">&#39;a</span>&gt;),
+	<span class="doccomment">/// Mutable reference to [`RECT`](crate::RECT).
+	</span>Rect(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>RECT),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

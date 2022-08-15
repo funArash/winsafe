@@ -137,144 +137,144 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">LANGID</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::version::decl</span>::{<span class="ident">GetFileVersionInfo</span>, <span class="ident">VarQueryValue</span>, <span class="ident">VS_FIXEDFILEINFO</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{LANGID, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::version::decl::{GetFileVersionInfo, VarQueryValue, VS_FIXEDFILEINFO};
 
-<span class="doccomment">/// Retrieves data from an embedded resource, which can be read from an</span>
-<span class="doccomment">/// executable file or a DLL.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Reading version information:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{HINSTANCE, ResourceInfo};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let exe_name = HINSTANCE::NULL.GetModuleFileName()?;</span>
-<span class="doccomment">/// let res_info = ResourceInfo::read_from(&amp;exe_name)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// if let Some(ver_info) = res_info.version_info() {</span>
-<span class="doccomment">///     let ver = ver_info.dwFileVersion();</span>
-<span class="doccomment">///     println!(&quot;Version: {}.{}.{}.{}&quot;,</span>
-<span class="doccomment">///         ver[0], ver[1], ver[2], ver[3]);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Reading information strings. An embedded resource can have multiple string</span>
-<span class="doccomment">/// blocks, and each block is identified by a language/code page pair. Each</span>
-<span class="doccomment">/// block can have their own information strings:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{HINSTANCE, ResourceInfo};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let exe_name = HINSTANCE::NULL.GetModuleFileName()?;</span>
-<span class="doccomment">/// let res_info = ResourceInfo::read_from(&amp;exe_name)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for block in res_info.blocks() {</span>
-<span class="doccomment">///     if let Some(product_name) = block.product_name() {</span>
-<span class="doccomment">///         println!(&quot;Product name: {}&quot;, product_name);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     if let Some(copyright) = block.legal_copyright() {</span>
-<span class="doccomment">///         println!(&quot;Copyright: {}&quot;, copyright);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResourceInfo</span> {
-	<span class="ident">res_buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Retrieves data from an embedded resource, which can be read from an
+/// executable file or a DLL.
+///
+/// # Examples
+///
+/// Reading version information:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{HINSTANCE, ResourceInfo};
+///
+/// let exe_name = HINSTANCE::NULL.GetModuleFileName()?;
+/// let res_info = ResourceInfo::read_from(&amp;exe_name)?;
+///
+/// if let Some(ver_info) = res_info.version_info() {
+///     let ver = ver_info.dwFileVersion();
+///     println!(&quot;Version: {}.{}.{}.{}&quot;,
+///         ver[0], ver[1], ver[2], ver[3]);
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+///
+/// Reading information strings. An embedded resource can have multiple string
+/// blocks, and each block is identified by a language/code page pair. Each
+/// block can have their own information strings:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{HINSTANCE, ResourceInfo};
+///
+/// let exe_name = HINSTANCE::NULL.GetModuleFileName()?;
+/// let res_info = ResourceInfo::read_from(&amp;exe_name)?;
+///
+/// for block in res_info.blocks() {
+///     if let Some(product_name) = block.product_name() {
+///         println!(&quot;Product name: {}&quot;, product_name);
+///     }
+///     if let Some(copyright) = block.legal_copyright() {
+///         println!(&quot;Copyright: {}&quot;, copyright);
+///     }
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ResourceInfo {
+	res_buf: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ResourceInfo</span> {
-	<span class="doccomment">/// Reads and stores the resource data from an executable file or a DLL.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_from</span>(<span class="ident">exe_file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">ResourceInfo</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">res_buf</span>: <span class="ident">GetFileVersionInfo</span>(<span class="ident">exe_file</span>)<span class="question-mark">?</span> })
+<span class="kw">impl </span>ResourceInfo {
+	<span class="doccomment">/// Reads and stores the resource data from an executable file or a DLL.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>read_from(exe_file: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;ResourceInfo&gt; {
+		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{ res_buf: GetFileVersionInfo(exe_file)<span class="question-mark">? </span>})
 	}
 
-	<span class="doccomment">/// Returns an iterator over the language blocks, if any, which are composed</span>
-	<span class="doccomment">/// of a language ID and a code page.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// These blocks allow retrieval of version information strings in their</span>
-	<span class="doccomment">/// respective languages.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocks</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ResourceInfoBlock</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">VarQueryValue</span>::<span class="op">&lt;</span>(<span class="ident">LANGID</span>, <span class="ident">co::CP</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">res_buf</span>, <span class="string">&quot;\\VarFileInfo\\Translation&quot;</span>)
-				.<span class="ident">ok</span>()
-				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">plangs</span>, <span class="ident">sz</span>)<span class="op">|</span>
-					<span class="ident">std::slice::from_raw_parts</span>(
-						<span class="ident">plangs</span>,
-						<span class="ident">sz</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span>(<span class="ident">LANGID</span>, <span class="ident">co::CP</span>)<span class="op">&gt;</span>(),
+	<span class="doccomment">/// Returns an iterator over the language blocks, if any, which are composed
+	/// of a language ID and a code page.
+	///
+	/// These blocks allow retrieval of version information strings in their
+	/// respective languages.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>blocks&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ResourceInfoBlock&gt; + <span class="lifetime">&#39;a </span>{
+		<span class="kw">unsafe </span>{
+			VarQueryValue::&lt;(LANGID, co::CP)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\VarFileInfo\\Translation&quot;</span>)
+				.ok()
+				.map(|(plangs, sz)|
+					std::slice::from_raw_parts(
+						plangs,
+						sz <span class="kw">as </span>usize / std::mem::size_of::&lt;(LANGID, co::CP)&gt;(),
 					)
 				)
-				.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[])
-				.<span class="ident">iter</span>()
-				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">lang_id</span>, <span class="ident">code_page</span>)<span class="op">|</span>
-					<span class="ident">ResourceInfoBlock</span> {
-						<span class="ident">res_info</span>: <span class="self">self</span>,
-						<span class="ident">lang_id</span>: <span class="kw-2">*</span><span class="ident">lang_id</span>,
-						<span class="ident">code_page</span>: <span class="kw-2">*</span><span class="ident">code_page</span>,
+				.unwrap_or(<span class="kw-2">&amp;</span>[])
+				.iter()
+				.map(|(lang_id, code_page)|
+					ResourceInfoBlock {
+						res_info: <span class="self">self</span>,
+						lang_id: <span class="kw-2">*</span>lang_id,
+						code_page: <span class="kw-2">*</span>code_page,
 					}
 				)
 		}
 	}
 
-	<span class="doccomment">/// Returns the version information, if any.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">VS_FIXEDFILEINFO</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">VarQueryValue</span>::<span class="op">&lt;</span><span class="ident">VS_FIXEDFILEINFO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">res_buf</span>, <span class="string">&quot;\\&quot;</span>)
-				.<span class="ident">ok</span>()
-				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">pvsf</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pvsf</span>)
+	<span class="doccomment">/// Returns the version information, if any.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>version_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>VS_FIXEDFILEINFO&gt; {
+		<span class="kw">unsafe </span>{
+			VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\&quot;</span>)
+				.ok()
+				.map(|(pvsf, <span class="kw">_</span>)| <span class="kw-2">&amp;*</span>pvsf)
 		}
 	}
 }
 
-<span class="doccomment">/// An language block of [`ResourceInfo`](crate::ResourceInfo), composed of a</span>
-<span class="doccomment">/// language ID and a code page.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResourceInfoBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">res_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ResourceInfo</span>,
-	<span class="ident">lang_id</span>: <span class="ident">LANGID</span>,
-	<span class="ident">code_page</span>: <span class="ident">co::CP</span>,
+<span class="doccomment">/// An language block of [`ResourceInfo`](crate::ResourceInfo), composed of a
+/// language ID and a code page.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ResourceInfoBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+	res_info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ResourceInfo,
+	lang_id: LANGID,
+	code_page: co::CP,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ResourceInfoBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">lang_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LANGID</span> { <span class="self">self</span>.<span class="ident">lang_id</span> }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">code_page</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::CP</span> { <span class="self">self</span>.<span class="ident">code_page</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ResourceInfoBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="attribute">#[must_use]</span> <span class="kw">pub const fn </span>lang_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LANGID { <span class="self">self</span>.lang_id }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub const fn </span>code_page(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::CP { <span class="self">self</span>.code_page }
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;Comments&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">company_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;CompanyName&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;FileDescrition&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;FileVersion&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;InternalName&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">legal_copyright</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;LegalCopyright&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">legal_trademarks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;LegalTrademarks&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">original_filename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;OriginalFilename&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">product_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;ProductName&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">product_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;ProductVersion&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;PrivateBuild&quot;</span>) }
-	<span class="attribute">#[<span class="ident">must_use</span>]</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">special_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">generic_string_info</span>(<span class="string">&quot;SpecialBuild&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>comments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;Comments&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>company_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;CompanyName&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>file_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileDescrition&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>file_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileVersion&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>internal_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;InternalName&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>legal_copyright(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalCopyright&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>legal_trademarks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalTrademarks&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>original_filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;OriginalFilename&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>product_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductName&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>product_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductVersion&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>private_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;PrivateBuild&quot;</span>) }
+	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>special_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;SpecialBuild&quot;</span>) }
 
-	<span class="kw">fn</span> <span class="ident">generic_string_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">VarQueryValue</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>(
-				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">res_info</span>.<span class="ident">res_buf</span>,
+	<span class="kw">fn </span>generic_string_info(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+		<span class="kw">unsafe </span>{
+			VarQueryValue::&lt;u16&gt;(
+				<span class="kw-2">&amp;</span><span class="self">self</span>.res_info.res_buf,
 				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\StringFileInfo\\{:04x}{:04x}\\{}&quot;</span>,
-					<span class="ident">u16::from</span>(<span class="self">self</span>.<span class="ident">lang_id</span>), <span class="ident">u16::from</span>(<span class="self">self</span>.<span class="ident">code_page</span>), <span class="ident">info</span>),
-			).<span class="ident">ok</span>()
-				.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">pstr</span>, <span class="ident">len</span>)<span class="op">|</span> {
-					<span class="ident">WString::from_wchars_slice</span>(
-						<span class="ident">std::slice::from_raw_parts</span>(<span class="ident">pstr</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="kw">_</span>),
-					).<span class="ident">to_string</span>()
+					u16::from(<span class="self">self</span>.lang_id), u16::from(<span class="self">self</span>.code_page), info),
+			).ok()
+				.map(|(pstr, len)| {
+					WString::from_wchars_slice(
+						std::slice::from_raw_parts(pstr, len <span class="kw">as _</span>),
+					).to_string()
 				})
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -120,127 +120,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::dlg_base::DlgBase</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::WindowEventsAll</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::msg_error::MsgResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">AnyResult</span>, <span class="ident">HINSTANCE</span>, <span class="ident">IdStr</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::wm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiEvents</span>, <span class="ident">kernel_Hinstance</span>, <span class="ident">user_Hinstance</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">IdOicStr</span>, <span class="ident">PostQuitMessage</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::dlg_base::DlgBase;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::WindowEventsAll;
+<span class="kw">use </span><span class="kw">crate</span>::gui::msg_error::MsgResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, HINSTANCE, IdStr};
+<span class="kw">use </span><span class="kw">crate</span>::msg::wm;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiEvents, kernel_Hinstance, user_Hinstance, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, IdOicStr, PostQuitMessage, SIZE};
 
-<span class="kw">struct</span> <span class="ident">Obj</span> { <span class="comment">// actual fields of DlgMain</span>
-	<span class="ident">dlg_base</span>: <span class="ident">DlgBase</span>,
-	<span class="ident">icon_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">accel_table_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="kw">struct </span>Obj { <span class="comment">// actual fields of DlgMain
+	</span>dlg_base: DlgBase,
+	icon_id: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+	accel_table_id: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+	_pin: PhantomPinned,
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// A dialog-based main window.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">DlgMain</span>(<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Obj</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+</span><span class="doccomment">/// A dialog-based main window.
+</span><span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>DlgMain(Pin&lt;Arc&lt;Obj&gt;&gt;);
 
-<span class="kw">impl</span> <span class="ident">DlgMain</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-		<span class="ident">dialog_id</span>: <span class="ident">u16</span>,
-		<span class="ident">icon_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-		<span class="ident">accel_table_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-	{
-		<span class="kw">let</span> <span class="ident">new_self</span> <span class="op">=</span> <span class="self">Self</span>(
-			<span class="ident">Arc::pin</span>(
-				<span class="ident">Obj</span> {
-					<span class="ident">dlg_base</span>: <span class="ident">DlgBase::new</span>(<span class="prelude-val">None</span>, <span class="ident">dialog_id</span>),
-					<span class="ident">icon_id</span>,
-					<span class="ident">accel_table_id</span>,
-					<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="kw">impl </span>DlgMain {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(
+		dialog_id: u16,
+		icon_id: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+		accel_table_id: <span class="prelude-ty">Option</span>&lt;u16&gt;) -&gt; <span class="self">Self
+	</span>{
+		<span class="kw">let </span>new_self = <span class="self">Self</span>(
+			Arc::pin(
+				Obj {
+					dlg_base: DlgBase::new(<span class="prelude-val">None</span>, dialog_id),
+					icon_id,
+					accel_table_id,
+					_pin: PhantomPinned,
 				},
 			),
 		);
-		<span class="ident">new_self</span>.<span class="ident">default_message_handlers</span>();
-		<span class="ident">new_self</span>
+		new_self.default_message_handlers();
+		new_self
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">as_base</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">unsafe fn </span>as_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.as_base()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">hwnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HWND</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">hwnd</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HWND {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.hwnd()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEventsAll</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">on</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.on()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>spawn_new_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">spawn_new_thread</span>(<span class="ident">func</span>);
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.spawn_new_thread(func);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>run_ui_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static
+	</span>{
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.run_ui_thread(func);
+	}
+
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>run_main(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		cmd_show: <span class="prelude-ty">Option</span>&lt;co::SW&gt;) -&gt; MsgResult&lt;i32&gt;
 	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">run_ui_thread</span>(<span class="ident">func</span>);
-	}
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.create_dialog_param();
+		<span class="kw">let </span>hinst = HINSTANCE::GetModuleHandle(<span class="prelude-val">None</span>).unwrap();
+		<span class="kw">let </span>haccel = <span class="self">self</span>.<span class="number">0</span>.accel_table_id
+			.map(|id| hinst.LoadAccelerators(IdStr::Id(id))) <span class="comment">// resources are automatically freed
+			</span>.transpose()
+			.unwrap();
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">run_main</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">cmd_show</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">co::SW</span><span class="op">&gt;</span>) -&gt; <span class="ident">MsgResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>
-	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">create_dialog_param</span>();
-		<span class="kw">let</span> <span class="ident">hinst</span> <span class="op">=</span> <span class="ident">HINSTANCE::GetModuleHandle</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="kw">let</span> <span class="ident">haccel</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">accel_table_id</span>
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">hinst</span>.<span class="ident">LoadAccelerators</span>(<span class="ident">IdStr::Id</span>(<span class="ident">id</span>))) <span class="comment">// resources are automatically freed</span>
-			.<span class="ident">transpose</span>()
-			.<span class="ident">unwrap</span>();
+		<span class="self">self</span>.set_icon_if_any(hinst);
+		<span class="self">self</span>.hwnd().ShowWindow(cmd_show.unwrap_or(co::SW::SHOW));
 
-		<span class="self">self</span>.<span class="ident">set_icon_if_any</span>(<span class="ident">hinst</span>);
-		<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">ShowWindow</span>(<span class="ident">cmd_show</span>.<span class="ident">unwrap_or</span>(<span class="ident">co::SW::SHOW</span>));
+		Base::run_main_loop(haccel) <span class="comment">// blocks until window is closed
+	</span>}
 
-		<span class="ident">Base::run_main_loop</span>(<span class="ident">haccel</span>) <span class="comment">// blocks until window is closed</span>
-	}
-
-	<span class="kw">fn</span> <span class="ident">default_message_handlers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="kw">let</span> <span class="ident">self2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-		<span class="self">self</span>.<span class="ident">on</span>().<span class="ident">wm_close</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-			<span class="ident">self2</span>.<span class="ident">hwnd</span>().<span class="ident">DestroyWindow</span>().<span class="ident">unwrap</span>();
+	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
+		<span class="self">self</span>.on().wm_close(<span class="kw">move </span>|| {
+			self2.hwnd().DestroyWindow().unwrap();
 			<span class="prelude-val">Ok</span>(())
 		});
 
-		<span class="self">self</span>.<span class="ident">on</span>().<span class="ident">wm_nc_destroy</span>(<span class="op">|</span><span class="op">|</span> {
-			<span class="ident">PostQuitMessage</span>(<span class="number">0</span>);
+		<span class="self">self</span>.on().wm_nc_destroy(|| {
+			PostQuitMessage(<span class="number">0</span>);
 			<span class="prelude-val">Ok</span>(())
 		});
 	}
 
-	<span class="kw">fn</span> <span class="ident">set_icon_if_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hinst</span>: <span class="ident">HINSTANCE</span>) {
-		<span class="comment">// If an icon ID was specified, load it from the resources.</span>
-		<span class="comment">// Resource icons are automatically released by the system.</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">icon_id</span> {
-			<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(
-				<span class="ident">wm::SetIcon</span> {
-					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(
-						<span class="ident">IdOicStr::Id</span>(<span class="ident">id</span>), <span class="ident">SIZE::new</span>(<span class="number">16</span>, <span class="number">16</span>), <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
-					<span class="ident">size</span>: <span class="ident">co::ICON_SZ::SMALL</span>,
+	<span class="kw">fn </span>set_icon_if_any(<span class="kw-2">&amp;</span><span class="self">self</span>, hinst: HINSTANCE) {
+		<span class="comment">// If an icon ID was specified, load it from the resources.
+		// Resource icons are automatically released by the system.
+		</span><span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="self">self</span>.<span class="number">0</span>.icon_id {
+			<span class="self">self</span>.hwnd().SendMessage(
+				wm::SetIcon {
+					hicon: hinst.LoadImageIcon(
+						IdOicStr::Id(id), SIZE::new(<span class="number">16</span>, <span class="number">16</span>), co::LR::DEFAULTCOLOR).unwrap(),
+					size: co::ICON_SZ::SMALL,
 				},
 			);
 
-			<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(
-				<span class="ident">wm::SetIcon</span> {
-					<span class="ident">hicon</span>: <span class="ident">hinst</span>.<span class="ident">LoadImageIcon</span>(
-						<span class="ident">IdOicStr::Id</span>(<span class="ident">id</span>), <span class="ident">SIZE::new</span>(<span class="number">32</span>, <span class="number">32</span>), <span class="ident">co::LR::DEFAULTCOLOR</span>).<span class="ident">unwrap</span>(),
-					<span class="ident">size</span>: <span class="ident">co::ICON_SZ::BIG</span>,
+			<span class="self">self</span>.hwnd().SendMessage(
+				wm::SetIcon {
+					hicon: hinst.LoadImageIcon(
+						IdOicStr::Id(id), SIZE::new(<span class="number">32</span>, <span class="number">32</span>), co::LR::DEFAULTCOLOR).unwrap(),
+					size: co::ICON_SZ::BIG,
 				},
 			);
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

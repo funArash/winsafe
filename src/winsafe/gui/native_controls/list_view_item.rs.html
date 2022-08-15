@@ -247,254 +247,254 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::LVITEM</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::list_view::ListView</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::lvm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiWindow</span>, <span class="ident">NativeBitflag</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::RECT</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::LVITEM;
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::list_view::ListView;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::msg::lvm;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, NativeBitflag, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::RECT;
 
-<span class="doccomment">/// A single item of a [`ListView`](crate::gui::ListView) control.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** Each object keeps the zero-based index of an item. If new items</span>
-<span class="doccomment">/// are added/removed from the list view control, the object may then point to a</span>
-<span class="doccomment">/// different item.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListView</span>,
-	<span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// A single item of a [`ListView`](crate::gui::ListView) control.
+///
+/// **Note:** Each object keeps the zero-based index of an item. If new items
+/// are added/removed from the list view control, the object may then point to a
+/// different item.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub struct </span>ListViewItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListView,
+	index: u32,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ListViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListView</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">owner</span>, <span class="ident">index</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ListViewItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListView, index: u32) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ owner, index }
 	}
 
-	<span class="doccomment">/// Deletes the item by sending an</span>
-	<span class="doccomment">/// [`lvm::DeleteItem`](crate::msg::lvm::DeleteItem) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::DeleteItem</span> { <span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>, })
-			.<span class="ident">unwrap</span>();
+	<span class="doccomment">/// Deletes the item by sending an
+	/// [`lvm::DeleteItem`](crate::msg::lvm::DeleteItem) message.
+	</span><span class="kw">pub fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::DeleteItem { index: <span class="self">self</span>.index, })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Scrolls the list by sending an</span>
-	<span class="doccomment">/// [`lvm::EnsureVisible`](crate::msg::lvm::EnsureVisible) message so that</span>
-	<span class="doccomment">/// the item is visible in the list.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_visible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::EnsureVisible</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-				<span class="ident">entirely_visible</span>: <span class="bool-val">true</span>,
+	<span class="doccomment">/// Scrolls the list by sending an
+	/// [`lvm::EnsureVisible`](crate::msg::lvm::EnsureVisible) message so that
+	/// the item is visible in the list.
+	</span><span class="kw">pub fn </span>ensure_visible(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::EnsureVisible {
+				index: <span class="self">self</span>.index,
+				entirely_visible: <span class="bool-val">true</span>,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the item as the focused one sending an</span>
-	<span class="doccomment">/// [`lvm:SetItemState`](crate::msg::lvm::SetItemState) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">focus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">stateMask</span> <span class="op">=</span> <span class="ident">co::LVIS::FOCUSED</span>;
-		<span class="ident">lvi</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">co::LVIS::FOCUSED</span>;
+	<span class="doccomment">/// Sets the item as the focused one sending an
+	/// [`lvm:SetItemState`](crate::msg::lvm::SetItemState) message.
+	</span><span class="kw">pub fn </span>focus(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.stateMask = co::LVIS::FOCUSED;
+		lvi.state = co::LVIS::FOCUSED;
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItemState</span> {
-				<span class="ident">index</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">index</span>),
-				<span class="ident">lvitem</span>: <span class="kw-2">&amp;</span><span class="ident">lvi</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItemState {
+				index: <span class="prelude-val">Some</span>(<span class="self">self</span>.index),
+				lvitem: <span class="kw-2">&amp;</span>lvi,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the icon index of the item by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItem`](crate::msg::lvm::GetItem) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">iItem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvi</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVIF::IMAGE</span>;
+	<span class="doccomment">/// Retrieves the icon index of the item by sending an
+	/// [`lvm::GetItem`](crate::msg::lvm::GetItem) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>icon_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.iItem = <span class="self">self</span>.index <span class="kw">as _</span>;
+		lvi.mask = co::LVIF::IMAGE;
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItem</span> { <span class="ident">lvitem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">lvi</span> })
-			.<span class="ident">unwrap</span>();
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItem { lvitem: <span class="kw-2">&amp;mut </span>lvi })
+			.unwrap();
 
-		<span class="kw">match</span> <span class="ident">lvi</span>.<span class="ident">iImage</span> {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+		<span class="kw">match </span>lvi.iImage {
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">None</span>,
+			idx =&gt; <span class="prelude-val">Some</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="doccomment">/// Returns the zero-based index of the item.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">index</span>
+	<span class="doccomment">/// Returns the zero-based index of the item.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.index
 	}
 
-	<span class="doccomment">/// Tells if the item is the focused one by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItemState`](crate::msg::lvm::GetItemState) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_focused</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetItemState</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-				<span class="ident">mask</span>: <span class="ident">co::LVIS::FOCUSED</span>,
+	<span class="doccomment">/// Tells if the item is the focused one by sending an
+	/// [`lvm::GetItemState`](crate::msg::lvm::GetItemState) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>is_focused(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetItemState {
+				index: <span class="self">self</span>.index,
+				mask: co::LVIS::FOCUSED,
 			})
-			.<span class="ident">has</span>(<span class="ident">co::LVIS::FOCUSED</span>)
+			.has(co::LVIS::FOCUSED)
 	}
 
-	<span class="doccomment">/// Tells if the item is selected by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItemState`](crate::msg::lvm::GetItemState) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_selected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetItemState</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-				<span class="ident">mask</span>: <span class="ident">co::LVIS::SELECTED</span>,
+	<span class="doccomment">/// Tells if the item is selected by sending an
+	/// [`lvm::GetItemState`](crate::msg::lvm::GetItemState) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>is_selected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetItemState {
+				index: <span class="self">self</span>.index,
+				mask: co::LVIS::SELECTED,
 			})
-			.<span class="ident">has</span>(<span class="ident">co::LVIS::SELECTED</span>)
+			.has(co::LVIS::SELECTED)
 	}
 
-	<span class="doccomment">/// Tells if the item is currently visible by sending an</span>
-	<span class="doccomment">/// [`lvm::IsItemVisible`](crate::msg::lvm::IsItemVisible) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_visible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::IsItemVisible</span> { <span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span> })
+	<span class="doccomment">/// Tells if the item is currently visible by sending an
+	/// [`lvm::IsItemVisible`](crate::msg::lvm::IsItemVisible) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>is_visible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::IsItemVisible { index: <span class="self">self</span>.index })
 	}
 
-	<span class="doccomment">/// Retrieves the user-defined value by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItem`](crate::msg::lvm::GetItem) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lparam</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">isize</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">iItem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvi</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVIF::PARAM</span>;
+	<span class="doccomment">/// Retrieves the user-defined value by sending an
+	/// [`lvm::GetItem`](crate::msg::lvm::GetItem) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>lparam(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.iItem = <span class="self">self</span>.index <span class="kw">as _</span>;
+		lvi.mask = co::LVIF::PARAM;
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetItem</span> { <span class="ident">lvitem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">lvi</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="ident">lvi</span>.<span class="ident">lParam</span>
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetItem { lvitem: <span class="kw-2">&amp;mut </span>lvi })
+			.unwrap();
+		lvi.lParam
 	}
 
-	<span class="doccomment">/// Retrieves the unique ID for the item index by sending an</span>
-	<span class="doccomment">/// [`lvm::MapIndexToId`](crate::msg::lvm::MapIndexToId) message.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the item index has became invalid, returns `None`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_index_to_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::MapIndexToId</span> { <span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span> })
-			.<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Retrieves the unique ID for the item index by sending an
+	/// [`lvm::MapIndexToId`](crate::msg::lvm::MapIndexToId) message.
+	///
+	/// If the item index has became invalid, returns `None`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>map_index_to_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::MapIndexToId { index: <span class="self">self</span>.index })
+			.unwrap()
 	}
 
-	<span class="doccomment">/// Retrieves the bound rectangle of item by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItemRect`](crate::msg::lvm::GetItemRect) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">portion</span>: <span class="ident">co::LVIR</span>) -&gt; <span class="ident">RECT</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetItemRect</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-				<span class="ident">rect</span>: <span class="kw-2">&amp;mut</span> <span class="ident">rc</span>,
-				<span class="ident">portion</span>,
+	<span class="doccomment">/// Retrieves the bound rectangle of item by sending an
+	/// [`lvm::GetItemRect`](crate::msg::lvm::GetItemRect) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>rect(<span class="kw-2">&amp;</span><span class="self">self</span>, portion: co::LVIR) -&gt; RECT {
+		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::GetItemRect {
+				index: <span class="self">self</span>.index,
+				rect: <span class="kw-2">&amp;mut </span>rc,
+				portion,
 			})
-			.<span class="ident">unwrap</span>();
-		<span class="ident">rc</span>
+			.unwrap();
+		rc
 	}
 
-	<span class="doccomment">/// Sets or removes the selection from the item by sending an</span>
-	<span class="doccomment">/// [`lvm::SetItemState`](crate::msg::lvm::SetItemState) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">set</span>: <span class="ident">bool</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">stateMask</span> <span class="op">=</span> <span class="ident">co::LVIS::SELECTED</span>;
-		<span class="kw">if</span> <span class="ident">set</span> { <span class="ident">lvi</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">co::LVIS::SELECTED</span>; }
+	<span class="doccomment">/// Sets or removes the selection from the item by sending an
+	/// [`lvm::SetItemState`](crate::msg::lvm::SetItemState) message.
+	</span><span class="kw">pub fn </span>select(<span class="kw-2">&amp;</span><span class="self">self</span>, set: bool) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.stateMask = co::LVIS::SELECTED;
+		<span class="kw">if </span>set { lvi.state = co::LVIS::SELECTED; }
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItemState</span> {
-				<span class="ident">index</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">index</span>),
-				<span class="ident">lvitem</span>: <span class="kw-2">&amp;</span><span class="ident">lvi</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItemState {
+				index: <span class="prelude-val">Some</span>(<span class="self">self</span>.index),
+				lvitem: <span class="kw-2">&amp;</span>lvi,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the icon index of the item by sending an</span>
-	<span class="doccomment">/// [`lvm::SetItem`](crate::msg::lvm::SetItem) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_icon_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">icon_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">iItem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvi</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVIF::IMAGE</span>;
-		<span class="ident">lvi</span>.<span class="ident">iImage</span> <span class="op">=</span> <span class="ident">icon_index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>);
+	<span class="doccomment">/// Sets the icon index of the item by sending an
+	/// [`lvm::SetItem`](crate::msg::lvm::SetItem) message.
+	</span><span class="kw">pub fn </span>set_icon_index(<span class="kw-2">&amp;</span><span class="self">self</span>, icon_index: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.iItem = <span class="self">self</span>.index <span class="kw">as _</span>;
+		lvi.mask = co::LVIF::IMAGE;
+		lvi.iImage = icon_index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as _</span>);
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItem</span> { <span class="ident">lvitem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">lvi</span> })
-			.<span class="ident">unwrap</span>();
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItem { lvitem: <span class="kw-2">&amp;mut </span>lvi })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the user-defined value by sending an</span>
-	<span class="doccomment">/// [`lvm::SetItem`](crate::msg::lvm::SetItem) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_lparam</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lparam</span>: <span class="ident">isize</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">iItem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">lvi</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::LVIF::PARAM</span>;
-		<span class="ident">lvi</span>.<span class="ident">lParam</span> <span class="op">=</span> <span class="ident">lparam</span>;
+	<span class="doccomment">/// Sets the user-defined value by sending an
+	/// [`lvm::SetItem`](crate::msg::lvm::SetItem) message.
+	</span><span class="kw">pub fn </span>set_lparam(<span class="kw-2">&amp;</span><span class="self">self</span>, lparam: isize) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.iItem = <span class="self">self</span>.index <span class="kw">as _</span>;
+		lvi.mask = co::LVIF::PARAM;
+		lvi.lParam = lparam;
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItem</span> { <span class="ident">lvitem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">lvi</span> })
-			.<span class="ident">unwrap</span>();
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItem { lvitem: <span class="kw-2">&amp;mut </span>lvi })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Sets the text of the item under a column by sending an</span>
-	<span class="doccomment">/// [`lvm::SetItemText`](crate::msg::lvm::SetItemText) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-		<span class="ident">lvi</span>.<span class="ident">iSubItem</span> <span class="op">=</span> <span class="ident">column_index</span> <span class="kw">as</span> <span class="kw">_</span>;
+	<span class="doccomment">/// Sets the text of the item under a column by sending an
+	/// [`lvm::SetItemText`](crate::msg::lvm::SetItemText) message.
+	</span><span class="kw">pub fn </span>set_text(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32, text: <span class="kw-2">&amp;</span>str) {
+		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+		lvi.iSubItem = column_index <span class="kw">as _</span>;
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wtext</span> <span class="op">=</span> <span class="ident">WString::from_str</span>(<span class="ident">text</span>);
-		<span class="ident">lvi</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">wtext</span>));
+		<span class="kw">let </span><span class="kw-2">mut </span>wtext = WString::from_str(text);
+		lvi.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wtext));
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lvm::SetItemText</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-				<span class="ident">lvitem</span>: <span class="kw-2">&amp;</span><span class="ident">lvi</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lvm::SetItemText {
+				index: <span class="self">self</span>.index,
+				lvitem: <span class="kw-2">&amp;</span>lvi,
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the text of an item under a column by sending an</span>
-	<span class="doccomment">/// [`lvm::GetItemText`](crate::msg::lvm::GetItemText) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">String</span> {
-		<span class="comment">// https://forums.codeguru.com/showthread.php?351972-Getting-listView-item-text-length</span>
-		<span class="kw">const</span> <span class="ident">BLOCK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>; <span class="comment">// arbitrary</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf_sz</span> <span class="op">=</span> <span class="ident">BLOCK</span>;
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::default</span>();
+	<span class="doccomment">/// Retrieves the text of an item under a column by sending an
+	/// [`lvm::GetItemText`](crate::msg::lvm::GetItemText) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32) -&gt; String {
+		<span class="comment">// https://forums.codeguru.com/showthread.php?351972-Getting-listView-item-text-length
+		</span><span class="kw">const </span>BLOCK: usize = <span class="number">64</span>; <span class="comment">// arbitrary
+		</span><span class="kw">let </span><span class="kw-2">mut </span>buf_sz = BLOCK;
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::default();
 
-		<span class="kw">loop</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lvi</span> <span class="op">=</span> <span class="ident">LVITEM::default</span>();
-			<span class="ident">lvi</span>.<span class="ident">iSubItem</span> <span class="op">=</span> <span class="ident">column_index</span> <span class="kw">as</span> <span class="kw">_</span>;
+		<span class="kw">loop </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
+			lvi.iSubItem = column_index <span class="kw">as _</span>;
 
-			<span class="ident">buf</span>.<span class="ident">realloc_buffer</span>(<span class="ident">buf_sz</span>);
-			<span class="ident">lvi</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>));
+			buf.realloc_buffer(buf_sz);
+			lvi.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>buf));
 
-			<span class="kw">let</span> <span class="ident">num_chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">lvm::GetItemText</span> { <span class="comment">// char count without terminating null</span>
-					<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">index</span>,
-					<span class="ident">lvitem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">lvi</span>,
+			<span class="kw">let </span>num_chars = <span class="self">self</span>.owner.hwnd()
+				.SendMessage(lvm::GetItemText { <span class="comment">// char count without terminating null
+					</span>index: <span class="self">self</span>.index,
+					lvitem: <span class="kw-2">&amp;mut </span>lvi,
 				});
 
-			<span class="kw">if</span> (<span class="ident">num_chars</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="ident">buf_sz</span> { <span class="comment">// to break, must have at least 1 char gap</span>
-				<span class="kw">break</span>;
+			<span class="kw">if </span>(num_chars <span class="kw">as </span>usize) + <span class="number">1 </span>&lt; buf_sz { <span class="comment">// to break, must have at least 1 char gap
+				</span><span class="kw">break</span>;
 			}
 
-			<span class="ident">buf_sz</span> <span class="op">+</span><span class="op">=</span> <span class="ident">BLOCK</span>; <span class="comment">// increase buffer size to try again</span>
-		}
+			buf_sz += BLOCK; <span class="comment">// increase buffer size to try again
+		</span>}
 
-		<span class="ident">buf</span>.<span class="ident">to_string</span>()
+		buf.to_string()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

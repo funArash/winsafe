@@ -166,173 +166,173 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::ptr::NonNull;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">PROCESSENTRY32</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">HandleClose</span>};
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, PROCESSENTRY32, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HPROCESSLIST</span>: <span class="string">&quot;kernel&quot;</span>;
-	<span class="doccomment">/// Handle to a process list</span>
-	<span class="doccomment">/// [snapshot](https://docs.microsoft.com/en-us/windows/win32/toolhelp/taking-a-snapshot-and-viewing-processes).</span>
-	<span class="doccomment">/// Originally just a `HANDLE`.</span>
-}
+<span class="macro">impl_handle!</span> { HPROCESSLIST: <span class="string">&quot;kernel&quot;</span>;
+	<span class="doccomment">/// Handle to a process list
+	/// [snapshot](https://docs.microsoft.com/en-us/windows/win32/toolhelp/taking-a-snapshot-and-viewing-processes).
+	/// Originally just a `HANDLE`.
+</span>}
 
-<span class="kw">impl</span> <span class="ident">HandleClose</span> <span class="kw">for</span> <span class="ident">HPROCESSLIST</span> {}
-<span class="kw">impl</span> <span class="ident">kernel_Hprocesslist</span> <span class="kw">for</span> <span class="ident">HPROCESSLIST</span> {}
+<span class="kw">impl </span>HandleClose <span class="kw">for </span>HPROCESSLIST {}
+<span class="kw">impl </span>kernel_Hprocesslist <span class="kw">for </span>HPROCESSLIST {}
 
-<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
-<span class="doccomment">/// [`HPROCESSLIST`](crate::HPROCESSLIST).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hprocesslist</span>: <span class="ident">Handle</span> {
-		<span class="doccomment">/// Returns an iterator over the processes list by calling</span>
-	<span class="doccomment">/// [`HPROCESSLIST::Process32First`](crate::prelude::kernel_Hprocesslist::Process32First)</span>
-	<span class="doccomment">/// and then</span>
-	<span class="doccomment">/// [`HPROCESSLIST::Process32Next`](crate::prelude::kernel_Hprocesslist::Process32Next)</span>
-	<span class="doccomment">/// consecutively.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HPROCESSLIST, PROCESSENTRY32};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut pe = PROCESSENTRY32::default();</span>
-	<span class="doccomment">/// let hpl = HPROCESSLIST::</span>
-	<span class="doccomment">///     CreateToolhelp32Snapshot(co::TH32CS::SNAPPROCESS, None)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for pe in hpl.iter(&amp;mut pe) {</span>
-	<span class="doccomment">///     let pe = pe?;</span>
-	<span class="doccomment">///     println!(&quot;{} {} {}&quot;,</span>
-	<span class="doccomment">///         pe.szExeFile(), pe.th32ProcessID, pe.cntThreads);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hpl.CloseHandle()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">pe32</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">PROCESSENTRY32</span>)
-		-&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PROCESSENTRY32</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
+/// [`HPROCESSLIST`](crate::HPROCESSLIST).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>kernel_Hprocesslist: Handle {
+	<span class="doccomment">/// Returns an iterator over the processes list by calling
+	/// [`HPROCESSLIST::Process32First`](crate::prelude::kernel_Hprocesslist::Process32First)
+	/// and then
+	/// [`HPROCESSLIST::Process32Next`](crate::prelude::kernel_Hprocesslist::Process32Next)
+	/// consecutively.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HPROCESSLIST, PROCESSENTRY32};
+	///
+	/// let mut pe = PROCESSENTRY32::default();
+	/// let hpl = HPROCESSLIST::
+	///     CreateToolhelp32Snapshot(co::TH32CS::SNAPPROCESS, None)?;
+	///
+	/// for pe in hpl.iter(&amp;mut pe) {
+	///     let pe = pe?;
+	///     println!(&quot;{} {} {}&quot;,
+	///         pe.szExeFile(), pe.th32ProcessID, pe.cntThreads);
+	/// }
+	///
+	/// hpl.CloseHandle()?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, pe32: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>PROCESSENTRY32)
+		-&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PROCESSENTRY32&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;
 	{
-		<span class="ident">Box::new</span>(<span class="ident">ProcessIter::new</span>(<span class="ident">HPROCESSLIST</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_ptr</span>() }), <span class="ident">pe32</span>))
+		Box::new(ProcessIter::new(HPROCESSLIST(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }), pe32))
 	}
 
-	<span class="doccomment">/// [`CreateToolhelp32Snapshot`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HPROCESSLIST::CloseHandle`](crate::prelude::HandleClose::CloseHandle)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateToolhelp32Snapshot</span>(
-		<span class="ident">flags</span>: <span class="ident">co::TH32CS</span>,
-		<span class="ident">th32_process_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HPROCESSLIST</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`CreateToolhelp32Snapshot`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HPROCESSLIST::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateToolhelp32Snapshot(
+		flags: co::TH32CS,
+		th32_process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;HPROCESSLIST&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::CreateToolhelp32Snapshot</span>(
-				<span class="ident">flags</span>.<span class="number">0</span>,
-				<span class="ident">th32_process_id</span>.<span class="ident">unwrap_or_default</span>(),
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HPROCESSLIST</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			kernel::ffi::CreateToolhelp32Snapshot(
+				flags.<span class="number">0</span>,
+				th32_process_id.unwrap_or_default(),
+			).as_mut()
+		}.map(|ptr| HPROCESSLIST(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`Process32First`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32firstw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer using</span>
-	<span class="doccomment">/// [`HPROCESSLIST::iter`](crate::prelude::kernel_Hprocesslist::iter), which</span>
-	<span class="doccomment">/// is simpler.</span>
-	<span class="kw">fn</span> <span class="ident">Process32First</span>(<span class="self">self</span>, <span class="ident">pe</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PROCESSENTRY32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::Process32FirstW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pe</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`Process32First`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32firstw)
+	/// method.
+	///
+	/// Prefer using
+	/// [`HPROCESSLIST::iter`](crate::prelude::kernel_Hprocesslist::iter), which
+	/// is simpler.
+	</span><span class="kw">fn </span>Process32First(<span class="self">self</span>, pe: <span class="kw-2">&amp;mut </span>PROCESSENTRY32) -&gt; SysResult&lt;bool&gt; {
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::Process32FirstW(<span class="self">self</span>.as_ptr(), pe <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		} {
-			<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-				<span class="ident">co::ERROR::NO_MORE_FILES</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-				<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::NO_MORE_FILES =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+				err =&gt; <span class="prelude-val">Err</span>(err),
 			},
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`Process32Next`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32nextw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer using</span>
-	<span class="doccomment">/// [`HPROCESSLIST::iter`](crate::prelude::kernel_Hprocesslist::iter), which</span>
-	<span class="doccomment">/// is simpler.</span>
-	<span class="kw">fn</span> <span class="ident">Process32Next</span>(<span class="self">self</span>, <span class="ident">pe</span>: <span class="kw-2">&amp;mut</span> <span class="ident">PROCESSENTRY32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::Process32NextW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pe</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`Process32Next`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-process32nextw)
+	/// method.
+	///
+	/// Prefer using
+	/// [`HPROCESSLIST::iter`](crate::prelude::kernel_Hprocesslist::iter), which
+	/// is simpler.
+	</span><span class="kw">fn </span>Process32Next(<span class="self">self</span>, pe: <span class="kw-2">&amp;mut </span>PROCESSENTRY32) -&gt; SysResult&lt;bool&gt; {
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::Process32NextW(<span class="self">self</span>.as_ptr(), pe <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		} {
-			<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-				<span class="ident">co::ERROR::NO_MORE_FILES</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-				<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::NO_MORE_FILES =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+				err =&gt; <span class="prelude-val">Err</span>(err),
 			},
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 		}
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">struct</span> <span class="ident">ProcessIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">hpl</span>: <span class="ident">HPROCESSLIST</span>,
-	<span class="ident">pe32</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">PROCESSENTRY32</span><span class="op">&gt;</span>,
-	<span class="ident">first_pass</span>: <span class="ident">bool</span>,
-	<span class="ident">has_more</span>: <span class="ident">bool</span>,
-	<span class="ident">_pe32</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">PROCESSENTRY32</span><span class="op">&gt;</span>,
+</span><span class="kw">struct </span>ProcessIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	hpl: HPROCESSLIST,
+	pe32: NonNull&lt;PROCESSENTRY32&gt;,
+	first_pass: bool,
+	has_more: bool,
+	_pe32: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>PROCESSENTRY32&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ProcessIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PROCESSENTRY32</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>ProcessIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PROCESSENTRY32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_more</span> {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span>!<span class="self">self</span>.has_more {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">first_pass</span> {
-			<span class="self">self</span>.<span class="ident">first_pass</span> <span class="op">=</span> <span class="bool-val">false</span>;
-			<span class="self">self</span>.<span class="ident">hpl</span>.<span class="ident">Process32First</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">pe32</span>.<span class="ident">as_mut</span>() })
-		} <span class="kw">else</span> {
-			<span class="self">self</span>.<span class="ident">hpl</span>.<span class="ident">Process32Next</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">pe32</span>.<span class="ident">as_mut</span>() })
+		<span class="kw">match if </span><span class="self">self</span>.first_pass {
+			<span class="self">self</span>.first_pass = <span class="bool-val">false</span>;
+			<span class="self">self</span>.hpl.Process32First(<span class="kw">unsafe </span>{ <span class="self">self</span>.pe32.as_mut() })
+		} <span class="kw">else </span>{
+			<span class="self">self</span>.hpl.Process32Next(<span class="kw">unsafe </span>{ <span class="self">self</span>.pe32.as_mut() })
 		} {
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">has_more</span> <span class="op">=</span> <span class="bool-val">false</span>; <span class="comment">// no further iterations</span>
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
+			<span class="prelude-val">Err</span>(e) =&gt; {
+				<span class="self">self</span>.has_more = <span class="bool-val">false</span>; <span class="comment">// no further iterations
+				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
 			},
-			<span class="prelude-val">Ok</span>(<span class="ident">has_more</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">has_more</span> <span class="op">=</span> <span class="ident">has_more</span>;
-				<span class="kw">if</span> <span class="ident">has_more</span> {
-					<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">pe32</span>.<span class="ident">as_mut</span>() }))
-				} <span class="kw">else</span> {
-					<span class="prelude-val">None</span> <span class="comment">// no process found</span>
-				}
+			<span class="prelude-val">Ok</span>(has_more) =&gt; {
+				<span class="self">self</span>.has_more = has_more;
+				<span class="kw">if </span>has_more {
+					<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.pe32.as_mut() }))
+				} <span class="kw">else </span>{
+					<span class="prelude-val">None </span><span class="comment">// no process found
+				</span>}
 			},
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ProcessIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hpl</span>: <span class="ident">HPROCESSLIST</span>, <span class="ident">pe32</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">PROCESSENTRY32</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">hpl</span>,
-			<span class="ident">pe32</span>: <span class="ident">NonNull::from</span>(<span class="ident">pe32</span>),
-			<span class="ident">first_pass</span>: <span class="bool-val">true</span>,
-			<span class="ident">has_more</span>: <span class="bool-val">true</span>,
-			<span class="ident">_pe32</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ProcessIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(hpl: HPROCESSLIST, pe32: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>PROCESSENTRY32) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			hpl,
+			pe32: NonNull::from(pe32),
+			first_pass: <span class="bool-val">true</span>,
+			has_more: <span class="bool-val">true</span>,
+			_pe32: PhantomData,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

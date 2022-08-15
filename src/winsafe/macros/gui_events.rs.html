@@ -219,226 +219,226 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(unused_macros)]</span>
 
-<span class="doccomment">/// Ordinary window message, no parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_noparm_noret</span> {
+<span class="doccomment">/// Ordinary window message, no parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> fn_wm_noparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-				<span class="ident">func</span>()<span class="question-mark">?</span>;
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>, <span class="kw">move </span>|<span class="kw">_</span>| {
+				func()<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
 			});
 		}
 	};
 }
 
-<span class="doccomment">/// Ordinary window message, no parameters, returns bool.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_noparm_boolret</span> {
+<span class="doccomment">/// Ordinary window message, no parameters, returns bool.
+</span><span class="macro">macro_rules!</span> fn_wm_noparm_boolret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;bool&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>,
+				<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">? </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="doccomment">/// Ordinary window message, with parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_withparm_noret</span> {
+<span class="doccomment">/// Ordinary window message, with parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> fn_wm_withparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr, <span class="macro-nonterminal">$parm</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="macro-nonterminal">$parm</span>) -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-				<span class="ident">func</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span><span class="op">&gt;</span><span class="ident">::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>;
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>, <span class="kw">move </span>|p| {
+				func(&lt;<span class="macro-nonterminal">$parm</span>&gt;::from_generic_wm(p))<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
 			});
 		}
 	};
 }
 
-<span class="doccomment">/// Ordinary window message, with parameters, returns bool.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_withparm_boolret</span> {
+<span class="doccomment">/// Ordinary window message, with parameters, returns bool.
+</span><span class="macro">macro_rules!</span> fn_wm_withparm_boolret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr, <span class="macro-nonterminal">$parm</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="macro-nonterminal">$parm</span>) -&gt; AnyResult&lt;bool&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span><span class="op">&gt;</span><span class="ident">::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>,
+				<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(&lt;<span class="macro-nonterminal">$parm</span>&gt;::from_generic_wm(p))<span class="question-mark">? </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="doccomment">/// Ordinary window message, with parameters, returns constant.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_withparm_coret</span> {
+<span class="doccomment">/// Ordinary window message, with parameters, returns constant.
+</span><span class="macro">macro_rules!</span> fn_wm_withparm_coret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">coret</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr, <span class="macro-nonterminal">$parm</span>:ty, <span class="macro-nonterminal">$coret</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">coret</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="macro-nonterminal">$parm</span>) -&gt; AnyResult&lt;<span class="macro-nonterminal">$coret</span>&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span><span class="op">&gt;</span><span class="ident">::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>,
+				<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(&lt;<span class="macro-nonterminal">$parm</span>&gt;::from_generic_wm(p))<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="doccomment">/// WM_CTLCOLOR* message.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fn_wm_ctlcolor</span> {
+<span class="doccomment">/// WM_CTLCOLOR* message.
+</span><span class="macro">macro_rules!</span> fn_wm_ctlcolor {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$wmconst</span>:expr, <span class="macro-nonterminal">$parm</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::user::decl::HBRUSH</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="macro-nonterminal">$parm</span>) -&gt; AnyResult&lt;<span class="kw">crate</span>::user::decl::HBRUSH&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="ident">wm</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wmconst</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parm</span><span class="op">&gt;</span><span class="ident">::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.wm(<span class="macro-nonterminal">$wmconst</span>,
+				<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(&lt;<span class="macro-nonterminal">$parm</span>&gt;::from_generic_wm(p))<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// WM_COMMAND message, no parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_cmd_noparm_noret</span> {
+</span><span class="doccomment">/// WM_COMMAND message, no parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> pub_fn_cmd_noparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cmd</span>:<span class="ident">expr</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$cmd</span>:expr,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_command</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cmd</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">func</span>());
+			<span class="self">self</span>.<span class="number">0</span>.wm_command(<span class="macro-nonterminal">$cmd</span>,
+				<span class="kw">move </span>|| func());
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, no parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_noparm_noret</span> {
+<span class="doccomment">/// WM_NOTIFY message, no parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_noparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-				<span class="ident">func</span>()<span class="question-mark">?</span>;
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>, <span class="kw">move </span>|<span class="kw">_</span>| {
+				func()<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
 			});
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, with parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_withparm_noret</span> {
+<span class="doccomment">/// WM_NOTIFY message, with parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_withparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr, <span class="macro-nonterminal">$param</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$param</span>) -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-				<span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="ident">p</span>.<span class="ident">cast_nmhdr</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span><span class="op">&gt;</span>() })<span class="question-mark">?</span>;
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>, <span class="kw">move </span>|p| {
+				func(<span class="kw">unsafe </span>{ p.cast_nmhdr::&lt;<span class="macro-nonterminal">$param</span>&gt;() })<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
 			});
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, with mutable parameters, no meaningful return.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_withmutparm_noret</span> {
+<span class="doccomment">/// WM_NOTIFY message, with mutable parameters, no meaningful return.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_withmutparm_noret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr, <span class="macro-nonterminal">$param</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$param</span>) -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-				<span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="ident">p</span>.<span class="ident">cast_nmhdr_mut</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span><span class="op">&gt;</span>() })<span class="question-mark">?</span>;
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>, <span class="kw">move </span>|p| {
+				func(<span class="kw">unsafe </span>{ p.cast_nmhdr_mut::&lt;<span class="macro-nonterminal">$param</span>&gt;() })<span class="question-mark">?</span>;
 				<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
 			});
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, with parameters, returns bool.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_withparm_boolret</span> {
+<span class="doccomment">/// WM_NOTIFY message, with parameters, returns bool.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_withparm_boolret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr, <span class="macro-nonterminal">$param</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$param</span>) -&gt; AnyResult&lt;bool&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="ident">p</span>.<span class="ident">cast_nmhdr</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span><span class="op">&gt;</span>() })<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>,
+				<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(<span class="kw">unsafe </span>{ p.cast_nmhdr::&lt;<span class="macro-nonterminal">$param</span>&gt;() })<span class="question-mark">? </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, no parameters, returns i32.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_noparm_i32ret</span> {
+<span class="doccomment">/// WM_NOTIFY message, no parameters, returns i32.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_noparm_i32ret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;i32&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>,
+				<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">? </span><span class="kw">as _</span>)));
 		}
 	};
 }
 
-<span class="doccomment">/// WM_NOTIFY message, with parameters, returns i32.</span>
-<span class="macro">macro_rules!</span> <span class="ident">pub_fn_nfy_withparm_i32ret</span> {
+<span class="doccomment">/// WM_NOTIFY message, with parameters, returns i32.
+</span><span class="macro">macro_rules!</span> pub_fn_nfy_withparm_i32ret {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">ty</span>,
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$nfy</span>:expr, <span class="macro-nonterminal">$param</span>:ty,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-			<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
+		<span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+			<span class="kw">where </span>F: Fn(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$param</span>) -&gt; AnyResult&lt;i32&gt; + <span class="lifetime">&#39;static</span>,
 		{
-			<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nfy</span>,
-				<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="ident">p</span>.<span class="ident">cast_nmhdr</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span><span class="op">&gt;</span>() })<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+			<span class="self">self</span>.<span class="number">0</span>.wm_notify(<span class="macro-nonterminal">$nfy</span>,
+				<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(<span class="kw">unsafe </span>{ p.cast_nmhdr::&lt;<span class="macro-nonterminal">$param</span>&gt;() })<span class="question-mark">? </span><span class="kw">as _</span>)));
 		}
 	};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

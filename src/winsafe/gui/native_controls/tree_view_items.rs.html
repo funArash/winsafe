@@ -177,184 +177,184 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{<span class="ident">HTREEITEM</span>, <span class="ident">TreeitemTvi</span>, <span class="ident">TVINSERTSTRUCT</span>, <span class="ident">TVITEMEX</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::tree_view_item::TreeViewItem</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::tree_view::TreeView</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::tvm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiWindow</span>, <span class="ident">Handle</span>, <span class="ident">user_Hwnd</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{HTREEITEM, TreeitemTvi, TVINSERTSTRUCT, TVITEMEX};
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::tree_view_item::TreeViewItem;
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::tree_view::TreeView;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::msg::tvm;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, Handle, user_Hwnd};
 
-<span class="doccomment">/// Exposes item methods of a [`TreeView`](crate::gui::TreeView) control.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeViewItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>,
+<span class="doccomment">/// Exposes item methods of a [`TreeView`](crate::gui::TreeView) control.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>TreeViewItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TreeViewItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">owner</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TreeViewItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ owner }
 	}
 
-	<span class="doccomment">/// Adds a new root item by sending a</span>
-	<span class="doccomment">/// [`tvm::InsertItem`](crate::msg::tvm::InsertItem) message, and returns</span>
-	<span class="doccomment">/// the newly added item.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">icon_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+	<span class="doccomment">/// Adds a new root item by sending a
+	/// [`tvm::InsertItem`](crate::msg::tvm::InsertItem) message, and returns
+	/// the newly added item.
+	</span><span class="kw">pub fn </span>add_root(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		text: <span class="kw-2">&amp;</span>str, icon_index: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::from_str</span>(<span class="ident">text</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::from_str(text);
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tvix</span> <span class="op">=</span> <span class="ident">TVITEMEX::default</span>();
-		<span class="ident">tvix</span>.<span class="ident">mask</span> <span class="op">=</span> <span class="ident">co::TVIF::TEXT</span>;
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">icon_index</span>) <span class="op">=</span> <span class="ident">icon_index</span> {
-			<span class="ident">tvix</span>.<span class="ident">mask</span> <span class="op">|</span><span class="op">=</span> <span class="ident">co::TVIF::IMAGE</span>;
-			<span class="ident">tvix</span>.<span class="ident">iImage</span> <span class="op">=</span> <span class="ident">icon_index</span> <span class="kw">as</span> <span class="kw">_</span>;
+		<span class="kw">let </span><span class="kw-2">mut </span>tvix = TVITEMEX::default();
+		tvix.mask = co::TVIF::TEXT;
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(icon_index) = icon_index {
+			tvix.mask |= co::TVIF::IMAGE;
+			tvix.iImage = icon_index <span class="kw">as _</span>;
 		}
-		<span class="ident">tvix</span>.<span class="ident">set_pszText</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>));
+		tvix.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>buf));
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tvis</span> <span class="op">=</span> <span class="ident">TVINSERTSTRUCT::default</span>();
-		<span class="ident">tvis</span>.<span class="ident">set_hInsertAfter</span>(<span class="ident">TreeitemTvi::Tvi</span>(<span class="ident">co::TVI::LAST</span>));
-		<span class="ident">tvis</span>.<span class="ident">itemex</span> <span class="op">=</span> <span class="ident">tvix</span>;
+		<span class="kw">let </span><span class="kw-2">mut </span>tvis = TVINSERTSTRUCT::default();
+		tvis.set_hInsertAfter(TreeitemTvi::Tvi(co::TVI::LAST));
+		tvis.itemex = tvix;
 
-		<span class="kw">let</span> <span class="ident">new_hitem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::InsertItem</span> { <span class="ident">tvinsertstruct</span>: <span class="kw-2">&amp;mut</span> <span class="ident">tvis</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="self">self</span>.<span class="ident">get</span>(<span class="ident">new_hitem</span>)
+		<span class="kw">let </span>new_hitem = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::InsertItem { tvinsertstruct: <span class="kw-2">&amp;mut </span>tvis })
+			.unwrap();
+		<span class="self">self</span>.get(new_hitem)
 	}
 
-	<span class="doccomment">/// Deletes all items by sending a</span>
-	<span class="doccomment">/// [`tvm::DeleteItem`](crate::msg::tvm::DeleteItem) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::DeleteItem</span> { <span class="ident">hitem</span>: <span class="ident">HTREEITEM::NULL</span> })
-			.<span class="ident">unwrap</span>();
+	<span class="doccomment">/// Deletes all items by sending a
+	/// [`tvm::DeleteItem`](crate::msg::tvm::DeleteItem) message.
+	</span><span class="kw">pub fn </span>delete_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::DeleteItem { hitem: HTREEITEM::NULL })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the total number of items by sending a</span>
-	<span class="doccomment">/// [`tvm::GetCount`](crate::msg::tvm::GetCount) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetCount</span> {})
+	<span class="doccomment">/// Retrieves the total number of items by sending a
+	/// [`tvm::GetCount`](crate::msg::tvm::GetCount) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::GetCount {})
 	}
 
-	<span class="doccomment">/// Retrieves the number of visible items by sending a</span>
-	<span class="doccomment">/// [`tvm::GetVisibleCount`](crate::msg::tvm::GetVisibleCount) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_visible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetVisibleCount</span> {})
+	<span class="doccomment">/// Retrieves the number of visible items by sending a
+	/// [`tvm::GetVisibleCount`](crate::msg::tvm::GetVisibleCount) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>count_visible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::GetVisibleCount {})
 	}
 
-	<span class="doccomment">/// Ends the editing of the item&#39;s text by sending a</span>
-	<span class="doccomment">/// [`tvm::EndEditLabelNow`](crate::msg::tvm::EndEditLabelNow) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_edit_label_now</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">save</span>: <span class="ident">bool</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::EndEditLabelNow</span> { <span class="ident">save</span> })
-			.<span class="ident">unwrap</span>();
+	<span class="doccomment">/// Ends the editing of the item&#39;s text by sending a
+	/// [`tvm::EndEditLabelNow`](crate::msg::tvm::EndEditLabelNow) message.
+	</span><span class="kw">pub fn </span>end_edit_label_now(<span class="kw-2">&amp;</span><span class="self">self</span>, save: bool) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::EndEditLabelNow { save })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the item of the given handle.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** This method is cheap – even if `htreeitem` is invalid, an</span>
-	<span class="doccomment">/// object will still be returned. However, operations upon this object will</span>
-	<span class="doccomment">/// fail.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hitem</span>: <span class="ident">HTREEITEM</span>) -&gt; <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-		<span class="ident">TreeViewItem::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="ident">hitem</span>)
+	<span class="doccomment">/// Retrieves the item of the given handle.
+	///
+	/// **Note:** This method is cheap – even if `htreeitem` is invalid, an
+	/// object will still be returned. However, operations upon this object will
+	/// fail.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, hitem: HTREEITEM) -&gt; TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+		TreeViewItem::new(<span class="self">self</span>.owner, hitem)
 	}
 
-	<span class="doccomment">/// Returns an iterator over the selected items.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_selected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-		<span class="ident">TreeViewItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="prelude-val">None</span>, <span class="ident">co::TVGN::CARET</span>)
+	<span class="doccomment">/// Returns an iterator over the selected items.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iter_selected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+		TreeViewItemIter::new(<span class="self">self</span>.owner, <span class="prelude-val">None</span>, co::TVGN::CARET)
 	}
 
-	<span class="doccomment">/// Returns an iterator over the root items.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-		<span class="ident">TreeViewChildItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>, <span class="prelude-val">None</span>)
+	<span class="doccomment">/// Returns an iterator over the root items.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iter_root(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+		TreeViewChildItemIter::new(<span class="self">self</span>.owner, <span class="prelude-val">None</span>)
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">TreeViewItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>,
-	<span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">relationship</span>: <span class="ident">co::TVGN</span>,
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>TreeViewItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
+	current: <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+	relationship: co::TVGN,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">TreeViewItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>TreeViewItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetNextItem</span> {
-				<span class="ident">relationship</span>: <span class="self">self</span>.<span class="ident">relationship</span>,
-				<span class="ident">hitem</span>: <span class="self">self</span>.<span class="ident">current</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">htreeitem</span>()),
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="self">self</span>.current = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(tvm::GetNextItem {
+				relationship: <span class="self">self</span>.relationship,
+				hitem: <span class="self">self</span>.current.map(|it| it.htreeitem()),
 			})
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hitem</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">items</span>().<span class="ident">get</span>(<span class="ident">hitem</span>));
+			.map(|hitem| <span class="self">self</span>.owner.items().get(hitem));
 
-		<span class="self">self</span>.<span class="ident">current</span>
+		<span class="self">self</span>.current
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TreeViewItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(
-		<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>,
-		<span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">relationship</span>: <span class="ident">co::TVGN</span>) -&gt; <span class="self">Self</span>
-	{
-		<span class="self">Self</span> { <span class="ident">owner</span>, <span class="ident">current</span>, <span class="ident">relationship</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TreeViewItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(
+		owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
+		current: <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+		relationship: co::TVGN) -&gt; <span class="self">Self
+	</span>{
+		<span class="self">Self </span>{ owner, current, relationship }
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">TreeViewChildItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>,
-	<span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">first_call</span>: <span class="ident">bool</span>,
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>TreeViewChildItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
+	current: <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+	first_call: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">TreeViewChildItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>TreeViewChildItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">first_call</span> { <span class="comment">// search for the first child</span>
-			<span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">tvm::GetNextItem</span> {
-					<span class="ident">relationship</span>: <span class="ident">co::TVGN::CHILD</span>,
-					<span class="ident">hitem</span>: <span class="self">self</span>.<span class="ident">current</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">htreeitem</span>()),
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">self</span>.first_call { <span class="comment">// search for the first child
+			</span><span class="self">self</span>.current = <span class="self">self</span>.owner.hwnd()
+				.SendMessage(tvm::GetNextItem {
+					relationship: co::TVGN::CHILD,
+					hitem: <span class="self">self</span>.current.map(|it| it.htreeitem()),
 				})
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hitem</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">items</span>().<span class="ident">get</span>(<span class="ident">hitem</span>));
+				.map(|hitem| <span class="self">self</span>.owner.items().get(hitem));
 
-			<span class="self">self</span>.<span class="ident">first_call</span> <span class="op">=</span> <span class="bool-val">false</span>;
+			<span class="self">self</span>.first_call = <span class="bool-val">false</span>;
 
-		} <span class="kw">else</span> { <span class="comment">// search for next siblings</span>
-			<span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current</span>
-				.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="ident">item</span>.<span class="ident">iter_next_siblings</span>().<span class="ident">next</span>())
+		} <span class="kw">else </span>{ <span class="comment">// search for next siblings
+			</span><span class="self">self</span>.current = <span class="self">self</span>.current
+				.and_then(|item| item.iter_next_siblings().next())
 		}
 
-		<span class="self">self</span>.<span class="ident">current</span>
+		<span class="self">self</span>.current
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TreeViewChildItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-		<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TreeView</span>,
-		<span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TreeViewItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-	{
-		<span class="self">Self</span> {
-			<span class="ident">owner</span>,
-			<span class="ident">current</span>,
-			<span class="ident">first_call</span>: <span class="bool-val">true</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TreeViewChildItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(
+		owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
+		current: <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self
+	</span>{
+		<span class="self">Self </span>{
+			owner,
+			current,
+			first_call: <span class="bool-val">true</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

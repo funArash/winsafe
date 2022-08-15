@@ -27,34 +27,34 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::INITCOMMONCONTROLSEX</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">LANGID</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
+<span class="kw">use </span><span class="kw">crate</span>::comctl;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::INITCOMMONCONTROLSEX;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{LANGID, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 
-<span class="doccomment">/// [`InitCommonControls`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initcommoncontrols)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">InitCommonControls</span>() {
-	<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::InitCommonControls</span>() }
+<span class="doccomment">/// [`InitCommonControls`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initcommoncontrols)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub fn </span>InitCommonControls() {
+	<span class="kw">unsafe </span>{ comctl::ffi::InitCommonControls() }
 }
 
-<span class="doccomment">/// [`InitCommonControlsEx`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initcommoncontrolsex)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">InitCommonControlsEx</span>(<span class="ident">icce</span>: <span class="kw-2">&amp;</span><span class="ident">INITCOMMONCONTROLSEX</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::InitCommonControlsEx</span>(<span class="ident">icce</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span>  <span class="kw">_</span>) }
+<span class="doccomment">/// [`InitCommonControlsEx`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initcommoncontrolsex)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub fn </span>InitCommonControlsEx(icce: <span class="kw-2">&amp;</span>INITCOMMONCONTROLSEX) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ comctl::ffi::InitCommonControlsEx(icce <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as  _</span>) }
 	)
 }
 
-<span class="doccomment">/// [`InitMUILanguage`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initmuilanguage)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">InitMUILanguage</span>(<span class="ident">ui_lang</span>: <span class="ident">LANGID</span>) {
-	<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::InitMUILanguage</span>(<span class="ident">ui_lang</span>.<span class="number">0</span>) }
+<span class="doccomment">/// [`InitMUILanguage`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-initmuilanguage)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub fn </span>InitMUILanguage(ui_lang: LANGID) {
+	<span class="kw">unsafe </span>{ comctl::ffi::InitMUILanguage(ui_lang.<span class="number">0</span>) }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

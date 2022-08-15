@@ -67,74 +67,74 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::status_bar::StatusBar</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::sb</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiWindow</span>, <span class="ident">user_Hwnd</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::status_bar::StatusBar;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::msg::sb;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, user_Hwnd};
 
-<span class="doccomment">/// Exposes the part methods of a [`StatusBar`](crate::gui::StatusBar) control.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatusBarParts</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StatusBar</span>,
+<span class="doccomment">/// Exposes the part methods of a [`StatusBar`](crate::gui::StatusBar) control.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>StatusBarParts&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StatusBar,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StatusBarParts</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StatusBar</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">owner</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatusBarParts&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StatusBar) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ owner }
 	}
 
-	<span class="doccomment">/// Retrieves the number of parts by sending an</span>
-	<span class="doccomment">/// [`sb::GetParts`](crate::msg::sb::GetParts) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">sb::GetParts</span> { <span class="ident">right_edges</span>: <span class="prelude-val">None</span> })
+	<span class="doccomment">/// Retrieves the number of parts by sending an
+	/// [`sb::GetParts`](crate::msg::sb::GetParts) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(sb::GetParts { right_edges: <span class="prelude-val">None </span>})
 	}
 
-	<span class="doccomment">/// Sets the text of a part by sending an</span>
-	<span class="doccomment">/// [`sb::SetText`](crate::msg::sb::SetText) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">part_index</span>: <span class="ident">u8</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">sb::SetText</span> {
-				<span class="ident">part_index</span>,
-				<span class="ident">draw_operation</span>: <span class="ident">co::SBT::BORDER</span>,
-				<span class="ident">text</span>: <span class="ident">WString::from_str</span>(<span class="ident">text</span>),
+	<span class="doccomment">/// Sets the text of a part by sending an
+	/// [`sb::SetText`](crate::msg::sb::SetText) message.
+	</span><span class="kw">pub fn </span>set_text(<span class="kw-2">&amp;</span><span class="self">self</span>, part_index: u8, text: <span class="kw-2">&amp;</span>str) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(sb::SetText {
+				part_index,
+				draw_operation: co::SBT::BORDER,
+				text: WString::from_str(text),
 			})
-			.<span class="ident">unwrap</span>();
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the text of the item by sending a</span>
-	<span class="doccomment">/// [`sb::GetText`](crate::msg::sb::GetText) message.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let my_sb: gui::StatusBar; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// # let my_sb = gui::StatusBar::new(&amp;wnd, &amp;[]);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// println!(&quot;Text: {}&quot;, my_sb.parts().text(0));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">part_index</span>: <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
-		<span class="kw">let</span> (<span class="ident">num_chars</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">sb::GetTextLength</span> { <span class="ident">part_index</span> });
+	<span class="doccomment">/// Retrieves the text of the item by sending a
+	/// [`sb::GetText`](crate::msg::sb::GetText) message.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let my_sb: gui::StatusBar; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// # let my_sb = gui::StatusBar::new(&amp;wnd, &amp;[]);
+	///
+	/// println!(&quot;Text: {}&quot;, my_sb.parts().text(0));
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>, part_index: u8) -&gt; String {
+		<span class="kw">let </span>(num_chars, <span class="kw">_</span>) = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(sb::GetTextLength { part_index });
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">num_chars</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">sb::GetText</span> {
-				<span class="ident">part_index</span>,
-				<span class="ident">text</span>: <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(num_chars <span class="kw">as </span>usize + <span class="number">1</span>);
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(sb::GetText {
+				part_index,
+				text: <span class="kw-2">&amp;mut </span>buf,
 			});
-		<span class="ident">buf</span>.<span class="ident">to_string</span>()
+		buf.to_string()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

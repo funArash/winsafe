@@ -213,220 +213,220 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">comctl</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">HBITMAP</span>, <span class="ident">HICON</span>, <span class="ident">POINT</span>, <span class="ident">SIZE</span>};
+<span class="kw">use crate</span>::{co, comctl};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HBITMAP, HICON, POINT, SIZE};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HIMAGELIST</span>: <span class="string">&quot;comctl&quot;</span>;
-	<span class="doccomment">/// Handle to an</span>
-	<span class="doccomment">/// [image list](https://docs.microsoft.com/en-us/windows/win32/controls/image-lists).</span>
-}
+<span class="macro">impl_handle!</span> { HIMAGELIST: <span class="string">&quot;comctl&quot;</span>;
+	<span class="doccomment">/// Handle to an
+	/// [image list](https://docs.microsoft.com/en-us/windows/win32/controls/image-lists).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">comctl_Himagelist</span> <span class="kw">for</span> <span class="ident">HIMAGELIST</span> {}
+<span class="kw">impl </span>comctl_Himagelist <span class="kw">for </span>HIMAGELIST {}
 
-<span class="doccomment">/// This trait is enabled with the `comctl` feature, and provides methods for</span>
-<span class="doccomment">/// [`HIMAGELIST`](crate::HIMAGELIST).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">comctl_Himagelist</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`ImageList_Add`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_add)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** A copy of the bitmap is made, and this copy is then stored.</span>
-	<span class="doccomment">/// You&#39;re still responsible for freeing the original bitmap.</span>
-	<span class="kw">fn</span> <span class="ident">Add</span>(<span class="self">self</span>,
-		<span class="ident">hbmp_image</span>: <span class="ident">HBITMAP</span>, <span class="ident">hbmp_mask</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `comctl` feature, and provides methods for
+/// [`HIMAGELIST`](crate::HIMAGELIST).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub trait </span>comctl_Himagelist: Handle {
+	<span class="doccomment">/// [`ImageList_Add`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_add)
+	/// method.
+	///
+	/// **Note:** A copy of the bitmap is made, and this copy is then stored.
+	/// You&#39;re still responsible for freeing the original bitmap.
+	</span><span class="kw">fn </span>Add(<span class="self">self</span>,
+		hbmp_image: HBITMAP, hbmp_mask: <span class="prelude-ty">Option</span>&lt;HBITMAP&gt;) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">comctl::ffi::ImageList_Add</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">hbmp_image</span>.<span class="number">0</span>,
-				<span class="ident">hbmp_mask</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
+		<span class="kw">match unsafe </span>{
+			comctl::ffi::ImageList_Add(
+				<span class="self">self</span>.as_ptr(),
+				hbmp_image.<span class="number">0</span>,
+				hbmp_mask.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
 			)
 		} {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`ImageList_AddIcon`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addicon)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The icon can be destroyed right after this call, its handle its</span>
-	<span class="doccomment">/// duplicated inside the image list.</span>
-	<span class="kw">fn</span> <span class="ident">AddIcon</span>(<span class="self">self</span>, <span class="ident">hicon</span>: <span class="ident">HICON</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">ReplaceIcon</span>(<span class="prelude-val">None</span>, <span class="ident">hicon</span>)
+	<span class="doccomment">/// [`ImageList_AddIcon`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addicon)
+	/// method.
+	///
+	/// The icon can be destroyed right after this call, its handle its
+	/// duplicated inside the image list.
+	</span><span class="kw">fn </span>AddIcon(<span class="self">self</span>, hicon: HICON) -&gt; SysResult&lt;u32&gt; {
+		<span class="self">self</span>.ReplaceIcon(<span class="prelude-val">None</span>, hicon)
 	}
 
-	<span class="doccomment">/// [`ImageList_AddMasked`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addmasked)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">AddMasked</span>(<span class="self">self</span>,
-		<span class="ident">hbmp_image</span>: <span class="ident">HBITMAP</span>, <span class="ident">color_mask</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`ImageList_AddMasked`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addmasked)
+	/// method.
+	</span><span class="kw">fn </span>AddMasked(<span class="self">self</span>,
+		hbmp_image: HBITMAP, color_mask: COLORREF) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">comctl::ffi::ImageList_AddMasked</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hbmp_image</span>.<span class="number">0</span>, <span class="ident">color_mask</span>.<span class="number">0</span>,
+		<span class="kw">match unsafe </span>{
+			comctl::ffi::ImageList_AddMasked(
+				<span class="self">self</span>.as_ptr(), hbmp_image.<span class="number">0</span>, color_mask.<span class="number">0</span>,
 			)
 		} {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`ImageList_BeginDrag`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_begindrag)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HIMAGELIST::EndDrag`](crate::prelude::comctl_Himagelist::EndDrag)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="kw">fn</span> <span class="ident">BeginDrag</span>(<span class="self">self</span>, <span class="ident">track</span>: <span class="ident">u32</span>, <span class="ident">hotspot</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::ImageList_BeginDrag</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">track</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">hotspot</span>.<span class="ident">x</span>, <span class="ident">hotspot</span>.<span class="ident">y</span>,
+	<span class="doccomment">/// [`ImageList_BeginDrag`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_begindrag)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HIMAGELIST::EndDrag`](crate::prelude::comctl_Himagelist::EndDrag)
+	/// call.
+	</span><span class="kw">fn </span>BeginDrag(<span class="self">self</span>, track: u32, hotspot: POINT) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::ImageList_BeginDrag(
+					<span class="self">self</span>.as_ptr(),
+					track <span class="kw">as _</span>,
+					hotspot.x, hotspot.y,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`ImageList_Create`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_create)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HIMAGELIST::Destroy`](crate::prelude::comctl_Himagelist::Destroy)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HIMAGELIST, SIZE};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let himgl = HIMAGELIST::Create(</span>
-	<span class="doccomment">///     SIZE::new(16, 16), co::ILC::COLOR32, 1, 1)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// himgl.Destroy()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">Create</span>(
-		<span class="ident">image_sz</span>: <span class="ident">SIZE</span>, <span class="ident">flags</span>: <span class="ident">co::ILC</span>,
-		<span class="ident">initial_size</span>: <span class="ident">i32</span>, <span class="ident">grow_size</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HIMAGELIST</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`ImageList_Create`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_create)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HIMAGELIST::Destroy`](crate::prelude::comctl_Himagelist::Destroy)
+	/// call.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HIMAGELIST, SIZE};
+	///
+	/// let himgl = HIMAGELIST::Create(
+	///     SIZE::new(16, 16), co::ILC::COLOR32, 1, 1)?;
+	///
+	/// himgl.Destroy()?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>Create(
+		image_sz: SIZE, flags: co::ILC,
+		initial_size: i32, grow_size: i32) -&gt; SysResult&lt;HIMAGELIST&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">comctl::ffi::ImageList_Create</span>(
-				<span class="ident">image_sz</span>.<span class="ident">cx</span>, <span class="ident">image_sz</span>.<span class="ident">cy</span>,
-				<span class="ident">flags</span>.<span class="number">0</span>,
-				<span class="ident">initial_size</span>,
-				<span class="ident">grow_size</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HIMAGELIST</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			comctl::ffi::ImageList_Create(
+				image_sz.cx, image_sz.cy,
+				flags.<span class="number">0</span>,
+				initial_size,
+				grow_size,
+			).as_mut()
+		}.map(|ptr| HIMAGELIST(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`ImageList_Destroy`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_destroy)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Destroy</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::ImageList_Destroy</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) },
+	<span class="doccomment">/// [`ImageList_Destroy`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_destroy)
+	/// method.
+	</span><span class="kw">fn </span>Destroy(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_Destroy(<span class="self">self</span>.as_ptr()) },
 		)
 	}
 
-	<span class="doccomment">/// [`ImageList_DragMove`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_dragmove)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DragMove</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::ImageList_DragMove</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>) },
+	<span class="doccomment">/// [`ImageList_DragMove`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_dragmove)
+	/// method.
+	</span><span class="kw">fn </span>DragMove(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_DragMove(<span class="self">self</span>.as_ptr(), x, y) },
 		)
 	}
 
-	<span class="doccomment">/// [`ImageList_DragShowNolock`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_dragshownolock)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="kw">fn</span> <span class="ident">DragShowNolock</span>(<span class="ident">show</span>: <span class="ident">bool</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::ImageList_DragShowNolock</span>(<span class="ident">show</span> <span class="kw">as</span> <span class="kw">_</span>) },
+	<span class="doccomment">/// [`ImageList_DragShowNolock`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_dragshownolock)
+	/// static method.
+	</span><span class="kw">fn </span>DragShowNolock(show: bool) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_DragShowNolock(show <span class="kw">as _</span>) },
 		)
 	}
 
-	<span class="doccomment">/// [`ImageList_EndDrag`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_enddrag)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="kw">fn</span> <span class="ident">EndDrag</span>() {
-		<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::ImageList_EndDrag</span>(); }
+	<span class="doccomment">/// [`ImageList_EndDrag`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_enddrag)
+	/// static method.
+	</span><span class="kw">fn </span>EndDrag() {
+		<span class="kw">unsafe </span>{ comctl::ffi::ImageList_EndDrag(); }
 	}
 
-	<span class="doccomment">/// [`ImageList_GetIconSize`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_geticonsize)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetIconSize</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::ImageList_GetIconSize</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sz</span>.<span class="ident">cy</span>,
+	<span class="doccomment">/// [`ImageList_GetIconSize`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_geticonsize)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetIconSize(<span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::ImageList_GetIconSize(
+					<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz.cx, <span class="kw-2">&amp;mut </span>sz.cy,
 				)
 			}
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`ImageList_GetImageCount`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_getimagecount)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetImageCount</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="kw">unsafe</span> { <span class="ident">comctl::ffi::ImageList_GetImageCount</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw">_</span> }
+	<span class="doccomment">/// [`ImageList_GetImageCount`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_getimagecount)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetImageCount(<span class="self">self</span>) -&gt; u32 {
+		<span class="kw">unsafe </span>{ comctl::ffi::ImageList_GetImageCount(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}
 	}
 
-	<span class="doccomment">/// [`ImageList_Remove`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_remove)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Remove</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::ImageList_Remove</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// [`ImageList_Remove`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_remove)
+	/// method.
+	</span><span class="kw">fn </span>Remove(<span class="self">self</span>, index: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::ImageList_Remove(
+					<span class="self">self</span>.as_ptr(), index.map_or(-<span class="number">1</span>, |i| i <span class="kw">as _</span>),
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`ImageList_ReplaceIcon`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_replaceicon)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The icon can be destroyed right after this call, its handle its</span>
-	<span class="doccomment">/// duplicated inside the image list.</span>
-	<span class="kw">fn</span> <span class="ident">ReplaceIcon</span>(<span class="self">self</span>,
-		<span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">hicon_new</span>: <span class="ident">HICON</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`ImageList_ReplaceIcon`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_replaceicon)
+	/// method.
+	///
+	/// The icon can be destroyed right after this call, its handle its
+	/// duplicated inside the image list.
+	</span><span class="kw">fn </span>ReplaceIcon(<span class="self">self</span>,
+		index: <span class="prelude-ty">Option</span>&lt;u32&gt;, hicon_new: HICON) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">comctl::ffi::ImageList_ReplaceIcon</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="kw">as</span> <span class="kw">_</span>),
-				<span class="ident">hicon_new</span>.<span class="number">0</span>,
+		<span class="kw">match unsafe </span>{
+			comctl::ffi::ImageList_ReplaceIcon(
+				<span class="self">self</span>.as_ptr(),
+				index.map_or(-<span class="number">1</span>, |i| i <span class="kw">as _</span>),
+				hicon_new.<span class="number">0</span>,
 			)
 		} {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`ImageList_SetImageCount`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_setimagecount)</span>
-	<span class="doccomment">/// methods.</span>
-	<span class="kw">fn</span> <span class="ident">SetImageCount</span>(<span class="self">self</span>, <span class="ident">new_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::ImageList_SetImageCount</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">new_count</span>)
+	<span class="doccomment">/// [`ImageList_SetImageCount`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_setimagecount)
+	/// methods.
+	</span><span class="kw">fn </span>SetImageCount(<span class="self">self</span>, new_count: u32) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::ImageList_SetImageCount(<span class="self">self</span>.as_ptr(), new_count)
 			},
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

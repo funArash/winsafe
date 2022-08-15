@@ -60,67 +60,67 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 
-<span class="doccomment">/// Registry value types.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegistryValue</span> {
-	<span class="doccomment">/// Binary value, defined as [`REG::BINARY`](crate::co::REG::BINARY).</span>
-	<span class="ident">Binary</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
-	<span class="doccomment">/// An `u32` integer value, defined as [`REG::DWORD`](crate::co::REG::DWORD).</span>
-	<span class="ident">Dword</span>(<span class="ident">u32</span>),
-	<span class="doccomment">/// An `u64` integer value, defined as [`REG::QWORD`](crate::co::REG::QWORD).</span>
-	<span class="ident">Qword</span>(<span class="ident">u64</span>),
-	<span class="doccomment">/// String value, defined as [`REG::SZ`](crate::co::REG::SZ).</span>
-	<span class="ident">Sz</span>(<span class="ident">WString</span>),
-	<span class="doccomment">/// No value, defined as [`REG::NONE`](crate::co::REG::NONE). Also used for</span>
-	<span class="doccomment">/// non-implemented value types.</span>
-	<span class="prelude-val">None</span>,
+<span class="doccomment">/// Registry value types.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>RegistryValue {
+	<span class="doccomment">/// Binary value, defined as [`REG::BINARY`](crate::co::REG::BINARY).
+	</span>Binary(Vec&lt;u8&gt;),
+	<span class="doccomment">/// An `u32` integer value, defined as [`REG::DWORD`](crate::co::REG::DWORD).
+	</span>Dword(u32),
+	<span class="doccomment">/// An `u64` integer value, defined as [`REG::QWORD`](crate::co::REG::QWORD).
+	</span>Qword(u64),
+	<span class="doccomment">/// String value, defined as [`REG::SZ`](crate::co::REG::SZ).
+	</span>Sz(WString),
+	<span class="doccomment">/// No value, defined as [`REG::NONE`](crate::co::REG::NONE). Also used for
+	/// non-implemented value types.
+	</span><span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">RegistryValue</span> {
-	<span class="doccomment">/// Creates a new `RegistryValue::Sz` value from a `&amp;str`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sz</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RegistryValue</span> {
-		<span class="ident"><span class="self">Self</span>::Sz</span>(<span class="ident">WString::from_str</span>(<span class="ident">s</span>))
+<span class="kw">impl </span>RegistryValue {
+	<span class="doccomment">/// Creates a new `RegistryValue::Sz` value from a `&amp;str`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_sz(s: <span class="kw-2">&amp;</span>str) -&gt; RegistryValue {
+		<span class="self">Self</span>::Sz(WString::from_str(s))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Binary</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Dword</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">*</span><span class="ident">n</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Qword</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">*</span><span class="ident">n</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Sz</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span> },
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">std::ptr::null</span>(),
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>std::ffi::c_void {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Binary(b) =&gt; b.as_ptr() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Dword(n) =&gt; <span class="kw-2">*</span>n <span class="kw">as _</span>,
+			<span class="self">Self</span>::Qword(n) =&gt; <span class="kw-2">*</span>n <span class="kw">as _</span>,
+			<span class="self">Self</span>::Sz(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() <span class="kw">as _ </span>},
+			<span class="self">Self</span>::None =&gt; std::ptr::null(),
 		}
 	}
 
-	<span class="doccomment">/// Returns the correspondent [`co::REG`](crate::co::REG) constant.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reg_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::REG</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Binary</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::REG::BINARY</span>,
-			<span class="ident"><span class="self">Self</span>::Dword</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::REG::DWORD</span>,
-			<span class="ident"><span class="self">Self</span>::Qword</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::REG::QWORD</span>,
-			<span class="ident"><span class="self">Self</span>::Sz</span>(<span class="kw">_</span>) =&gt; <span class="ident">co::REG::SZ</span>,
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">co::REG::NONE</span>,
+	<span class="doccomment">/// Returns the correspondent [`co::REG`](crate::co::REG) constant.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>reg_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::REG {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Binary(<span class="kw">_</span>) =&gt; co::REG::BINARY,
+			<span class="self">Self</span>::Dword(<span class="kw">_</span>) =&gt; co::REG::DWORD,
+			<span class="self">Self</span>::Qword(<span class="kw">_</span>) =&gt; co::REG::QWORD,
+			<span class="self">Self</span>::Sz(<span class="kw">_</span>) =&gt; co::REG::SZ,
+			<span class="self">Self</span>::None =&gt; co::REG::NONE,
 		}
 	}
 
-	<span class="doccomment">/// Returns the length of the stored data.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Binary</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">len</span>(),
-			<span class="ident"><span class="self">Self</span>::Dword</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(),
-			<span class="ident"><span class="self">Self</span>::Qword</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(),
-			<span class="ident"><span class="self">Self</span>::Sz</span>(<span class="ident">ws</span>) =&gt; (<span class="ident">ws</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>(), <span class="comment">// including terminating null</span>
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="number">0</span>,
+	<span class="doccomment">/// Returns the length of the stored data.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Binary(b) =&gt; b.len(),
+			<span class="self">Self</span>::Dword(<span class="kw">_</span>) =&gt; std::mem::size_of::&lt;u32&gt;(),
+			<span class="self">Self</span>::Qword(<span class="kw">_</span>) =&gt; std::mem::size_of::&lt;u64&gt;(),
+			<span class="self">Self</span>::Sz(ws) =&gt; (ws.len() + <span class="number">1</span>) * std::mem::size_of::&lt;u16&gt;(), <span class="comment">// including terminating null
+			</span><span class="self">Self</span>::None =&gt; <span class="number">0</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

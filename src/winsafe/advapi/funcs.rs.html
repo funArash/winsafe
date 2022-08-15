@@ -54,61 +54,61 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::advapi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::advapi::privs::UNLEN</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
+<span class="kw">use </span><span class="kw">crate</span>::advapi;
+<span class="kw">use </span><span class="kw">crate</span>::advapi::privs::UNLEN;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 
-<span class="doccomment">/// [`DecryptFile`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-decryptfilew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">DecryptFile</span>(<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">advapi::ffi::DecryptFileW</span>(<span class="ident">WString::from_str</span>(<span class="ident">file_name</span>).<span class="ident">as_ptr</span>(), <span class="number">0</span>)
+<span class="doccomment">/// [`DecryptFile`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-decryptfilew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
+<span class="kw">pub fn </span>DecryptFile(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			advapi::ffi::DecryptFileW(WString::from_str(file_name).as_ptr(), <span class="number">0</span>)
 		},
 	)
 }
 
-<span class="doccomment">/// [`EncryptFile`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-encryptfilew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EncryptFile</span>(<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">advapi::ffi::EncryptFileW</span>(<span class="ident">WString::from_str</span>(<span class="ident">file_name</span>).<span class="ident">as_ptr</span>())
+<span class="doccomment">/// [`EncryptFile`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-encryptfilew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EncryptFile(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			advapi::ffi::EncryptFileW(WString::from_str(file_name).as_ptr())
 		},
 	)
 }
 
-<span class="doccomment">/// [`EncryptionDisable`](https://docs.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-encryptiondisable)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EncryptionDisable</span>(<span class="ident">dir_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">disable</span>: <span class="ident">bool</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">advapi::ffi::EncryptionDisable</span>(
-				<span class="ident">WString::from_str</span>(<span class="ident">dir_path</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">disable</span> <span class="kw">as</span> <span class="kw">_</span>,
+<span class="doccomment">/// [`EncryptionDisable`](https://docs.microsoft.com/en-us/windows/win32/api/winefs/nf-winefs-encryptiondisable)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EncryptionDisable(dir_path: <span class="kw-2">&amp;</span>str, disable: bool) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			advapi::ffi::EncryptionDisable(
+				WString::from_str(dir_path).as_ptr(),
+				disable <span class="kw">as _</span>,
 			)
 		},
 	)
 }
 
-<span class="doccomment">/// [`GetUserName`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetUserName</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">UNLEN</span> <span class="op">+</span> <span class="number">1</span>);
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="ident">u32</span>;
+<span class="doccomment">/// [`GetUserName`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetUserName() -&gt; SysResult&lt;String&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(UNLEN + <span class="number">1</span>);
+	<span class="kw">let </span><span class="kw-2">mut </span>sz = buf.buffer_size() <span class="kw">as </span>u32;
 
-	<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">advapi::ffi::GetUserNameW</span>(<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">sz</span>) } {
-		<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">to_string</span>()),
+	<span class="kw">match unsafe </span>{ advapi::ffi::GetUserNameW(buf.as_mut_ptr(), <span class="kw-2">&amp;mut </span>sz) } {
+		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

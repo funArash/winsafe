@@ -90,97 +90,97 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl::IFilterGraph</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCSTR</span>, <span class="ident">PSTR</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">CoTaskMemFree</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dshow_IMediaFilter</span>, <span class="ident">ole_IUnknown</span>, <span class="ident">shell_IPersist</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IMediaFilterVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::IFilterGraph;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCSTR, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IMediaFilter, ole_IUnknown, shell_IPersist};
+<span class="kw">use </span><span class="kw">crate</span>::vt::IMediaFilterVT;
 
-<span class="doccomment">/// [`IBaseFilter`](crate::IBaseFilter) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IBaseFilterVT</span> {
-	<span class="kw">pub</span> <span class="ident">IMediaFilterVT</span>: <span class="ident">IMediaFilterVT</span>,
-	<span class="kw">pub</span> <span class="ident">EnumPins</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">FindPin</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryFilterInfo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">JoinFilterGraph</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">QueryVendorInfo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">PSTR</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IBaseFilter`](crate::IBaseFilter) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IBaseFilterVT {
+	<span class="kw">pub </span>IMediaFilterVT: IMediaFilterVT,
+	<span class="kw">pub </span>EnumPins: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>FindPin: <span class="kw">fn</span>(ComPtr, PCSTR, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>QueryFilterInfo: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>JoinFilterGraph: <span class="kw">fn</span>(ComPtr, ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>QueryVendorInfo: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IBaseFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ibasefilter)</span>
-<span class="doccomment">/// COM interface over [`IBaseFilterVT`](crate::vt::IBaseFilterVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, CoCreateInstance, IBaseFilter};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let vmr = CoCreateInstance::&lt;IBaseFilter&gt;(</span>
-<span class="doccomment">///     &amp;co::CLSID::EnhancedVideoRenderer,</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     co::CLSCTX::INPROC_SERVER,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IBaseFilter</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IBaseFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ibasefilter)
+/// COM interface over [`IBaseFilterVT`](crate::vt::IBaseFilterVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, CoCreateInstance, IBaseFilter};
+///
+/// let vmr = CoCreateInstance::&lt;IBaseFilter&gt;(
+///     &amp;co::CLSID::EnhancedVideoRenderer,
+///     None,
+///     co::CLSCTX::INPROC_SERVER,
+/// )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IBaseFilter(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IBaseFilter</span>, <span class="string">&quot;56a86895-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IPersist</span> <span class="kw">for</span> <span class="ident">IBaseFilter</span> {}
-<span class="kw">impl</span> <span class="ident">dshow_IMediaFilter</span> <span class="kw">for</span> <span class="ident">IBaseFilter</span> {}
-<span class="kw">impl</span> <span class="ident">dshow_IBaseFilter</span> <span class="kw">for</span> <span class="ident">IBaseFilter</span> {}
+<span class="macro">impl_iunknown!</span>(IBaseFilter, <span class="string">&quot;56a86895-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
+<span class="kw">impl </span>shell_IPersist <span class="kw">for </span>IBaseFilter {}
+<span class="kw">impl </span>dshow_IMediaFilter <span class="kw">for </span>IBaseFilter {}
+<span class="kw">impl </span>dshow_IBaseFilter <span class="kw">for </span>IBaseFilter {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IBaseFilter`](crate::IBaseFilter).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IBaseFilter</span>: <span class="ident">dshow_IMediaFilter</span> {
-	<span class="doccomment">/// [`IBaseFilter::JoinFilterGraph`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ibasefilter-joinfiltergraph)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">JoinFilterGraph</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">graph</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IFilterGraph</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IBaseFilter`](crate::IBaseFilter).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IBaseFilter: dshow_IMediaFilter {
+	<span class="doccomment">/// [`IBaseFilter::JoinFilterGraph`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ibasefilter-joinfiltergraph)
+	/// method.
+	</span><span class="kw">fn </span>JoinFilterGraph(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		graph: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IFilterGraph&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IBaseFilterVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">JoinFilterGraph</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">graph</span>.<span class="ident">map_or</span>(<span class="ident">ComPtr::null</span>(), <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">ptr</span>()),
-					<span class="ident">WString::from_str</span>(<span class="ident">name</span>).<span class="ident">as_ptr</span>(),
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IBaseFilterVT);
+			ok_to_hrresult(
+				(vt.JoinFilterGraph)(
+					<span class="self">self</span>.ptr(),
+					graph.map_or(ComPtr::null(), |g| g.ptr()),
+					WString::from_str(name).as_ptr(),
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IBaseFilter::QueryVendorInfo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ibasefilter-queryvendorinfo)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">QueryVendorInfo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pstr</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IBaseFilterVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">QueryVendorInfo</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">pstr</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">WString::from_wchars_nullt</span>(<span class="ident">pstr</span>);
-			<span class="ident">CoTaskMemFree</span>(<span class="ident">pstr</span> <span class="kw">as</span> <span class="kw">_</span>);
-			<span class="ident">name</span>.<span class="ident">to_string</span>()
+	<span class="doccomment">/// [`IBaseFilter::QueryVendorInfo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ibasefilter-queryvendorinfo)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>QueryVendorInfo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IBaseFilterVT);
+			ok_to_hrresult((vt.QueryVendorInfo)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
+		}.map(|<span class="kw">_</span>| {
+			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
+			CoTaskMemFree(pstr <span class="kw">as _</span>);
+			name.to_string()
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

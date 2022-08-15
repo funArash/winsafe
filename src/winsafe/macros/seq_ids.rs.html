@@ -45,52 +45,52 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Generates sequential `u16` constants starting from the given value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro is useful to generate constants for loaded resources, like menus</span>
-<span class="doccomment">/// or dialog windows.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::seq_ids;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// seq_ids! {</span>
-<span class="doccomment">///     MNU_FILE = 3000;</span>
-<span class="doccomment">///     MNU_FILE_OPEN</span>
-<span class="doccomment">///     MNU_FILE_SAVE</span>
-<span class="doccomment">///     MNU_FILE_CLOSE</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The code above will generate the following:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// pub const MNU_FILE: u16 = 3000;</span>
-<span class="doccomment">/// pub const MNU_FILE_OPEN: u16 = 3001;</span>
-<span class="doccomment">/// pub const MNU_FILE_SAVE: u16 = 3002;</span>
-<span class="doccomment">/// pub const MNU_FILE_CLOSE: u16 = 3003;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">seq_ids</span> {
+</pre><pre class="rust"><code><span class="doccomment">/// Generates sequential `u16` constants starting from the given value.
+///
+/// This macro is useful to generate constants for loaded resources, like menus
+/// or dialog windows.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::seq_ids;
+///
+/// seq_ids! {
+///     MNU_FILE = 3000;
+///     MNU_FILE_OPEN
+///     MNU_FILE_SAVE
+///     MNU_FILE_CLOSE
+/// }
+/// ```
+///
+/// The code above will generate the following:
+///
+/// ```rust,no_run
+/// pub const MNU_FILE: u16 = 3000;
+/// pub const MNU_FILE_OPEN: u16 = 3001;
+/// pub const MNU_FILE_SAVE: u16 = 3002;
+/// pub const MNU_FILE_CLOSE: u16 = 3003;
+/// ```
+</span><span class="attribute">#[macro_export]</span>
+<span class="macro">macro_rules!</span> seq_ids {
 	(
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>;
-		$( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">others</span>:<span class="ident">ident</span> )<span class="op">*</span>
+		<span class="macro-nonterminal">$name</span>:ident = <span class="macro-nonterminal">$val</span>:expr;
+		$( <span class="macro-nonterminal">$others</span>:ident )*
 	) =&gt; {
-		<span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>;
-		<span class="macro">seq_ids!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> <span class="op">+</span> <span class="number">1</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">others</span>,)<span class="kw-2">*</span>);
+		<span class="kw">pub const </span><span class="macro-nonterminal">$name</span>: u16 = <span class="macro-nonterminal">$val</span>;
+		<span class="macro">seq_ids!</span>(<span class="macro-nonterminal">$val </span>+ <span class="number">1</span>, $(<span class="macro-nonterminal">$others</span>,)<span class="kw-2">*</span>);
 	};
 
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>,) =&gt; {};
+	(<span class="macro-nonterminal">$val</span>:expr,) =&gt; {};
 
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>,) =&gt; {
-		<span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>;
+	(<span class="macro-nonterminal">$val</span>:expr, <span class="macro-nonterminal">$name</span>:ident,) =&gt; {
+		<span class="kw">pub const </span><span class="macro-nonterminal">$name</span>: u16 = <span class="macro-nonterminal">$val</span>;
 	};
 
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">others</span>:<span class="ident">ident</span>, )<span class="op">+</span>) =&gt; {
-		<span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>;
-		<span class="macro">seq_ids!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> <span class="op">+</span> <span class="number">1</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">others</span>,)<span class="kw-2">*</span>);
+	(<span class="macro-nonterminal">$val</span>:expr, <span class="macro-nonterminal">$name</span>:ident, $( <span class="macro-nonterminal">$others</span>:ident, )+) =&gt; {
+		<span class="kw">pub const </span><span class="macro-nonterminal">$name</span>: u16 = <span class="macro-nonterminal">$val</span>;
+		<span class="macro">seq_ids!</span>(<span class="macro-nonterminal">$val </span>+ <span class="number">1</span>, $(<span class="macro-nonterminal">$others</span>,)<span class="kw-2">*</span>);
 	};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

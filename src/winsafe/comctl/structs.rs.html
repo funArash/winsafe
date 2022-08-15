@@ -1128,1135 +1128,1135 @@
 <span id="1128">1128</span>
 <span id="1129">1129</span>
 <span id="1130">1130</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{
-	<span class="ident">BmpIdbRes</span>, <span class="ident">HIMAGELIST</span>, <span class="ident">HTREEITEM</span>, <span class="ident">IndexStr</span>, <span class="ident">PFNLVGROUPCOMPARE</span>, <span class="ident">TreeitemTvi</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{
+	BmpIdbRes, HIMAGELIST, HTREEITEM, IndexStr, PFNLVGROUPCOMPARE, TreeitemTvi,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::privs</span>::{<span class="ident">HINST_COMMCTRL</span>, <span class="ident">L_MAX_URL_LENGTH</span>, <span class="ident">MAX_LINKID_TEXT</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HINSTANCE</span>, <span class="ident">IdStr</span>, <span class="ident">SYSTEMTIME</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::IS_INTRESOURCE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">COLORREF</span>, <span class="ident">HBITMAP</span>, <span class="ident">HDC</span>, <span class="ident">HWND</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>, <span class="ident">SIZE</span>, <span class="ident">WINDOWPOS</span>,
+<span class="kw">use </span><span class="kw">crate</span>::comctl::privs::{HINST_COMMCTRL, L_MAX_URL_LENGTH, MAX_LINKID_TEXT};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, IdStr, SYSTEMTIME, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::IS_INTRESOURCE;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	COLORREF, HBITMAP, HDC, HWND, POINT, RECT, SIZE, WINDOWPOS,
 };
 
-<span class="doccomment">/// [`BUTTON_IMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-button_imagelist)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BUTTON_IMAGELIST</span> {
-	<span class="kw">pub</span> <span class="ident">himl</span>: <span class="ident">HIMAGELIST</span>,
-	<span class="kw">pub</span> <span class="ident">margin</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">uAlign</span>: <span class="ident">co::BIA</span>,
+<span class="doccomment">/// [`BUTTON_IMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-button_imagelist)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>BUTTON_IMAGELIST {
+	<span class="kw">pub </span>himl: HIMAGELIST,
+	<span class="kw">pub </span>margin: RECT,
+	<span class="kw">pub </span>uAlign: co::BIA,
 }
 
-<span class="doccomment">/// [`BUTTON_SPLITINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-button_splitinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BUTTON_SPLITINFO</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::BCSIF</span>,
-	<span class="kw">pub</span> <span class="ident">himlGlyph</span>: <span class="ident">HIMAGELIST</span>,
-	<span class="kw">pub</span> <span class="ident">uSplitStyle</span>: <span class="ident">co::BCSS</span>,
-	<span class="kw">pub</span> <span class="ident">size</span>: <span class="ident">SIZE</span>,
+<span class="doccomment">/// [`BUTTON_SPLITINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-button_splitinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>BUTTON_SPLITINFO {
+	<span class="kw">pub </span>mask: co::BCSIF,
+	<span class="kw">pub </span>himlGlyph: HIMAGELIST,
+	<span class="kw">pub </span>uSplitStyle: co::BCSS,
+	<span class="kw">pub </span>size: SIZE,
 }
 
-<span class="doccomment">/// [`DATETIMEPICKERINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-datetimepickerinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DATETIMEPICKERINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcCheck</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">stateCheck</span>: <span class="ident">co::STATE_SYSTEM</span>,
-	<span class="kw">pub</span> <span class="ident">rcButton</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">stateButton</span>: <span class="ident">co::STATE_SYSTEM</span>,
-	<span class="kw">pub</span> <span class="ident">hwndEdit</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndUD</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndDropDown</span>: <span class="ident">HWND</span>,
+<span class="doccomment">/// [`DATETIMEPICKERINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-datetimepickerinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>DATETIMEPICKERINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>rcCheck: RECT,
+	<span class="kw">pub </span>stateCheck: co::STATE_SYSTEM,
+	<span class="kw">pub </span>rcButton: RECT,
+	<span class="kw">pub </span>stateButton: co::STATE_SYSTEM,
+	<span class="kw">pub </span>hwndEdit: HWND,
+	<span class="kw">pub </span>hwndUD: HWND,
+	<span class="kw">pub </span>hwndDropDown: HWND,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">DATETIMEPICKERINFO</span>, <span class="ident">cbSize</span>);
+<span class="macro">impl_default_with_size!</span>(DATETIMEPICKERINFO, cbSize);
 
-<span class="doccomment">/// [`EDITBALLOONTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-editballoontip)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EDITBALLOONTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="ident">cbStruct</span>: <span class="ident">u32</span>,
-	<span class="ident">pszTitle</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">ttiIcon</span>: <span class="ident">co::TTI</span>,
+<span class="doccomment">/// [`EDITBALLOONTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-editballoontip)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>EDITBALLOONTIP&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	cbStruct: u32,
+	pszTitle: <span class="kw-2">*mut </span>u16,
+	pszText: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>ttiIcon: co::TTI,
 
-	<span class="ident">_pszTitle</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszTitle: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">EDITBALLOONTIP</span>, <span class="ident">cbStruct</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
+<span class="macro">impl_default_with_size!</span>(EDITBALLOONTIP, cbStruct, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">EDITBALLOONTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszTitle</span>, <span class="ident">set_pszTitle</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; EDITBALLOONTIP&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszTitle, set_pszTitle);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, pszText, set_pszText);
 }
 
-<span class="doccomment">/// [`HDITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hditemw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::HDI</span>,
-	<span class="kw">pub</span> <span class="ident">cxy</span>: <span class="ident">i32</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">hbm</span>: <span class="ident">HBITMAP</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">fmt</span>: <span class="ident">co::HDF</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">iImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iOrder</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">typeFilter</span>: <span class="ident">co::HDFT</span>,
-	<span class="kw">pub</span> <span class="ident">pvFilter</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::HDIS</span>,
+<span class="doccomment">/// [`HDITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hditemw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>HDITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::HDI,
+	<span class="kw">pub </span>cxy: i32,
+	pszText: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>hbm: HBITMAP,
+	cchTextMax: i32,
+	<span class="kw">pub </span>fmt: co::HDF,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>iImage: i32,
+	<span class="kw">pub </span>iOrder: i32,
+	<span class="kw">pub </span>typeFilter: co::HDFT,
+	<span class="kw">pub </span>pvFilter: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>state: co::HDIS,
 
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">HDITEM</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(HDITEM, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">HDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; HDITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
 }
 
-<span class="doccomment">/// [`HDHITTESTINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hdhittestinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HDHITTESTINFO</span> {
-	<span class="kw">pub</span> <span class="ident">pt</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::HHT</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`HDHITTESTINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hdhittestinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>HDHITTESTINFO {
+	<span class="kw">pub </span>pt: POINT,
+	<span class="kw">pub </span>flags: co::HHT,
+	<span class="kw">pub </span>iItem: i32,
 }
 
-<span class="doccomment">/// [`HDLAYOUT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hdlayout)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HDLAYOUT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="ident">prc</span>: <span class="kw-2">*mut</span> <span class="ident">RECT</span>,
-	<span class="ident">pwpos</span>: <span class="kw-2">*mut</span> <span class="ident">WINDOWPOS</span>,
+<span class="doccomment">/// [`HDLAYOUT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-hdlayout)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>HDLAYOUT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	prc: <span class="kw-2">*mut </span>RECT,
+	pwpos: <span class="kw-2">*mut </span>WINDOWPOS,
 
-	<span class="ident">_prc</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span><span class="op">&gt;</span>,
-	<span class="ident">_pwpos</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">WINDOWPOS</span><span class="op">&gt;</span>,
+	_prc: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT&gt;,
+	_pwpos: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>WINDOWPOS&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">HDLAYOUT</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
+<span class="macro">impl_default!</span>(HDLAYOUT, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">HDLAYOUT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Sets the field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_prc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">prc</span> <span class="op">=</span> <span class="ident">rc</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">rc</span><span class="op">|</span> <span class="ident">rc</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or</span>(<span class="ident">std::ptr::null_mut</span>());
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; HDLAYOUT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="doccomment">/// Sets the field.
+	</span><span class="kw">pub fn </span>set_prc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT&gt;) {
+		<span class="self">self</span>.prc = rc.map(|rc| rc <span class="kw">as _</span>).unwrap_or(std::ptr::null_mut());
 	}
 
-	<span class="doccomment">/// Sets the field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pwpos</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">WINDOWPOS</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">pwpos</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">pos</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or</span>(<span class="ident">std::ptr::null_mut</span>());
-	}
-}
-
-<span class="doccomment">/// [`INITCOMMONCONTROLSEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-initcommoncontrolsex)</span>
-<span class="doccomment">/// struct</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">INITCOMMONCONTROLSEX</span> {
-	<span class="ident">dwSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">icc</span>: <span class="ident">co::ICC</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">INITCOMMONCONTROLSEX</span>, <span class="ident">dwSize</span>);
-
-<span class="doccomment">/// [`LITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-litem)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LITEM</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LIF</span>,
-	<span class="kw">pub</span> <span class="ident">iLink</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::LIS</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::LIS</span>,
-	<span class="ident">szID</span>: [<span class="ident">u16</span>; <span class="ident">MAX_LINKID_TEXT</span>],
-	<span class="ident">szUrl</span>: [<span class="ident">u16</span>; <span class="ident">L_MAX_URL_LENGTH</span>],
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LITEM</span>);
-
-<span class="kw">impl</span> <span class="ident">LITEM</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">szID</span>, <span class="ident">set_szID</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">szUrl</span>, <span class="ident">set_szUrl</span>);
-}
-
-<span class="doccomment">/// [`LVBKIMAGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvbkimagew)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVBKIMAGE</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">uFlags</span>: <span class="ident">co::LVBKIF</span>,
-	<span class="kw">pub</span> <span class="ident">hbm</span>: <span class="ident">HBITMAP</span>,
-	<span class="ident">pszImage</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchImageMax</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">xOffsetPercent</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">yOffsetPercent</span>: <span class="ident">i32</span>,
-
-	<span class="ident">_pszImage</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LVBKIMAGE</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVBKIMAGE</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszImage</span>, <span class="ident">set_pszImage</span>, <span class="ident">cchImageMax</span>);
-}
-
-<span class="doccomment">/// [`LVCOLUMN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvcolumnw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVCOLUMN</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVCF</span>,
-	<span class="kw">pub</span> <span class="ident">fmt</span>: <span class="ident">co::LVCFMT_C</span>,
-	<span class="kw">pub</span> <span class="ident">cx</span>: <span class="ident">i32</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iOrder</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cxMin</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cxDefault</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cxIdeal</span>: <span class="ident">i32</span>,
-
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LVCOLUMN</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVCOLUMN</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
-}
-
-<span class="doccomment">/// [`LVFINDINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfindinfow)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVFINDINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::LVFI</span>,
-	<span class="ident">psz</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">pt</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">vkDirection</span>: <span class="ident">co::VK_DIR</span>,
-
-	<span class="ident">_psz</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LVFINDINFO</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVFINDINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">psz</span>, <span class="ident">set_psz</span>);
-}
-
-<span class="doccomment">/// [`LVFOOTERINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfooterinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVFOOTERINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVFF</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cItems</span>: <span class="ident">u32</span>,
-
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LVFOOTERINFO</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVFOOTERINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
-}
-
-<span class="doccomment">/// [`LVFOOTERITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfooteritem)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVFOOTERITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVFIF</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::LVFIS</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::LVFIS</span>,
-
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">LVFOOTERITEM</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVFOOTERITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
-}
-
-<span class="doccomment">/// [`LVGROUP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvgroup)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVGROUP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVGF</span>,
-	<span class="ident">pszHeader</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchHeader</span>: <span class="ident">i32</span>,
-	<span class="ident">pszFooter</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchFooter</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iGroupId</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::LVGS</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::LVGS</span>,
-	<span class="kw">pub</span> <span class="ident">uAlign</span>: <span class="ident">co::LVGA_FH</span>,
-	<span class="ident">pszSubtitle</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchSubtitle</span>: <span class="ident">i32</span>,
-	<span class="ident">pszTask</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTask</span>: <span class="ident">i32</span>,
-	<span class="ident">pszDescriptionTop</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchDescriptionTop</span>: <span class="ident">i32</span>,
-	<span class="ident">pszDescriptionBottom</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchDescriptionBottom</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iTitleImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iExtendedImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iFirstItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cItems</span>: <span class="ident">u32</span>,
-	<span class="ident">pszSubsetTitle</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchSubsetTitle</span>: <span class="ident">i32</span>,
-
-	<span class="ident">_pszHeader</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszFooter</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszSubtitle</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszTask</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;d</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszDescriptionTop</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;e</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszDescriptionBottom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;f</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszSubsetTitle</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">LVGROUP</span>, <span class="ident">cbSize</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> <span class="ident">LVGROUP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszHeader</span>, <span class="ident">set_pszHeader</span>, <span class="ident">cchHeader</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;b</span>, <span class="ident">pszFooter</span>, <span class="ident">set_pszFooter</span>, <span class="ident">cchFooter</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;c</span>, <span class="ident">pszSubtitle</span>, <span class="ident">set_pszSubtitle</span>, <span class="ident">cchSubtitle</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;d</span>, <span class="ident">pszTask</span>, <span class="ident">set_pszTask</span>, <span class="ident">cchTask</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;e</span>, <span class="ident">pszDescriptionTop</span>, <span class="ident">set_pszDescriptionTop</span>, <span class="ident">cchDescriptionTop</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;f</span>, <span class="ident">pszDescriptionBottom</span>, <span class="ident">set_pszDescriptionBottom</span>, <span class="ident">cchDescriptionBottom</span>);
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;g</span>, <span class="ident">pszSubsetTitle</span>, <span class="ident">set_pszSubsetTitle</span>, <span class="ident">cchSubsetTitle</span>);
-}
-
-<span class="doccomment">/// [`LVGROUPMETRICS`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvgroupmetrics)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVGROUPMETRICS</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVGMF</span>,
-	<span class="kw">pub</span> <span class="ident">Left</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">Top</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">Right</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">Bottom</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">crLeft</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">crTop</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">crRight</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">crBottom</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">crHeader</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">crFooter</span>: <span class="ident">COLORREF</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">LVGROUPMETRICS</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`LVHITTESTINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvhittestinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVHITTESTINFO</span> {
-	<span class="kw">pub</span> <span class="ident">pt</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::LVHT</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iGroup</span>: <span class="ident">i32</span>,
-}
-
-<span class="doccomment">/// [`LVINSERTGROUPSORTED`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvinsertgroupsorted)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVINSERTGROUPSORTED</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">pfnGroupCompare</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PFNLVGROUPCOMPARE</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">pvData</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">lvGroup</span>: <span class="ident">LVGROUP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LVINSERTGROUPSORTED</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">pfnGroupCompare</span>: <span class="prelude-val">None</span>,
-			<span class="ident">pvData</span>: <span class="number">0</span>,
-			<span class="ident">lvGroup</span>: <span class="ident">LVGROUP::default</span>(), <span class="comment">// has cbSize, so we can&#39;t use impl_default_size macro</span>
-		}
+	<span class="doccomment">/// Sets the field.
+	</span><span class="kw">pub fn </span>set_pwpos(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>WINDOWPOS&gt;) {
+		<span class="self">self</span>.pwpos = pos.map(|pos| pos <span class="kw">as _</span>).unwrap_or(std::ptr::null_mut());
 	}
 }
 
-<span class="doccomment">/// [`LVINSERTMARK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvinsertmark)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVINSERTMARK</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::LVIM</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="ident">dwReserved</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`INITCOMMONCONTROLSEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-initcommoncontrolsex)
+/// struct
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>INITCOMMONCONTROLSEX {
+	dwSize: u32,
+	<span class="kw">pub </span>icc: co::ICC,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">LVINSERTMARK</span>);
+<span class="macro">impl_default_with_size!</span>(INITCOMMONCONTROLSEX, dwSize);
 
-<span class="doccomment">/// [`LVITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvitemw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::LVIF</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::LVIS</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">iIndent</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iGroupId</span>: <span class="ident">co::LVI_GROUPID</span>,
-	<span class="kw">pub</span> <span class="ident">cColumns</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">puColumns</span>: <span class="kw-2">*mut</span> <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">piColFmt</span>: <span class="kw-2">*mut</span> <span class="ident">co::LVCFMT_I</span>,
-	<span class="kw">pub</span> <span class="ident">iGroup</span>: <span class="ident">i32</span>,
-
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`LITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-litem)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LITEM {
+	<span class="kw">pub </span>mask: co::LIF,
+	<span class="kw">pub </span>iLink: i32,
+	<span class="kw">pub </span>state: co::LIS,
+	<span class="kw">pub </span>stateMask: co::LIS,
+	szID: [u16; MAX_LINKID_TEXT],
+	szUrl: [u16; L_MAX_URL_LENGTH],
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">LVITEM</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(LITEM);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
+<span class="kw">impl </span>LITEM {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szID, set_szID);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szUrl, set_szUrl);
 }
 
-<span class="doccomment">/// [`LVITEMINDEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvitemindex)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVITEMINDEX</span> {
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iGroup</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`LVBKIMAGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvbkimagew)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVBKIMAGE&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>uFlags: co::LVBKIF,
+	<span class="kw">pub </span>hbm: HBITMAP,
+	pszImage: <span class="kw-2">*mut </span>u16,
+	cchImageMax: u32,
+	<span class="kw">pub </span>xOffsetPercent: i32,
+	<span class="kw">pub </span>yOffsetPercent: i32,
+
+	_pszImage: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`LVSETINFOTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvsetinfotip)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVSETINFOTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">u32</span>, <span class="comment">// unspecified</span>
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
+<span class="macro">impl_default!</span>(LVBKIMAGE, <span class="lifetime">&#39;a</span>);
 
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVBKIMAGE&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszImage, set_pszImage, cchImageMax);
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">LVSETINFOTIP</span>, <span class="ident">cbSize</span>, <span class="lifetime">&#39;a</span>);
+<span class="doccomment">/// [`LVCOLUMN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvcolumnw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVCOLUMN&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::LVCF,
+	<span class="kw">pub </span>fmt: co::LVCFMT_C,
+	<span class="kw">pub </span>cx: i32,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>iImage: i32,
+	<span class="kw">pub </span>iOrder: i32,
+	<span class="kw">pub </span>cxMin: i32,
+	<span class="kw">pub </span>cxDefault: i32,
+	<span class="kw">pub </span>cxIdeal: i32,
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVSETINFOTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>);
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`LVTILEINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvtileinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVTILEINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="ident">cColumns</span>: <span class="ident">u32</span>,
-	<span class="ident">puColumns</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>,
-	<span class="ident">piColFmt</span>: <span class="kw-2">*mut</span> <span class="ident">co::LVCFMT_C</span>,
+<span class="macro">impl_default!</span>(LVCOLUMN, <span class="lifetime">&#39;a</span>);
 
-	<span class="ident">_puColumns</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVCOLUMN&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">LVTILEINFO</span>, <span class="ident">cbSize</span>, <span class="lifetime">&#39;a</span>);
+<span class="doccomment">/// [`LVFINDINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfindinfow)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVFINDINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>flags: co::LVFI,
+	psz: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>pt: POINT,
+	<span class="kw">pub </span>vkDirection: co::VK_DIR,
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LVTILEINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Returns the `puColumns` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">puColumns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u32</span>]<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">puColumns</span>.<span class="ident">as_mut</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">puColumns</span>, <span class="self">self</span>.<span class="ident">cColumns</span> <span class="kw">as</span> <span class="kw">_</span>))
-		}
+	_psz: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default!</span>(LVFINDINFO, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVFINDINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, psz, set_psz);
+}
+
+<span class="doccomment">/// [`LVFOOTERINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfooterinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVFOOTERINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::LVFF,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>cItems: u32,
+
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default!</span>(LVFOOTERINFO, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVFOOTERINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
+}
+
+<span class="doccomment">/// [`LVFOOTERITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvfooteritem)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVFOOTERITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::LVFIF,
+	<span class="kw">pub </span>iItem: i32,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>state: co::LVFIS,
+	<span class="kw">pub </span>stateMask: co::LVFIS,
+
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default!</span>(LVFOOTERITEM, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVFOOTERITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
+}
+
+<span class="doccomment">/// [`LVGROUP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvgroup)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVGROUP&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>mask: co::LVGF,
+	pszHeader: <span class="kw-2">*mut </span>u16,
+	cchHeader: i32,
+	pszFooter: <span class="kw-2">*mut </span>u16,
+	cchFooter: i32,
+	<span class="kw">pub </span>iGroupId: i32,
+	<span class="kw">pub </span>stateMask: co::LVGS,
+	<span class="kw">pub </span>state: co::LVGS,
+	<span class="kw">pub </span>uAlign: co::LVGA_FH,
+	pszSubtitle: <span class="kw-2">*mut </span>u16,
+	cchSubtitle: i32,
+	pszTask: <span class="kw-2">*mut </span>u16,
+	cchTask: i32,
+	pszDescriptionTop: <span class="kw-2">*mut </span>u16,
+	cchDescriptionTop: i32,
+	pszDescriptionBottom: <span class="kw-2">*mut </span>u16,
+	cchDescriptionBottom: i32,
+	<span class="kw">pub </span>iTitleImage: i32,
+	<span class="kw">pub </span>iExtendedImage: i32,
+	<span class="kw">pub </span>iFirstItem: i32,
+	<span class="kw">pub </span>cItems: u32,
+	pszSubsetTitle: <span class="kw-2">*mut </span>u16,
+	cchSubsetTitle: i32,
+
+	_pszHeader: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+	_pszFooter: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>u16&gt;,
+	_pszSubtitle: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw-2">mut </span>u16&gt;,
+	_pszTask: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;d </span><span class="kw-2">mut </span>u16&gt;,
+	_pszDescriptionTop: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;e </span><span class="kw-2">mut </span>u16&gt;,
+	_pszDescriptionBottom: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;f </span><span class="kw-2">mut </span>u16&gt;,
+	_pszSubsetTitle: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default_with_size!</span>(LVGROUP, cbSize, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; LVGROUP&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszHeader, set_pszHeader, cchHeader);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;b</span>, pszFooter, set_pszFooter, cchFooter);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;c</span>, pszSubtitle, set_pszSubtitle, cchSubtitle);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;d</span>, pszTask, set_pszTask, cchTask);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;e</span>, pszDescriptionTop, set_pszDescriptionTop, cchDescriptionTop);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;f</span>, pszDescriptionBottom, set_pszDescriptionBottom, cchDescriptionBottom);
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;g</span>, pszSubsetTitle, set_pszSubsetTitle, cchSubsetTitle);
+}
+
+<span class="doccomment">/// [`LVGROUPMETRICS`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvgroupmetrics)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVGROUPMETRICS {
+	cbSize: u32,
+	<span class="kw">pub </span>mask: co::LVGMF,
+	<span class="kw">pub </span>Left: u32,
+	<span class="kw">pub </span>Top: u32,
+	<span class="kw">pub </span>Right: u32,
+	<span class="kw">pub </span>Bottom: u32,
+	<span class="kw">pub </span>crLeft: COLORREF,
+	<span class="kw">pub </span>crTop: COLORREF,
+	<span class="kw">pub </span>crRight: COLORREF,
+	<span class="kw">pub </span>crBottom: COLORREF,
+	<span class="kw">pub </span>crHeader: COLORREF,
+	<span class="kw">pub </span>crFooter: COLORREF,
+}
+
+<span class="macro">impl_default_with_size!</span>(LVGROUPMETRICS, cbSize);
+
+<span class="doccomment">/// [`LVHITTESTINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvhittestinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>LVHITTESTINFO {
+	<span class="kw">pub </span>pt: POINT,
+	<span class="kw">pub </span>flags: co::LVHT,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>iGroup: i32,
+}
+
+<span class="doccomment">/// [`LVINSERTGROUPSORTED`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvinsertgroupsorted)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVINSERTGROUPSORTED&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; {
+	<span class="kw">pub </span>pfnGroupCompare: <span class="prelude-ty">Option</span>&lt;PFNLVGROUPCOMPARE&gt;,
+	<span class="kw">pub </span>pvData: usize,
+	<span class="kw">pub </span>lvGroup: LVGROUP&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; Default <span class="kw">for </span>LVINSERTGROUPSORTED&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>&gt; {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			pfnGroupCompare: <span class="prelude-val">None</span>,
+			pvData: <span class="number">0</span>,
+			lvGroup: LVGROUP::default(), <span class="comment">// has cbSize, so we can&#39;t use impl_default_size macro
+		</span>}
 	}
+}
 
-	<span class="doccomment">/// Returns the `piColFmt` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">piColFmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">co::LVCFMT_C</span>]<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">puColumns</span>.<span class="ident">as_mut</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">piColFmt</span>, <span class="self">self</span>.<span class="ident">cColumns</span> <span class="kw">as</span> <span class="kw">_</span>))
+<span class="doccomment">/// [`LVINSERTMARK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvinsertmark)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVINSERTMARK {
+	cbSize: u32,
+	<span class="kw">pub </span>dwFlags: co::LVIM,
+	<span class="kw">pub </span>iItem: i32,
+	dwReserved: u32,
+}
+
+<span class="macro">impl_default!</span>(LVINSERTMARK);
+
+<span class="doccomment">/// [`LVITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvitemw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::LVIF,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>state: co::LVIS,
+	<span class="kw">pub </span>stateMask: co::LVIS,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>iImage: i32,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>iIndent: i32,
+	<span class="kw">pub </span>iGroupId: co::LVI_GROUPID,
+	<span class="kw">pub </span>cColumns: u32,
+	<span class="kw">pub </span>puColumns: <span class="kw-2">*mut </span>i32,
+	<span class="kw">pub </span>piColFmt: <span class="kw-2">*mut </span>co::LVCFMT_I,
+	<span class="kw">pub </span>iGroup: i32,
+
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default!</span>(LVITEM, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
+}
+
+<span class="doccomment">/// [`LVITEMINDEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvitemindex)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>LVITEMINDEX {
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iGroup: i32,
+}
+
+<span class="doccomment">/// [`LVSETINFOTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvsetinfotip)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVSETINFOTIP&lt;<span class="lifetime">&#39;a</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>dwFlags: u32, <span class="comment">// unspecified
+	</span>pszText: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default_with_size!</span>(LVSETINFOTIP, cbSize, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVSETINFOTIP&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText);
+}
+
+<span class="doccomment">/// [`LVTILEINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvtileinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVTILEINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>iItem: i32,
+	cColumns: u32,
+	puColumns: <span class="kw-2">*mut </span>u32,
+	piColFmt: <span class="kw-2">*mut </span>co::LVCFMT_C,
+
+	_puColumns: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u32&gt;,
+}
+
+<span class="macro">impl_default_with_size!</span>(LVTILEINFO, cbSize, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LVTILEINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="doccomment">/// Returns the `puColumns` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>puColumns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u32]&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="self">self</span>.puColumns.as_mut()
+				.map(|<span class="kw">_</span>| std::slice::from_raw_parts_mut(<span class="self">self</span>.puColumns, <span class="self">self</span>.cColumns <span class="kw">as _</span>))
 		}
 	}
 
-	<span class="doccomment">/// Sets the `puColumns` and `piColFmt` fields. The slices must have the</span>
-	<span class="doccomment">/// same length.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_puColumns_piColFmt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u32</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">co::LVCFMT_C</span>])<span class="op">&gt;</span>) {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">val</span> {
-			<span class="kw">if</span> <span class="ident">val</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">val</span>.<span class="number">1</span>.<span class="ident">len</span>() {
-				<span class="macro">panic!</span>(<span class="string">&quot;Different slice lengths: {} and {}.&quot;</span>, <span class="ident">val</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">val</span>.<span class="number">1</span>.<span class="ident">len</span>());
+	<span class="doccomment">/// Returns the `piColFmt` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>piColFmt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[co::LVCFMT_C]&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="self">self</span>.puColumns.as_mut()
+				.map(|<span class="kw">_</span>| std::slice::from_raw_parts_mut(<span class="self">self</span>.piColFmt, <span class="self">self</span>.cColumns <span class="kw">as _</span>))
+		}
+	}
+
+	<span class="doccomment">/// Sets the `puColumns` and `piColFmt` fields. The slices must have the
+	/// same length.
+	</span><span class="kw">pub fn </span>set_puColumns_piColFmt(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u32], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[co::LVCFMT_C])&gt;) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(val) = val {
+			<span class="kw">if </span>val.<span class="number">0</span>.len() != val.<span class="number">1</span>.len() {
+				<span class="macro">panic!</span>(<span class="string">&quot;Different slice lengths: {} and {}.&quot;</span>, val.<span class="number">0</span>.len(), val.<span class="number">1</span>.len());
 			}
-			<span class="self">self</span>.<span class="ident">cColumns</span> <span class="op">=</span> <span class="ident">val</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>;
-			<span class="self">self</span>.<span class="ident">puColumns</span> <span class="op">=</span> <span class="ident">val</span>.<span class="number">0</span>.<span class="ident">as_mut_ptr</span>();
-			<span class="self">self</span>.<span class="ident">piColFmt</span> <span class="op">=</span> <span class="ident">val</span>.<span class="number">1</span>.<span class="ident">as_mut_ptr</span>();
-		} <span class="kw">else</span> {
-			<span class="self">self</span>.<span class="ident">cColumns</span> <span class="op">=</span> <span class="number">0</span>;
-			<span class="self">self</span>.<span class="ident">puColumns</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-			<span class="self">self</span>.<span class="ident">piColFmt</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
+			<span class="self">self</span>.cColumns = val.<span class="number">0</span>.len() <span class="kw">as _</span>;
+			<span class="self">self</span>.puColumns = val.<span class="number">0</span>.as_mut_ptr();
+			<span class="self">self</span>.piColFmt = val.<span class="number">1</span>.as_mut_ptr();
+		} <span class="kw">else </span>{
+			<span class="self">self</span>.cColumns = <span class="number">0</span>;
+			<span class="self">self</span>.puColumns = std::ptr::null_mut();
+			<span class="self">self</span>.piColFmt = std::ptr::null_mut();
 		}
 	}
 }
 
-<span class="doccomment">/// [`LVTILEVIEWINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvtileviewinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LVTILEVIEWINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwMask</span>: <span class="ident">co::LVTVIM</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::LVTVIF</span>,
-	<span class="kw">pub</span> <span class="ident">sizeTile</span>: <span class="ident">SIZE</span>,
-	<span class="kw">pub</span> <span class="ident">cLines</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">rcLabelMargin</span>: <span class="ident">RECT</span>,
+<span class="doccomment">/// [`LVTILEVIEWINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-lvtileviewinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>LVTILEVIEWINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>dwMask: co::LVTVIM,
+	<span class="kw">pub </span>dwFlags: co::LVTVIF,
+	<span class="kw">pub </span>sizeTile: SIZE,
+	<span class="kw">pub </span>cLines: i32,
+	<span class="kw">pub </span>rcLabelMargin: RECT,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">LVTILEVIEWINFO</span>, <span class="ident">cbSize</span>);
+<span class="macro">impl_default_with_size!</span>(LVTILEVIEWINFO, cbSize);
 
-<span class="doccomment">/// [`NMBCDROPDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbcdropdown)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMBCDROPDOWN</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">rcButton</span>: <span class="ident">RECT</span>,
+<span class="doccomment">/// [`NMBCDROPDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbcdropdown)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMBCDROPDOWN {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>rcButton: RECT,
 }
 
-<span class="doccomment">/// [`NMBCHOTITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbchotitem)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMBCHOTITEM</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::HICF</span>,
+<span class="doccomment">/// [`NMBCHOTITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbchotitem)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMBCHOTITEM {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwFlags: co::HICF,
 }
 
-<span class="doccomment">/// [`NMCHAR`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmchar)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMCHAR</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">ch</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemPrev</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemNext</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`NMCHAR`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmchar)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMCHAR {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>ch: u32,
+	<span class="kw">pub </span>dwItemPrev: u32,
+	<span class="kw">pub </span>dwItemNext: u32,
 }
 
-<span class="doccomment">/// [`NMCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmcustomdraw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMCUSTOMDRAW</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwDrawStage</span>: <span class="ident">co::CDDS</span>,
-	<span class="kw">pub</span> <span class="ident">hdc</span>: <span class="ident">HDC</span>,
-	<span class="kw">pub</span> <span class="ident">rc</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemSpec</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">uItemState</span>: <span class="ident">co::CDIS</span>,
-	<span class="kw">pub</span> <span class="ident">lItemlParam</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`NMCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmcustomdraw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMCUSTOMDRAW {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwDrawStage: co::CDDS,
+	<span class="kw">pub </span>hdc: HDC,
+	<span class="kw">pub </span>rc: RECT,
+	<span class="kw">pub </span>dwItemSpec: usize,
+	<span class="kw">pub </span>uItemState: co::CDIS,
+	<span class="kw">pub </span>lItemlParam: isize,
 }
 
-<span class="doccomment">/// [`NMDATETIMECHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimechange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDATETIMECHANGE</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::GDT</span>,
-	<span class="kw">pub</span> <span class="ident">st</span>: <span class="ident">SYSTEMTIME</span>,
+<span class="doccomment">/// [`NMDATETIMECHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimechange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDATETIMECHANGE {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	<span class="kw">pub </span>dwFlags: co::GDT,
+	<span class="kw">pub </span>st: SYSTEMTIME,
 }
 
-<span class="doccomment">/// [`NMDATETIMEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimeformatw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDATETIMEFORMAT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="ident">pszFormat</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">st</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="ident">pszDisplay</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">szDisplay</span>: [<span class="ident">u16</span>; <span class="number">64</span>], <span class="comment">// used as a buffer to pszDisplay</span>
+<span class="doccomment">/// [`NMDATETIMEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimeformatw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDATETIMEFORMAT&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	pszFormat: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>st: SYSTEMTIME,
+	pszDisplay: <span class="kw-2">*mut </span>u16,
+	szDisplay: [u16; <span class="number">64</span>], <span class="comment">// used as a buffer to pszDisplay
 
-	<span class="ident">_pszFormat</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	</span>_pszFormat: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">NMDATETIMEFORMAT</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(NMDATETIMEFORMAT, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMDATETIMEFORMAT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszFormat</span>, <span class="ident">set_pszFormat</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDATETIMEFORMAT&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszFormat, set_pszFormat);
 
-	<span class="doccomment">/// Returns the `pszDisplay` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pszDisplay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-		<span class="ident">WString::from_wchars_nullt</span>(<span class="self">self</span>.<span class="ident">pszDisplay</span>).<span class="ident">to_string</span>()
+	<span class="doccomment">/// Returns the `pszDisplay` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>pszDisplay(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+		WString::from_wchars_nullt(<span class="self">self</span>.pszDisplay).to_string()
 	}
 
-	<span class="doccomment">/// Sets the `pszDisplay` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pszDisplay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="ident">WString::from_str</span>(<span class="ident">text</span>).<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">szDisplay</span>);
-	}
-}
-
-<span class="doccomment">/// [`NMDATETIMEFORMATQUERY`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimeformatqueryw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDATETIMEFORMATQUERY</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="ident">pszFormat</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">szMax</span>: <span class="ident">SIZE</span>,
-
-	<span class="ident">_pszFormat</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NMDATETIMEFORMATQUERY</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMDATETIMEFORMATQUERY</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszFormat</span>, <span class="ident">set_pszFormat</span>);
-}
-
-<span class="doccomment">/// [`NMDATETIMESTRING`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimestringw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDATETIMESTRING</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="ident">pszUserString</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">st</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::GDT</span>,
-
-	<span class="ident">_pszUserString</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NMDATETIMESTRING</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMDATETIMESTRING</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszUserString</span>, <span class="ident">set_pszUserString</span>);
-}
-
-<span class="doccomment">/// [`NMDATETIMEWMKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimewmkeydownw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDATETIMEWMKEYDOWN</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">nVirtKey</span>: <span class="ident">i32</span>,
-	<span class="ident">pszFormat</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">st</span>: <span class="ident">SYSTEMTIME</span>,
-
-	<span class="ident">_pszFormat</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NMDATETIMEWMKEYDOWN</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMDATETIMEWMKEYDOWN</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszFormat</span>, <span class="ident">set_pszFormat</span>);
-}
-
-<span class="doccomment">/// [`NMDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdaystate)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMDAYSTATE</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">stStart</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="ident">cDayState</span>: <span class="ident">i32</span>,
-	<span class="ident">prgDayState</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>,
-
-	<span class="ident">_prgDayState</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u32</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NMDAYSTATE</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMDAYSTATE</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">prgDayState</span>, <span class="ident">set_prgDayState</span>, <span class="ident">cDayState</span>, <span class="ident">u32</span>);
-}
-
-<span class="doccomment">/// [`NMHDR`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nmhdr)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMHDR</span> {
-	<span class="doccomment">/// A window handle to the control sending the message.</span>
-	<span class="kw">pub</span> <span class="ident">hwndFrom</span>: <span class="ident">HWND</span>,
-	<span class="ident">idFrom</span>: <span class="ident">usize</span>,
-	<span class="doccomment">/// Notification code sent in</span>
-	<span class="doccomment">/// [`WM_NOTIFY`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-notify).</span>
-	<span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">co::NM</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NMHDR</span>);
-
-<span class="kw">impl</span> <span class="ident">NMHDR</span> {
-	<span class="doccomment">/// `Returns the `idFrom` field, the ID of the control sending the message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">idFrom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-		<span class="self">self</span>.<span class="ident">idFrom</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
-
-	<span class="doccomment">/// Sets the `idFrom` field, the ID of the control sending the message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_idFrom</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u16</span>) {
-		<span class="self">self</span>.<span class="ident">idFrom</span> <span class="op">=</span> <span class="ident">val</span> <span class="kw">as</span> <span class="kw">_</span>
+	<span class="doccomment">/// Sets the `pszDisplay` field.
+	</span><span class="kw">pub fn </span>set_pszDisplay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+		WString::from_str(text).copy_to_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>.szDisplay);
 	}
 }
 
-<span class="doccomment">/// [`NMITEMACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmitemactivate)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMITEMACTIVATE</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">uNewState</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uOldState</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uChanged</span>: <span class="ident">co::LVIF</span>,
-	<span class="kw">pub</span> <span class="ident">ptAction</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">uKeyFlags</span>: <span class="ident">co::LVKF</span>,
+<span class="doccomment">/// [`NMDATETIMEFORMATQUERY`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimeformatqueryw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDATETIMEFORMATQUERY&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	pszFormat: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>szMax: SIZE,
+
+	_pszFormat: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`PBRANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-pbrange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PBRANGE</span> {
-	<span class="kw">pub</span> <span class="ident">iLow</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iHigh</span>: <span class="ident">i32</span>,
+<span class="macro">impl_default!</span>(NMDATETIMEFORMATQUERY, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDATETIMEFORMATQUERY&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszFormat, set_pszFormat);
 }
 
-<span class="doccomment">/// [`NMIPADDRESS`](https://docs.microsoft.com/en-us/windows/win32/api/Commctrl/ns-commctrl-nmipaddress)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMIPADDRESS</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iField</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iValue</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`NMDATETIMESTRING`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimestringw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDATETIMESTRING&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	pszUserString: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>st: SYSTEMTIME,
+	<span class="kw">pub </span>dwFlags: co::GDT,
+
+	_pszUserString: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`NMLINK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlink)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLINK</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">item</span>: <span class="ident">LITEM</span>,
+<span class="macro">impl_default!</span>(NMDATETIMESTRING, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDATETIMESTRING&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszUserString, set_pszUserString);
 }
 
-<span class="doccomment">/// [`NMLISTVIEW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlistview)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLISTVIEW</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">uNewState</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uOldState</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uChanged</span>: <span class="ident">co::LVIF</span>,
-	<span class="kw">pub</span> <span class="ident">ptAction</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`NMDATETIMEWMKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdatetimewmkeydownw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDATETIMEWMKEYDOWN&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	<span class="kw">pub </span>nVirtKey: i32,
+	pszFormat: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>st: SYSTEMTIME,
+
+	_pszFormat: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`NMLVCACHEHINT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvcachehint)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVCACHEHINT</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iFrom</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iTo</span>: <span class="ident">i32</span>,
+<span class="macro">impl_default!</span>(NMDATETIMEWMKEYDOWN, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDATETIMEWMKEYDOWN&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszFormat, set_pszFormat);
 }
 
-<span class="doccomment">/// [`NMLVCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvcustomdraw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVCUSTOMDRAW</span> {
-	<span class="kw">pub</span> <span class="ident">mcd</span>: <span class="ident">NMCUSTOMDRAW</span>,
-	<span class="kw">pub</span> <span class="ident">clrText</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">clrTextBk</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemType</span>: <span class="ident">co::LVCDI</span>,
-	<span class="kw">pub</span> <span class="ident">clrFace</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">iIconEffect</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iIconPhase</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iPartId</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iStateId</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">rcText</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">uAlign</span>: <span class="ident">co::LVGA_HEADER</span>,
+<span class="doccomment">/// [`NMDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmdaystate)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMDAYSTATE&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	<span class="kw">pub </span>stStart: SYSTEMTIME,
+	cDayState: i32,
+	prgDayState: <span class="kw-2">*mut </span>u32,
+
+	_prgDayState: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u32&gt;,
 }
 
-<span class="doccomment">/// [`NMLVDISPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvdispinfow)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVDISPINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">item</span>: <span class="ident">LVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="macro">impl_default!</span>(NMDAYSTATE, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDAYSTATE&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, prgDayState, set_prgDayState, cDayState, u32);
 }
 
-<span class="doccomment">/// [`NMLVEMPTYMARKUP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvemptymarkup)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVEMPTYMARKUP</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::EMF</span>,
-	<span class="ident">szMarkup</span>: [<span class="ident">u16</span>; <span class="ident">L_MAX_URL_LENGTH</span>],
+<span class="doccomment">/// [`NMHDR`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nmhdr)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>NMHDR {
+	<span class="doccomment">/// A window handle to the control sending the message.
+	</span><span class="kw">pub </span>hwndFrom: HWND,
+	idFrom: usize,
+	<span class="doccomment">/// Notification code sent in
+	/// [`WM_NOTIFY`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-notify).
+	</span><span class="kw">pub </span>code: co::NM,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">NMLVEMPTYMARKUP</span>);
+<span class="macro">impl_default!</span>(NMHDR);
 
-<span class="kw">impl</span> <span class="ident">NMLVEMPTYMARKUP</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">szMarkup</span>, <span class="ident">set_szMarkup</span>);
+<span class="kw">impl </span>NMHDR {
+	<span class="doccomment">/// `Returns the `idFrom` field, the ID of the control sending the message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>idFrom(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+		<span class="self">self</span>.idFrom <span class="kw">as _
+	</span>}
+
+	<span class="doccomment">/// Sets the `idFrom` field, the ID of the control sending the message.
+	</span><span class="kw">pub fn </span>set_idFrom(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u16) {
+		<span class="self">self</span>.idFrom = val <span class="kw">as _
+	</span>}
 }
 
-<span class="doccomment">/// [`NMLVFINDITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvfinditemw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVFINDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iStart</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lvfi</span>: <span class="ident">LVFINDINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`NMITEMACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmitemactivate)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMITEMACTIVATE {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>uNewState: co::LVIS,
+	<span class="kw">pub </span>uOldState: co::LVIS,
+	<span class="kw">pub </span>uChanged: co::LVIF,
+	<span class="kw">pub </span>ptAction: POINT,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>uKeyFlags: co::LVKF,
 }
 
-<span class="doccomment">/// [`NMLVGETINFOTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvgetinfotipw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVGETINFOTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::LVGIT</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`PBRANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-pbrange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>PBRANGE {
+	<span class="kw">pub </span>iLow: i32,
+	<span class="kw">pub </span>iHigh: i32,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">NMLVGETINFOTIP</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NMLVGETINFOTIP</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
+<span class="doccomment">/// [`NMIPADDRESS`](https://docs.microsoft.com/en-us/windows/win32/api/Commctrl/ns-commctrl-nmipaddress)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMIPADDRESS {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iField: i32,
+	<span class="kw">pub </span>iValue: i32,
 }
 
-<span class="doccomment">/// [`NMLVKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvkeydown)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVKEYDOWN</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">wVKey</span>: <span class="ident">co::VK</span>,
-	<span class="ident">flags</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`NMLINK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlink)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLINK {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>item: LITEM,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">NMLVKEYDOWN</span>);
-
-<span class="doccomment">/// [`NMLVLINK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvlink)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVLINK</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">link</span>: <span class="ident">LITEM</span>,
-	<span class="kw">pub</span> <span class="ident">iItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSubItem</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`NMLISTVIEW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlistview)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLISTVIEW {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>uNewState: co::LVIS,
+	<span class="kw">pub </span>uOldState: co::LVIS,
+	<span class="kw">pub </span>uChanged: co::LVIF,
+	<span class="kw">pub </span>ptAction: POINT,
+	<span class="kw">pub </span>lParam: isize,
 }
 
-<span class="doccomment">/// [`NMLVODSTATECHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvodstatechange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVODSTATECHANGE</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">iFrom</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iTo</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">uNewState</span>: <span class="ident">co::LVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uOldState</span>: <span class="ident">co::LVIS</span>,
+<span class="doccomment">/// [`NMLVCACHEHINT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvcachehint)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVCACHEHINT {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iFrom: i32,
+	<span class="kw">pub </span>iTo: i32,
 }
 
-<span class="doccomment">/// [`NMLVSCROLL`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvscroll)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMLVSCROLL</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dx</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">dy</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`NMLVCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvcustomdraw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVCUSTOMDRAW {
+	<span class="kw">pub </span>mcd: NMCUSTOMDRAW,
+	<span class="kw">pub </span>clrText: COLORREF,
+	<span class="kw">pub </span>clrTextBk: COLORREF,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>dwItemType: co::LVCDI,
+	<span class="kw">pub </span>clrFace: COLORREF,
+	<span class="kw">pub </span>iIconEffect: i32,
+	<span class="kw">pub </span>iIconPhase: i32,
+	<span class="kw">pub </span>iPartId: i32,
+	<span class="kw">pub </span>iStateId: i32,
+	<span class="kw">pub </span>rcText: RECT,
+	<span class="kw">pub </span>uAlign: co::LVGA_HEADER,
 }
 
-<span class="doccomment">/// [`NMMOUSE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmmouse)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMMOUSE</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemSpec</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemData</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">pt</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">dwHitInfo</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`NMLVDISPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvdispinfow)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVDISPINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>item: LVITEM&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="doccomment">/// [`NMTRBTHUMBPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtrbthumbposchanging)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMTRBTHUMBPOSCHANGING</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwPos</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nReason</span>: <span class="ident">co::TB</span>,
+<span class="doccomment">/// [`NMLVEMPTYMARKUP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvemptymarkup)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVEMPTYMARKUP {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwFlags: co::EMF,
+	szMarkup: [u16; L_MAX_URL_LENGTH],
 }
 
-<span class="doccomment">/// [`NMSELCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmselchange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMSELCHANGE</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">stSelStart</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="kw">pub</span> <span class="ident">stSelEnd</span>: <span class="ident">SYSTEMTIME</span>,
+<span class="macro">impl_default!</span>(NMLVEMPTYMARKUP);
+
+<span class="kw">impl </span>NMLVEMPTYMARKUP {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szMarkup, set_szMarkup);
 }
 
-<span class="doccomment">/// [`NMTREEVIEW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtreevieww)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMTREEVIEW</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">action</span>: <span class="ident">u32</span>, <span class="comment">// actual type varies</span>
-	<span class="kw">pub</span> <span class="ident">itemOld</span>: <span class="ident">TVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">itemNew</span>: <span class="ident">TVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">ptDrag</span>: <span class="ident">POINT</span>,
+<span class="doccomment">/// [`NMLVFINDITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvfinditemw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVFINDITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iStart: i32,
+	<span class="kw">pub </span>lvfi: LVFINDINFO&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="doccomment">/// [`NMTVCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtvcustomdraw)</span>
-<span class="doccomment">/// stuct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMTVCUSTOMDRAW</span> {
-	<span class="kw">pub</span> <span class="ident">nmcd</span>: <span class="ident">NMCUSTOMDRAW</span>,
-	<span class="kw">pub</span> <span class="ident">clrText</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">clrTextBk</span>: <span class="ident">COLORREF</span>,
-	<span class="kw">pub</span> <span class="ident">iLevel</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`NMLVGETINFOTIP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvgetinfotipw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVGETINFOTIP&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwFlags: co::LVGIT,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
+	<span class="kw">pub </span>lParam: isize,
+
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="doccomment">/// [`NMTVITEMCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtvitemchange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMTVITEMCHANGE</span> {
-	<span class="kw">pub</span> <span class="ident">hdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">uChanged</span>: <span class="ident">co::TVIF</span>,
-	<span class="kw">pub</span> <span class="ident">hItem</span>: <span class="ident">HTREEITEM</span>,
-	<span class="kw">pub</span> <span class="ident">uStateNew</span>: <span class="ident">co::TVIS</span>,
-	<span class="kw">pub</span> <span class="ident">uStateOld</span>: <span class="ident">co::TVIS</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
+<span class="macro">impl_default!</span>(NMLVGETINFOTIP, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMLVGETINFOTIP&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
 }
 
-<span class="doccomment">/// [`NMVIEWCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmviewchange)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NMVIEWCHANGE</span> {
-	<span class="kw">pub</span> <span class="ident">nmhdr</span>: <span class="ident">NMHDR</span>,
-	<span class="kw">pub</span> <span class="ident">dwOldView</span>: <span class="ident">co::MCMV</span>,
-	<span class="kw">pub</span> <span class="ident">dwNewView</span>: <span class="ident">co::MCMV</span>,
+<span class="doccomment">/// [`NMLVKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvkeydown)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVKEYDOWN {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>wVKey: co::VK,
+	flags: u32,
 }
 
-<span class="doccomment">/// [`TBADDBITMAP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tbaddbitmap)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TBADDBITMAP</span> {
-	<span class="ident">hInst</span>: <span class="ident">HINSTANCE</span>,
-	<span class="ident">nID</span>: <span class="ident">usize</span>,
+<span class="macro">impl_default!</span>(NMLVKEYDOWN);
+
+<span class="doccomment">/// [`NMLVLINK`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvlink)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVLINK {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>link: LITEM,
+	<span class="kw">pub </span>iItem: i32,
+	<span class="kw">pub </span>iSubItem: i32,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TBADDBITMAP</span>);
+<span class="doccomment">/// [`NMLVODSTATECHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvodstatechange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVODSTATECHANGE {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>iFrom: i32,
+	<span class="kw">pub </span>iTo: i32,
+	<span class="kw">pub </span>uNewState: co::LVIS,
+	<span class="kw">pub </span>uOldState: co::LVIS,
+}
 
-<span class="kw">impl</span> <span class="ident">TBADDBITMAP</span> {
-	<span class="doccomment">/// Returns the `hInst` and `nID` fields.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nID</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BmpIdbRes</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">hInst</span> {
-			<span class="ident">HINST_COMMCTRL</span> =&gt; <span class="ident">BmpIdbRes::Idb</span>(<span class="ident">co::IDB</span>(<span class="self">self</span>.<span class="ident">nID</span>)),
-			<span class="ident">HINSTANCE::NULL</span> =&gt; <span class="ident">BmpIdbRes::Bmp</span>(<span class="ident">HBITMAP</span>(<span class="self">self</span>.<span class="ident">nID</span> <span class="kw">as</span> <span class="kw">_</span> )),
-			<span class="ident">hInst</span> =&gt; <span class="ident">BmpIdbRes::Res</span>(<span class="ident">IdStr::from_ptr</span>(<span class="self">self</span>.<span class="ident">nID</span> <span class="kw">as</span> <span class="kw">_</span>), <span class="ident">hInst</span>),
+<span class="doccomment">/// [`NMLVSCROLL`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmlvscroll)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMLVSCROLL {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dx: i32,
+	<span class="kw">pub </span>dy: i32,
+}
+
+<span class="doccomment">/// [`NMMOUSE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmmouse)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMMOUSE {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwItemSpec: usize,
+	<span class="kw">pub </span>dwItemData: usize,
+	<span class="kw">pub </span>pt: POINT,
+	<span class="kw">pub </span>dwHitInfo: isize,
+}
+
+<span class="doccomment">/// [`NMTRBTHUMBPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtrbthumbposchanging)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMTRBTHUMBPOSCHANGING {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>dwPos: u32,
+	<span class="kw">pub </span>nReason: co::TB,
+}
+
+<span class="doccomment">/// [`NMSELCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmselchange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMSELCHANGE {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	<span class="kw">pub </span>stSelStart: SYSTEMTIME,
+	<span class="kw">pub </span>stSelEnd: SYSTEMTIME,
+}
+
+<span class="doccomment">/// [`NMTREEVIEW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtreevieww)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMTREEVIEW&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>action: u32, <span class="comment">// actual type varies
+	</span><span class="kw">pub </span>itemOld: TVITEM&lt;<span class="lifetime">&#39;a</span>&gt;,
+	<span class="kw">pub </span>itemNew: TVITEM&lt;<span class="lifetime">&#39;b</span>&gt;,
+	<span class="kw">pub </span>ptDrag: POINT,
+}
+
+<span class="doccomment">/// [`NMTVCUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtvcustomdraw)
+/// stuct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMTVCUSTOMDRAW {
+	<span class="kw">pub </span>nmcd: NMCUSTOMDRAW,
+	<span class="kw">pub </span>clrText: COLORREF,
+	<span class="kw">pub </span>clrTextBk: COLORREF,
+	<span class="kw">pub </span>iLevel: i32,
+}
+
+<span class="doccomment">/// [`NMTVITEMCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtvitemchange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMTVITEMCHANGE {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>uChanged: co::TVIF,
+	<span class="kw">pub </span>hItem: HTREEITEM,
+	<span class="kw">pub </span>uStateNew: co::TVIS,
+	<span class="kw">pub </span>uStateOld: co::TVIS,
+	<span class="kw">pub </span>lParam: isize,
+}
+
+<span class="doccomment">/// [`NMVIEWCHANGE`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmviewchange)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NMVIEWCHANGE {
+	<span class="kw">pub </span>nmhdr: NMHDR,
+	<span class="kw">pub </span>dwOldView: co::MCMV,
+	<span class="kw">pub </span>dwNewView: co::MCMV,
+}
+
+<span class="doccomment">/// [`TBADDBITMAP`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tbaddbitmap)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>TBADDBITMAP {
+	hInst: HINSTANCE,
+	nID: usize,
+}
+
+<span class="macro">impl_default!</span>(TBADDBITMAP);
+
+<span class="kw">impl </span>TBADDBITMAP {
+	<span class="doccomment">/// Returns the `hInst` and `nID` fields.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>nID(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BmpIdbRes {
+		<span class="kw">match </span><span class="self">self</span>.hInst {
+			HINST_COMMCTRL =&gt; BmpIdbRes::Idb(co::IDB(<span class="self">self</span>.nID)),
+			HINSTANCE::NULL =&gt; BmpIdbRes::Bmp(HBITMAP(<span class="self">self</span>.nID <span class="kw">as _ </span>)),
+			hInst =&gt; BmpIdbRes::Res(IdStr::from_ptr(<span class="self">self</span>.nID <span class="kw">as _</span>), hInst),
 		}
 	}
 
-	<span class="doccomment">/// Sets the `hInst` and `nID` fields.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nID</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">BmpIdbRes</span>) {
-		<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span> {
-			<span class="ident">BmpIdbRes::Idb</span>(<span class="ident">idb</span>) =&gt; <span class="self">Self</span> { <span class="ident">hInst</span>: <span class="ident">HINST_COMMCTRL</span>, <span class="ident">nID</span>: <span class="ident">idb</span>.<span class="number">0</span> },
-			<span class="ident">BmpIdbRes::Bmp</span>(<span class="ident">bmp</span>) =&gt; <span class="self">Self</span> { <span class="ident">hInst</span>: <span class="ident">HINSTANCE::NULL</span>, <span class="ident">nID</span>: <span class="ident">bmp</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span> },
-			<span class="ident">BmpIdbRes::Res</span>(<span class="ident">res</span>, <span class="ident">hInst</span>) =&gt; <span class="self">Self</span> { <span class="ident">hInst</span>: <span class="kw-2">*</span><span class="ident">hInst</span>, <span class="ident">nID</span>: <span class="ident">res</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span> },
+	<span class="doccomment">/// Sets the `hInst` and `nID` fields.
+	</span><span class="kw">pub fn </span>set_nID(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;</span>BmpIdbRes) {
+		<span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>val {
+			BmpIdbRes::Idb(idb) =&gt; <span class="self">Self </span>{ hInst: HINST_COMMCTRL, nID: idb.<span class="number">0 </span>},
+			BmpIdbRes::Bmp(bmp) =&gt; <span class="self">Self </span>{ hInst: HINSTANCE::NULL, nID: bmp.<span class="number">0 </span><span class="kw">as _ </span>},
+			BmpIdbRes::Res(res, hInst) =&gt; <span class="self">Self </span>{ hInst: <span class="kw-2">*</span>hInst, nID: res.as_ptr() <span class="kw">as _ </span>},
 		}
 	}
 }
 
-<span class="doccomment">/// [`TBBUTTON`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tbbutton)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TBBUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">iBitmap</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">idCommand</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">fsState</span>: <span class="ident">co::TBSTATE</span>,
-	<span class="kw">pub</span> <span class="ident">fsStyle</span>: <span class="ident">co::BTNS</span>,
-	<span class="ident">bReserved</span>: [<span class="ident">u8</span>; <span class="number">6</span>], <span class="comment">// assumes 64-bit architecture</span>
-	<span class="kw">pub</span> <span class="ident">dwData</span>: <span class="ident">usize</span>,
-	<span class="ident">iString</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`TBBUTTON`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tbbutton)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TBBUTTON&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>iBitmap: i32,
+	<span class="kw">pub </span>idCommand: i32,
+	<span class="kw">pub </span>fsState: co::TBSTATE,
+	<span class="kw">pub </span>fsStyle: co::BTNS,
+	bReserved: [u8; <span class="number">6</span>], <span class="comment">// assumes 64-bit architecture
+	</span><span class="kw">pub </span>dwData: usize,
+	iString: isize,
 
-	<span class="ident">_iString</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_iString: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TBBUTTON</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(TBBUTTON, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TBBUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Returns the `iString` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iString</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IndexStr</span> {
-		<span class="kw">if</span> <span class="ident">IS_INTRESOURCE</span>(<span class="self">self</span>.<span class="ident">iString</span> <span class="kw">as</span> <span class="kw">_</span>) {
-			<span class="ident">IndexStr::Index</span>(<span class="self">self</span>.<span class="ident">iString</span> <span class="kw">as</span> <span class="kw">_</span>)
-		} <span class="kw">else</span> {
-			<span class="ident">IndexStr::Str</span>(<span class="ident">WString::from_wchars_nullt</span>(<span class="self">self</span>.<span class="ident">iString</span> <span class="kw">as</span> <span class="kw">_</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TBBUTTON&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="doccomment">/// Returns the `iString` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iString(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IndexStr {
+		<span class="kw">if </span>IS_INTRESOURCE(<span class="self">self</span>.iString <span class="kw">as _</span>) {
+			IndexStr::Index(<span class="self">self</span>.iString <span class="kw">as _</span>)
+		} <span class="kw">else </span>{
+			IndexStr::Str(WString::from_wchars_nullt(<span class="self">self</span>.iString <span class="kw">as _</span>))
 		}
 	}
 
-	<span class="doccomment">/// Sets the `iString` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_iString</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">IndexStr</span>) {
-		<span class="self">self</span>.<span class="ident">iString</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span> {
-			<span class="ident">IndexStr::Index</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IndexStr::Str</span>(<span class="ident">s</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">s</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span> },
+	<span class="doccomment">/// Sets the `iString` field.
+	</span><span class="kw">pub fn </span>set_iString(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>IndexStr) {
+		<span class="self">self</span>.iString = <span class="kw">match </span>val {
+			IndexStr::Index(i) =&gt; <span class="kw-2">*</span>i <span class="kw">as _</span>,
+			IndexStr::Str(s) =&gt; <span class="kw">unsafe </span>{ s.as_mut_ptr() <span class="kw">as _ </span>},
 		};
 	}
 }
 
-<span class="doccomment">/// [`TVINSERTSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvinsertstructw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TVINSERTSTRUCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hParent</span>: <span class="ident">HTREEITEM</span>,
-	<span class="ident">hInsertAfter</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">itemex</span>: <span class="ident">TVITEMEX</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`TVINSERTSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvinsertstructw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TVINSERTSTRUCT&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>hParent: HTREEITEM,
+	hInsertAfter: isize,
+	<span class="kw">pub </span>itemex: TVITEMEX&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TVINSERTSTRUCT</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(TVINSERTSTRUCT, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TVINSERTSTRUCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Returns the `hInsertAfter` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hInsertAfter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TreeitemTvi</span> {
-		<span class="ident">TreeitemTvi::from_isize</span>(<span class="self">self</span>.<span class="ident">hInsertAfter</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TVINSERTSTRUCT&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="doccomment">/// Returns the `hInsertAfter` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>hInsertAfter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TreeitemTvi {
+		TreeitemTvi::from_isize(<span class="self">self</span>.hInsertAfter)
 	}
 
-	<span class="doccomment">/// Sets the `hInsertAfter` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_hInsertAfter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">TreeitemTvi</span>) {
-		<span class="self">self</span>.<span class="ident">hInsertAfter</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">as_isize</span>();
+	<span class="doccomment">/// Sets the `hInsertAfter` field.
+	</span><span class="kw">pub fn </span>set_hInsertAfter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: TreeitemTvi) {
+		<span class="self">self</span>.hInsertAfter = val.as_isize();
 	}
 }
 
-<span class="doccomment">/// [`TVITEMEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TVITEMEX</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::TVIF</span>,
-	<span class="kw">pub</span> <span class="ident">hItem</span>: <span class="ident">HTREEITEM</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::TVIS</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::TVIS</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSelectedImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cChildren</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">iIntegral</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">uStateEx</span>: <span class="ident">co::TVIS_EX</span>,
-	<span class="ident">hwnd</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">iExpandedImage</span>: <span class="ident">i32</span>,
-	<span class="ident">iReserved</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`TVITEMEX`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TVITEMEX&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::TVIF,
+	<span class="kw">pub </span>hItem: HTREEITEM,
+	<span class="kw">pub </span>state: co::TVIS,
+	<span class="kw">pub </span>stateMask: co::TVIS,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>iImage: i32,
+	<span class="kw">pub </span>iSelectedImage: i32,
+	<span class="kw">pub </span>cChildren: i32,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>iIntegral: i32,
+	<span class="kw">pub </span>uStateEx: co::TVIS_EX,
+	hwnd: HWND,
+	<span class="kw">pub </span>iExpandedImage: i32,
+	iReserved: i32,
 
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TVITEMEX</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(TVITEMEX, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TVITEMEX</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TVITEMEX&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
 }
 
-<span class="doccomment">/// [`TVITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">co::TVIF</span>,
-	<span class="kw">pub</span> <span class="ident">hItem</span>: <span class="ident">HTREEITEM</span>,
-	<span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">co::TVIS</span>,
-	<span class="kw">pub</span> <span class="ident">stateMask</span>: <span class="ident">co::TVIS</span>,
-	<span class="ident">pszText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cchTextMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iSelectedImage</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cChildren</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`TVITEM`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TVITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>mask: co::TVIF,
+	<span class="kw">pub </span>hItem: HTREEITEM,
+	<span class="kw">pub </span>state: co::TVIS,
+	<span class="kw">pub </span>stateMask: co::TVIS,
+	pszText: <span class="kw-2">*mut </span>u16,
+	cchTextMax: i32,
+	<span class="kw">pub </span>iImage: i32,
+	<span class="kw">pub </span>iSelectedImage: i32,
+	<span class="kw">pub </span>cChildren: i32,
+	<span class="kw">pub </span>lParam: isize,
 
-	<span class="ident">_pszText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TVITEM</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(TVITEM, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TVITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszText</span>, <span class="ident">set_pszText</span>, <span class="ident">cchTextMax</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TVITEM&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_string_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, pszText, set_pszText, cchTextMax);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

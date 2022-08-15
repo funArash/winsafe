@@ -40,47 +40,47 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl::HrResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oleaut::decl::IPicture</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">gdi_oleaut_Hdc</span>, <span class="ident">Handle</span>, <span class="ident">oleaut_IPicture</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HDC</span>, <span class="ident">HWND</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::IPicture;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{gdi_oleaut_Hdc, Handle, oleaut_IPicture, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HDC, HWND, SIZE};
 
-<span class="kw">impl</span> <span class="ident">gdi_oleaut_IPicture</span> <span class="kw">for</span> <span class="ident">IPicture</span> {}
+<span class="kw">impl </span>gdi_oleaut_IPicture <span class="kw">for </span>IPicture {}
 
-<span class="doccomment">/// This trait is enabled with `gdi` and `oleaut` features, and provides methods</span>
-<span class="doccomment">/// for [`IPicture`](crate::IPicture).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">gdi_oleaut_IPicture</span>: <span class="ident">oleaut_IPicture</span> {
-	<span class="doccomment">/// Calls</span>
-	<span class="doccomment">/// [`IPicture::get_Width`](crate::prelude::oleaut_IPicture::get_Width) and</span>
-	<span class="doccomment">/// [`IPicture::get_Height`](crate::prelude::oleaut_IPicture::get_Height),</span>
-	<span class="doccomment">/// then converts the HIMETRIC units to pixels.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If `hdc` is not provided, `HWND::NULL.GetDC()` will be used.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">size_px</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hdc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HDC</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">our_hdc</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hdc</span>) <span class="op">=</span> <span class="ident">hdc</span> {
-			<span class="ident">hdc</span>
-		} <span class="kw">else</span> {
-			<span class="ident">HWND::NULL</span>.<span class="ident">GetDC</span>()
-				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_hresult</span>())<span class="question-mark">?</span>
-		};
-		<span class="kw">let</span> (<span class="ident">cx</span>, <span class="ident">cy</span>) <span class="op">=</span> <span class="ident">our_hdc</span>.<span class="ident">HiMetricToPixel</span>(
-			<span class="self">self</span>.<span class="ident">get_Width</span>()<span class="question-mark">?</span>, <span class="self">self</span>.<span class="ident">get_Height</span>()<span class="question-mark">?</span>);
-		<span class="kw">if</span> <span class="ident">hdc</span>.<span class="ident">is_none</span>() {
-			<span class="ident">HWND::NULL</span>.<span class="ident">ReleaseDC</span>(<span class="ident">our_hdc</span>)
-				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_hresult</span>())<span class="question-mark">?</span>;
+<span class="doccomment">/// This trait is enabled with `gdi` and `oleaut` features, and provides methods
+/// for [`IPicture`](crate::IPicture).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;oleaut&quot;</span>))))]</span>
+<span class="kw">pub trait </span>gdi_oleaut_IPicture: oleaut_IPicture {
+	<span class="doccomment">/// Calls
+	/// [`IPicture::get_Width`](crate::prelude::oleaut_IPicture::get_Width) and
+	/// [`IPicture::get_Height`](crate::prelude::oleaut_IPicture::get_Height),
+	/// then converts the HIMETRIC units to pixels.
+	///
+	/// If `hdc` is not provided, `HWND::NULL.GetDC()` will be used.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>size_px(<span class="kw-2">&amp;</span><span class="self">self</span>, hdc: <span class="prelude-ty">Option</span>&lt;HDC&gt;) -&gt; HrResult&lt;SIZE&gt; {
+		<span class="kw">let </span>our_hdc = <span class="kw">if let </span><span class="prelude-val">Some</span>(hdc) = hdc {
+			hdc
+		} <span class="kw">else </span>{
+			HWND::NULL.GetDC()
+				.map_err(|e| e.to_hresult())<span class="question-mark">?
+		</span>};
+		<span class="kw">let </span>(cx, cy) = our_hdc.HiMetricToPixel(
+			<span class="self">self</span>.get_Width()<span class="question-mark">?</span>, <span class="self">self</span>.get_Height()<span class="question-mark">?</span>);
+		<span class="kw">if </span>hdc.is_none() {
+			HWND::NULL.ReleaseDC(our_hdc)
+				.map_err(|e| e.to_hresult())<span class="question-mark">?</span>;
 		}
-		<span class="prelude-val">Ok</span>(<span class="ident">SIZE::new</span>(<span class="ident">cx</span>, <span class="ident">cy</span>))
+		<span class="prelude-val">Ok</span>(SIZE::new(cx, cy))
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

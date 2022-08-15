@@ -449,456 +449,456 @@
 <span id="449">449</span>
 <span id="450">450</span>
 <span id="451">451</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Windows API and GUI in safe, idiomatic Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Crate](https://crates.io/crates/winsafe) •</span>
-<span class="doccomment">//! [GitHub](https://github.com/rodrigocfd/winsafe) •</span>
-<span class="doccomment">//! [Docs (stable)](https://docs.rs/winsafe/) •</span>
-<span class="doccomment">//! [Docs (master branch)](https://rodrigocfd.github.io/winsafe/winsafe/) •</span>
-<span class="doccomment">//! [Examples](https://github.com/rodrigocfd/winsafe-examples)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! WinSafe has:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * low-level Win32 API constants, functions and structs;</span>
-<span class="doccomment">//! * high-level structs to build native Win32 GUI applications.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you&#39;re looking for a comprehensive Win32 coverage, take a look at</span>
-<span class="doccomment">//! [winapi](https://crates.io/crates/winapi) or</span>
-<span class="doccomment">//! [windows](https://crates.io/crates/windows) crates, which are *unsafe*, but</span>
-<span class="doccomment">//! have everything.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Add the dependency in your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! winsafe = { version = &quot;0.0.10&quot;, features = [] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Then you must enable the</span>
-<span class="doccomment">//! [Cargo features](https://doc.rust-lang.org/cargo/reference/features.html#the-features-section)</span>
-<span class="doccomment">//! you want to be included – these modules are named after native Windows DLL</span>
-<span class="doccomment">//! and library names, mostly.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following Cargo features are available so far:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature | Description |</span>
-<span class="doccomment">//! | - | - |</span>
-<span class="doccomment">//! | `advapi` | Advapi32.dll, for Windows Registry |</span>
-<span class="doccomment">//! | `comctl` | ComCtl32.dll, for [Common Controls](https://docs.microsoft.com/en-us/windows/win32/api/_controls/) |</span>
-<span class="doccomment">//! | `comdlg` | ComDlg32.dll, for the old [Common Dialogs](https://docs.microsoft.com/en-us/windows/win32/uxguide/win-common-dlg) |</span>
-<span class="doccomment">//! | `dshow` | [DirectShow](https://docs.microsoft.com/en-us/windows/win32/directshow/directshow) |</span>
-<span class="doccomment">//! | `gdi` | Gdi32.dll, the [Windows GDI](https://docs.microsoft.com/en-us/windows/win32/gdi/windows-gdi) |</span>
-<span class="doccomment">//! | **[`gui`](crate::gui)** | **The WinSafe high-level GUI structs** |</span>
-<span class="doccomment">//! | `kernel` | Kernel32.dll, required by all others |</span>
-<span class="doccomment">//! | `msimg` | Msimg32.dll |</span>
-<span class="doccomment">//! | `ole` | OLE and basic COM support |</span>
-<span class="doccomment">//! | `oleaut` | [OLE Automation](https://docs.microsoft.com/en-us/windows/win32/api/_automat/) |</span>
-<span class="doccomment">//! | `shell` | Shell32.dll and Shlwapi.dll, the COM-based [Windows Shell](https://docs.microsoft.com/en-us/windows/win32/shell/shell-entry) |</span>
-<span class="doccomment">//! | `user` | User32.dll, the basic Windows UI support |</span>
-<span class="doccomment">//! | `uxtheme` | UxTheme.dll, extended UI theming |</span>
-<span class="doccomment">//! | `version` | Version.dll, to manipulate *.exe version info |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that a Cargo feature may depend on other features, which will be</span>
-<span class="doccomment">//! enabled automatically.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # The GUI API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! WinSafe features idiomatic bindings for the Win32 API, but on top of that,</span>
-<span class="doccomment">//! it features a set of high-level GUI structs, which scaffolds the boilerplate</span>
-<span class="doccomment">//! needed to build native Win32 GUI applications, event-oriented. Unless you&#39;re</span>
-<span class="doccomment">//! doing something really specific, these high-level wrappers are highly</span>
-<span class="doccomment">//! recommended – you&#39;ll usually start with the</span>
-<span class="doccomment">//! [`WindowMain`](crate::gui::WindowMain).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! One of the greatest strenghts of the GUI API is supporting the use of</span>
-<span class="doccomment">//! resource files, which can be created with a WYSIWYG</span>
-<span class="doccomment">//! [resource editor](https://en.wikipedia.org/wiki/Resource_(Windows)#Resource_software).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! GUI structs can be found in module [`gui`](crate::gui).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Native function calls</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The best way to understand the idea behind WinSafe bindings is comparing</span>
-<span class="doccomment">//! them to the correspondent C code.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, take the following C code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```c</span>
-<span class="doccomment">//! HWND hwnd = GetDesktopWindow();</span>
-<span class="doccomment">//! SetFocus(hwnd);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is equivalent to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! use winsafe::prelude::*;</span>
-<span class="doccomment">//! use winsafe::HWND;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let hwnd = HWND::GetDesktopWindow();</span>
-<span class="doccomment">//! hwnd.SetFocus();</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note how [`GetDesktopWindow`](crate::prelude::user_Hwnd::GetDesktopWindow)</span>
-<span class="doccomment">//! is a static method of [`HWND`](crate::HWND), and</span>
-<span class="doccomment">//! [`SetFocus`](crate::prelude::user_Hwnd::SetFocus) is an instance method</span>
-<span class="doccomment">//! called directly upon `hwnd`. All native handles (`HWND`,</span>
-<span class="doccomment">//! [`HDC`](crate::HDC), [`HINSTANCE`](crate::HINSTANCE), etc.) are structs,</span>
-<span class="doccomment">//! thus:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * native Win32 functions that return a handle are *static methods* in WinSafe;</span>
-<span class="doccomment">//! * native Win32 functions whose *first parameter* is a handle are *instance methods*.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Now this C code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```c</span>
-<span class="doccomment">//! PostQuitMessage(0);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Is equivalent to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! use winsafe::prelude::*;</span>
-<span class="doccomment">//! use winsafe::PostQuitMessage;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! PostQuitMessage(0);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Since [`PostQuitMessage`](crate::PostQuitMessage) is a free function, it&#39;s</span>
-<span class="doccomment">//! simply at the root of the crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Native constants</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All native Win32 constants can be found in the [`co`](crate::co) module.</span>
-<span class="doccomment">//! They&#39;re all *typed*, what means that different constant types cannot be</span>
-<span class="doccomment">//! mixed (unless you explicitly say so).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Technically, each constant type is simply a</span>
-<span class="doccomment">//! [newtype](https://doc.rust-lang.org/rust-by-example/generics/new_types.html)</span>
-<span class="doccomment">//! with a couple implementations, including those allowing bitflag operations.</span>
-<span class="doccomment">//! Also, all constant values can be converted to its underlying</span>
-<span class="doccomment">//! [integer type](https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The name of the constant type is often its prefix. For example, constants of</span>
-<span class="doccomment">//! [`MessageBox`](crate::prelude::user_Hwnd::MessageBox) function, like</span>
-<span class="doccomment">//! `MB_OKCANCEL`, belong to a type called [`MB`](crate::co::MB).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, take the following C code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```c</span>
-<span class="doccomment">//! let hwnd = GetDesktopWindow();</span>
-<span class="doccomment">//! MessageBox(hwnd, &quot;Hello, world&quot;, &quot;My hello&quot;, MB_OKCANCEL | MB_ICONINFORMATION);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is equivalent to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! use winsafe::prelude::*;</span>
-<span class="doccomment">//! use winsafe::{co::MB, HWND};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let hwnd = HWND::GetDesktopWindow();</span>
-<span class="doccomment">//! hwnd.MessageBox(&quot;Hello, world&quot;, &quot;Title&quot;, MB::OKCANCEL | MB::ICONINFORMATION)?;</span>
-<span class="doccomment">//! # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The method [`MessageBox`](crate::prelude::user_Hwnd::MessageBox), like most</span>
-<span class="doccomment">//! functions that can return errors, will return</span>
-<span class="doccomment">//! [`WinResult`](crate::WinResult), which can contain an</span>
-<span class="doccomment">//! [`ERROR`](crate::co::ERROR) constant.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Native structs</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! WinSafe implements native Win32 structs in a very restricted way. First off,</span>
-<span class="doccomment">//! fields which control the size of the struct – often named `cbSize` – are</span>
-<span class="doccomment">//! *private* and automatically set when the struct is instantiated.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Pointer fields are also private, and they can be set and retrieved *only*</span>
-<span class="doccomment">//! through getter and setter methods. In particular, when setting a string</span>
-<span class="doccomment">//! pointer field, you need to pass a reference to a [`WString`](crate::WString)</span>
-<span class="doccomment">//! buffer, which will keep the actual string contents.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, the following C code:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```c</span>
-<span class="doccomment">//! WNDCLASSEX wcx = {0};</span>
-<span class="doccomment">//! wcx.cbSize = sizeof(WNDCLASSEX);</span>
-<span class="doccomment">//! wcx.lpszClassName = &quot;MY_WINDOW&quot;;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! if (RegisterClassEx(&amp;wcx) == 0) {</span>
-<span class="doccomment">//!     DWORD err = GetLastError();</span>
-<span class="doccomment">//!     // handle error...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Is equivalent to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! use winsafe::prelude::*;</span>
-<span class="doccomment">//! use winsafe::{RegisterClassEx, WNDCLASSEX, WString};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let mut wcx = WNDCLASSEX::default();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let mut buf = WString::from_str(&quot;MY_WINDOW&quot;);</span>
-<span class="doccomment">//! wcx.set_lpszClassName(Some(&amp;mut buf));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! if let Err(err) = RegisterClassEx(&amp;wcx) {</span>
-<span class="doccomment">//!     // handle error...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note how you *don&#39;t need* to call [`GetLastError`](crate::GetLastError) to</span>
-<span class="doccomment">//! retrieve the error code: it&#39;s returned by the method itself in the</span>
-<span class="doccomment">//! [`WinResult`](crate::WinResult).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Text encoding</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Windows natively uses</span>
-<span class="doccomment">//! [Unicode UTF-16](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! WinSafe uses Unicode UTF-16 internally but exposes idiomatic UTF-8,</span>
-<span class="doccomment">//! performing conversions automatically when needed, so you don&#39;t have to worry</span>
-<span class="doccomment">//! about [`OsString`](https://doc.rust-lang.org/std/ffi/struct.OsString.html)</span>
-<span class="doccomment">//! or any low-level conversion.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! However, there are cases where a string conversion is still needed, like</span>
-<span class="doccomment">//! when dealing with native Win32 structs. In such cases, you can use the</span>
-<span class="doccomment">//! [`WString`](crate::WString) struct, which is also capable of working as a</span>
-<span class="doccomment">//! buffer to receive text from Win32 calls.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Errors and result aliases</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! WinSafe declares a few</span>
-<span class="doccomment">//! [`Result` aliases](https://doc.rust-lang.org/rust-by-example/error/result/result_alias.html)</span>
-<span class="doccomment">//! which are returned by its functions and methods:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Alias | Error | Used for |</span>
-<span class="doccomment">//! | - | - | - |</span>
-<span class="doccomment">//! | [`WinResult`](crate::WinResult) | [`ERROR`](crate::co::ERROR) | Standard [system errors](https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes). |</span>
-<span class="doccomment">//! | [`HrResult`](crate::HrResult) | [`HRESULT`](crate::co::HRESULT) | [COM errors](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/0642cb2f-2075-4469-918c-4441e69c548a).</span>
-<span class="doccomment">//! | [`MsgResult`](crate::gui::MsgResult) | [`MsgError`](crate::gui::MsgError) | Errors from a closure of a window message handling. |</span>
-<span class="doccomment">//! | [`AnyResult`](crate::AnyResult) | `Box&lt;dyn Error + Send + Sync&gt;` | Holding different error types – all other `Result` aliases can be converted into it. |</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Windows API and GUI in safe, idiomatic Rust.
+//!
+//! [Crate](https://crates.io/crates/winsafe) •
+//! [GitHub](https://github.com/rodrigocfd/winsafe) •
+//! [Docs (stable)](https://docs.rs/winsafe/) •
+//! [Docs (master branch)](https://rodrigocfd.github.io/winsafe/winsafe/) •
+//! [Examples](https://github.com/rodrigocfd/winsafe-examples)
+//!
+//! WinSafe has:
+//!
+//! * low-level Win32 API constants, functions and structs;
+//! * high-level structs to build native Win32 GUI applications.
+//!
+//! If you&#39;re looking for a comprehensive Win32 coverage, take a look at
+//! [winapi](https://crates.io/crates/winapi) or
+//! [windows](https://crates.io/crates/windows) crates, which are *unsafe*, but
+//! have everything.
+//!
+//! # Usage
+//!
+//! Add the dependency in your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! winsafe = { version = &quot;0.0.10&quot;, features = [] }
+//! ```
+//!
+//! Then you must enable the
+//! [Cargo features](https://doc.rust-lang.org/cargo/reference/features.html#the-features-section)
+//! you want to be included – these modules are named after native Windows DLL
+//! and library names, mostly.
+//!
+//! The following Cargo features are available so far:
+//!
+//! | Feature | Description |
+//! | - | - |
+//! | `advapi` | Advapi32.dll, for Windows Registry |
+//! | `comctl` | ComCtl32.dll, for [Common Controls](https://docs.microsoft.com/en-us/windows/win32/api/_controls/) |
+//! | `comdlg` | ComDlg32.dll, for the old [Common Dialogs](https://docs.microsoft.com/en-us/windows/win32/uxguide/win-common-dlg) |
+//! | `dshow` | [DirectShow](https://docs.microsoft.com/en-us/windows/win32/directshow/directshow) |
+//! | `gdi` | Gdi32.dll, the [Windows GDI](https://docs.microsoft.com/en-us/windows/win32/gdi/windows-gdi) |
+//! | **[`gui`](crate::gui)** | **The WinSafe high-level GUI structs** |
+//! | `kernel` | Kernel32.dll, required by all others |
+//! | `msimg` | Msimg32.dll |
+//! | `ole` | OLE and basic COM support |
+//! | `oleaut` | [OLE Automation](https://docs.microsoft.com/en-us/windows/win32/api/_automat/) |
+//! | `shell` | Shell32.dll and Shlwapi.dll, the COM-based [Windows Shell](https://docs.microsoft.com/en-us/windows/win32/shell/shell-entry) |
+//! | `user` | User32.dll, the basic Windows UI support |
+//! | `uxtheme` | UxTheme.dll, extended UI theming |
+//! | `version` | Version.dll, to manipulate *.exe version info |
+//!
+//! Note that a Cargo feature may depend on other features, which will be
+//! enabled automatically.
+//!
+//! # The GUI API
+//!
+//! WinSafe features idiomatic bindings for the Win32 API, but on top of that,
+//! it features a set of high-level GUI structs, which scaffolds the boilerplate
+//! needed to build native Win32 GUI applications, event-oriented. Unless you&#39;re
+//! doing something really specific, these high-level wrappers are highly
+//! recommended – you&#39;ll usually start with the
+//! [`WindowMain`](crate::gui::WindowMain).
+//!
+//! One of the greatest strenghts of the GUI API is supporting the use of
+//! resource files, which can be created with a WYSIWYG
+//! [resource editor](https://en.wikipedia.org/wiki/Resource_(Windows)#Resource_software).
+//!
+//! GUI structs can be found in module [`gui`](crate::gui).
+//!
+//! # Native function calls
+//!
+//! The best way to understand the idea behind WinSafe bindings is comparing
+//! them to the correspondent C code.
+//!
+//! For example, take the following C code:
+//!
+//! ```c
+//! HWND hwnd = GetDesktopWindow();
+//! SetFocus(hwnd);
+//! ```
+//!
+//! This is equivalent to:
+//!
+//! ```rust,ignore
+//! use winsafe::prelude::*;
+//! use winsafe::HWND;
+//!
+//! let hwnd = HWND::GetDesktopWindow();
+//! hwnd.SetFocus();
+//! ```
+//!
+//! Note how [`GetDesktopWindow`](crate::prelude::user_Hwnd::GetDesktopWindow)
+//! is a static method of [`HWND`](crate::HWND), and
+//! [`SetFocus`](crate::prelude::user_Hwnd::SetFocus) is an instance method
+//! called directly upon `hwnd`. All native handles (`HWND`,
+//! [`HDC`](crate::HDC), [`HINSTANCE`](crate::HINSTANCE), etc.) are structs,
+//! thus:
+//!
+//! * native Win32 functions that return a handle are *static methods* in WinSafe;
+//! * native Win32 functions whose *first parameter* is a handle are *instance methods*.
+//!
+//! Now this C code:
+//!
+//! ```c
+//! PostQuitMessage(0);
+//! ```
+//!
+//! Is equivalent to:
+//!
+//! ```rust,ignore
+//! use winsafe::prelude::*;
+//! use winsafe::PostQuitMessage;
+//!
+//! PostQuitMessage(0);
+//! ```
+//!
+//! Since [`PostQuitMessage`](crate::PostQuitMessage) is a free function, it&#39;s
+//! simply at the root of the crate.
+//!
+//! # Native constants
+//!
+//! All native Win32 constants can be found in the [`co`](crate::co) module.
+//! They&#39;re all *typed*, what means that different constant types cannot be
+//! mixed (unless you explicitly say so).
+//!
+//! Technically, each constant type is simply a
+//! [newtype](https://doc.rust-lang.org/rust-by-example/generics/new_types.html)
+//! with a couple implementations, including those allowing bitflag operations.
+//! Also, all constant values can be converted to its underlying
+//! [integer type](https://doc.rust-lang.org/book/ch03-02-data-types.html#integer-types).
+//!
+//! The name of the constant type is often its prefix. For example, constants of
+//! [`MessageBox`](crate::prelude::user_Hwnd::MessageBox) function, like
+//! `MB_OKCANCEL`, belong to a type called [`MB`](crate::co::MB).
+//!
+//! For example, take the following C code:
+//!
+//! ```c
+//! let hwnd = GetDesktopWindow();
+//! MessageBox(hwnd, &quot;Hello, world&quot;, &quot;My hello&quot;, MB_OKCANCEL | MB_ICONINFORMATION);
+//! ```
+//!
+//! This is equivalent to:
+//!
+//! ```rust,ignore
+//! use winsafe::prelude::*;
+//! use winsafe::{co::MB, HWND};
+//!
+//! let hwnd = HWND::GetDesktopWindow();
+//! hwnd.MessageBox(&quot;Hello, world&quot;, &quot;Title&quot;, MB::OKCANCEL | MB::ICONINFORMATION)?;
+//! # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+//! ```
+//!
+//! The method [`MessageBox`](crate::prelude::user_Hwnd::MessageBox), like most
+//! functions that can return errors, will return
+//! [`SysResult`](crate::SysResult), which can contain an
+//! [`ERROR`](crate::co::ERROR) constant.
+//!
+//! # Native structs
+//!
+//! WinSafe implements native Win32 structs in a very restricted way. First off,
+//! fields which control the size of the struct – often named `cbSize` – are
+//! *private* and automatically set when the struct is instantiated.
+//!
+//! Pointer fields are also private, and they can be set and retrieved *only*
+//! through getter and setter methods. In particular, when setting a string
+//! pointer field, you need to pass a reference to a [`WString`](crate::WString)
+//! buffer, which will keep the actual string contents.
+//!
+//! For example, the following C code:
+//!
+//! ```c
+//! WNDCLASSEX wcx = {0};
+//! wcx.cbSize = sizeof(WNDCLASSEX);
+//! wcx.lpszClassName = &quot;MY_WINDOW&quot;;
+//!
+//! if (RegisterClassEx(&amp;wcx) == 0) {
+//!     DWORD err = GetLastError();
+//!     // handle error...
+//! }
+//! ```
+//!
+//! Is equivalent to:
+//!
+//! ```rust,ignore
+//! use winsafe::prelude::*;
+//! use winsafe::{RegisterClassEx, WNDCLASSEX, WString};
+//!
+//! let mut wcx = WNDCLASSEX::default();
+//!
+//! let mut buf = WString::from_str(&quot;MY_WINDOW&quot;);
+//! wcx.set_lpszClassName(Some(&amp;mut buf));
+//!
+//! if let Err(err) = RegisterClassEx(&amp;wcx) {
+//!     // handle error...
+//! }
+//! ```
+//!
+//! Note how you *don&#39;t need* to call [`GetLastError`](crate::GetLastError) to
+//! retrieve the error code: it&#39;s returned by the method itself in the
+//! [`SysResult`](crate::SysResult).
+//!
+//! # Text encoding
+//!
+//! Windows natively uses
+//! [Unicode UTF-16](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings).
+//!
+//! WinSafe uses Unicode UTF-16 internally but exposes idiomatic UTF-8,
+//! performing conversions automatically when needed, so you don&#39;t have to worry
+//! about [`OsString`](https://doc.rust-lang.org/std/ffi/struct.OsString.html)
+//! or any low-level conversion.
+//!
+//! However, there are cases where a string conversion is still needed, like
+//! when dealing with native Win32 structs. In such cases, you can use the
+//! [`WString`](crate::WString) struct, which is also capable of working as a
+//! buffer to receive text from Win32 calls.
+//!
+//! # Errors and result aliases
+//!
+//! WinSafe declares a few
+//! [`Result` aliases](https://doc.rust-lang.org/rust-by-example/error/result/result_alias.html)
+//! which are returned by its functions and methods:
+//!
+//! | Alias | Error | Used for |
+//! | - | - | - |
+//! | [`SysResult`](crate::SysResult) | [`ERROR`](crate::co::ERROR) | Standard [system errors](https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes). |
+//! | [`HrResult`](crate::HrResult) | [`HRESULT`](crate::co::HRESULT) | [COM errors](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/0642cb2f-2075-4469-918c-4441e69c548a).
+//! | [`MsgResult`](crate::gui::MsgResult) | [`MsgError`](crate::gui::MsgError) | Errors from a closure of a window message handling. Usually these are the errors thrown by the user. |
+//! | [`AnyResult`](crate::AnyResult) | `Box&lt;dyn Error + Send + Sync&gt;` | Holding different error types. All other `Result` aliases can be converted into it. |
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+</span><span class="attribute">#![cfg_attr(docsrs, feature(doc_cfg))]</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="attribute">#[macro_use]</span> <span class="kw">mod </span>macros;
 
-<span class="kw">mod</span> <span class="ident">ffi_types</span>;
+<span class="kw">mod </span>ffi_types;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">mod</span> <span class="ident">comctl_gdi</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">mod</span> <span class="ident">comctl_ole</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>))]</span> <span class="kw">mod</span> <span class="ident">comctl_shell</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">mod</span> <span class="ident">dshow_gdi</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>))]</span> <span class="kw">mod</span> <span class="ident">gdi_oleaut</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">advapi</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">comctl</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">comdlg</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">dshow</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">gdi</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">kernel</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;msimg&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">msimg</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">ole</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">oleaut</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">shell</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">user</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">uxtheme</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">version</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">mod </span>comctl_gdi;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">mod </span>comctl_ole;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))]</span> <span class="kw">mod </span>comctl_shell;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;dshow&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">mod </span>dshow_gdi;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;oleaut&quot;</span>))]</span> <span class="kw">mod </span>gdi_oleaut;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">mod </span>advapi;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">mod </span>comctl;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">mod </span>comdlg;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">mod </span>dshow;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">mod </span>gdi;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">mod </span>kernel;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;msimg&quot;</span>)]</span> <span class="kw">mod </span>msimg;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">mod </span>ole;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">mod </span>oleaut;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">mod </span>shell;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">mod </span>user;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">mod </span>uxtheme;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">mod </span>version;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gui</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gui&quot;</span>)]</span> <span class="kw">pub mod </span>gui;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comctl_gdi::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comctl_ole::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">advapi::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comctl::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">comdlg::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dshow::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">gdi::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kernel::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ole::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">oleaut::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">shell::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">user::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uxtheme::decl</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">version::decl</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">pub use </span>comctl_gdi::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">pub use </span>comctl_ole::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub use </span>advapi::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span>comctl::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">pub use </span>comdlg::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub use </span>dshow::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub use </span>gdi::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub use </span>kernel::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span>ole::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub use </span>oleaut::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub use </span>shell::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub use </span>user::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub use </span>uxtheme::decl::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">pub use </span>version::decl::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">co</span> {
-	<span class="doccomment">//! Native constants.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! All types can be converted from/to their underlying integer type. Some</span>
-	<span class="doccomment">//! types implement the [`NativeBitflag`](crate::prelude::NativeBitflag)</span>
-	<span class="doccomment">//! trait and bitflag operations.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! Among these constant types, three are error types:</span>
-	<span class="doccomment">//! [`CDERR`](crate::co::CDERR), [`ERROR`](crate::co::ERROR) and</span>
-	<span class="doccomment">//! [`HRESULT`](crate::co::HRESULT).</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::advapi::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comdlg::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::dshow::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gdi::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::kernel::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ole::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::oleaut::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::shell::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::uxtheme::co</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::version::co</span>::<span class="kw-2">*</span>;
+<span class="kw">pub mod </span>co {
+	<span class="doccomment">//! Native constants.
+	//!
+	//! All types can be converted from/to their underlying integer type. Some
+	//! types implement the [`NativeBitflag`](crate::prelude::NativeBitflag)
+	//! trait and bitflag operations.
+	//!
+	//! Among these constant types, three are error types:
+	//! [`CDERR`](crate::co::CDERR), [`ERROR`](crate::co::ERROR) and
+	//! [`HRESULT`](crate::co::HRESULT).
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::advapi::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comdlg&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comdlg::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::dshow::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::gdi::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::kernel::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::ole::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::oleaut::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::shell::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::user::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::uxtheme::co::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;version&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::version::co::<span class="kw-2">*</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">msg</span> {
-	<span class="doccomment">//! Parameters of</span>
-	<span class="doccomment">//! [window messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues).</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! [`WndMsg`](crate::msg::WndMsg) is the generic message, with `WPARAM` and</span>
-	<span class="doccomment">//! `LPARAM` fields. Other messages belong to a module according to its</span>
-	<span class="doccomment">//! prefix, for example, [`BM_CLICK`](crate::msg::bm::Click) can be found in</span>
-	<span class="doccomment">//! [`bm`](crate::msg::bm) module.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! # Examples</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! We want to delete the 3rd element of a</span>
-	<span class="doccomment">//! [`ListView`](crate::gui::ListView) control. This can be done by sending</span>
-	<span class="doccomment">//! it an [`LVM_DELETEITEM`](crate::msg::lvm::DeleteItem) message via</span>
-	<span class="doccomment">//! [`HWND::SendMessage`](crate::prelude::user_Hwnd::SendMessage). The</span>
-	<span class="doccomment">//! message itself is a struct, which is initialized with the specific</span>
-	<span class="doccomment">//! message parameters.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! The message struct also defines the data type returned by `SendMessage`.</span>
-	<span class="doccomment">//! In the example below, `LVM_DELETEITEM` returns `WinResult&lt;()&gt;`.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! ```rust,ignore</span>
-	<span class="doccomment">//! use winsafe::prelude::*;</span>
-	<span class="doccomment">//! use winsafe::{HWND, msg::lvm};</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! let hlistview: HWND; // initialized somewhere</span>
-	<span class="doccomment">//! # let hlistview = HWND::NULL;</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! hlistview.SendMessage(</span>
-	<span class="doccomment">//!     lvm::DeleteItem {</span>
-	<span class="doccomment">//!         index: 2,</span>
-	<span class="doccomment">//!     },</span>
-	<span class="doccomment">//! ).expect(&quot;Failed to delete item 2.&quot;);</span>
-	<span class="doccomment">//! ```</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! Messages are organized into modules according to their prefixes:</span>
-	<span class="doccomment">//! [`wm`](crate::msg::wm) (window messages), [`lvm`](crate::msg::lvm) (list</span>
-	<span class="doccomment">//! view messages), and so on.</span>
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>, feature = <span class="string">&quot;user&quot;</span>))]</span>
+<span class="kw">pub mod </span>msg {
+	<span class="doccomment">//! Parameters of
+	//! [window messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues).
+	//!
+	//! [`WndMsg`](crate::msg::WndMsg) is the generic message, with `WPARAM` and
+	//! `LPARAM` fields. Other messages belong to a module according to its
+	//! prefix, for example, [`BM_CLICK`](crate::msg::bm::Click) can be found in
+	//! [`bm`](crate::msg::bm) module.
+	//!
+	//! # Examples
+	//!
+	//! We want to delete the 3rd element of a
+	//! [`ListView`](crate::gui::ListView) control. This can be done by sending
+	//! it an [`LVM_DELETEITEM`](crate::msg::lvm::DeleteItem) message via
+	//! [`HWND::SendMessage`](crate::prelude::user_Hwnd::SendMessage). The
+	//! message itself is a struct, which is initialized with the specific
+	//! message parameters.
+	//!
+	//! The message struct also defines the data type returned by `SendMessage`.
+	//! In the example below, `LVM_DELETEITEM` returns `SysResult&lt;()&gt;`.
+	//!
+	//! ```rust,ignore
+	//! use winsafe::prelude::*;
+	//! use winsafe::{HWND, msg::lvm};
+	//!
+	//! let hlistview: HWND; // initialized somewhere
+	//! # let hlistview = HWND::NULL;
+	//!
+	//! hlistview.SendMessage(
+	//!     lvm::DeleteItem {
+	//!         index: 2,
+	//!     },
+	//! ).expect(&quot;Failed to delete item 2.&quot;);
+	//! ```
+	//!
+	//! Messages are organized into modules according to their prefixes:
+	//! [`wm`](crate::msg::wm) (window messages), [`lvm`](crate::msg::lvm) (list
+	//! view messages), and so on.
 
-	<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user::messages::WndMsg</span>;
+	</span><span class="kw">pub use </span><span class="kw">super</span>::user::messages::WndMsg;
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bm</span> {
-		<span class="doccomment">//! Button control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-button-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`BM`](crate::co::BM) and</span>
-		<span class="doccomment">//! [`BCM`](crate::co::BCM) prefixes.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::bcm</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::user::messages::bm</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span>
+	<span class="kw">pub mod </span>bm {
+		<span class="doccomment">//! Button control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-button-control-reference-messages),
+		//! whose constants have [`BM`](crate::co::BM) and
+		//! [`BCM`](crate::co::BCM) prefixes.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::bcm::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::user::messages::bm::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cb</span> {
-		<span class="doccomment">//! Combo box control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-combobox-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`CB`](crate::co::CB) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::cb</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::user::messages::cb</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span>
+	<span class="kw">pub mod </span>cb {
+		<span class="doccomment">//! Combo box control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-combobox-control-reference-messages),
+		//! whose constants have [`CB`](crate::co::CB) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::cb::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::user::messages::cb::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dtm</span> {
-		<span class="doccomment">//! Date and time picker control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-date-and-time-picker-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`DTM`](crate::co::DTM) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl_gdi::messages::dtm</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::dtm</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span>
+	<span class="kw">pub mod </span>dtm {
+		<span class="doccomment">//! Date and time picker control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-date-and-time-picker-control-reference-messages),
+		//! whose constants have [`DTM`](crate::co::DTM) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl_gdi::messages::dtm::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::dtm::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">em</span> {
-		<span class="doccomment">//! Edit control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-edit-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`EM`](crate::co::EM) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::em</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::user::messages::em</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span>
+	<span class="kw">pub mod </span>em {
+		<span class="doccomment">//! Edit control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-edit-control-reference-messages),
+		//! whose constants have [`EM`](crate::co::EM) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::em::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::user::messages::em::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::hdm</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user::messages::lb</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::hdm;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::user::messages::lb;
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">lvm</span> {
-		<span class="doccomment">//! List view control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-list-view-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`LVM`](crate::co::LVM) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl_ole::messages::lvm</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::lvm</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span>
+	<span class="kw">pub mod </span>lvm {
+		<span class="doccomment">//! List view control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-list-view-control-reference-messages),
+		//! whose constants have [`LVM`](crate::co::LVM) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl_ole::messages::lvm::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::lvm::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::mcm</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::pbm</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::sb</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::stm</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::tbm</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::messages::trbm</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::mcm;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::pbm;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::sb;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::stm;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::tbm;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::messages::trbm;
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tvm</span> {
-		<span class="doccomment">//! Tree view control</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-tree-view-control-reference-messages),</span>
-		<span class="doccomment">//! whose constants have [`TVM`](crate::co::TVM) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl_ole::messages::tvm</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::tvm</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span>
+	<span class="kw">pub mod </span>tvm {
+		<span class="doccomment">//! Tree view control
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-tree-view-control-reference-messages),
+		//! whose constants have [`TVM`](crate::co::TVM) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl_ole::messages::tvm::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::tvm::<span class="kw-2">*</span>;
 	}
 
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">wm</span> {
-		<span class="doccomment">//! Generic window</span>
-		<span class="doccomment">//! [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues),</span>
-		<span class="doccomment">//! whose constants have [`WM`](crate::co::WM) prefix.</span>
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::wm</span>::<span class="kw-2">*</span>;
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::gdi::messages::wm</span>::<span class="kw-2">*</span>;
-		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::shell::messages::wm</span>::<span class="kw-2">*</span>;
-		<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::user::messages::wm</span>::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span>
+	<span class="kw">pub mod </span>wm {
+		<span class="doccomment">//! Generic window
+		//! [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues),
+		//! whose constants have [`WM`](crate::co::WM) prefix.
+		</span><span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::wm::<span class="kw-2">*</span>;
+		<span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::gdi::messages::wm::<span class="kw-2">*</span>;
+		<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::shell::messages::wm::<span class="kw-2">*</span>;
+		<span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::user::messages::wm::<span class="kw-2">*</span>;
 	}
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
-	<span class="doccomment">//! The WinSafe prelude.</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! The purpose of this module is to alleviate imports of many common</span>
-	<span class="doccomment">//! traits. To use it, add a glob import to the top of all your modules that</span>
-	<span class="doccomment">//! use the library:</span>
-	<span class="doccomment">//!</span>
-	<span class="doccomment">//! ```rust,no_run</span>
-	<span class="doccomment">//! use winsafe::prelude::*;</span>
-	<span class="doccomment">//! ```</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gdi_oleaut::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl_ole::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl_shell::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::dshow_gdi::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::advapi::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::comctl::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::dshow::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gdi::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gui::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::kernel::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;msimg&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::msimg::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ole::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::oleaut::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::shell::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user::traits</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::uxtheme::traits</span>::<span class="kw-2">*</span>;
+<span class="kw">pub mod </span>prelude {
+	<span class="doccomment">//! The WinSafe prelude.
+	//!
+	//! The purpose of this module is to alleviate imports of many common
+	//! traits. To use it, add a glob import to the top of all your modules that
+	//! use the library:
+	//!
+	//! ```rust,no_run
+	//! use winsafe::prelude::*;
+	//! ```
+	</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;oleaut&quot;</span>))]</span> <span class="kw">pub use </span><span class="kw">super</span>::gdi_oleaut::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl_ole::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl_shell::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(all(feature = <span class="string">&quot;dshow&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))]</span> <span class="kw">pub use </span><span class="kw">super</span>::dshow_gdi::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::advapi::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::comctl::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::dshow::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::gdi::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;gui&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::gui::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::kernel::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;msimg&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::msimg::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::ole::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::oleaut::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::shell::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;user&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::user::traits::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::uxtheme::traits::<span class="kw-2">*</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">vt</span> {
-	<span class="doccomment">//! Virtual tables of COM interfaces.</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::dshow::vt</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ole::vt</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::oleaut::vt</span>::<span class="kw-2">*</span>;
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::shell::vt</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;ole&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))]</span>
+<span class="kw">pub mod </span>vt {
+	<span class="doccomment">//! Virtual tables of COM interfaces.
+	</span><span class="attribute">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::dshow::vt::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::ole::vt::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::oleaut::vt::<span class="kw-2">*</span>;
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)]</span> <span class="kw">pub use </span><span class="kw">super</span>::shell::vt::<span class="kw-2">*</span>;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -6,7 +6,7 @@
 <a href="../struct.IShellItemArray.html"><code>IShellItemArray</code></a>.</p>
 <p>Prefer importing this trait through the prelude:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">winsafe::prelude</span>::<span class="kw-2">*</span>;</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;</code></pre></div>
 </div></details><h2 id="provided-methods" class="small-section-header">Provided Methods<a href="#provided-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="method.iter" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/winsafe/shell/com_interfaces/ishellitemarray.rs.html#95-97">source</a></div><h4 class="code-header">fn <a href="#method.iter" class="fnname">iter</a>&lt;'a&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;'a self<br>) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;dyn <a class="trait" href="https://doc.rust-lang.org/nightly/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a>&lt;Item = <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;<a class="struct" href="../struct.IShellItem.html" title="struct winsafe::IShellItem">IShellItem</a>&gt;&gt; + 'a&gt;&gt;</h4></div></summary><div class="docblock"><p>Returns an iterator over the <a href="../struct.IShellItem.html"><code>IShellItem</code></a> elements
 by calling
 <a href="trait.shell_IShellItemArray.html#method.GetCount"><code>IShellItemArray::GetCount</code></a>
@@ -16,35 +16,35 @@ consecutively.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Iterating over the <a href="../struct.IShellItem.html"><code>IShellItem</code></a> objects:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">winsafe::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">winsafe</span>::{<span class="ident">co</span>, <span class="ident">IShellItemArray</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>winsafe::{co, IShellItemArray};
 
-<span class="kw">let</span> <span class="ident">ish_arr</span>: <span class="ident">IShellItemArray</span>; <span class="comment">// initialized somewhere</span>
+<span class="kw">let </span>ish_arr: IShellItemArray; <span class="comment">// initialized somewhere
 
-<span class="kw">for</span> <span class="ident">ish_item</span> <span class="kw">in</span> <span class="ident">ish_arr</span>.<span class="ident">iter</span>()<span class="question-mark">?</span> {
-    <span class="kw">let</span> <span class="ident">ish_item</span> <span class="op">=</span> <span class="ident">ish_item</span><span class="question-mark">?</span>;
+</span><span class="kw">for </span>ish_item <span class="kw">in </span>ish_arr.iter()<span class="question-mark">? </span>{
+    <span class="kw">let </span>ish_item = ish_item<span class="question-mark">?</span>;
     <span class="macro">println!</span>(<span class="string">&quot;Path: {}&quot;</span>,
-        <span class="ident">ish_item</span>.<span class="ident">GetDisplayName</span>(<span class="ident">co::SIGDN::FILESYSPATH</span>)<span class="question-mark">?</span>);
+        ish_item.GetDisplayName(co::SIGDN::FILESYSPATH)<span class="question-mark">?</span>);
 }</code></pre></div>
 <p>Collecting the file paths into a
 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a>:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">winsafe::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">winsafe</span>::{<span class="ident">co</span>, <span class="ident">HrResult</span>, <span class="ident">IShellItemArray</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>winsafe::{co, HrResult, IShellItemArray};
 
-<span class="kw">let</span> <span class="ident">ish_arr</span>: <span class="ident">IShellItemArray</span>; <span class="comment">// initialized somewhere</span>
+<span class="kw">let </span>ish_arr: IShellItemArray; <span class="comment">// initialized somewhere
 
-<span class="kw">let</span> <span class="ident">paths</span> <span class="op">=</span> <span class="ident">ish_arr</span>.<span class="ident">iter</span>()<span class="question-mark">?</span>
-    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">shi</span><span class="op">|</span>
-        <span class="ident">shi</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">shi</span><span class="op">|</span>
-            <span class="ident">shi</span>.<span class="ident">GetDisplayName</span>(<span class="ident">co::SIGDN::FILESYSPATH</span>),
+</span><span class="kw">let </span>paths = ish_arr.iter()<span class="question-mark">?
+    </span>.map(|shi|
+        shi.and_then(|shi|
+            shi.GetDisplayName(co::SIGDN::FILESYSPATH),
         ),
     )
-    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;</code></pre></div>
+    .collect::&lt;HrResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.GetCount" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/winsafe/shell/com_interfaces/ishellitemarray.rs.html#102-108">source</a></div><h4 class="code-header">fn <a href="#method.GetCount" class="fnname">GetCount</a>(&amp;self) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>&gt;</h4></div></summary><div class="docblock"><p><a href="https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getcount"><code>IShellItemArray::GetCount</code></a>
 method.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.GetItemAt" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/winsafe/shell/com_interfaces/ishellitemarray.rs.html#116-123">source</a></div><h4 class="code-header">fn <a href="#method.GetItemAt" class="fnname">GetItemAt</a>(&amp;self, index: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;<a class="struct" href="../struct.IShellItem.html" title="struct winsafe::IShellItem">IShellItem</a>&gt;</h4></div></summary><div class="docblock"><p><a href="https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getitemat"><code>IShellItemArray::GetItemAt</code></a>
 method.</p>
 <p>Prefer using
 <a href="trait.shell_IShellItemArray.html#method.iter"><code>IShellItemArrayT::iter</code></a>.</p>
-</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-shell_IShellItemArray-for-IShellItemArray" class="impl has-srclink"><span class="rightside"><a class="srclink" href="../../src/winsafe/shell/com_interfaces/ishellitemarray.rs.html#37">source</a></span><a href="#impl-shell_IShellItemArray-for-IShellItemArray" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="trait.shell_IShellItemArray.html" title="trait winsafe::prelude::shell_IShellItemArray">shell_IShellItemArray</a> for <a class="struct" href="../struct.IShellItemArray.html" title="struct winsafe::IShellItemArray">IShellItemArray</a></h3></section></div><script type="text/javascript" src="../../implementors/winsafe/shell/com_interfaces/ishellitemarray/trait.shell_IShellItemArray.js" data-ignore-extern-crates="" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-shell_IShellItemArray-for-IShellItemArray" class="impl has-srclink"><span class="rightside"><a class="srclink" href="../../src/winsafe/shell/com_interfaces/ishellitemarray.rs.html#37">source</a></span><a href="#impl-shell_IShellItemArray-for-IShellItemArray" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="trait.shell_IShellItemArray.html" title="trait winsafe::prelude::shell_IShellItemArray">shell_IShellItemArray</a> for <a class="struct" href="../struct.IShellItemArray.html" title="struct winsafe::IShellItemArray">IShellItemArray</a></h3></section></div><script type="text/javascript" src="../../implementors/winsafe/shell/com_interfaces/ishellitemarray/trait.shell_IShellItemArray.js" data-ignore-extern-crates="" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -46,53 +46,53 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi_oleaut::privs::HIMETRIC_PER_INCH</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::MulDiv</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::gdi_Hdc</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HDC</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gdi_oleaut::privs::HIMETRIC_PER_INCH;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::MulDiv;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::gdi_Hdc;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HDC;
 
-<span class="kw">impl</span> <span class="ident">gdi_oleaut_Hdc</span> <span class="kw">for</span> <span class="ident">HDC</span> {}
+<span class="kw">impl </span>gdi_oleaut_Hdc <span class="kw">for </span>HDC {}
 
-<span class="doccomment">/// This trait is enabled with `gdi` and `oleaut` features, and provides methods</span>
-<span class="doccomment">/// for [`HDC`](crate::HDC).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">gdi_oleaut_Hdc</span>: <span class="ident">gdi_Hdc</span> {
-	<span class="doccomment">/// Converts HIMETRIC units to pixels.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Equivalent to</span>
-	<span class="doccomment">/// [`AtlHiMetricToPixel`](https://docs.microsoft.com/en-us/cpp/atl/reference/pixel-himetric-conversion-global-functions?view=msvc-170#atlhimetrictopixel)</span>
-	<span class="doccomment">/// ATL function.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">HiMetricToPixel</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">i32</span>) {
-		<span class="comment">// http://www.verycomputer.com/5_5f2f75dc2d090ee8_1.htm</span>
-		<span class="comment">// https://forums.codeguru.com/showthread.php?109554-Unresizable-activeX-control</span>
-		(
-			<span class="ident">MulDiv</span>(<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSX</span>), <span class="ident">HIMETRIC_PER_INCH</span>),
-			<span class="ident">MulDiv</span>(<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSY</span>), <span class="ident">HIMETRIC_PER_INCH</span>),
+<span class="doccomment">/// This trait is enabled with `gdi` and `oleaut` features, and provides methods
+/// for [`HDC`](crate::HDC).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;oleaut&quot;</span>))))]</span>
+<span class="kw">pub trait </span>gdi_oleaut_Hdc: gdi_Hdc {
+	<span class="doccomment">/// Converts HIMETRIC units to pixels.
+	///
+	/// Equivalent to
+	/// [`AtlHiMetricToPixel`](https://docs.microsoft.com/en-us/cpp/atl/reference/pixel-himetric-conversion-global-functions?view=msvc-170#atlhimetrictopixel)
+	/// ATL function.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>HiMetricToPixel(<span class="self">self</span>, x: i32, y: i32) -&gt; (i32, i32) {
+		<span class="comment">// http://www.verycomputer.com/5_5f2f75dc2d090ee8_1.htm
+		// https://forums.codeguru.com/showthread.php?109554-Unresizable-activeX-control
+		</span>(
+			MulDiv(x, <span class="self">self</span>.GetDeviceCaps(co::GDC::LOGPIXELSX), HIMETRIC_PER_INCH),
+			MulDiv(y, <span class="self">self</span>.GetDeviceCaps(co::GDC::LOGPIXELSY), HIMETRIC_PER_INCH),
 		)
 	}
 
-	<span class="doccomment">/// Converts pixels to HIMETRIC units.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Equivalent to</span>
-	<span class="doccomment">/// [`AtlPixelToHiMetric`](https://docs.microsoft.com/en-us/cpp/atl/reference/pixel-himetric-conversion-global-functions?view=msvc-170#atlpixeltohimetric)</span>
-	<span class="doccomment">/// ATL function.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">PixelToHiMetric</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">i32</span>) {
+	<span class="doccomment">/// Converts pixels to HIMETRIC units.
+	///
+	/// Equivalent to
+	/// [`AtlPixelToHiMetric`](https://docs.microsoft.com/en-us/cpp/atl/reference/pixel-himetric-conversion-global-functions?view=msvc-170#atlpixeltohimetric)
+	/// ATL function.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>PixelToHiMetric(<span class="self">self</span>, x: i32, y: i32) -&gt; (i32, i32) {
 		(
-			<span class="ident">MulDiv</span>(<span class="ident">x</span>, <span class="ident">HIMETRIC_PER_INCH</span>, <span class="self">self</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSX</span>)),
-			<span class="ident">MulDiv</span>(<span class="ident">y</span>, <span class="ident">HIMETRIC_PER_INCH</span>, <span class="self">self</span>.<span class="ident">GetDeviceCaps</span>(<span class="ident">co::GDC::LOGPIXELSY</span>)),
+			MulDiv(x, HIMETRIC_PER_INCH, <span class="self">self</span>.GetDeviceCaps(co::GDC::LOGPIXELSX)),
+			MulDiv(y, HIMETRIC_PER_INCH, <span class="self">self</span>.GetDeviceCaps(co::GDC::LOGPIXELSY)),
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

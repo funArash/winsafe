@@ -520,527 +520,527 @@
 <span id="520">520</span>
 <span id="521">521</span>
 <span id="522">522</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">MultiByteToWideChar</span>, <span class="ident">WinResult</span>};
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{MultiByteToWideChar, SysResult};
 
-<span class="doccomment">/// Stores a `Vec&lt;u16&gt;` buffer for a null-terminated</span>
-<span class="doccomment">/// [Unicode UTF-16](https://docs.microsoft.com/en-us/windows/win32/intl/unicode-in-the-windows-api)</span>
-<span class="doccomment">/// wide string natively used by Windows.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Performs UTF-8 conversions and can be used as a buffer to low-level Win32</span>
-<span class="doccomment">/// functions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is struct is mostly used internally by the library, as a bridge between</span>
-<span class="doccomment">/// Windows and Rust strings.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WString</span> {
-	<span class="ident">vec_u16</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Stores a `Vec&lt;u16&gt;` buffer for a null-terminated
+/// [Unicode UTF-16](https://docs.microsoft.com/en-us/windows/win32/intl/unicode-in-the-windows-api)
+/// wide string natively used by Windows.
+///
+/// Performs UTF-8 conversions and can be used as a buffer to low-level Win32
+/// functions.
+///
+/// This is struct is mostly used internally by the library, as a bridge between
+/// Windows and Rust strings.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>WString {
+	vec_u16: <span class="prelude-ty">Option</span>&lt;Vec&lt;u16&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">WString</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">vec_u16</span>: <span class="prelude-val">None</span> }
+<span class="kw">impl </span>Default <span class="kw">for </span>WString {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ vec_u16: <span class="prelude-val">None </span>}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">WString</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>())
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>WString {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.to_string())
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">WString</span> {
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from an optional</span>
-	<span class="doccomment">/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The string will be stored with a terminating null.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If `s` is `None`, the internal buffer is not allocated.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_opt_str</span>(<span class="ident">s</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">WString</span> {
-		<span class="self">Self</span> {
-			<span class="ident">vec_u16</span>: <span class="ident">s</span>.<span class="ident">map</span>(
-				<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">encode_utf16</span>()
-					.<span class="ident">chain</span>(<span class="ident">std::iter::once</span>(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null</span>
-					.<span class="ident">collect</span>(),
+<span class="kw">impl </span>WString {
+	<span class="doccomment">/// Creates and stores a new UTF-16 string from an optional
+	/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).
+	///
+	/// The string will be stored with a terminating null.
+	///
+	/// If `s` is `None`, the internal buffer is not allocated.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; WString {
+		<span class="self">Self </span>{
+			vec_u16: s.map(
+				|s| s.encode_utf16()
+					.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null
+					</span>.collect(),
 			)
 		}
 	}
 
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from an ordinary</span>
-	<span class="doccomment">/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The string will be stored with a terminating null.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WString</span> {
-		<span class="ident"><span class="self">Self</span>::from_opt_str</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>))
+	<span class="doccomment">/// Creates and stores a new UTF-16 string from an ordinary
+	/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).
+	///
+	/// The string will be stored with a terminating null.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; WString {
+		<span class="self">Self</span>::from_opt_str(<span class="prelude-val">Some</span>(s))
 	}
 
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from a</span>
-	<span class="doccomment">/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) of ordinary</span>
-	<span class="doccomment">/// strings. This new string will be stored as sequential null-separated</span>
-	<span class="doccomment">/// strings, terminated with two nulls. That means that further retrieval</span>
-	<span class="doccomment">/// operations will &quot;see&quot; only the first string.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method is intended to pass multi-strings to native APIs, not to</span>
-	<span class="doccomment">/// retrieve them.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str_vec</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="ident">WString</span> {
-		<span class="kw">let</span> <span class="ident">tot_chars</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>() <span class="comment">// number of chars of all strings, including terminating nulls</span>
-			.<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">tot</span>, <span class="ident">s</span><span class="op">|</span> <span class="ident">tot</span> <span class="op">+</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>) <span class="comment">// including terminating null</span>
-				<span class="op">+</span> <span class="number">1</span>; <span class="comment">// double terminating null</span>
+	<span class="doccomment">/// Creates and stores a new UTF-16 string from a
+	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) of ordinary
+	/// strings. This new string will be stored as sequential null-separated
+	/// strings, terminated with two nulls. That means that further retrieval
+	/// operations will &quot;see&quot; only the first string.
+	///
+	/// This method is intended to pass multi-strings to native APIs, not to
+	/// retrieve them.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; WString {
+		<span class="kw">let </span>tot_chars = v.iter() <span class="comment">// number of chars of all strings, including terminating nulls
+			</span>.fold(<span class="number">0</span>, |tot, s| tot + s.as_ref().len() + <span class="number">1</span>) <span class="comment">// including terminating null
+				</span>+ <span class="number">1</span>; <span class="comment">// double terminating null
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf16</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">tot_chars</span>);
-		<span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span>
-			<span class="ident">buf16</span>.<span class="ident">extend</span>(
-				<span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">encode_utf16</span>()
-					.<span class="ident">chain</span>(<span class="ident">std::iter::once</span>(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null</span>
-			),
+		</span><span class="kw">let </span><span class="kw-2">mut </span>buf16 = Vec::with_capacity(tot_chars);
+		v.iter().for_each(|s|
+			buf16.extend(
+				s.as_ref().encode_utf16()
+					.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null
+			</span>),
 		);
-		<span class="ident">buf16</span>.<span class="ident">push</span>(<span class="number">0x0000</span>); <span class="comment">// double terminating null</span>
+		buf16.push(<span class="number">0x0000</span>); <span class="comment">// double terminating null
 
-		<span class="self">Self</span> { <span class="ident">vec_u16</span>: <span class="prelude-val">Some</span>(<span class="ident">buf16</span>) }
+		</span><span class="self">Self </span>{ vec_u16: <span class="prelude-val">Some</span>(buf16) }
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a buffer, specifying the</span>
-	<span class="doccomment">/// number of existing chars, not counting a terminating null.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The string will be stored with a terminating null.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_wchars_count</span>(<span class="ident">src</span>: <span class="kw-2">*const</span> <span class="ident">u16</span>, <span class="ident">num_chars</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WString</span> {
-		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">is_null</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">num_chars</span> <span class="op">==</span> <span class="number">0</span> {
-			<span class="ident"><span class="self">Self</span>::default</span>()
-		} <span class="kw">else</span> {
-			<span class="kw">let</span> <span class="ident">tot_chars</span> <span class="op">=</span> <span class="ident">num_chars</span> <span class="op">+</span> <span class="number">1</span>; <span class="comment">// add room for terminating null</span>
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf16</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0x0000</span>; <span class="ident">tot_chars</span>];
-			<span class="kw">unsafe</span> {
-				<span class="ident">src</span>.<span class="ident">copy_to_nonoverlapping</span>(<span class="ident">buf16</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">tot_chars</span> <span class="op">-</span> <span class="number">1</span>); <span class="comment">// no terminating null to copy</span>
-				<span class="kw-2">*</span><span class="ident">buf16</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">tot_chars</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">=</span> <span class="number">0x0000</span>;
+	<span class="doccomment">/// Creates a new UTF-16 string by copying from a buffer, specifying the
+	/// number of existing chars, not counting a terminating null.
+	///
+	/// The string will be stored with a terminating null.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; WString {
+		<span class="kw">if </span>src.is_null() || num_chars == <span class="number">0 </span>{
+			<span class="self">Self</span>::default()
+		} <span class="kw">else </span>{
+			<span class="kw">let </span>tot_chars = num_chars + <span class="number">1</span>; <span class="comment">// add room for terminating null
+			</span><span class="kw">let </span><span class="kw-2">mut </span>buf16 = <span class="macro">vec!</span>[<span class="number">0x0000</span>; tot_chars];
+			<span class="kw">unsafe </span>{
+				src.copy_to_nonoverlapping(buf16.as_mut_ptr(), tot_chars - <span class="number">1</span>); <span class="comment">// no terminating null to copy
+				</span><span class="kw-2">*</span>buf16.get_unchecked_mut(tot_chars - <span class="number">1</span>) = <span class="number">0x0000</span>;
 			}
 
-			<span class="self">Self</span> { <span class="ident">vec_u16</span>: <span class="prelude-val">Some</span>(<span class="ident">buf16</span>) }
+			<span class="self">Self </span>{ vec_u16: <span class="prelude-val">Some</span>(buf16) }
 		}
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a null-terminated buffer.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The string will be stored with a terminating null.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_wchars_nullt</span>(<span class="ident">src</span>: <span class="kw-2">*const</span> <span class="ident">u16</span>) -&gt; <span class="ident">WString</span> {
-		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">is_null</span>() {
-			<span class="ident"><span class="self">Self</span>::default</span>()
-		} <span class="kw">else</span> {
-			<span class="ident"><span class="self">Self</span>::from_wchars_count</span>(
-				<span class="ident">src</span>, <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::lstrlenW</span>(<span class="ident">src</span>) } <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// Creates a new UTF-16 string by copying from a null-terminated buffer.
+	///
+	/// The string will be stored with a terminating null.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; WString {
+		<span class="kw">if </span>src.is_null() {
+			<span class="self">Self</span>::default()
+		} <span class="kw">else </span>{
+			<span class="self">Self</span>::from_wchars_count(
+				src, <span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(src) } <span class="kw">as _</span>)
 		}
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a slice.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The string will be stored with a terminating null.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_wchars_slice</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u16</span>]) -&gt; <span class="ident">WString</span> {
-		<span class="ident"><span class="self">Self</span>::from_wchars_count</span>(<span class="ident">src</span>.<span class="ident">as_ptr</span>(), <span class="ident">src</span>.<span class="ident">len</span>())
+	<span class="doccomment">/// Creates a new UTF-16 string by copying from a slice.
+	///
+	/// The string will be stored with a terminating null.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; WString {
+		<span class="self">Self</span>::from_wchars_count(src.as_ptr(), src.len())
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 buffer allocated with an specific length. All</span>
-	<span class="doccomment">/// UTF-16 chars will be set to zero.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_alloc_buffer</span>(<span class="ident">num_chars</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WString</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-		<span class="ident">me</span>.<span class="ident">realloc_buffer</span>(<span class="ident">num_chars</span>);
-		<span class="ident">me</span>
+	<span class="doccomment">/// Creates a new UTF-16 buffer allocated with an specific length. All
+	/// UTF-16 chars will be set to zero.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_alloc_buffer(num_chars: usize) -&gt; WString {
+		<span class="kw">let </span><span class="kw-2">mut </span>me = <span class="self">Self</span>::default();
+		me.realloc_buffer(num_chars);
+		me
 	}
 
-	<span class="doccomment">/// Returns a</span>
-	<span class="doccomment">/// [`LPWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)</span>
-	<span class="doccomment">/// mut pointer to the internal UTF-16 string buffer, to be passed to native</span>
-	<span class="doccomment">/// Win32 functions. This is useful to receive strings.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the buffer wasn&#39;t previously allocated. Be sure to alloc</span>
-	<span class="doccomment">/// enough room, otherwise a buffer overrun may occur.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u16</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_mut</span>()
-			.<span class="ident">map_or_else</span>(
-				<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
-				<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_mut_ptr</span>(),
+	<span class="doccomment">/// Returns a
+	/// [`LPWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
+	/// mut pointer to the internal UTF-16 string buffer, to be passed to native
+	/// Win32 functions. This is useful to receive strings.
+	///
+	/// # Panics
+	///
+	/// Panics if the buffer wasn&#39;t previously allocated. Be sure to alloc
+	/// enough room, otherwise a buffer overrun may occur.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub unsafe fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
+		<span class="self">self</span>.vec_u16.as_mut()
+			.map_or_else(
+				|| <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
+				|v| v.as_mut_ptr(),
 			)
 	}
 
-	<span class="doccomment">/// Returns a</span>
-	<span class="doccomment">/// [`LPCWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)</span>
-	<span class="doccomment">/// const pointer to the internal UTF-16 string buffer, to be passed to</span>
-	<span class="doccomment">/// native Win32 functions.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Returns a null pointer if the buffer wasn&#39;t previously</span>
-	<span class="doccomment">/// allocated. Make sure the `WString` object outlives the function call,</span>
-	<span class="doccomment">/// otherwise it will point to an invalid memory location.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>()
-			.<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_ptr</span>())
+	<span class="doccomment">/// Returns a
+	/// [`LPCWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
+	/// const pointer to the internal UTF-16 string buffer, to be passed to
+	/// native Win32 functions.
+	///
+	/// **Note:** Returns a null pointer if the buffer wasn&#39;t previously
+	/// allocated. Make sure the `WString` object outlives the function call,
+	/// otherwise it will point to an invalid memory location.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub unsafe fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="self">self</span>.vec_u16.as_ref()
+			.map_or(std::ptr::null(), |v| v.as_ptr())
 	}
 
-	<span class="doccomment">/// Returns a slice to the internal</span>
-	<span class="doccomment">/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) buffer. This</span>
-	<span class="doccomment">/// is useful to receive strings.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the buffer wasn&#39;t previously allocated. Be sure to alloc</span>
-	<span class="doccomment">/// enough room, otherwise a buffer overrun may occur.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u16</span>] {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_mut</span>()
-			.<span class="ident">map_or_else</span>(
-				<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
-				<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_mut_slice</span>(),
+	<span class="doccomment">/// Returns a slice to the internal
+	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) buffer. This
+	/// is useful to receive strings.
+	///
+	/// # Panics
+	///
+	/// Panics if the buffer wasn&#39;t previously allocated. Be sure to alloc
+	/// enough room, otherwise a buffer overrun may occur.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
+		<span class="self">self</span>.vec_u16.as_mut()
+			.map_or_else(
+				|| <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
+				|v| v.as_mut_slice(),
 			)
 	}
 
-	<span class="doccomment">/// Returns a slice to the internal UTF-16 string buffer.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the buffer wasn&#39;t previously allocated. Make sure the</span>
-	<span class="doccomment">/// `WString` object outlives the function call, otherwise it will point to</span>
-	<span class="doccomment">/// an invalid memory location.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u16</span>] {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>()
-			.<span class="ident">map_or_else</span>(
-				<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
-				<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>(),
+	<span class="doccomment">/// Returns a slice to the internal UTF-16 string buffer.
+	///
+	/// # Panics
+	///
+	/// Panics if the buffer wasn&#39;t previously allocated. Make sure the
+	/// `WString` object outlives the function call, otherwise it will point to
+	/// an invalid memory location.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
+		<span class="self">self</span>.vec_u16.as_ref()
+			.map_or_else(
+				|| <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
+				|v| v.as_slice(),
 			)
 	}
 
-	<span class="doccomment">/// Returns the size of the allocated internal buffer.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the buffer was not allocated yet, returns zero.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>()
-			.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">len</span>())
+	<span class="doccomment">/// Returns the size of the allocated internal buffer.
+	///
+	/// If the buffer was not allocated yet, returns zero.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>buffer_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.vec_u16.as_ref()
+			.map_or(<span class="number">0</span>, |v| v.len())
 	}
 
-	<span class="doccomment">/// Copies the content into an external buffer. A terminating null will be</span>
-	<span class="doccomment">/// appended.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If `dest` is smaller, the string will be truncated.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if `dest` has zero length. If length is 1, the buffer will</span>
-	<span class="doccomment">/// receive a single null char.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u16</span>]) {
-		<span class="kw">if</span> <span class="ident">dest</span>.<span class="ident">is_empty</span>() {
+	<span class="doccomment">/// Copies the content into an external buffer. A terminating null will be
+	/// appended.
+	///
+	/// If `dest` is smaller, the string will be truncated.
+	///
+	/// # Panics
+	///
+	/// Panics if `dest` has zero length. If length is 1, the buffer will
+	/// receive a single null char.
+	</span><span class="kw">pub fn </span>copy_to_slice(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u16]) {
+		<span class="kw">if </span>dest.is_empty() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Destination buffer cannot have zero length.&quot;</span>);
 		}
 
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">vec_u16_ref</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>() {
-			<span class="kw">let</span> <span class="ident">num_chars</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">vec_u16_ref</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>, <span class="ident">dest</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>); <span class="comment">// no terminating null</span>
-			<span class="kw">unsafe</span> {
-				<span class="ident">vec_u16_ref</span>.<span class="ident">as_ptr</span>()
-					.<span class="ident">copy_to_nonoverlapping</span>(<span class="ident">dest</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">num_chars</span>);
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(vec_u16_ref) = <span class="self">self</span>.vec_u16.as_ref() {
+			<span class="kw">let </span>num_chars = std::cmp::min(vec_u16_ref.len() - <span class="number">1</span>, dest.len() - <span class="number">1</span>); <span class="comment">// no terminating null
+			</span><span class="kw">unsafe </span>{
+				vec_u16_ref.as_ptr()
+					.copy_to_nonoverlapping(dest.as_mut_ptr(), num_chars);
 
-				<span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">num_chars</span>..<span class="ident">dest</span>.<span class="ident">len</span>() {
-					<span class="kw-2">*</span><span class="ident">dest</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="number">0x0000</span>; <span class="comment">// zero the rest of the slice</span>
-				}
+				<span class="kw">for </span>i <span class="kw">in </span>num_chars..dest.len() {
+					<span class="kw-2">*</span>dest.get_unchecked_mut(i) = <span class="number">0x0000</span>; <span class="comment">// zero the rest of the slice
+				</span>}
 			}
 		}
 	}
 
-	<span class="doccomment">/// Fills the entire buffer with zero values. The buffer size is not</span>
-	<span class="doccomment">/// changed.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_with_zero</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_mut</span>()
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">vec_u16</span><span class="op">|</span>
-				<span class="ident">vec_u16</span>.<span class="ident">iter_mut</span>()
-					.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">wchar</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">wchar</span> <span class="op">=</span> <span class="number">0x0000</span>),
+	<span class="doccomment">/// Fills the entire buffer with zero values. The buffer size is not
+	/// changed.
+	</span><span class="kw">pub fn </span>fill_with_zero(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="self">self</span>.vec_u16.as_mut()
+			.map(|vec_u16|
+				vec_u16.iter_mut()
+					.for_each(|wchar| <span class="kw-2">*</span>wchar = <span class="number">0x0000</span>),
 			);
 	}
 
-	<span class="doccomment">/// Tells whether the internal buffer is storing a null string pointer, or</span>
-	<span class="doccomment">/// if it&#39;s holding a string with a length of zero.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+	<span class="doccomment">/// Tells whether the internal buffer is storing a null string pointer, or
+	/// if it&#39;s holding a string with a length of zero.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.len() == <span class="number">0
+	</span>}
+
+	<span class="doccomment">/// Tells whether the internal buffer is storing a null string pointer.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.vec_u16.is_none()
 	}
 
-	<span class="doccomment">/// Tells whether the internal buffer is storing a null string pointer.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">is_none</span>()
+	<span class="doccomment">/// Wrapper to
+	/// [`lstrlen`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).
+	///
+	/// Returns the number of
+	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) characters
+	/// stored in the internal buffer, not counting the terminating null.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.vec_u16.as_ref()
+			.map_or(<span class="number">0</span>,
+				|vec_u16| <span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(vec_u16.as_ptr()) } <span class="kw">as _</span>)
 	}
 
-	<span class="doccomment">/// Wrapper to</span>
-	<span class="doccomment">/// [`lstrlen`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the number of</span>
-	<span class="doccomment">/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) characters</span>
-	<span class="doccomment">/// stored in the internal buffer, not counting the terminating null.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>()
-			.<span class="ident">map_or</span>(<span class="number">0</span>,
-				<span class="op">|</span><span class="ident">vec_u16</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::lstrlenW</span>(<span class="ident">vec_u16</span>.<span class="ident">as_ptr</span>()) } <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// Resizes the internal buffer, to be used as a buffer for native Win32
+	/// functions. All UTF-16 chars will be set to zero.
+	///
+	/// The underlying `Vec` will be resized with a call to
+	/// [`Vec::resize`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.resize).
+	///
+	/// If the new size is zero, the internal buffer is deallocated.
+	///
+	/// **Note:** The internal memory can move after a realloc, so if you&#39;re
+	/// using a pointer or reference to the internal buffer, they may then point
+	/// to an invalid memory location. After a realloc, the following methods
+	/// must be called again:
+	/// * [`as_mut_ptr`](crate::WString::as_mut_ptr);
+	/// * [`as_ptr`](crate::WString::as_ptr);
+	/// * [`as_mut_slice`](crate::WString::as_mut_slice);
+	/// * [`as_slice`](crate::WString::as_slice).
+	</span><span class="kw">pub fn </span>realloc_buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_size: usize) {
+		<span class="kw">if </span>new_size == <span class="number">0 </span>{
+			<span class="self">self</span>.vec_u16 = <span class="prelude-val">None</span>; <span class="comment">// dealloc
+		</span>} <span class="kw">else </span>{
+			<span class="kw">if </span><span class="self">self</span>.vec_u16.is_none() {
+				<span class="self">self</span>.vec_u16 = <span class="prelude-val">Some</span>(Vec::default()); <span class="comment">// create if not yet; default Vec is empty
+			</span>}
+			<span class="self">self</span>.vec_u16.as_mut().unwrap().resize(new_size, <span class="number">0x0000</span>); <span class="comment">// filled with nulls
+		</span>}
 	}
 
-	<span class="doccomment">/// Resizes the internal buffer, to be used as a buffer for native Win32</span>
-	<span class="doccomment">/// functions. All UTF-16 chars will be set to zero.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The underlying `Vec` will be resized with a call to</span>
-	<span class="doccomment">/// [`Vec::resize`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.resize).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the new size is zero, the internal buffer is deallocated.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** The internal memory can move after a realloc, so if you&#39;re</span>
-	<span class="doccomment">/// using a pointer or reference to the internal buffer, they may then point</span>
-	<span class="doccomment">/// to an invalid memory location. After a realloc, the following methods</span>
-	<span class="doccomment">/// must be called again:</span>
-	<span class="doccomment">/// * [`as_mut_ptr`](crate::WString::as_mut_ptr);</span>
-	<span class="doccomment">/// * [`as_ptr`](crate::WString::as_ptr);</span>
-	<span class="doccomment">/// * [`as_mut_slice`](crate::WString::as_mut_slice);</span>
-	<span class="doccomment">/// * [`as_slice`](crate::WString::as_slice).</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">realloc_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_size</span>: <span class="ident">usize</span>) {
-		<span class="kw">if</span> <span class="ident">new_size</span> <span class="op">==</span> <span class="number">0</span> {
-			<span class="self">self</span>.<span class="ident">vec_u16</span> <span class="op">=</span> <span class="prelude-val">None</span>; <span class="comment">// dealloc</span>
-		} <span class="kw">else</span> {
-			<span class="kw">if</span> <span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">is_none</span>() {
-				<span class="self">self</span>.<span class="ident">vec_u16</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Vec::default</span>()); <span class="comment">// create if not yet; default Vec is empty</span>
-			}
-			<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">resize</span>(<span class="ident">new_size</span>, <span class="number">0x0000</span>); <span class="comment">// filled with nulls</span>
-		}
+	<span class="doccomment">/// Converts into
+	/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html). An
+	/// internal null pointer will simply be converted into an empty string.
+	///
+	/// # Panics
+	///
+	/// Panics if any invalid character is found.
+	///
+	/// If you&#39;re parsing raw data which may contain errors, prefer using
+ 	/// [`to_string_checked`](crate::WString::to_string_checked) instead.
+	 </span><span class="attribute">#[must_use]</span>
+	 <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+		<span class="self">self</span>.to_string_checked().unwrap()
 	}
 
-	<span class="doccomment">/// Converts into</span>
-	<span class="doccomment">/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html). An</span>
-	<span class="doccomment">/// internal null pointer will simply be converted into an empty string.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if any invalid character is found.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If you&#39;re parsing raw data which may contain errors, prefer using</span>
- 	<span class="doccomment">/// [`to_string_checked`](crate::WString::to_string_checked) instead.</span>
-	 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-	 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-		<span class="self">self</span>.<span class="ident">to_string_checked</span>().<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Converts into
+	/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html) by
+	/// calling
+	/// [`String::from_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16).
+	/// An internal null pointer will simply be converted into an empty string.
+	///
+	/// This method is useful if you&#39;re parsing raw data which may contain
+	/// invalid characters. If you&#39;re dealing with a string known to be valid,
+	/// [`to_string`](crate::WString::to_string) is more practical.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>to_string_checked(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::string::FromUtf16Error&gt; {
+		<span class="self">self</span>.vec_u16.as_ref()
+			.map_or(
+				<span class="prelude-val">Ok</span>(String::default()),
+				|v| String::from_utf16(<span class="kw-2">&amp;</span>v[..<span class="self">self</span>.len()]), <span class="comment">// without terminating null
+			</span>)
 	}
 
-	<span class="doccomment">/// Converts into</span>
-	<span class="doccomment">/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html) by</span>
-	<span class="doccomment">/// calling</span>
-	<span class="doccomment">/// [`String::from_utf16`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf16).</span>
-	<span class="doccomment">/// An internal null pointer will simply be converted into an empty string.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method is useful if you&#39;re parsing raw data which may contain</span>
-	<span class="doccomment">/// invalid characters. If you&#39;re dealing with a string known to be valid,</span>
-	<span class="doccomment">/// [`to_string`](crate::WString::to_string) is more practical.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string_checked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">std::string::FromUtf16Error</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">vec_u16</span>.<span class="ident">as_ref</span>()
-			.<span class="ident">map_or</span>(
-				<span class="prelude-val">Ok</span>(<span class="ident">String::default</span>()),
-				<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..<span class="self">self</span>.<span class="ident">len</span>()]), <span class="comment">// without terminating null</span>
-			)
-	}
-
-	<span class="doccomment">/// Guesses the [`Encoding`](crate::Encoding) of the given data, also</span>
-	<span class="doccomment">/// returning the size of its</span>
-	<span class="doccomment">/// [BOM](https://en.wikipedia.org/wiki/Byte_order_mark), if any.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guess_encoding</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">Encoding</span>, <span class="ident">usize</span>) {
-		<span class="kw">let</span> <span class="ident">has_bom</span> <span class="op">=</span> <span class="op">|</span><span class="ident">bom_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> -&gt; <span class="ident">bool</span> {
-			<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">bom_bytes</span>.<span class="ident">len</span>()
-				<span class="op">&amp;&amp;</span> <span class="ident">data</span>[..<span class="ident">bom_bytes</span>.<span class="ident">len</span>()].<span class="ident">cmp</span>(<span class="ident">bom_bytes</span>) <span class="op">==</span> <span class="ident">Ordering::Equal</span>
+	<span class="doccomment">/// Guesses the [`Encoding`](crate::Encoding) of the given data, also
+	/// returning the size of its
+	/// [BOM](https://en.wikipedia.org/wiki/Byte_order_mark), if any.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>guess_encoding(data: <span class="kw-2">&amp;</span>[u8]) -&gt; (Encoding, usize) {
+		<span class="kw">let </span>has_bom = |bom_bytes: <span class="kw-2">&amp;</span>[u8]| -&gt; bool {
+			data.len() &gt;= bom_bytes.len()
+				&amp;&amp; data[..bom_bytes.len()].cmp(bom_bytes) == Ordering::Equal
 		};
 
-		<span class="kw">const</span> <span class="ident">UTF8</span>: [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">0xef</span>, <span class="number">0xbb</span>, <span class="number">0xbf</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">UTF8</span>) { <span class="comment">// UTF-8 BOM</span>
-			<span class="kw">return</span> (<span class="ident">Encoding::Utf8</span>, <span class="ident">UTF8</span>.<span class="ident">len</span>());
+		<span class="kw">const </span>UTF8: [u8; <span class="number">3</span>] = [<span class="number">0xef</span>, <span class="number">0xbb</span>, <span class="number">0xbf</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF8) { <span class="comment">// UTF-8 BOM
+			</span><span class="kw">return </span>(Encoding::Utf8, UTF8.len());
 		}
 
-		<span class="kw">const</span> <span class="ident">UTF16BE</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">0xfe</span>, <span class="number">0xff</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">UTF16BE</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Utf16be</span>, <span class="ident">UTF16BE</span>.<span class="ident">len</span>());
+		<span class="kw">const </span>UTF16BE: [u8; <span class="number">2</span>] = [<span class="number">0xfe</span>, <span class="number">0xff</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF16BE) {
+			<span class="kw">return </span>(Encoding::Utf16be, UTF16BE.len());
 		}
 
-		<span class="kw">const</span> <span class="ident">UTF16LE</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">0xff</span>, <span class="number">0xfe</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">UTF16LE</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Utf16le</span>, <span class="ident">UTF16LE</span>.<span class="ident">len</span>());
+		<span class="kw">const </span>UTF16LE: [u8; <span class="number">2</span>] = [<span class="number">0xff</span>, <span class="number">0xfe</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF16LE) {
+			<span class="kw">return </span>(Encoding::Utf16le, UTF16LE.len());
 		}
 
-		<span class="kw">const</span> <span class="ident">UTF32BE</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">UTF32BE</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Utf32be</span>, <span class="ident">UTF32BE</span>.<span class="ident">len</span>())
+		<span class="kw">const </span>UTF32BE: [u8; <span class="number">4</span>] = [<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF32BE) {
+			<span class="kw">return </span>(Encoding::Utf32be, UTF32BE.len())
 		}
 
-		<span class="kw">const</span> <span class="ident">UTF32LE</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="number">0xff</span>, <span class="number">0xfe</span>, <span class="number">0x00</span>, <span class="number">0x00</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">UTF32LE</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Utf32le</span>, <span class="ident">UTF32LE</span>.<span class="ident">len</span>())
+		<span class="kw">const </span>UTF32LE: [u8; <span class="number">4</span>] = [<span class="number">0xff</span>, <span class="number">0xfe</span>, <span class="number">0x00</span>, <span class="number">0x00</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF32LE) {
+			<span class="kw">return </span>(Encoding::Utf32le, UTF32LE.len())
 		}
 
-		<span class="kw">const</span> <span class="ident">SCSU</span>: [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">0x0e</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">SCSU</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Scsu</span>, <span class="ident">SCSU</span>.<span class="ident">len</span>())
+		<span class="kw">const </span>SCSU: [u8; <span class="number">3</span>] = [<span class="number">0x0e</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>SCSU) {
+			<span class="kw">return </span>(Encoding::Scsu, SCSU.len())
 		}
 
-		<span class="kw">const</span> <span class="ident">BOCU1</span>: [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">0xfb</span>, <span class="number">0xee</span>, <span class="number">0x28</span>];
-		<span class="kw">if</span> <span class="ident">has_bom</span>(<span class="kw-2">&amp;</span><span class="ident">BOCU1</span>) {
-			<span class="kw">return</span> (<span class="ident">Encoding::Bocu1</span>, <span class="ident">BOCU1</span>.<span class="ident">len</span>())
+		<span class="kw">const </span>BOCU1: [u8; <span class="number">3</span>] = [<span class="number">0xfb</span>, <span class="number">0xee</span>, <span class="number">0x28</span>];
+		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>BOCU1) {
+			<span class="kw">return </span>(Encoding::Bocu1, BOCU1.len())
 		}
 
-		<span class="comment">// No BOM found, guess UTF-8 without BOM, or Windows-1252 (superset of</span>
-		<span class="comment">// ISO-8859-1).</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">can_be_win1252</span> <span class="op">=</span> <span class="bool-val">false</span>;
-		<span class="kw">for</span> (<span class="ident">c0</span>, <span class="ident">c1</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">windows</span>(<span class="number">2</span>)
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">chunk</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>), <span class="kw-2">*</span><span class="ident">chunk</span>.<span class="ident">get_unchecked</span>(<span class="number">1</span>)) })
+		<span class="comment">// No BOM found, guess UTF-8 without BOM, or Windows-1252 (superset of
+		// ISO-8859-1).
+		</span><span class="kw">let </span><span class="kw-2">mut </span>can_be_win1252 = <span class="bool-val">false</span>;
+		<span class="kw">for </span>(c0, c1) <span class="kw">in </span>data.windows(<span class="number">2</span>)
+			.map(|chunk| <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>chunk.get_unchecked(<span class="number">0</span>), <span class="kw-2">*</span>chunk.get_unchecked(<span class="number">1</span>)) })
 		{
-			<span class="kw">if</span> <span class="ident">c0</span> <span class="op">&gt;</span> <span class="number">0x7f</span> { <span class="comment">// 127</span>
-				<span class="ident">can_be_win1252</span> <span class="op">=</span> <span class="bool-val">true</span>;
-				<span class="kw">if</span> <span class="ident">c0</span> <span class="op">==</span> <span class="number">0xc2</span> <span class="op">&amp;&amp;</span> (<span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0xa1</span> <span class="op">&amp;&amp;</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xbf</span>) <span class="comment">// http://www.utf8-chartable.de</span>
-					<span class="op">|</span><span class="op">|</span> <span class="ident">c0</span> <span class="op">==</span> <span class="number">0xc3</span> <span class="op">&amp;&amp;</span> (<span class="ident">c1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0x80</span> <span class="op">&amp;&amp;</span> <span class="ident">c1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xbf</span>)
+			<span class="kw">if </span>c0 &gt; <span class="number">0x7f </span>{ <span class="comment">// 127
+				</span>can_be_win1252 = <span class="bool-val">true</span>;
+				<span class="kw">if </span>c0 == <span class="number">0xc2 </span>&amp;&amp; (c1 &gt;= <span class="number">0xa1 </span>&amp;&amp; c1 &lt;= <span class="number">0xbf</span>) <span class="comment">// http://www.utf8-chartable.de
+					</span>|| c0 == <span class="number">0xc3 </span>&amp;&amp; (c1 &gt;= <span class="number">0x80 </span>&amp;&amp; c1 &lt;= <span class="number">0xbf</span>)
 				{
-					<span class="kw">return</span> (<span class="ident">Encoding::Utf8</span>, <span class="number">0</span>); <span class="comment">// UTF-8 without BOM</span>
-				}
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">c1</span> <span class="op">&gt;</span> <span class="number">0x7f</span> {
-				<span class="ident">can_be_win1252</span> <span class="op">=</span> <span class="bool-val">true</span>;
+					<span class="kw">return </span>(Encoding::Utf8, <span class="number">0</span>); <span class="comment">// UTF-8 without BOM
+				</span>}
+			} <span class="kw">else if </span>c1 &gt; <span class="number">0x7f </span>{
+				can_be_win1252 = <span class="bool-val">true</span>;
 			}
 		}
 
-		(<span class="kw">if</span> <span class="ident">can_be_win1252</span> { <span class="ident">Encoding::Win1252</span> } <span class="kw">else</span> { <span class="ident">Encoding::Ansi</span> }, <span class="number">0</span>)
+		(<span class="kw">if </span>can_be_win1252 { Encoding::Win1252 } <span class="kw">else </span>{ Encoding::Ansi }, <span class="number">0</span>)
 	}
 
-	<span class="doccomment">/// Guesses the encoding with</span>
-	<span class="doccomment">/// [`WString::guess_encoding`](crate::WString::guess_encoding) and parses</span>
-	<span class="doccomment">/// the data as string.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If you&#39;re sure the data has UTF-8 encoding, you can also use the</span>
-	<span class="doccomment">/// built-in</span>
-	<span class="doccomment">/// [`String::from_utf8`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// To serialize the string back into UTF-8 bytes, use the built-in</span>
-	<span class="doccomment">/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">WString</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>;
-		<span class="kw">if</span> <span class="ident">data</span>.<span class="ident">is_empty</span>() { <span class="comment">// nothing to parse</span>
-			<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">WString::default</span>());
+	<span class="doccomment">/// Guesses the encoding with
+	/// [`WString::guess_encoding`](crate::WString::guess_encoding) and parses
+	/// the data as string.
+	///
+	/// If you&#39;re sure the data has UTF-8 encoding, you can also use the
+	/// built-in
+	/// [`String::from_utf8`](https://doc.rust-lang.org/std/string/struct.String.html#method.from_utf8).
+	///
+	/// To serialize the string back into UTF-8 bytes, use the built-in
+	/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>parse_str(data: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;WString&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>data = data;
+		<span class="kw">if </span>data.is_empty() { <span class="comment">// nothing to parse
+			</span><span class="kw">return </span><span class="prelude-val">Ok</span>(WString::default());
 		}
 
-		<span class="kw">let</span> (<span class="ident">encoding</span>, <span class="ident">sz_bom</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::guess_encoding</span>(<span class="ident">data</span>);
-		<span class="ident">data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="ident">sz_bom</span>..]; <span class="comment">// skip BOM, if any</span>
+		<span class="kw">let </span>(encoding, sz_bom) = <span class="self">Self</span>::guess_encoding(data);
+		data = <span class="kw-2">&amp;</span>data[sz_bom..]; <span class="comment">// skip BOM, if any
 
-		<span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-			<span class="ident">vec_u16</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">encoding</span> {
-				<span class="ident">Encoding::Ansi</span> =&gt; <span class="ident"><span class="self">Self</span>::parse_ansi_str</span>(<span class="ident">data</span>),
-				<span class="ident">Encoding::Win1252</span> =&gt; <span class="ident">MultiByteToWideChar</span>(<span class="ident">co::CP::WINDOWS_1252</span>, <span class="ident">co::MBC::NoValue</span>, <span class="ident">data</span>)<span class="question-mark">?</span>,
-				<span class="ident">Encoding::Utf8</span> =&gt; <span class="ident">MultiByteToWideChar</span>(<span class="ident">co::CP::UTF8</span>, <span class="ident">co::MBC::NoValue</span>, <span class="ident">data</span>)<span class="question-mark">?</span>,
-				<span class="ident">Encoding::Utf16be</span> =&gt; <span class="ident"><span class="self">Self</span>::parse_utf16_str</span>(<span class="ident">data</span>, <span class="bool-val">true</span>),
-				<span class="ident">Encoding::Utf16le</span> =&gt; <span class="ident"><span class="self">Self</span>::parse_utf16_str</span>(<span class="ident">data</span>, <span class="bool-val">false</span>),
-				<span class="ident">Encoding::Utf32be</span>
-				<span class="op">|</span> <span class="ident">Encoding::Utf32le</span>
-				<span class="op">|</span> <span class="ident">Encoding::Scsu</span>
-				<span class="op">|</span> <span class="ident">Encoding::Bocu1</span>
-				<span class="op">|</span> <span class="ident">Encoding::Unknown</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encoding {} not implemented.&quot;</span>, <span class="ident">encoding</span>),
+		</span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+			vec_u16: <span class="prelude-val">Some</span>(<span class="kw">match </span>encoding {
+				Encoding::Ansi =&gt; <span class="self">Self</span>::parse_ansi_str(data),
+				Encoding::Win1252 =&gt; MultiByteToWideChar(co::CP::WINDOWS_1252, co::MBC::NoValue, data)<span class="question-mark">?</span>,
+				Encoding::Utf8 =&gt; MultiByteToWideChar(co::CP::UTF8, co::MBC::NoValue, data)<span class="question-mark">?</span>,
+				Encoding::Utf16be =&gt; <span class="self">Self</span>::parse_utf16_str(data, <span class="bool-val">true</span>),
+				Encoding::Utf16le =&gt; <span class="self">Self</span>::parse_utf16_str(data, <span class="bool-val">false</span>),
+				Encoding::Utf32be
+				| Encoding::Utf32le
+				| Encoding::Scsu
+				| Encoding::Bocu1
+				| Encoding::Unknown =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encoding {} not implemented.&quot;</span>, encoding),
 			}),
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_ansi_str</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">the_len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
-		<span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">by</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-			<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">by</span> <span class="op">==</span> <span class="number">0x00</span> { <span class="comment">// found terminating null amidst data, stop processing</span>
-				<span class="ident">the_len</span> <span class="op">=</span> <span class="ident">idx</span>;
+	<span class="kw">fn </span>parse_ansi_str(data: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u16&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>the_len = data.len();
+		<span class="kw">for </span>(idx, by) <span class="kw">in </span>data.iter().enumerate() {
+			<span class="kw">if </span><span class="kw-2">*</span>by == <span class="number">0x00 </span>{ <span class="comment">// found terminating null amidst data, stop processing
+				</span>the_len = idx;
 				<span class="kw">break</span>;
 			}
 		}
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">str16</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">the_len</span> <span class="op">+</span> <span class="number">1</span>); <span class="comment">// room for terminating null</span>
-		<span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">by</span><span class="op">|</span> <span class="ident">str16</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">by</span> <span class="kw">as</span> <span class="kw">_</span>)); <span class="comment">// u8 to u18 raw conversion</span>
-		<span class="ident">str16</span>.<span class="ident">push</span>(<span class="number">0x0000</span>); <span class="comment">// terminating null</span>
-		<span class="ident">str16</span>
+		<span class="kw">let </span><span class="kw-2">mut </span>str16 = Vec::with_capacity(the_len + <span class="number">1</span>); <span class="comment">// room for terminating null
+		</span>data.iter().for_each(|by| str16.push(<span class="kw-2">*</span>by <span class="kw">as _</span>)); <span class="comment">// u8 to u18 raw conversion
+		</span>str16.push(<span class="number">0x0000</span>); <span class="comment">// terminating null
+		</span>str16
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_utf16_str</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">is_big_endian</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> {
-			<span class="kw-2">&amp;</span><span class="ident">data</span>[..<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="comment">// if odd number of bytes, discard last one</span>
-		} <span class="kw">else</span> {
-			<span class="ident">data</span>
+	<span class="kw">fn </span>parse_utf16_str(data: <span class="kw-2">&amp;</span>[u8], is_big_endian: bool) -&gt; Vec&lt;u16&gt; {
+		<span class="kw">let </span>data = <span class="kw">if </span>data.len() % <span class="number">2 </span>== <span class="number">1 </span>{
+			<span class="kw-2">&amp;</span>data[..data.len() - <span class="number">1</span>] <span class="comment">// if odd number of bytes, discard last one
+		</span>} <span class="kw">else </span>{
+			data
 		};
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">str16</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>(<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>); <span class="comment">// room for terminating null</span>
-		<span class="kw">for</span> (<span class="ident">b0</span>, <span class="ident">b1</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">windows</span>(<span class="number">2</span>)
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">chunk</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>), <span class="kw-2">*</span><span class="ident">chunk</span>.<span class="ident">get_unchecked</span>(<span class="number">1</span>)) })
+		<span class="kw">let </span><span class="kw-2">mut </span>str16 = Vec::&lt;u16&gt;::with_capacity(data.len() / <span class="number">2 </span>+ <span class="number">1</span>); <span class="comment">// room for terminating null
+		</span><span class="kw">for </span>(b0, b1) <span class="kw">in </span>data.windows(<span class="number">2</span>)
+			.map(|chunk| <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>chunk.get_unchecked(<span class="number">0</span>), <span class="kw-2">*</span>chunk.get_unchecked(<span class="number">1</span>)) })
 		{
-			<span class="kw">if</span> <span class="ident">b0</span> <span class="op">==</span> <span class="number">0x00</span> <span class="op">&amp;&amp;</span> <span class="ident">b1</span> <span class="op">==</span> <span class="number">0x00</span> {
-				<span class="kw">break</span>; <span class="comment">// found terminating null amidst data, stop processing</span>
-			}
+			<span class="kw">if </span>b0 == <span class="number">0x00 </span>&amp;&amp; b1 == <span class="number">0x00 </span>{
+				<span class="kw">break</span>; <span class="comment">// found terminating null amidst data, stop processing
+			</span>}
 
-			<span class="kw">let</span> (<span class="ident">b0</span>, <span class="ident">b1</span>) <span class="op">=</span> (<span class="ident">b0</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="ident">b1</span> <span class="kw">as</span> <span class="ident">u16</span>); <span class="comment">// avoid left shift overflow</span>
-			<span class="ident">str16</span>.<span class="ident">push</span>(<span class="kw">if</span> <span class="ident">is_big_endian</span> {
-				(<span class="ident">b0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">b1</span>
-			} <span class="kw">else</span> {
-				<span class="ident">b0</span> <span class="op">|</span> (<span class="ident">b1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-			} <span class="kw">as</span> <span class="kw">_</span>);
+			<span class="kw">let </span>(b0, b1) = (b0 <span class="kw">as </span>u16, b1 <span class="kw">as </span>u16); <span class="comment">// avoid left shift overflow
+			</span>str16.push(<span class="kw">if </span>is_big_endian {
+				(b0 &lt;&lt; <span class="number">8</span>) | b1
+			} <span class="kw">else </span>{
+				b0 | (b1 &lt;&lt; <span class="number">8</span>)
+			} <span class="kw">as _</span>);
 		}
 
-		<span class="ident">str16</span>.<span class="ident">push</span>(<span class="number">0x0000</span>); <span class="comment">// terminating null</span>
-		<span class="ident">str16</span>
+		str16.push(<span class="number">0x0000</span>); <span class="comment">// terminating null
+		</span>str16
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// String encodings that can be guessed by</span>
-<span class="doccomment">/// [`WString::guess_encoding`](crate::WString::guess_encoding).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Encoding</span> {
-	<span class="doccomment">/// Unknown encoding.</span>
-	<span class="ident">Unknown</span>,
-	<span class="doccomment">/// Common [US_ASCII](https://en.wikipedia.org/wiki/ASCII) encoding.</span>
-	<span class="ident">Ansi</span>,
-	<span class="doccomment">/// [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252) encoding.</span>
-	<span class="ident">Win1252</span>,
-	<span class="doccomment">/// [UTF-8](https://en.wikipedia.org/wiki/UTF-8) encoding.</span>
-	<span class="ident">Utf8</span>,
-	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, big-endian.</span>
-	<span class="ident">Utf16be</span>,
-	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, little-endian.</span>
-	<span class="ident">Utf16le</span>,
-	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, big-endian.</span>
-	<span class="ident">Utf32be</span>,
-	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, little-endian.</span>
-	<span class="ident">Utf32le</span>,
-	<span class="doccomment">/// [Standard Compression Scheme for Unicode](https://en.wikipedia.org/wiki/Standard_Compression_Scheme_for_Unicode).</span>
-	<span class="ident">Scsu</span>,
-	<span class="doccomment">/// [Binary Ordered Compression for Unicode](https://en.wikipedia.org/wiki/Binary_Ordered_Compression_for_Unicode).</span>
-	<span class="ident">Bocu1</span>,
+</span><span class="doccomment">/// String encodings that can be guessed by
+/// [`WString::guess_encoding`](crate::WString::guess_encoding).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]</span>
+<span class="kw">pub enum </span>Encoding {
+	<span class="doccomment">/// Unknown encoding.
+	</span>Unknown,
+	<span class="doccomment">/// Common [US_ASCII](https://en.wikipedia.org/wiki/ASCII) encoding.
+	</span>Ansi,
+	<span class="doccomment">/// [Windows-1252](https://en.wikipedia.org/wiki/Windows-1252) encoding.
+	</span>Win1252,
+	<span class="doccomment">/// [UTF-8](https://en.wikipedia.org/wiki/UTF-8) encoding.
+	</span>Utf8,
+	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, big-endian.
+	</span>Utf16be,
+	<span class="doccomment">/// [UTF-16](https://en.wikipedia.org/wiki/UTF-16) encoding, little-endian.
+	</span>Utf16le,
+	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, big-endian.
+	</span>Utf32be,
+	<span class="doccomment">/// [UTF-32](https://en.wikipedia.org/wiki/UTF-32) encoding, little-endian.
+	</span>Utf32le,
+	<span class="doccomment">/// [Standard Compression Scheme for Unicode](https://en.wikipedia.org/wiki/Standard_Compression_Scheme_for_Unicode).
+	</span>Scsu,
+	<span class="doccomment">/// [Binary Ordered Compression for Unicode](https://en.wikipedia.org/wiki/Binary_Ordered_Compression_for_Unicode).
+	</span>Bocu1,
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Encoding</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;Unknown&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Ansi</span> =&gt; <span class="string">&quot;ANSI&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Win1252</span> =&gt; <span class="string">&quot;Windows 1252&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf8</span> =&gt; <span class="string">&quot;UTF-8&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf16be</span> =&gt; <span class="string">&quot;UTF-16 BE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf16le</span> =&gt; <span class="string">&quot;UTF-16 LE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf32be</span> =&gt; <span class="string">&quot;UTF-32 BE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Utf32le</span> =&gt; <span class="string">&quot;UTF-32 LE&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Scsu</span> =&gt; <span class="string">&quot;SCSU&quot;</span>,
-			<span class="ident"><span class="self">Self</span>::Bocu1</span> =&gt; <span class="string">&quot;BOCU1&quot;</span>,
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Encoding {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;Unknown&quot;</span>,
+			<span class="self">Self</span>::Ansi =&gt; <span class="string">&quot;ANSI&quot;</span>,
+			<span class="self">Self</span>::Win1252 =&gt; <span class="string">&quot;Windows 1252&quot;</span>,
+			<span class="self">Self</span>::Utf8 =&gt; <span class="string">&quot;UTF-8&quot;</span>,
+			<span class="self">Self</span>::Utf16be =&gt; <span class="string">&quot;UTF-16 BE&quot;</span>,
+			<span class="self">Self</span>::Utf16le =&gt; <span class="string">&quot;UTF-16 LE&quot;</span>,
+			<span class="self">Self</span>::Utf32be =&gt; <span class="string">&quot;UTF-32 BE&quot;</span>,
+			<span class="self">Self</span>::Utf32le =&gt; <span class="string">&quot;UTF-32 LE&quot;</span>,
+			<span class="self">Self</span>::Scsu =&gt; <span class="string">&quot;SCSU&quot;</span>,
+			<span class="self">Self</span>::Bocu1 =&gt; <span class="string">&quot;BOCU1&quot;</span>,
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

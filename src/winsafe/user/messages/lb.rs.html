@@ -1109,1116 +1109,1116 @@
 <span id="1109">1109</span>
 <span id="1110">1110</span>
 <span id="1111">1111</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HIWORD</span>, <span class="ident">LCID</span>, <span class="ident">LOWORD</span>, <span class="ident">MAKEDWORD</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::WndMsg</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSend</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">POINT</span>, <span class="ident">RECT</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs</span>::{<span class="ident">LB_ERR</span>, <span class="ident">LB_ERRSPACE</span>, <span class="ident">zero_as_err</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LCID, LOWORD, MAKEDWORD, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{POINT, RECT};
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::{LB_ERR, LB_ERRSPACE, zero_as_err};
 
-<span class="doccomment">/// [`LB_ADDFILE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-addfile)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddFile</span> {
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">WString</span>,
+<span class="doccomment">/// [`LB_ADDFILE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-addfile)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>AddFile {
+	<span class="kw">pub </span>text: WString,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">AddFile</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>AddFile {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::ADDFILE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_ADDSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-addstring)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddString</span> {
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">WString</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">AddString</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::ADDSTRING</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::ADDFILE.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_DELETESTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-deletestring)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeleteString</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_ADDSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-addstring)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>AddString {
+	<span class="kw">pub </span>text: WString,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">DeleteString</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>AddString {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::DELETESTRING</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_DIR`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-dir)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dir</span> {
-	<span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">co::DDL</span>,
-	<span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">WString</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">Dir</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::DIR</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">attributes</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::ADDSTRING.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_FINDSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-findstring)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FindString</span> {
-	<span class="kw">pub</span> <span class="ident">preceding_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">WString</span>,
+<span class="doccomment">/// [`LB_DELETESTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-deletestring)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>DeleteString {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">FindString</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>DeleteString {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::FINDSTRING</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">preceding_index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_FINDSTRINGEXACT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-findstringexact)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FindStringExact</span> {
-	<span class="kw">pub</span> <span class="ident">preceding_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">WString</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">FindStringExact</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::FINDSTRINGEXACT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">preceding_index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::DELETESTRING.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETANCHORINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getanchorindex)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetAnchorIndex</span> {}
+<span class="doccomment">/// [`LB_DIR`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-dir)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>Dir {
+	<span class="kw">pub </span>attributes: co::DDL,
+	<span class="kw">pub </span>path: WString,
+}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetAnchorIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>Dir {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETANCHORINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::DIR.into(),
+			wparam: <span class="self">self</span>.attributes.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.path.as_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETCARETINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcaretindex)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetCaretIndex</span> {}
+<span class="doccomment">/// [`LB_FINDSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-findstring)
+/// message parameters.
+///
+/// Return type: `Option&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>FindString {
+	<span class="kw">pub </span>preceding_index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	<span class="kw">pub </span>text: WString,
+}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetCaretIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>FindString {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">None</span>,
+			idx =&gt; <span class="prelude-val">Some</span>(idx <span class="kw">as _</span>),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETCARETINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::FINDSTRING.into(),
+			wparam: <span class="self">self</span>.preceding_index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcount)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetCount</span> {}
+<span class="doccomment">/// [`LB_FINDSTRINGEXACT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-findstringexact)
+/// message parameters.
+///
+/// Return type: `Option&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>FindStringExact {
+	<span class="kw">pub </span>preceding_index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	<span class="kw">pub </span>text: WString,
+}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetCount</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>FindStringExact {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">None</span>,
+			idx =&gt; <span class="prelude-val">Some</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETCOUNT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::FINDSTRINGEXACT.into(),
+			wparam: <span class="self">self</span>.preceding_index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcursel)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetCurSel</span> {}
+<span class="doccomment">/// [`LB_GETANCHORINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getanchorindex)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetAnchorIndex {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetCurSel</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetAnchorIndex {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">None</span>,
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETCURSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETANCHORINDEX.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETHORIZONTALEXTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gethorizontalextent)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetHorizontalExtent</span> {}
+<span class="doccomment">/// [`LB_GETCARETINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcaretindex)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetCaretIndex {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetHorizontalExtent</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetCaretIndex {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETHORIZONTALEXTENT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETCARETINDEX.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETITEMDATA`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemdata)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;isize&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemData</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-}
+<span class="doccomment">/// [`LB_GETCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcount)
+/// message, which has no parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetCount {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemData</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetCount {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">const</span> <span class="ident">LB_ERR_ISIZE</span>: <span class="ident">isize</span> <span class="op">=</span> <span class="ident">LB_ERR</span> <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="kw">match</span> <span class="ident">v</span> {
-			<span class="ident">LB_ERR_ISIZE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">data</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">data</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETITEMDATA</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETCOUNT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETITEMHEIGHT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemheight)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u8&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemHeight</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-}
+<span class="doccomment">/// [`LB_GETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getcursel)
+/// message, which has no parameters.
+///
+/// Return type: `Option&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetCurSel {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemHeight</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetCurSel {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">height</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">height</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">None</span>,
+			idx =&gt; <span class="prelude-val">Some</span>(idx <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETITEMHEIGHT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_GETITEMRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemrect)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rect</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETITEMRECT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">rect</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETCURSEL.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETLISTBOXINFO`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getlistboxinfo)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetListBoxInfo</span> {}
+<span class="doccomment">/// [`LB_GETHORIZONTALEXTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gethorizontalextent)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetHorizontalExtent {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetListBoxInfo</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetHorizontalExtent {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETLISTBOXINFO</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETHORIZONTALEXTENT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETLOCALE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getlocale)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `LCID`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetLocale</span> {}
+<span class="doccomment">/// [`LB_GETITEMDATA`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemdata)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;isize&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemData {
+	<span class="kw">pub </span>index: u32,
+}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetLocale</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">LCID</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetItemData {
+	<span class="kw">type </span>RetType = SysResult&lt;isize&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">LCID</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">const </span>LB_ERR_ISIZE: isize = LB_ERR <span class="kw">as _</span>;
+		<span class="kw">match </span>v {
+			LB_ERR_ISIZE =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			data =&gt; <span class="prelude-val">Ok</span>(data),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETLOCALE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETITEMDATA.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getsel)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;bool&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSel</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_GETITEMHEIGHT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemheight)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u8&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemHeight {
+	<span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetSel</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetItemHeight {
+	<span class="kw">type </span>RetType = SysResult&lt;u8&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">status</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">status</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			height =&gt; <span class="prelude-val">Ok</span>(height <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_GETSELCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getselcount)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSelCount</span> {}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetSelCount</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETSELCOUNT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETITEMHEIGHT.into(),
+			wparam: <span class="self">self</span>.index.unwrap_or(<span class="number">0</span>) <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETSELITEMS`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getselitems)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSelItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u32</span>],
+<span class="doccomment">/// [`LB_GETITEMRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getitemrect)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>rect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetSelItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetItemRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETSELITEMS</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(),
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_GETTEXT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettext)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetText</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">WString</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetText</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">nchars</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">nchars</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETTEXT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_mut_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETITEMRECT.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.rect <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETTEXTLEN`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettextlen)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetTextLen</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-}
+<span class="doccomment">/// [`LB_GETLISTBOXINFO`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getlistboxinfo)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetListBoxInfo {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetTextLen</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetListBoxInfo {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">nchars</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">nchars</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETTEXTLEN</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETLISTBOXINFO.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_GETTOPINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettopindex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetTopIndex</span> {}
+<span class="doccomment">/// [`LB_GETLOCALE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getlocale)
+/// message, which has no parameters.
+///
+/// Return type: `LCID`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetLocale {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetTopIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetLocale {
+	<span class="kw">type </span>RetType = LCID;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		LCID(v <span class="kw">as _</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::GETTOPINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETLOCALE.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_INITSTORAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-initstorage)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InitStorage</span> {
-	<span class="kw">pub</span> <span class="ident">num_items</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">memory_bytes</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_GETSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getsel)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;bool&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetSel {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">InitStorage</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetSel {
+	<span class="kw">type </span>RetType = SysResult&lt;bool&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">n_items</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">n_items</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			status =&gt; <span class="prelude-val">Ok</span>(status != <span class="number">0</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::INITSTORAGE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">num_items</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">memory_bytes</span> <span class="kw">as</span> <span class="kw">_</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_INSERTSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-insertstring)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InsertString</span> {
-	<span class="kw">pub</span> <span class="ident">insertion_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">WString</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">InsertString</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::INSERTSTRING</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">insertion_index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETSEL.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_ITEMFROMPOINT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-itemfrompoint)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `(i32, bool)`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ItemFromPoint</span> {
-	<span class="kw">pub</span> <span class="ident">coords</span>: <span class="ident">POINT</span>,
-}
+<span class="doccomment">/// [`LB_GETSELCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getselcount)
+/// message, which has no parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetSelCount {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">ItemFromPoint</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> (<span class="ident">i32</span>, <span class="ident">bool</span>);
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetSelCount {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		(<span class="ident">LOWORD</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">HIWORD</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">==</span> <span class="number">1</span>)
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::ITEMFROMPOINT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">coords</span>.<span class="ident">into_u32</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETSELCOUNT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="macro">pub_struct_msg_empty!</span> { <span class="ident">ResetContent</span>: <span class="ident">co::LB::RESETCONTENT</span>.<span class="ident">into</span>(); <span class="string">&quot;user&quot;</span>;
-	<span class="doccomment">/// [`LB_RESETCONTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-resetcontent)</span>
+<span class="doccomment">/// [`LB_GETSELITEMS`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-getselitems)
+/// message parameters.
+///
+/// Return type `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetSelItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u32],
 }
 
-<span class="doccomment">/// [`LB_SELECTSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selectstring)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelectString</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">prefix</span>: <span class="ident">WString</span>,
-}
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetSelItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SelectString</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="ident">idx</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SELECTSTRING</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">prefix</span>.<span class="ident">as_ptr</span>() } <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETSELITEMS.into(),
+			wparam: <span class="self">self</span>.buffer.len(),
+			lparam: <span class="self">self</span>.buffer.as_mut_ptr() <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SELITEMRANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selitemrange)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelItemRange</span> {
-	<span class="kw">pub</span> <span class="ident">select</span>: <span class="ident">bool</span>,
-	<span class="kw">pub</span> <span class="ident">first_item</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">last_item</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// [`LB_GETTEXT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettext)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetText&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>text: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>WString,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SelItemRange</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetText&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			nchars =&gt; <span class="prelude-val">Ok</span>(nchars <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SELITEMRANGE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">select</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="ident">MAKEDWORD</span>(<span class="self">self</span>.<span class="ident">first_item</span>, <span class="self">self</span>.<span class="ident">last_item</span>) <span class="kw">as</span> <span class="kw">_</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_SELITEMRANGEEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selitemrangeex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelItemRangeEx</span> {
-	<span class="kw">pub</span> <span class="ident">first_index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">last_index</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SelItemRangeEx</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SELITEMRANGEEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">first_index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">last_index</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETTEXT.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_mut_ptr() } <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETANCHORINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setanchorindex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetAnchorIndex</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_GETTEXTLEN`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettextlen)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetTextLen {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetAnchorIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetTextLen {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			nchars =&gt; <span class="prelude-val">Ok</span>(nchars <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETANCHORINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_SETCARETINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcaretindex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetCaretIndex</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">at_least_partially_visible</span>: <span class="ident">bool</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetCaretIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETCARETINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">at_least_partially_visible</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETTEXTLEN.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETCOLUMNWIDTH`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcolumnwidth)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetColumnWidth</span> {
-	<span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_GETTOPINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-gettopindex)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetTopIndex {}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetTopIndex {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::GETTOPINDEX.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
+		}
+	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetColumnWidth</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
+<span class="doccomment">/// [`LB_INITSTORAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-initstorage)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>InitStorage {
+	<span class="kw">pub </span>num_items: u32,
+	<span class="kw">pub </span>memory_bytes: u32,
+}
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>InitStorage {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			n_items =&gt; <span class="prelude-val">Ok</span>(n_items <span class="kw">as _</span>),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::INITSTORAGE.into(),
+			wparam: <span class="self">self</span>.num_items <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.memory_bytes <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_INSERTSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-insertstring)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>InsertString {
+	<span class="kw">pub </span>insertion_index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	<span class="kw">pub </span>text: WString,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>InsertString {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::INSERTSTRING.into(),
+			wparam: <span class="self">self</span>.insertion_index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.text.as_ptr() } <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_ITEMFROMPOINT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-itemfrompoint)
+/// message parameters.
+///
+/// Return type: `(i32, bool)`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ItemFromPoint {
+	<span class="kw">pub </span>coords: POINT,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>ItemFromPoint {
+	<span class="kw">type </span>RetType = (i32, bool);
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		(LOWORD(v <span class="kw">as _</span>) <span class="kw">as _</span>, HIWORD(v <span class="kw">as _</span>) == <span class="number">1</span>)
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::ITEMFROMPOINT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.coords.into_u32() <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="macro">pub_struct_msg_empty!</span> { ResetContent: co::LB::RESETCONTENT.into(); <span class="string">&quot;user&quot;</span>;
+	<span class="doccomment">/// [`LB_RESETCONTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-resetcontent)
+</span>}
+
+<span class="doccomment">/// [`LB_SELECTSTRING`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selectstring)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SelectString {
+	<span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	<span class="kw">pub </span>prefix: WString,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SelectString {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			idx =&gt; <span class="prelude-val">Ok</span>(idx <span class="kw">as _</span>),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SELECTSTRING.into(),
+			wparam: <span class="self">self</span>.index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="kw">unsafe </span>{ <span class="self">self</span>.prefix.as_ptr() } <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SELITEMRANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selitemrange)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SelItemRange {
+	<span class="kw">pub </span>select: bool,
+	<span class="kw">pub </span>first_item: u16,
+	<span class="kw">pub </span>last_item: u16,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SelItemRange {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SELITEMRANGE.into(),
+			wparam: <span class="self">self</span>.select <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.first_item, <span class="self">self</span>.last_item) <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SELITEMRANGEEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-selitemrangeex)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SelItemRangeEx {
+	<span class="kw">pub </span>first_index: u32,
+	<span class="kw">pub </span>last_index: u32,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SelItemRangeEx {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SELITEMRANGEEX.into(),
+			wparam: <span class="self">self</span>.first_index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.last_index <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SETANCHORINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setanchorindex)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetAnchorIndex {
+	<span class="kw">pub </span>index: u32,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetAnchorIndex {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETANCHORINDEX.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SETCARETINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcaretindex)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetCaretIndex {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>at_least_partially_visible: bool,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetCaretIndex {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETCARETINDEX.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.at_least_partially_visible <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SETCOLUMNWIDTH`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcolumnwidth)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetColumnWidth {
+	<span class="kw">pub </span>width: u32,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetColumnWidth {
+	<span class="kw">type </span>RetType = ();
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETCOLUMNWIDTH</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETCOLUMNWIDTH.into(),
+			wparam: <span class="self">self</span>.width <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcount)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetCount</span> {
-	<span class="kw">pub</span> <span class="ident">new_count</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_SETCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcount)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetCount {
+	<span class="kw">pub </span>new_count: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetCount</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetCount {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">LB_ERRSPACE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::NOT_ENOUGH_MEMORY</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			LB_ERRSPACE =&gt; <span class="prelude-val">Err</span>(co::ERROR::NOT_ENOUGH_MEMORY),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETCOUNT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">new_count</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETCOUNT.into(),
+			wparam: <span class="self">self</span>.new_count <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcursel)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetCurSel</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`LB_SETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setcursel)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetCurSel {
+	<span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetCurSel</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetCurSel {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">None</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">if let </span><span class="prelude-val">None </span>= <span class="self">self</span>.index {
 			<span class="prelude-val">Ok</span>(())
-		} <span class="kw">else</span> {
-			<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-				<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-				<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+		} <span class="kw">else </span>{
+			<span class="kw">match </span>v <span class="kw">as </span>i32 {
+				LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+				<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 			}
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETCURSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETCURSEL.into(),
+			wparam: <span class="self">self</span>.index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETHORIZONTALEXTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-sethorizontalextent)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetHorizontalExtent</span> {
-	<span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_SETHORIZONTALEXTENT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-sethorizontalextent)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetHorizontalExtent {
+	<span class="kw">pub </span>width: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetHorizontalExtent</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetHorizontalExtent {
+	<span class="kw">type </span>RetType = ();
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETHORIZONTALEXTENT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETHORIZONTALEXTENT.into(),
+			wparam: <span class="self">self</span>.width <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETITEMDATA`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setitemdata)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetItemData</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">isize</span>,
+<span class="doccomment">/// [`LB_SETITEMDATA`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setitemdata)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetItemData {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>data: isize,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetItemData</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetItemData {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETITEMDATA</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">data</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_SETITEMHEIGHT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setitemheight)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetItemHeight</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">height</span>: <span class="ident">u8</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetItemHeight</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETITEMHEIGHT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">height</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETITEMDATA.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.data,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETLOCALE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setlocale)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;LCID&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetLocale</span> {
-	<span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">LCID</span>,
+<span class="doccomment">/// [`LB_SETITEMHEIGHT`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setitemheight)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetItemHeight {
+	<span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	<span class="kw">pub </span>height: u8,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetLocale</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">LCID</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetItemHeight {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">lcid</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LCID</span>(<span class="ident">lcid</span> <span class="kw">as</span> <span class="kw">_</span>)),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETLOCALE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">locale</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`LB_SETSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setsel)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetSel</span> {
-	<span class="kw">pub</span> <span class="ident">select</span>: <span class="ident">bool</span>,
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetSel</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
-		}
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">select</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETITEMHEIGHT.into(),
+			wparam: <span class="self">self</span>.index.unwrap_or(<span class="number">0</span>) <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.height <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETTABSTOPS`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-settabstops)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetTabStops</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">tab_stops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u32</span>],
+<span class="doccomment">/// [`LB_SETLOCALE`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setlocale)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;LCID&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetLocale {
+	<span class="kw">pub </span>locale: LCID,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetTabStops</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetLocale {
+	<span class="kw">type </span>RetType = SysResult&lt;LCID&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			lcid =&gt; <span class="prelude-val">Ok</span>(LCID(lcid <span class="kw">as _</span>)),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETTABSTOPS</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">tab_stops</span>.<span class="ident">len</span>(),
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">tab_stops</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETLOCALE.into(),
+			wparam: <span class="self">self</span>.locale.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`LB_SETTOPINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-settopindex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetTopIndex</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`LB_SETSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-setsel)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetSel {
+	<span class="kw">pub </span>select: bool,
+	<span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetTopIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetSel {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">i32</span> {
-			<span class="ident">LB_ERR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::LB::SETTOPINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETSEL.into(),
+			wparam: <span class="self">self</span>.select <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SETTABSTOPS`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-settabstops)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetTabStops&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>tab_stops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u32],
+}
+
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>SetTabStops&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETTABSTOPS.into(),
+			wparam: <span class="self">self</span>.tab_stops.len(),
+			lparam: <span class="self">self</span>.tab_stops.as_ptr() <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LB_SETTOPINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/lb-settopindex)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetTopIndex {
+	<span class="kw">pub </span>index: u32,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetTopIndex {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v <span class="kw">as </span>i32 {
+			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LB::SETTOPINDEX.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

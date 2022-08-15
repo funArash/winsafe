@@ -162,169 +162,169 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::MAX_PATH</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::POINT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::shell;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::POINT;
 
-<span class="macro">impl_handle!</span> { <span class="ident">HDROP</span>: <span class="string">&quot;shell&quot;</span>;
-	<span class="doccomment">/// Handle to an</span>
-	<span class="doccomment">/// [internal drop structure](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdrop).</span>
-}
+<span class="macro">impl_handle!</span> { HDROP: <span class="string">&quot;shell&quot;</span>;
+	<span class="doccomment">/// Handle to an
+	/// [internal drop structure](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdrop).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">shell_Hdrop</span> <span class="kw">for</span> <span class="ident">HDROP</span> {}
+<span class="kw">impl </span>shell_Hdrop <span class="kw">for </span>HDROP {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`HDROP`](crate::HDROP).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_Hdrop</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// Returns an iterator over the dropped files by calling</span>
-	<span class="doccomment">/// [`HDROP::DragQueryFile`](crate::prelude::shell_Hdrop::DragQueryFile)</span>
-	<span class="doccomment">/// consecutively, then frees the handle by calling</span>
-	<span class="doccomment">/// [`HDROP::DragFinish`](crate::prelude::shell_Hdrop::DragFinish).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Iterating over the strings:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::HDROP;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let hdrop: HDROP; // initialized somewhere</span>
-	<span class="doccomment">/// # let hdrop = HDROP::NULL;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for file_path in hdrop.iter()? {</span>
-	<span class="doccomment">///     let file_path = file_path?;</span>
-	<span class="doccomment">///     println!(&quot;File: {}&quot;, file_path);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Collecting the strings into a</span>
-	<span class="doccomment">/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{HDROP, WinResult};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let hdrop: HDROP; // initialized somewhere</span>
-	<span class="doccomment">/// # let hdrop = HDROP::NULL;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let file_paths = hdrop.iter()?</span>
-	<span class="doccomment">///     .collect::&lt;WinResult&lt;Vec&lt;_&gt;&gt;&gt;()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">DropsIter::new</span>(<span class="ident">HDROP</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_ptr</span>() }))<span class="question-mark">?</span>))
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`HDROP`](crate::HDROP).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_Hdrop: Handle {
+	<span class="doccomment">/// Returns an iterator over the dropped files by calling
+	/// [`HDROP::DragQueryFile`](crate::prelude::shell_Hdrop::DragQueryFile)
+	/// consecutively, then frees the handle by calling
+	/// [`HDROP::DragFinish`](crate::prelude::shell_Hdrop::DragFinish).
+	///
+	/// # Examples
+	///
+	/// Iterating over the strings:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::HDROP;
+	///
+	/// let hdrop: HDROP; // initialized somewhere
+	/// # let hdrop = HDROP::NULL;
+	///
+	/// for file_path in hdrop.iter()? {
+	///     let file_path = file_path?;
+	///     println!(&quot;File: {}&quot;, file_path);
+	/// }
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	///
+	/// Collecting the strings into a
+	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{HDROP, SysResult};
+	///
+	/// let hdrop: HDROP; // initialized somewhere
+	/// # let hdrop = HDROP::NULL;
+	///
+	/// let file_paths = hdrop.iter()?
+	///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+		<span class="prelude-val">Ok</span>(Box::new(DropsIter::new(HDROP(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
 	}
 
-	<span class="doccomment">/// [`DragFinish`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragfinish)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer using [`HDROP::iter`](crate::prelude::shell_Hdrop::iter), which</span>
-	<span class="doccomment">/// calls `DragFinish` automatically.</span>
-	<span class="kw">fn</span> <span class="ident">DragFinish</span>(<span class="self">self</span>) {
-		<span class="kw">unsafe</span> { <span class="ident">shell::ffi::DragFinish</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
+	<span class="doccomment">/// [`DragFinish`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragfinish)
+	/// method.
+	///
+	/// Prefer using [`HDROP::iter`](crate::prelude::shell_Hdrop::iter), which
+	/// calls `DragFinish` automatically.
+	</span><span class="kw">fn </span>DragFinish(<span class="self">self</span>) {
+		<span class="kw">unsafe </span>{ shell::ffi::DragFinish(<span class="self">self</span>.as_ptr()) }
 	}
 
-	<span class="doccomment">/// [`DragQueryFile`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method is rather tricky, consider using</span>
-	<span class="doccomment">/// [`HDROP::iter`](crate::prelude::shell_Hdrop::iter).</span>
-	<span class="kw">fn</span> <span class="ident">DragQueryFile</span>(<span class="self">self</span>,
-		<span class="ident">ifile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">buf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">WString</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`DragQueryFile`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew)
+	/// method.
+	///
+	/// This method is rather tricky, consider using
+	/// [`HDROP::iter`](crate::prelude::shell_Hdrop::iter).
+	</span><span class="kw">fn </span>DragQueryFile(<span class="self">self</span>,
+		ifile: <span class="prelude-ty">Option</span>&lt;u32&gt;, buf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>WString&gt;) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">let</span> <span class="ident">cch</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">buffer_size</span>());
+		<span class="kw">let </span>cch = buf.as_ref().map_or(<span class="number">0</span>, |buf| buf.buffer_size());
 
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">shell::ffi::DragQueryFileW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">ifile</span>.<span class="ident">unwrap_or</span>(<span class="number">0xffff_ffff</span>),
-				<span class="ident">buf</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>()),
-				<span class="ident">cch</span> <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="kw">match unsafe </span>{
+			shell::ffi::DragQueryFileW(
+				<span class="self">self</span>.as_ptr(),
+				ifile.unwrap_or(<span class="number">0xffff_ffff</span>),
+				buf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr()),
+				cch <span class="kw">as _</span>,
 			)
 		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">char_count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">char_count</span>),
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			char_count =&gt; <span class="prelude-val">Ok</span>(char_count),
 		}
 	}
 
-	<span class="doccomment">/// [`DragQueryPoint`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragquerypoint)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the coordinates and whether the drop occurred in the client area</span>
-	<span class="doccomment">/// of the window.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">DragQueryPoint</span>(<span class="self">self</span>) -&gt; (<span class="ident">POINT</span>, <span class="ident">bool</span>) {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="kw">let</span> <span class="ident">client_area</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-			<span class="ident">shell::ffi::DragQueryPoint</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`DragQueryPoint`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragquerypoint)
+	/// method.
+	///
+	/// Returns the coordinates and whether the drop occurred in the client area
+	/// of the window.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>DragQueryPoint(<span class="self">self</span>) -&gt; (POINT, bool) {
+		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+		<span class="kw">let </span>client_area = <span class="kw">unsafe </span>{
+			shell::ffi::DragQueryPoint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		};
-		(<span class="ident">pt</span>, <span class="ident">client_area</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+		(pt, client_area != <span class="number">0</span>)
 	}
 }
 
-<span class="kw">struct</span> <span class="ident">DropsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">hdrop</span>: <span class="ident">HDROP</span>,
-	<span class="ident">buffer</span>: <span class="ident">WString</span>,
-	<span class="ident">count</span>: <span class="ident">u32</span>,
-	<span class="ident">current</span>: <span class="ident">u32</span>,
-	<span class="ident">_owner</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+<span class="kw">struct </span>DropsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	hdrop: HDROP,
+	buffer: WString,
+	count: u32,
+	current: u32,
+	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">hdrop</span>.<span class="ident">DragFinish</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>DropsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="self">self</span>.hdrop.DragFinish();
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DropsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>DropsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = SysResult&lt;String&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">count</span> {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">self</span>.current == <span class="self">self</span>.count {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">hdrop</span>
-			.<span class="ident">DragQueryFile</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">current</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>))
+		<span class="kw">match </span><span class="self">self</span>.hdrop
+			.DragQueryFile(<span class="prelude-val">Some</span>(<span class="self">self</span>.current), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer))
 		{
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span>; <span class="comment">// no further iterations will be made</span>
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
+			<span class="prelude-val">Err</span>(e) =&gt; {
+				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made
+				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
 			},
 			<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">to_string</span>()))
+				<span class="self">self</span>.current += <span class="number">1</span>;
+				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.buffer.to_string()))
 			},
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DropsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hdrop</span>: <span class="ident">HDROP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-			<span class="ident">hdrop</span>,
-			<span class="ident">buffer</span>: <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">MAX_PATH</span> <span class="op">+</span> <span class="number">1</span>), <span class="comment">// so we alloc just once</span>
-			<span class="ident">count</span>: <span class="ident">hdrop</span>.<span class="ident">DragQueryFile</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
-			<span class="ident">current</span>: <span class="number">0</span>,
-			<span class="ident">_owner</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DropsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(hdrop: HDROP) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
+		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+			hdrop,
+			buffer: WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>), <span class="comment">// so we alloc just once
+			</span>count: hdrop.DragQueryFile(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+			current: <span class="number">0</span>,
+			_owner: PhantomData,
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

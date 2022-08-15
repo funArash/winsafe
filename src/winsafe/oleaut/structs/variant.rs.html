@@ -119,126 +119,126 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
+<span class="kw">use </span>std::mem::ManuallyDrop;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">oleaut</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl::ComPtr</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">ole_IUnknown</span>, <span class="ident">oleaut_IDispatch</span>, <span class="ident">oleaut_Variant</span>};
+<span class="kw">use crate</span>::{co, oleaut};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::ComPtr;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IUnknown, oleaut_IDispatch, oleaut_Variant};
 
-<span class="doccomment">/// [`VARIANT`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant)</span>
-<span class="doccomment">/// struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`VariantClear`](https://docs.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantclear)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VARIANT</span> {
-	<span class="ident">vt</span>: <span class="ident">co::VT</span>,
-	<span class="ident">wReserved1</span>: <span class="ident">u16</span>,
-	<span class="ident">wReserved2</span>: <span class="ident">u16</span>,
-	<span class="ident">wReserved3</span>: <span class="ident">u16</span>,
-	<span class="ident">data</span>: [<span class="ident">u8</span>; <span class="number">16</span>],
+<span class="doccomment">/// [`VARIANT`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/ns-oaidl-variant)
+/// struct.
+///
+/// Automatically calls
+/// [`VariantClear`](https://docs.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-variantclear)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>VARIANT {
+	vt: co::VT,
+	wReserved1: u16,
+	wReserved2: u16,
+	wReserved3: u16,
+	data: [u8; <span class="number">16</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">VARIANT</span> {
-	<span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">vt</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">co::VT::EMPTY</span> {
-			<span class="kw">unsafe</span> { <span class="ident">oleaut::ffi::VariantClear</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>); } <span class="comment">// ignore errors</span>
-		}
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">VARIANT</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::mem::zeroed</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() };
-		<span class="kw">unsafe</span> { <span class="ident">oleaut::ffi::VariantInit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">obj</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>); }
-		<span class="ident">obj</span>
+<span class="kw">impl </span>Drop <span class="kw">for </span>VARIANT {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if </span><span class="self">self</span>.vt() != co::VT::EMPTY {
+			<span class="kw">unsafe </span>{ oleaut::ffi::VariantClear(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>); } <span class="comment">// ignore errors
+		</span>}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">oleaut_Variant</span> <span class="kw">for</span> <span class="ident">VARIANT</span> {
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>] {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
-	}
-
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">vt</span>: <span class="ident">co::VT</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-		<span class="ident">obj</span>.<span class="ident">vt</span> <span class="op">=</span> <span class="ident">vt</span>;
-		<span class="ident">data</span>.<span class="ident">iter</span>()
-			.<span class="ident">zip</span>(<span class="kw-2">&amp;mut</span> <span class="ident">obj</span>.<span class="ident">data</span>)
-			.<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">src</span>, <span class="ident">dest</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">dest</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">src</span>);
-		<span class="ident">obj</span>
-	}
-
-	<span class="kw">fn</span> <span class="ident">vt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::VT</span> {
-		<span class="self">self</span>.<span class="ident">vt</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>VARIANT {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;<span class="self">Self</span>&gt;() };
+		<span class="kw">unsafe </span>{ oleaut::ffi::VariantInit(<span class="kw-2">&amp;mut </span>obj <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>); }
+		obj
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">VARIANT</span> {
-	<span class="doccomment">/// Creates a new object holding an [`IDispatch`](crate::IDispatch) COM</span>
-	<span class="doccomment">/// value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that the `IDispatch` object will be cloned into the object, still</span>
-	<span class="doccomment">/// being able to be used thereafter.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_idispatch</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">oleaut_IDispatch</span>) -&gt; <span class="ident">VARIANT</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> <span class="ident">ptr</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cloned</span>.<span class="ident">leak</span>() }.<span class="ident">into</span>();
-		<span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::from_raw</span>(<span class="ident">co::VT::DISPATCH</span>, <span class="kw-2">&amp;</span><span class="ident">ptr</span>.<span class="ident">to_ne_bytes</span>()) }
+<span class="kw">impl </span>oleaut_Variant <span class="kw">for </span>VARIANT {
+	<span class="kw">unsafe fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>] {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.data
 	}
 
-	<span class="doccomment">/// If the object holds an [`IDispatch`](crate::IDispatch) COM value,</span>
-	<span class="doccomment">/// returns it, otherwise `None`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that the returned object will be a clone of the `IDispatch` being</span>
-	<span class="doccomment">/// held.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idispatch</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-		<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">oleaut_IDispatch</span>,
+	<span class="kw">unsafe fn </span>from_raw(vt: co::VT, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="self">Self</span>::default();
+		obj.vt = vt;
+		data.iter()
+			.zip(<span class="kw-2">&amp;mut </span>obj.data)
+			.for_each(|(src, dest)| <span class="kw-2">*</span>dest = <span class="kw-2">*</span>src);
+		obj
+	}
+
+	<span class="kw">fn </span>vt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::VT {
+		<span class="self">self</span>.vt
+	}
+}
+
+<span class="kw">impl </span>VARIANT {
+	<span class="doccomment">/// Creates a new object holding an [`IDispatch`](crate::IDispatch) COM
+	/// value.
+	///
+	/// Note that the `IDispatch` object will be cloned into the object, still
+	/// being able to be used thereafter.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_idispatch(val: <span class="kw-2">&amp;</span><span class="kw">impl </span>oleaut_IDispatch) -&gt; VARIANT {
+		<span class="kw">let </span><span class="kw-2">mut </span>cloned = val.clone();
+		<span class="kw">let </span>ptr: usize = <span class="kw">unsafe </span>{ cloned.leak() }.into();
+		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::DISPATCH, <span class="kw-2">&amp;</span>ptr.to_ne_bytes()) }
+	}
+
+	<span class="doccomment">/// If the object holds an [`IDispatch`](crate::IDispatch) COM value,
+	/// returns it, otherwise `None`.
+	///
+	/// Note that the returned object will be a clone of the `IDispatch` being
+	/// held.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>idispatch&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+		<span class="kw">where </span>T: oleaut_IDispatch,
 	{
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">vt</span>() <span class="op">==</span> <span class="ident">co::VT::DISPATCH</span> {
-			<span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">usize::from_ne_bytes</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">raw</span>() }[..<span class="number">8</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
-			<span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">T::from</span>(<span class="ident">ComPtr</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))); <span class="comment">// won&#39;t release the stored pointer</span>
-			<span class="kw">let</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="ident">T::clone</span>(<span class="kw-2">&amp;</span><span class="ident">obj</span>);
-			<span class="prelude-val">Some</span>(<span class="ident">cloned</span>)
-		} <span class="kw">else</span> {
-			<span class="prelude-val">None</span>
-		}
+		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::DISPATCH {
+			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
+			<span class="kw">let </span>obj = ManuallyDrop::new(T::from(ComPtr(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))); <span class="comment">// won&#39;t release the stored pointer
+			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
+			<span class="prelude-val">Some</span>(cloned)
+		} <span class="kw">else </span>{
+			<span class="prelude-val">None
+		</span>}
 	}
 
-	<span class="doccomment">/// Creates a new object holding an [`IUnknown`](crate::IUnknown) COM value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that the `IUnknown` object will be cloned into the object, still</span>
-	<span class="doccomment">/// being able to be used thereafter.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_iunknown</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">ole_IUnknown</span>) -&gt; <span class="ident">VARIANT</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> <span class="ident">ptr</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cloned</span>.<span class="ident">leak</span>() }.<span class="ident">into</span>();
-		<span class="kw">unsafe</span> { <span class="ident"><span class="self">Self</span>::from_raw</span>(<span class="ident">co::VT::UNKNOWN</span>, <span class="kw-2">&amp;</span><span class="ident">ptr</span>.<span class="ident">to_ne_bytes</span>()) }
+	<span class="doccomment">/// Creates a new object holding an [`IUnknown`](crate::IUnknown) COM value.
+	///
+	/// Note that the `IUnknown` object will be cloned into the object, still
+	/// being able to be used thereafter.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_iunknown&lt;T&gt;(val: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; VARIANT {
+		<span class="kw">let </span><span class="kw-2">mut </span>cloned = val.clone();
+		<span class="kw">let </span>ptr: usize = <span class="kw">unsafe </span>{ cloned.leak() }.into();
+		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::UNKNOWN, <span class="kw-2">&amp;</span>ptr.to_ne_bytes()) }
 	}
 
-	<span class="doccomment">/// If the object holds an [`IUnknown`](crate::IUnknown) COM value, returns</span>
-	<span class="doccomment">/// it, otherwise `None`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that the returned object will be a clone of the `IUnknown` being</span>
-	<span class="doccomment">/// held.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iunknown</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-		<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">ole_IUnknown</span>,
+	<span class="doccomment">/// If the object holds an [`IUnknown`](crate::IUnknown) COM value, returns
+	/// it, otherwise `None`.
+	///
+	/// Note that the returned object will be a clone of the `IUnknown` being
+	/// held.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iunknown&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">vt</span>() <span class="op">==</span> <span class="ident">co::VT::UNKNOWN</span> {
-			<span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">usize::from_ne_bytes</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">raw</span>() }[..<span class="number">8</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
-			<span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">T::from</span>(<span class="ident">ComPtr</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))); <span class="comment">// won&#39;t release the stored pointer</span>
-			<span class="kw">let</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="ident">T::clone</span>(<span class="kw-2">&amp;</span><span class="ident">obj</span>);
-			<span class="prelude-val">Some</span>(<span class="ident">cloned</span>)
-		} <span class="kw">else</span> {
-			<span class="prelude-val">None</span>
-		}
+		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::UNKNOWN {
+			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
+			<span class="kw">let </span>obj = ManuallyDrop::new(T::from(ComPtr(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>))); <span class="comment">// won&#39;t release the stored pointer
+			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
+			<span class="prelude-val">Some</span>(cloned)
+		} <span class="kw">else </span>{
+			<span class="prelude-val">None
+		</span>}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

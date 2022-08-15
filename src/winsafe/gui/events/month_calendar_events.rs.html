@@ -46,53 +46,53 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{<span class="ident">NMDAYSTATE</span>, <span class="ident">NMSELCHANGE</span>, <span class="ident">NMVIEWCHANGE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{NMDAYSTATE, NMSELCHANGE, NMVIEWCHANGE};
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
 
-<span class="doccomment">/// Exposes month calendar control</span>
-<span class="doccomment">/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-month-calendar-control-reference-notifications).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These event methods are just proxies to the</span>
-<span class="doccomment">/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who</span>
-<span class="doccomment">/// is the real responsible for the child event handling.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MonthCalendarEvents</span>(<span class="ident">BaseEventsProxy</span>);
+<span class="doccomment">/// Exposes month calendar control
+/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-month-calendar-control-reference-notifications).
+///
+/// These event methods are just proxies to the
+/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who
+/// is the real responsible for the child event handling.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>MonthCalendarEvents(BaseEventsProxy);
 
-<span class="kw">impl</span> <span class="ident">MonthCalendarEvents</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parent_base</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>, <span class="ident">ctrl_id</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">BaseEventsProxy::new</span>(<span class="ident">parent_base</span>, <span class="ident">ctrl_id</span>))
+<span class="kw">impl </span>MonthCalendarEvents {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent_base: <span class="kw-2">&amp;</span>Base, ctrl_id: u16) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(BaseEventsProxy::new(parent_base, ctrl_id))
 	}
 
-	<span class="macro">pub_fn_nfy_withparm_noret!</span> { <span class="ident">mcn_get_day_state</span>, <span class="ident">co::MCN::GETDAYSTATE</span>, <span class="ident">NMDAYSTATE</span>,
-		<span class="doccomment">/// [`MCN_GETDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-getdaystate)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_withparm_noret!</span> { mcn_get_day_state, co::MCN::GETDAYSTATE, NMDAYSTATE,
+		<span class="doccomment">/// [`MCN_GETDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-getdaystate)
+		/// notification.
+	</span>}
 
-	<span class="macro">pub_fn_nfy_withparm_noret!</span> { <span class="ident">mcn_sel_change</span>, <span class="ident">co::MCN::SELCHANGE</span>, <span class="ident">NMSELCHANGE</span>,
-		<span class="doccomment">/// [`MCN_GETDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-selchange)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_withparm_noret!</span> { mcn_sel_change, co::MCN::SELCHANGE, NMSELCHANGE,
+		<span class="doccomment">/// [`MCN_GETDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-selchange)
+		/// notification.
+	</span>}
 
-	<span class="macro">pub_fn_nfy_withparm_noret!</span> { <span class="ident">mcn_select</span>, <span class="ident">co::MCN::SELECT</span>, <span class="ident">NMSELCHANGE</span>,
-		<span class="doccomment">/// [`MCN_SELECT`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-select)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_withparm_noret!</span> { mcn_select, co::MCN::SELECT, NMSELCHANGE,
+		<span class="doccomment">/// [`MCN_SELECT`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-select)
+		/// notification.
+	</span>}
 
-	<span class="macro">pub_fn_nfy_withparm_noret!</span> { <span class="ident">mcn_view_change</span>, <span class="ident">co::MCN::VIEWCHANGE</span>, <span class="ident">NMVIEWCHANGE</span>,
-		<span class="doccomment">/// [`MCN_VIEWCHANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-viewchange)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_withparm_noret!</span> { mcn_view_change, co::MCN::VIEWCHANGE, NMVIEWCHANGE,
+		<span class="doccomment">/// [`MCN_VIEWCHANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/mcn-viewchange)
+		/// notification.
+	</span>}
 
-	<span class="macro">pub_fn_nfy_noparm_noret!</span> { <span class="ident">nm_released_capture</span>, <span class="ident">co::NM::RELEASEDCAPTURE</span>,
-		<span class="doccomment">/// [`NM_RELEASEDCAPTURE`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-releasedcapture-monthcal-)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_noparm_noret!</span> { nm_released_capture, co::NM::RELEASEDCAPTURE,
+		<span class="doccomment">/// [`NM_RELEASEDCAPTURE`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-releasedcapture-monthcal-)
+		/// notification.
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

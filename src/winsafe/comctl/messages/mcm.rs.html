@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">SYSTEMTIME</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::WndMsg</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSend</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::RECT</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs::zero_as_err</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SysResult, SYSTEMTIME};
+<span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::RECT;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_err;
 
-<span class="doccomment">/// [`MCM_GETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getcursel)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetCurSel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">SYSTEMTIME</span>,
+<span class="doccomment">/// [`MCM_GETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getcursel)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetCurSel&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>SYSTEMTIME,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetCurSel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetCurSel&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::GETCURSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::GETCURSEL.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`MCM_GETMINREQRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getminreqrect)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetMinReqRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">bounds_rect</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>,
+<span class="doccomment">/// [`MCM_GETMINREQRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getminreqrect)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetMinReqRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>bounds_rect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetMinReqRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetMinReqRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::GETMINREQRECT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">bounds_rect</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::GETMINREQRECT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.bounds_rect <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`MCM_GETMONTHDELTA`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getmonthdelta)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetMonthDelta</span> {}
+<span class="doccomment">/// [`MCM_GETMONTHDELTA`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-getmonthdelta)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetMonthDelta {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetMonthDelta</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetMonthDelta {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::GETMONTHDELTA</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::GETMONTHDELTA.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`MCM_SETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-setcursel)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetCurSel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SYSTEMTIME</span>,
+<span class="doccomment">/// [`MCM_SETCURSEL`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-setcursel)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetCurSel&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SYSTEMTIME,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetCurSel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>SetCurSel&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::SETCURSEL</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">info</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::SETCURSEL.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.info <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`MCM_SETCURRENTVIEW`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-setcurrentview)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetCurrentView</span> {
-	<span class="kw">pub</span> <span class="ident">view</span>: <span class="ident">co::MCMV</span>,
+<span class="doccomment">/// [`MCM_SETCURRENTVIEW`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-setcurrentview)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetCurrentView {
+	<span class="kw">pub </span>view: co::MCMV,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetCurrentView</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetCurrentView {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::SETCURRENTVIEW</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">view</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::SETCURRENTVIEW.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.view.<span class="number">0 </span><span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`MCM_SETTODAY`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-settoday)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetToday</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">today</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SYSTEMTIME</span>,
+<span class="doccomment">/// [`MCM_SETTODAY`](https://docs.microsoft.com/en-us/windows/win32/controls/mcm-settoday)
+/// message parameters.
+///
+/// Return type: `()`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetToday&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>today: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SYSTEMTIME,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetToday</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> ();
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>SetToday&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = ();
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: isize) -&gt; <span class="self">Self</span>::RetType {
 		()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::MCM::SETTODAY</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">today</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::MCM::SETTODAY.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.today <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

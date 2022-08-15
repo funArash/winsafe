@@ -73,80 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::SUBCLASSPROC</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">MsgSend</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
+<span class="kw">use </span><span class="kw">crate</span>::comctl;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::SUBCLASSPROC;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 
-<span class="kw">impl</span> <span class="ident">comctl_Hwnd</span> <span class="kw">for</span> <span class="ident">HWND</span> {}
+<span class="kw">impl </span>comctl_Hwnd <span class="kw">for </span>HWND {}
 
-<span class="doccomment">/// This trait is enabled with the `comctl` feature, and provides methods for</span>
-<span class="doccomment">/// [`HWND`](crate::HWND).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">comctl_Hwnd</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`DefSubclassProc`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-defsubclassproc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The return type is variable, being defined by the `RetType` associated</span>
-	<span class="doccomment">/// type of the [`MsgSend`](crate::prelude::MsgSend) trait. That means each</span>
-	<span class="doccomment">/// message can define its own return type.</span>
-	<span class="kw">fn</span> <span class="ident">DefSubclassProc</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">M</span>) -&gt; <span class="ident">M::RetType</span>
-		<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">MsgSend</span>,
+<span class="doccomment">/// This trait is enabled with the `comctl` feature, and provides methods for
+/// [`HWND`](crate::HWND).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub trait </span>comctl_Hwnd: Handle {
+	<span class="doccomment">/// [`DefSubclassProc`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-defsubclassproc)
+	/// method.
+	///
+	/// The return type is variable, being defined by the `RetType` associated
+	/// type of the [`MsgSend`](crate::prelude::MsgSend) trait. That means each
+	/// message can define its own return type.
+	</span><span class="kw">fn </span>DefSubclassProc&lt;M&gt;(<span class="self">self</span>, msg: M) -&gt; M::RetType
+		<span class="kw">where </span>M: MsgSend,
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>;
-		<span class="kw">let</span> <span class="ident">wm_any</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">as_generic_wm</span>();
-		<span class="ident">msg</span>.<span class="ident">convert_ret</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::DefSubclassProc</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">wm_any</span>.<span class="ident">msg_id</span>.<span class="number">0</span>, <span class="ident">wm_any</span>.<span class="ident">wparam</span>, <span class="ident">wm_any</span>.<span class="ident">lparam</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>msg = msg;
+		<span class="kw">let </span>wm_any = msg.as_generic_wm();
+		msg.convert_ret(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::DefSubclassProc(
+					<span class="self">self</span>.as_ptr(), wm_any.msg_id.<span class="number">0</span>, wm_any.wparam, wm_any.lparam,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`RemoveWindowSubclass`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RemoveWindowSubclass</span>(<span class="self">self</span>,
-		<span class="ident">subclass_func</span>: <span class="ident">SUBCLASSPROC</span>, <span class="ident">subclass_id</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`RemoveWindowSubclass`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-removewindowsubclass)
+	/// method.
+	</span><span class="kw">fn </span>RemoveWindowSubclass(<span class="self">self</span>,
+		subclass_func: SUBCLASSPROC, subclass_id: usize) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::RemoveWindowSubclass</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">subclass_func</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">subclass_id</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::RemoveWindowSubclass(
+					<span class="self">self</span>.as_ptr(),
+					subclass_func <span class="kw">as _</span>,
+					subclass_id,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`SetWindowSubclass`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetWindowSubclass</span>(<span class="self">self</span>,
-		<span class="ident">subclass_proc</span>: <span class="ident">SUBCLASSPROC</span>,
-		<span class="ident">subclass_id</span>: <span class="ident">usize</span>, <span class="ident">ref_data</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`SetWindowSubclass`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass)
+	/// method.
+	</span><span class="kw">fn </span>SetWindowSubclass(<span class="self">self</span>,
+		subclass_proc: SUBCLASSPROC,
+		subclass_id: usize, ref_data: usize) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">comctl::ffi::SetWindowSubclass</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">subclass_proc</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">subclass_id</span>,
-					<span class="ident">ref_data</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				comctl::ffi::SetWindowSubclass(
+					<span class="self">self</span>.as_ptr(),
+					subclass_proc <span class="kw">as _</span>,
+					subclass_id,
+					ref_data,
 				)
 			},
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

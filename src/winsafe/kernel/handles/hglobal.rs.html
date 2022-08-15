@@ -106,113 +106,113 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs</span>::{<span class="ident">bool_to_winresult</span>, <span class="ident">GMEM_INVALID_HANDLE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, GMEM_INVALID_HANDLE};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="macro">impl_handle!</span> { <span class="ident">HGLOBAL</span>: <span class="string">&quot;kernel&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [global memory block](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc).</span>
-	<span class="doccomment">/// Originally just a `HANDLE`.</span>
-}
+<span class="macro">impl_handle!</span> { HGLOBAL: <span class="string">&quot;kernel&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [global memory block](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc).
+	/// Originally just a `HANDLE`.
+</span>}
 
-<span class="kw">impl</span> <span class="ident">kernel_Hglobal</span> <span class="kw">for</span> <span class="ident">HGLOBAL</span> {}
+<span class="kw">impl </span>kernel_Hglobal <span class="kw">for </span>HGLOBAL {}
 
-<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
-<span class="doccomment">/// [`HGLOBAL`](crate::HGLOBAL).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hglobal</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`GlobalAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalAlloc</span>(<span class="ident">flags</span>: <span class="ident">co::GMEM</span>, <span class="ident">num_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalAlloc</span>(<span class="ident">flags</span>.<span class="number">0</span>, <span class="ident">num_bytes</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HGLOBAL</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
+/// [`HGLOBAL`](crate::HGLOBAL).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>kernel_Hglobal: Handle {
+	<span class="doccomment">/// [`GlobalAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GlobalAlloc(flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HGLOBAL&gt; {
+		<span class="kw">unsafe </span>{ kernel::ffi::GlobalAlloc(flags.<span class="number">0</span>, num_bytes).as_mut() }
+			.map(|ptr| HGLOBAL(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`GlobalFlags`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalflags)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalFlags</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::GMEM</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalFlags</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="ident">GMEM_INVALID_HANDLE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">flags</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::GMEM</span>(<span class="ident">flags</span>)),
+	<span class="doccomment">/// [`GlobalFlags`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalflags)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GlobalFlags(<span class="self">self</span>) -&gt; SysResult&lt;co::GMEM&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalFlags(<span class="self">self</span>.as_ptr()) } {
+			GMEM_INVALID_HANDLE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			flags =&gt; <span class="prelude-val">Ok</span>(co::GMEM(flags)),
 		}
 	}
 
-	<span class="doccomment">/// [`GlobalFree`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfree)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GlobalFree</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalFree</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() } {
-			<span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
-			<span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
+	<span class="doccomment">/// [`GlobalFree`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfree)
+	/// method.
+	</span><span class="kw">fn </span>GlobalFree(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalFree(<span class="self">self</span>.as_ptr()).as_mut() } {
+			<span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		}
 	}
 
-	<span class="doccomment">/// [`GlobalLock`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globallock)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Calls [`HGLOBAL::GlobalSize`](crate::prelude::kernel_Hglobal::GlobalSize)</span>
-	<span class="doccomment">/// to retrieve the size of the memory block.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalUnlock`](crate::prelude::kernel_Hglobal::GlobalUnlock)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalLock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">mem_sz</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">GlobalSize</span>()<span class="question-mark">?</span>;
-		<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalLock</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> {
-				<span class="ident">std::slice::from_raw_parts_mut</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">mem_sz</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`GlobalLock`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globallock)
+	/// method.
+	///
+	/// Calls [`HGLOBAL::GlobalSize`](crate::prelude::kernel_Hglobal::GlobalSize)
+	/// to retrieve the size of the memory block.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HGLOBAL::GlobalUnlock`](crate::prelude::kernel_Hglobal::GlobalUnlock)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GlobalLock&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]&gt; {
+		<span class="kw">let </span>mem_sz = <span class="self">self</span>.GlobalSize()<span class="question-mark">?</span>;
+		<span class="kw">unsafe </span>{ kernel::ffi::GlobalLock(<span class="self">self</span>.as_ptr()).as_mut() }
+			.map(|ptr| <span class="kw">unsafe </span>{
+				std::slice::from_raw_parts_mut(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as </span><span class="kw-2">*mut </span><span class="kw">_</span>, mem_sz <span class="kw">as _</span>)
 			})
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`GlobalReAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalrealloc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalReAlloc</span>(<span class="self">self</span>,
-		<span class="ident">num_bytes</span>: <span class="ident">usize</span>, <span class="ident">flags</span>: <span class="ident">co::GMEM</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HGLOBAL</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GlobalReAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalrealloc)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GlobalReAlloc(<span class="self">self</span>,
+		num_bytes: usize, flags: co::GMEM) -&gt; SysResult&lt;HGLOBAL&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::GlobalReAlloc</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">num_bytes</span>, <span class="ident">flags</span>.<span class="number">0</span>).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HGLOBAL</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GlobalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.<span class="number">0</span>).as_mut()
+		}.map(|ptr| HGLOBAL(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`GlobalSize`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GlobalSize</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalSize</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">sz</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">sz</span>),
+	<span class="doccomment">/// [`GlobalSize`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GlobalSize(<span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalSize(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			sz =&gt; <span class="prelude-val">Ok</span>(sz),
 		}
 	}
 
-	<span class="doccomment">/// [`GlobalUnlock`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunlock)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GlobalUnlock</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GlobalUnlock</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`GlobalUnlock`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunlock)
+	/// method.
+	</span><span class="kw">fn </span>GlobalUnlock(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::GlobalUnlock(<span class="self">self</span>.as_ptr()) })
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

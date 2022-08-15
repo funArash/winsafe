@@ -44,51 +44,51 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">shell</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HINSTANCE</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
+<span class="kw">use crate</span>::{co, shell};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, WString};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 
-<span class="kw">impl</span> <span class="ident">shell_Hwnd</span> <span class="kw">for</span> <span class="ident">HWND</span> {}
+<span class="kw">impl </span>shell_Hwnd <span class="kw">for </span>HWND {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`HWND`](crate::HWND).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_Hwnd</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`ShellExecute`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">ShellExecute</span>(<span class="self">self</span>,
-		<span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-		<span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-		<span class="ident">parameters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-		<span class="ident">directory</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-		<span class="ident">show_cmd</span>: <span class="ident">co::SW</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HINSTANCE</span>, <span class="ident">co::SE_ERR</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`HWND`](crate::HWND).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_Hwnd: Handle {
+	<span class="doccomment">/// [`ShellExecute`](https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutew)
+	/// method.
+	</span><span class="kw">fn </span>ShellExecute(<span class="self">self</span>,
+		operation: <span class="kw-2">&amp;</span>str,
+		file: <span class="kw-2">&amp;</span>str,
+		parameters: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		directory: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		show_cmd: co::SW) -&gt; <span class="prelude-ty">Result</span>&lt;HINSTANCE, co::SE_ERR&gt;
 	{
-		<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-			<span class="ident">shell::ffi::ShellExecuteW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">WString::from_str</span>(<span class="ident">operation</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">WString::from_str</span>(<span class="ident">file</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">parameters</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">WString::from_str</span>(<span class="ident">lp</span>).<span class="ident">as_ptr</span>()),
-				<span class="ident">directory</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">WString::from_str</span>(<span class="ident">lp</span>).<span class="ident">as_ptr</span>()),
-				<span class="ident">show_cmd</span>.<span class="number">0</span>,
+		<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
+			shell::ffi::ShellExecuteW(
+				<span class="self">self</span>.as_ptr(),
+				WString::from_str(operation).as_ptr(),
+				WString::from_str(file).as_ptr(),
+				parameters.map_or(std::ptr::null(), |lp| WString::from_str(lp).as_ptr()),
+				directory.map_or(std::ptr::null(), |lp| WString::from_str(lp).as_ptr()),
+				show_cmd.<span class="number">0</span>,
 			)
 		};
 
-		<span class="kw">if</span> <span class="ident">ret</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span> <span class="kw">as</span> <span class="kw">_</span> {
-			<span class="prelude-val">Err</span>(<span class="ident">co::SE_ERR</span>(<span class="ident">ret</span> <span class="kw">as</span> <span class="kw">_</span>))
-		} <span class="kw">else</span> {
-			<span class="prelude-val">Ok</span>(<span class="ident">HINSTANCE</span>(<span class="ident">ret</span> <span class="kw">as</span> <span class="kw">_</span>))
+		<span class="kw">if </span>ret &lt;= <span class="number">32 </span><span class="kw">as _ </span>{
+			<span class="prelude-val">Err</span>(co::SE_ERR(ret <span class="kw">as _</span>))
+		} <span class="kw">else </span>{
+			<span class="prelude-val">Ok</span>(HINSTANCE(ret <span class="kw">as _</span>))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -185,192 +185,192 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::rc::Rc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events</span>::{<span class="ident">ProcessResult</span>, <span class="ident">WindowEvents</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::func_store::FuncStore</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">wm</span>, <span class="ident">WndMsg</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiEvents</span>, <span class="ident">MsgSendRecv</span>};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEvents};
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::func_store::FuncStore;
+<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiEvents, MsgSendRecv};
 
-<span class="doccomment">/// Exposes window</span>
-<span class="doccomment">/// [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues),</span>
-<span class="doccomment">/// plus native control notifications.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// window.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WindowEventsAll</span> {
-	<span class="ident">window_events</span>: <span class="ident">WindowEvents</span>,
-	<span class="ident">tmrs</span>: <span class="ident">FuncStore</span><span class="op">&lt;</span> <span class="comment">// WM_TIMER messages</span>
-		<span class="ident">u32</span>,
-		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value is never meaningful</span>
-	<span class="op">&gt;</span>,
-	<span class="ident">cmds</span>: <span class="ident">FuncStore</span><span class="op">&lt;</span> <span class="comment">// WM_COMMAND notifications</span>
-		(<span class="ident">co::CMD</span>, <span class="ident">u16</span>), <span class="comment">// notif code, control ID</span>
-		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value is never meaningful</span>
-	<span class="op">&gt;</span>,
-	<span class="ident">nfys</span>: <span class="ident">FuncStore</span><span class="op">&lt;</span> <span class="comment">// WM_NOTIFY notifications</span>
-		(<span class="ident">u16</span>, <span class="ident">co::NM</span>), <span class="comment">// idFrom, code</span>
-		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">wm::Notify</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value may be meaningful</span>
-	<span class="op">&gt;</span>,
+<span class="doccomment">/// Exposes window
+/// [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues),
+/// plus native control notifications.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// window.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>WindowEventsAll {
+	window_events: WindowEvents,
+	tmrs: FuncStore&lt; <span class="comment">// WM_TIMER messages
+		</span>u32,
+		Box&lt;<span class="kw">dyn </span>Fn() -&gt; AnyResult&lt;()&gt;&gt;, <span class="comment">// return value is never meaningful
+	</span>&gt;,
+	cmds: FuncStore&lt; <span class="comment">// WM_COMMAND notifications
+		</span>(co::CMD, u16), <span class="comment">// notif code, control ID
+		</span>Box&lt;<span class="kw">dyn </span>Fn() -&gt; AnyResult&lt;()&gt;&gt;, <span class="comment">// return value is never meaningful
+	</span>&gt;,
+	nfys: FuncStore&lt; <span class="comment">// WM_NOTIFY notifications
+		</span>(u16, co::NM), <span class="comment">// idFrom, code
+		</span>Box&lt;<span class="kw">dyn </span>Fn(wm::Notify) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt;&gt;, <span class="comment">// return value may be meaningful
+	</span>&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">GuiEvents</span> <span class="kw">for</span> <span class="ident">WindowEventsAll</span> {
-	<span class="kw">fn</span> <span class="ident">wm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">co::WM</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl </span>GuiEvents <span class="kw">for </span>WindowEventsAll {
+	<span class="kw">fn </span>wm&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: co::WM, func: F)
+		<span class="kw">where </span>F: Fn(WndMsg) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">window_events</span>.<span class="ident">wm</span>(<span class="ident">ident</span>, <span class="ident">func</span>);
+		<span class="self">self</span>.window_events.wm(ident, func);
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">WindowEventsAll</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">window_events</span>: <span class="ident">WindowEvents::new</span>(),
-			<span class="ident">tmrs</span>: <span class="ident">FuncStore::new</span>(),
-			<span class="ident">cmds</span>: <span class="ident">FuncStore::new</span>(),
-			<span class="ident">nfys</span>: <span class="ident">FuncStore::new</span>(),
+<span class="kw">impl </span>WindowEventsAll {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			window_events: WindowEvents::new(),
+			tmrs: FuncStore::new(),
+			cmds: FuncStore::new(),
+			nfys: FuncStore::new(),
 		}
 	}
 
-	<span class="doccomment">/// Searches for the last added user function for the given message, and</span>
-	<span class="doccomment">/// runs if it exists, returning the result.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_one_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">ProcessResult</span><span class="op">&gt;</span>
+	<span class="doccomment">/// Searches for the last added user function for the given message, and
+	/// runs if it exists, returning the result.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>process_one_message(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		wm_any: WndMsg) -&gt; AnyResult&lt;ProcessResult&gt;
 	{
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">wm_any</span>.<span class="ident">msg_id</span> {
-			<span class="ident">co::WM::NOTIFY</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_nfy</span> <span class="op">=</span> <span class="ident">wm::Notify::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">wm_nfy</span>.<span class="ident">nmhdr</span>.<span class="ident">idFrom</span>(), <span class="ident">wm_nfy</span>.<span class="ident">nmhdr</span>.<span class="ident">code</span>);
-				<span class="kw">match</span> <span class="self">self</span>.<span class="ident">nfys</span>.<span class="ident">find</span>(<span class="ident">key</span>) {
-					<span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; { <span class="comment">// we have a stored function to handle this WM_NOTIFY notification</span>
-						<span class="kw">match</span> <span class="ident">func</span>(<span class="ident">wm_nfy</span>)<span class="question-mark">?</span> { <span class="comment">// execute user function</span>
-							<span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">ProcessResult::HandledWithRet</span>(<span class="ident">res</span>), <span class="comment">// meaningful return value</span>
-							<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::HandledWithoutRet</span>,
+		<span class="prelude-val">Ok</span>(<span class="kw">match </span>wm_any.msg_id {
+			co::WM::NOTIFY =&gt; {
+				<span class="kw">let </span>wm_nfy = wm::Notify::from_generic_wm(wm_any);
+				<span class="kw">let </span>key = (wm_nfy.nmhdr.idFrom(), wm_nfy.nmhdr.code);
+				<span class="kw">match </span><span class="self">self</span>.nfys.find(key) {
+					<span class="prelude-val">Some</span>(func) =&gt; { <span class="comment">// we have a stored function to handle this WM_NOTIFY notification
+						</span><span class="kw">match </span>func(wm_nfy)<span class="question-mark">? </span>{ <span class="comment">// execute user function
+							</span><span class="prelude-val">Some</span>(res) =&gt; ProcessResult::HandledWithRet(res), <span class="comment">// meaningful return value
+							</span><span class="prelude-val">None </span>=&gt; ProcessResult::HandledWithoutRet,
 						}
 					},
-					<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::NotHandled</span>, <span class="comment">// no stored WM_NOTIFY notification</span>
-				}
+					<span class="prelude-val">None </span>=&gt; ProcessResult::NotHandled, <span class="comment">// no stored WM_NOTIFY notification
+				</span>}
 			},
-			<span class="ident">co::WM::COMMAND</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_cmd</span> <span class="op">=</span> <span class="ident">wm::Command::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">wm_cmd</span>.<span class="ident">event</span>.<span class="ident">code_id</span>();
-				<span class="kw">match</span> <span class="self">self</span>.<span class="ident">cmds</span>.<span class="ident">find</span>(<span class="ident">key</span>) {
-					<span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; { <span class="comment">// we have a stored function to handle this WM_COMMAND notification</span>
-						<span class="ident">func</span>()<span class="question-mark">?</span>; <span class="comment">// execute user function</span>
-						<span class="ident">ProcessResult::HandledWithoutRet</span>
+			co::WM::COMMAND =&gt; {
+				<span class="kw">let </span>wm_cmd = wm::Command::from_generic_wm(wm_any);
+				<span class="kw">let </span>key = wm_cmd.event.code_id();
+				<span class="kw">match </span><span class="self">self</span>.cmds.find(key) {
+					<span class="prelude-val">Some</span>(func) =&gt; { <span class="comment">// we have a stored function to handle this WM_COMMAND notification
+						</span>func()<span class="question-mark">?</span>; <span class="comment">// execute user function
+						</span>ProcessResult::HandledWithoutRet
 					},
-					<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::NotHandled</span>, <span class="comment">// no stored WM_COMMAND notification</span>
-				}
+					<span class="prelude-val">None </span>=&gt; ProcessResult::NotHandled, <span class="comment">// no stored WM_COMMAND notification
+				</span>}
 			},
-			<span class="ident">co::WM::TIMER</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_tmr</span> <span class="op">=</span> <span class="ident">wm::Timer::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">match</span> <span class="self">self</span>.<span class="ident">tmrs</span>.<span class="ident">find</span>(<span class="ident">wm_tmr</span>.<span class="ident">timer_id</span>) {
-					<span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; { <span class="comment">// we have a stored function to handle this WM_TIMER message</span>
-						<span class="ident">func</span>()<span class="question-mark">?</span>; <span class="comment">// execute user function</span>
-						<span class="ident">ProcessResult::HandledWithoutRet</span>
+			co::WM::TIMER =&gt; {
+				<span class="kw">let </span>wm_tmr = wm::Timer::from_generic_wm(wm_any);
+				<span class="kw">match </span><span class="self">self</span>.tmrs.find(wm_tmr.timer_id) {
+					<span class="prelude-val">Some</span>(func) =&gt; { <span class="comment">// we have a stored function to handle this WM_TIMER message
+						</span>func()<span class="question-mark">?</span>; <span class="comment">// execute user function
+						</span>ProcessResult::HandledWithoutRet
 					},
-					<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::NotHandled</span>, <span class="comment">// no stored WM_TIMER message</span>
-				}
+					<span class="prelude-val">None </span>=&gt; ProcessResult::NotHandled, <span class="comment">// no stored WM_TIMER message
+				</span>}
 			}
-			<span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">window_events</span>.<span class="ident">process_one_message</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>,
+			<span class="kw">_ </span>=&gt; <span class="self">self</span>.window_events.process_one_message(wm_any)<span class="question-mark">?</span>,
 		})
 	}
 
-	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of</span>
-	<span class="doccomment">/// them, discarding the results.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_all_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of
+	/// them, discarding the results.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>process_all_messages(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		wm_any: WndMsg) -&gt; AnyResult&lt;()&gt;
 	{
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">wm_any</span>.<span class="ident">msg_id</span> {
-			<span class="ident">co::WM::NOTIFY</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_nfy</span> <span class="op">=</span> <span class="ident">wm::Notify::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">wm_nfy</span>.<span class="ident">nmhdr</span>.<span class="ident">idFrom</span>(), <span class="ident">wm_nfy</span>.<span class="ident">nmhdr</span>.<span class="ident">code</span>);
-				<span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">nfys</span>.<span class="ident">find_all</span>(<span class="ident">key</span>) {
-					<span class="ident">func</span>(<span class="ident">wm_nfy</span>)<span class="question-mark">?</span>; <span class="comment">// execute stored function</span>
-				}
+		<span class="prelude-val">Ok</span>(<span class="kw">match </span>wm_any.msg_id {
+			co::WM::NOTIFY =&gt; {
+				<span class="kw">let </span>wm_nfy = wm::Notify::from_generic_wm(wm_any);
+				<span class="kw">let </span>key = (wm_nfy.nmhdr.idFrom(), wm_nfy.nmhdr.code);
+				<span class="kw">for </span>func <span class="kw">in </span><span class="self">self</span>.nfys.find_all(key) {
+					func(wm_nfy)<span class="question-mark">?</span>; <span class="comment">// execute stored function
+				</span>}
 			},
-			<span class="ident">co::WM::COMMAND</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_cmd</span> <span class="op">=</span> <span class="ident">wm::Command::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">wm_cmd</span>.<span class="ident">event</span>.<span class="ident">code_id</span>();
-				<span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">cmds</span>.<span class="ident">find_all</span>(<span class="ident">key</span>) {
-					<span class="ident">func</span>()<span class="question-mark">?</span>; <span class="comment">// execute stored function</span>
-				}
+			co::WM::COMMAND =&gt; {
+				<span class="kw">let </span>wm_cmd = wm::Command::from_generic_wm(wm_any);
+				<span class="kw">let </span>key = wm_cmd.event.code_id();
+				<span class="kw">for </span>func <span class="kw">in </span><span class="self">self</span>.cmds.find_all(key) {
+					func()<span class="question-mark">?</span>; <span class="comment">// execute stored function
+				</span>}
 			},
-			<span class="ident">co::WM::TIMER</span> =&gt; {
-				<span class="kw">let</span> <span class="ident">wm_tmr</span> <span class="op">=</span> <span class="ident">wm::Timer::from_generic_wm</span>(<span class="ident">wm_any</span>);
-				<span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tmrs</span>.<span class="ident">find_all</span>(<span class="ident">wm_tmr</span>.<span class="ident">timer_id</span>) {
-					<span class="ident">func</span>()<span class="question-mark">?</span>; <span class="comment">// execute stored function</span>
-				}
+			co::WM::TIMER =&gt; {
+				<span class="kw">let </span>wm_tmr = wm::Timer::from_generic_wm(wm_any);
+				<span class="kw">for </span>func <span class="kw">in </span><span class="self">self</span>.tmrs.find_all(wm_tmr.timer_id) {
+					func()<span class="question-mark">?</span>; <span class="comment">// execute stored function
+				</span>}
 			},
-			<span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">window_events</span>.<span class="ident">process_all_messages</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>,
+			<span class="kw">_ </span>=&gt; <span class="self">self</span>.window_events.process_all_messages(wm_any)<span class="question-mark">?</span>,
 		})
 	}
 
-	<span class="doccomment">/// [`WM_TIMER`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-timer)</span>
-	<span class="doccomment">/// message, narrowed to a specific timer ID.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wm_timer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timer_id</span>: <span class="ident">u32</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_TIMER`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-timer)
+	/// message, narrowed to a specific timer ID.
+	</span><span class="kw">pub fn </span>wm_timer&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, timer_id: u32, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">tmrs</span>.<span class="ident">push</span>(<span class="ident">timer_id</span>, <span class="ident">Box::new</span>(<span class="ident">func</span>));
+		<span class="self">self</span>.tmrs.push(timer_id, Box::new(func));
 	}
 
-	<span class="doccomment">/// [`WM_COMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-command)</span>
-	<span class="doccomment">/// message, for specific code and control ID.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A command notification must be narrowed by the</span>
-	<span class="doccomment">/// [command code](crate::co::CMD) and the control ID, so the closure will</span>
-	<span class="doccomment">/// be fired for that specific control at that specific event.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Instead of using this event, you should always prefer the</span>
-	<span class="doccomment">/// specific command notifications, which will give you the correct message</span>
-	<span class="doccomment">/// parameters. This generic method should be used only when you have a</span>
-	<span class="doccomment">/// custom, non-standard window notification.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wm_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">co::CMD</span><span class="op">&gt;</span>, <span class="ident">ctrl_id</span>: <span class="ident">u16</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_COMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-command)
+	/// message, for specific code and control ID.
+	///
+	/// A command notification must be narrowed by the
+	/// [command code](crate::co::CMD) and the control ID, so the closure will
+	/// be fired for that specific control at that specific event.
+	///
+	/// **Note:** Instead of using this event, you should always prefer the
+	/// specific command notifications, which will give you the correct message
+	/// parameters. This generic method should be used only when you have a
+	/// custom, non-standard window notification.
+	</span><span class="kw">pub fn </span>wm_command&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, code: <span class="kw">impl </span>Into&lt;co::CMD&gt;, ctrl_id: u16, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="kw">let</span> <span class="ident">code</span>: <span class="ident">co::CMD</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">into</span>();
-		<span class="self">self</span>.<span class="ident">cmds</span>.<span class="ident">push</span>((<span class="ident">code</span>, <span class="ident">ctrl_id</span>), <span class="ident">Box::new</span>(<span class="ident">func</span>));
+		<span class="kw">let </span>code: co::CMD = code.into();
+		<span class="self">self</span>.cmds.push((code, ctrl_id), Box::new(func));
 	}
 
-	<span class="doccomment">/// [`WM_COMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-command)</span>
-	<span class="doccomment">/// message, handling both `CMD::Accelerator` and `CMD::Menu`, for a</span>
-	<span class="doccomment">/// specific command ID.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Ideal to be used with menu commands whose IDs are shared with</span>
-	<span class="doccomment">/// accelerators.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wm_command_accel_menu</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctrl_id</span>: <span class="ident">u16</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_COMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-command)
+	/// message, handling both `CMD::Accelerator` and `CMD::Menu`, for a
+	/// specific command ID.
+	///
+	/// Ideal to be used with menu commands whose IDs are shared with
+	/// accelerators.
+	</span><span class="kw">pub fn </span>wm_command_accel_menu&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctrl_id: u16, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="kw">let</span> <span class="ident">shared_func</span> <span class="op">=</span> <span class="ident">Rc::new</span>(<span class="ident">VeryUnsafeCell::new</span>(<span class="ident">func</span>));
+		<span class="kw">let </span>shared_func = Rc::new(VeryUnsafeCell::new(func));
 
-		<span class="self">self</span>.<span class="ident">wm_command</span>(<span class="ident">co::CMD::Menu</span>, <span class="ident">ctrl_id</span>, {
-			<span class="kw">let</span> <span class="ident">shared_func</span> <span class="op">=</span> <span class="ident">shared_func</span>.<span class="ident">clone</span>();
-			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">shared_func</span>()
+		<span class="self">self</span>.wm_command(co::CMD::Menu, ctrl_id, {
+			<span class="kw">let </span>shared_func = shared_func.clone();
+			<span class="kw">move </span>|| shared_func()
 		});
 
-		<span class="self">self</span>.<span class="ident">wm_command</span>(<span class="ident">co::CMD::Accelerator</span>, <span class="ident">ctrl_id</span>, {
-			<span class="kw">let</span> <span class="ident">shared_func</span> <span class="op">=</span> <span class="ident">shared_func</span>.<span class="ident">clone</span>();
-			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">shared_func</span>()
+		<span class="self">self</span>.wm_command(co::CMD::Accelerator, ctrl_id, {
+			<span class="kw">let </span>shared_func = shared_func.clone();
+			<span class="kw">move </span>|| shared_func()
 		});
 	}
 
-	<span class="doccomment">/// [`WM_NOTIFY`](crate::msg::wm::Notify) message, for specific ID and</span>
-	<span class="doccomment">/// notification code.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Instead of using this event, you should always prefer the</span>
-	<span class="doccomment">/// specific notifications, which will give you the correct notification</span>
-	<span class="doccomment">/// struct. This generic method should be used only when you have a custom,</span>
-	<span class="doccomment">/// non-standard window notification.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wm_notify</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id_from</span>: <span class="ident">u16</span>, <span class="ident">code</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">co::NM</span><span class="op">&gt;</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::Notify</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_NOTIFY`](crate::msg::wm::Notify) message, for specific ID and
+	/// notification code.
+	///
+	/// **Note:** Instead of using this event, you should always prefer the
+	/// specific notifications, which will give you the correct notification
+	/// struct. This generic method should be used only when you have a custom,
+	/// non-standard window notification.
+	</span><span class="kw">pub fn </span>wm_notify&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id_from: u16, code: <span class="kw">impl </span>Into&lt;co::NM&gt;, func: F)
+		<span class="kw">where </span>F: Fn(wm::Notify) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="kw">let</span> <span class="ident">code</span>: <span class="ident">co::NM</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">into</span>();
-		<span class="self">self</span>.<span class="ident">nfys</span>.<span class="ident">push</span>((<span class="ident">id_from</span>, <span class="ident">code</span>), <span class="ident">Box::new</span>(<span class="ident">func</span>));
+		<span class="kw">let </span>code: co::NM = code.into();
+		<span class="self">self</span>.nfys.push((id_from, code), Box::new(func));
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

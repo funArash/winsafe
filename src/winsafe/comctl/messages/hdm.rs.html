@@ -666,673 +666,673 @@
 <span id="666">666</span>
 <span id="667">667</span>
 <span id="668">668</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{<span class="ident">HDHITTESTINFO</span>, <span class="ident">HDITEM</span>, <span class="ident">HDLAYOUT</span>, <span class="ident">HIMAGELIST</span>, <span class="ident">PtIdx</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::WndMsg</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSend</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::RECT</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs</span>::{<span class="ident">zero_as_err</span>, <span class="ident">zero_as_none</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{HDHITTESTINFO, HDITEM, HDLAYOUT, HIMAGELIST, PtIdx};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::RECT;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::{zero_as_err, zero_as_none};
 
-<span class="doccomment">/// [`HDM_CLEARFILTER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-clearfilter)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `bool`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClearFilter</span> {
-	<span class="kw">pub</span> <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_CLEARFILTER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-clearfilter)
+/// message parameters.
+///
+/// Return type: `bool`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ClearFilter {
+	<span class="kw">pub </span>filter: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">ClearFilter</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>ClearFilter {
+	<span class="kw">type </span>RetType = bool;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v != <span class="number">0
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::CLEARFILTER</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">map_or</span>(<span class="op">-</span><span class="number">1</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::CLEARFILTER.into(),
+			wparam: <span class="self">self</span>.filter.map_or(-<span class="number">1</span>, |f| f <span class="kw">as </span>i32) <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_CREATEDRAGIMAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-createdragimage)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;HIMAGELIST&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateDragImage</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_CREATEDRAGIMAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-createdragimage)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;HIMAGELIST&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>CreateDragImage {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">CreateDragImage</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HIMAGELIST</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>CreateDragImage {
+	<span class="kw">type </span>RetType = SysResult&lt;HIMAGELIST&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">HIMAGELIST</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|p| HIMAGELIST(p <span class="kw">as _</span>))
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::CREATEDRAGIMAGE</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::CREATEDRAGIMAGE.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_DELETEITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-deleteitem)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeleteItem</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_DELETEITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-deleteitem)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>DeleteItem {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">DeleteItem</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>DeleteItem {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::DELETEITEM</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::DELETEITEM.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_EDITFILTER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-editfilter)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `bool`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditFilter</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">discard_changes</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// [`HDM_EDITFILTER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-editfilter)
+/// message parameters.
+///
+/// Return type: `bool`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>EditFilter {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>discard_changes: bool,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">EditFilter</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>EditFilter {
+	<span class="kw">type </span>RetType = bool;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v != <span class="number">0
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::EDITFILTER</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">discard_changes</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::EDITFILTER.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.discard_changes <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETBITMAPMARGIN`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getbitmapmargin)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetBitmapMargin</span> {}
+<span class="doccomment">/// [`HDM_GETBITMAPMARGIN`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getbitmapmargin)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetBitmapMargin {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetBitmapMargin</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetBitmapMargin {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETBITMAPMARGIN</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETBITMAPMARGIN.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETFOCUSEDITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getfocuseditem)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetFocusedItem</span> {}
+<span class="doccomment">/// [`HDM_GETFOCUSEDITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getfocuseditem)
+/// message, which has no parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetFocusedItem {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetFocusedItem</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetFocusedItem {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETFOCUSEDITEM</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETFOCUSEDITEM.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETIMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getimagelist)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;HIMAGELIST&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetImageList</span> {
-	<span class="kw">pub</span> <span class="ident">which</span>: <span class="ident">co::HDSIL</span>,
+<span class="doccomment">/// [`HDM_GETIMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getimagelist)
+/// message parameters.
+///
+/// Return type: `Option&lt;HIMAGELIST&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetImageList {
+	<span class="kw">pub </span>which: co::HDSIL,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetImageList</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HIMAGELIST</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetImageList {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;HIMAGELIST&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_none</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">HIMAGELIST</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_none(v).map(|p| HIMAGELIST(p <span class="kw">as _</span>))
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETIMAGELIST</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">which</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETIMAGELIST.into(),
+			wparam: <span class="self">self</span>.which.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitem)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hditem</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">HDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_GETITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitem)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>hditem: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>HDITEM&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; MsgSend <span class="kw">for </span>GetItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETITEM</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">hditem</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETITEM.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.hditem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETITEMCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemcount)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemCount</span> {}
+<span class="doccomment">/// [`HDM_GETITEMCOUNT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemcount)
+/// message, which has no parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemCount {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemCount</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetItemCount {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">count</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v {
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETITEMCOUNT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
-		}
-	}
-}
-
-<span class="doccomment">/// [`HDM_GETITEMDROPDOWNRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemdropdownrect)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemDropDownRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rect</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>,
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemDropDownRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-	}
-
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETITEMDROPDOWNRECT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">rect</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETITEMCOUNT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETITEMRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemrect)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetItemRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rect</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>,
+<span class="doccomment">/// [`HDM_GETITEMDROPDOWNRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemdropdownrect)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemDropDownRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>rect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetItemRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetItemDropDownRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETITEMRECT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">rect</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETITEMDROPDOWNRECT.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.rect <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETORDERARRAY`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getorderarray)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetOrderArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u32</span>],
+<span class="doccomment">/// [`HDM_GETITEMRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getitemrect)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetItemRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>rect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetOrderArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetItemRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETORDERARRAY</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(),
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETITEMRECT.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.rect <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETOVERFLOWRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getoverflowrect)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetOverflowRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">rect</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RECT</span>,
+<span class="doccomment">/// [`HDM_GETORDERARRAY`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getorderarray)
+/// message parameters.
+///
+/// Return type `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetOrderArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u32],
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetOverflowRect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetOrderArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETOVERFLOWRECT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">rect</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETORDERARRAY.into(),
+			wparam: <span class="self">self</span>.buffer.len(),
+			lparam: <span class="self">self</span>.buffer.as_mut_ptr() <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_GETUNICODEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getunicodeformat)</span>
-<span class="doccomment">/// message, which has no parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `bool`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetUnicodeFormat</span> {}
+<span class="doccomment">/// [`HDM_GETOVERFLOWRECT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getoverflowrect)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetOverflowRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>rect: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT,
+}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">GetUnicodeFormat</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>GetOverflowRect&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::GETUNICODEFORMAT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETOVERFLOWRECT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.rect <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_HITTEST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-hittest)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HitTest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">test_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">HDHITTESTINFO</span>,
-}
+<span class="doccomment">/// [`HDM_GETUNICODEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-getunicodeformat)
+/// message, which has no parameters.
+///
+/// Return type: `bool`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>GetUnicodeFormat {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">HitTest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetUnicodeFormat {
+	<span class="kw">type </span>RetType = bool;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v != <span class="number">0
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::HITTEST</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">test_info</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::GETUNICODEFORMAT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_INSERTITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-insertitem)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;u32&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InsertItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index_after</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hditem</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">HDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_HITTEST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-hittest)
+/// message parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>HitTest&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>test_info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>HDHITTESTINFO,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">InsertItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>HitTest&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="kw">match</span> <span class="ident">v</span> {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::BAD_ARGUMENTS</span>),
-			<span class="ident">index</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>),
-		}
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::INSERTITEM</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index_after</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">hditem</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::HITTEST.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.test_info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_LAYOUT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-layout)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Layout</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">hdlayout</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="ident">HDLAYOUT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_INSERTITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-insertitem)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;u32&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>InsertItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">pub </span>index_after: u32,
+	<span class="kw">pub </span>hditem: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>HDITEM&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">Layout</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; MsgSend <span class="kw">for </span>InsertItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;u32&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span>v {
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+			index =&gt; <span class="prelude-val">Ok</span>(index <span class="kw">as _</span>),
+		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::LAYOUT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">hdlayout</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::INSERTITEM.into(),
+			wparam: <span class="self">self</span>.index_after <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.hditem <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_ORDERTOINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-ordertoindex)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrderToIndex</span> {
-	<span class="kw">pub</span> <span class="ident">order</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_LAYOUT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-layout)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>Layout&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; {
+	<span class="kw">pub </span>hdlayout: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw-2">mut </span>HDLAYOUT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">OrderToIndex</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; MsgSend <span class="kw">for </span>Layout&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::ORDERTOINDEX</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">order</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::LAYOUT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.hdlayout <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETBITMAPMARGIN`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setbitmapmargin)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetBitmapMargin</span> {
-	<span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_ORDERTOINDEX`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-ordertoindex)
+/// message parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>OrderToIndex {
+	<span class="kw">pub </span>order: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetBitmapMargin</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>OrderToIndex {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETBITMAPMARGIN</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::ORDERTOINDEX.into(),
+			wparam: <span class="self">self</span>.order <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETFILTERCHANGETIMEOUT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setfilterchangetimeout)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetFilterChangeTimeout</span> {
-	<span class="kw">pub</span> <span class="ident">timeout_ms</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_SETBITMAPMARGIN`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setbitmapmargin)
+/// message parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetBitmapMargin {
+	<span class="kw">pub </span>width: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetFilterChangeTimeout</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetBitmapMargin {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETFILTERCHANGETIMEOUT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">timeout_ms</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETBITMAPMARGIN.into(),
+			wparam: <span class="self">self</span>.width <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETFOCUSEDITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setfocuseditem)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `bool`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetFocusedItem</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`HDM_SETFILTERCHANGETIMEOUT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setfilterchangetimeout)
+/// message parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetFilterChangeTimeout {
+	<span class="kw">pub </span>timeout_ms: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetFocusedItem</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetFilterChangeTimeout {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETFILTERCHANGETIMEOUT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="number">0</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETFILTERCHANGETIMEOUT.into(),
+			wparam: <span class="self">self</span>.timeout_ms <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETHOTDIVIDER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-sethotdivider)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `u32`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetHotDivider</span> {
-	<span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">PtIdx</span>,
+<span class="doccomment">/// [`HDM_SETFOCUSEDITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setfocuseditem)
+/// message parameters.
+///
+/// Return type: `bool`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetFocusedItem {
+	<span class="kw">pub </span>index: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetHotDivider</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetFocusedItem {
+	<span class="kw">type </span>RetType = bool;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span>
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v != <span class="number">0
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETHOTDIVIDER</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-				<span class="ident">PtIdx::Pt</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-				<span class="ident">PtIdx::Idx</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-			} <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-				<span class="ident">PtIdx::Pt</span>(<span class="ident">pt</span>) =&gt; <span class="ident">pt</span>.<span class="ident">into_u32</span>(),
-				<span class="ident">PtIdx::Idx</span>(<span class="ident">idx</span>) =&gt; <span class="ident">idx</span>,
-			} <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETFILTERCHANGETIMEOUT.into(),
+			wparam: <span class="number">0</span>,
+			lparam: <span class="self">self</span>.index <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETIMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setimagelist)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `Option&lt;HIMAGELIST&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetImageList</span> {
-	<span class="kw">pub</span> <span class="ident">which</span>: <span class="ident">co::HDSIL</span>,
-	<span class="kw">pub</span> <span class="ident">himagelist</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HIMAGELIST</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_SETHOTDIVIDER`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-sethotdivider)
+/// message parameters.
+///
+/// Return type: `u32`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetHotDivider {
+	<span class="kw">pub </span>value: PtIdx,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetImageList</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HIMAGELIST</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetHotDivider {
+	<span class="kw">type </span>RetType = u32;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_none</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">HIMAGELIST</span>(<span class="ident">h</span> <span class="kw">as</span> <span class="kw">_</span>))
-	}
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v <span class="kw">as _
+	</span>}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETIMAGELIST</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">which</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">himagelist</span>.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETHOTDIVIDER.into(),
+			wparam: <span class="kw">match </span><span class="self">self</span>.value {
+				PtIdx::Pt(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+				PtIdx::Idx(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+			} <span class="kw">as _</span>,
+			lparam: <span class="kw">match </span><span class="self">self</span>.value {
+				PtIdx::Pt(pt) =&gt; pt.into_u32(),
+				PtIdx::Idx(idx) =&gt; idx,
+			} <span class="kw">as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setitem)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">index</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hditem</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">HDITEM</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [`HDM_SETIMAGELIST`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setimagelist)
+/// message parameters.
+///
+/// Return type: `Option&lt;HIMAGELIST&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetImageList {
+	<span class="kw">pub </span>which: co::HDSIL,
+	<span class="kw">pub </span>himagelist: <span class="prelude-ty">Option</span>&lt;HIMAGELIST&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetImageList {
+	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;HIMAGELIST&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_none(v).map(|h| HIMAGELIST(h <span class="kw">as _</span>))
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETITEM</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">hditem</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETIMAGELIST.into(),
+			wparam: <span class="self">self</span>.which.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.himagelist.map_or(<span class="number">0</span>, |h| h.<span class="number">0 </span><span class="kw">as _</span>),
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETORDERARRAY`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setorderarray)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `WinResult&lt;()&gt;`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetOrderArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u32</span>],
+<span class="doccomment">/// [`HDM_SETITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setitem)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">pub </span>index: u32,
+	<span class="kw">pub </span>hditem: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>HDITEM&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetOrderArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; MsgSend <span class="kw">for </span>SetItem&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">zero_as_err</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETORDERARRAY</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>(),
-			<span class="ident">lparam</span>: <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETITEM.into(),
+			wparam: <span class="self">self</span>.index <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.hditem <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
 }
 
-<span class="doccomment">/// [`HDM_SETUNICODEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setunicodeformat)</span>
-<span class="doccomment">/// message parameters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return type: `bool`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SetUnicodeFormat</span> {
-	<span class="kw">pub</span> <span class="ident">use_unicode</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// [`HDM_SETORDERARRAY`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setorderarray)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;()&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetOrderArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u32],
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">MsgSend</span> <span class="kw">for</span> <span class="ident">SetUnicodeFormat</span> {
-	<span class="kw">type</span> <span class="ident">RetType</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSend <span class="kw">for </span>SetOrderArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
-	<span class="kw">fn</span> <span class="ident">convert_ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="ident"><span class="self">Self</span>::RetType</span> {
-		<span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		zero_as_err(v).map(|<span class="kw">_</span>| ())
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_generic_wm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WndMsg</span> {
-		<span class="ident">WndMsg</span> {
-			<span class="ident">msg_id</span>: <span class="ident">co::HDM::SETUNICODEFORMAT</span>.<span class="ident">into</span>(),
-			<span class="ident">wparam</span>: <span class="self">self</span>.<span class="ident">use_unicode</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">lparam</span>: <span class="number">0</span>,
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETORDERARRAY.into(),
+			wparam: <span class="self">self</span>.buffer.len(),
+			lparam: <span class="self">self</span>.buffer.as_ptr() <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`HDM_SETUNICODEFORMAT`](https://docs.microsoft.com/en-us/windows/win32/controls/hdm-setunicodeformat)
+/// message parameters.
+///
+/// Return type: `bool`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub struct </span>SetUnicodeFormat {
+	<span class="kw">pub </span>use_unicode: bool,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetUnicodeFormat {
+	<span class="kw">type </span>RetType = bool;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		v != <span class="number">0
+	</span>}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::HDM::SETUNICODEFORMAT.into(),
+			wparam: <span class="self">self</span>.use_unicode <span class="kw">as _</span>,
+			lparam: <span class="number">0</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

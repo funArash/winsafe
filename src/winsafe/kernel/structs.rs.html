@@ -394,401 +394,401 @@
 <span id="394">394</span>
 <span id="395">395</span>
 <span id="396">396</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HEVENT</span>, <span class="ident">HPIPE</span>, <span class="ident">HPROCESS</span>, <span class="ident">HTHREAD</span>, <span class="ident">MAKEQWORD</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::MAX_PATH</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HEVENT, HPIPE, HPROCESS, HTHREAD, MAKEQWORD};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
 
-<span class="doccomment">/// [`ACL`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-acl)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ACL</span> {
-	<span class="kw">pub</span> <span class="ident">AclRevision</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">Sbz1</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">AclSize</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">AceCount</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">Sbz2</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// [`ACL`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-acl)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>ACL {
+	<span class="kw">pub </span>AclRevision: u8,
+	<span class="kw">pub </span>Sbz1: u8,
+	<span class="kw">pub </span>AclSize: u16,
+	<span class="kw">pub </span>AceCount: u16,
+	<span class="kw">pub </span>Sbz2: u16,
 }
 
-<span class="doccomment">/// [`BY_HANDLE_FILE_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-by_handle_file_information)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BY_HANDLE_FILE_INFORMATION</span> {
-	<span class="kw">pub</span> <span class="ident">dwFileAttributes</span>: <span class="ident">co::FILE_ATTRIBUTE</span>,
-	<span class="kw">pub</span> <span class="ident">ftCreationTime</span>: <span class="ident">FILETIME</span>,
-	<span class="kw">pub</span> <span class="ident">ftLastAccessTime</span>: <span class="ident">FILETIME</span>,
-	<span class="kw">pub</span> <span class="ident">ftLastWriteTime</span>: <span class="ident">FILETIME</span>,
-	<span class="kw">pub</span> <span class="ident">dwVolumeSerialNumber</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nFileSizeHigh</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nFileSizeLow</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nNumberOfLinks</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nFileIndexHigh</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nFileIndexLow</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`BY_HANDLE_FILE_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-by_handle_file_information)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>BY_HANDLE_FILE_INFORMATION {
+	<span class="kw">pub </span>dwFileAttributes: co::FILE_ATTRIBUTE,
+	<span class="kw">pub </span>ftCreationTime: FILETIME,
+	<span class="kw">pub </span>ftLastAccessTime: FILETIME,
+	<span class="kw">pub </span>ftLastWriteTime: FILETIME,
+	<span class="kw">pub </span>dwVolumeSerialNumber: u32,
+	<span class="kw">pub </span>nFileSizeHigh: u32,
+	<span class="kw">pub </span>nFileSizeLow: u32,
+	<span class="kw">pub </span>nNumberOfLinks: u32,
+	<span class="kw">pub </span>nFileIndexHigh: u32,
+	<span class="kw">pub </span>nFileIndexLow: u32,
 }
 
-<span class="doccomment">/// [`FILETIME`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FILETIME</span> {
-	<span class="kw">pub</span> <span class="ident">dwLowDateTime</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwHighDateTime</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`FILETIME`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>FILETIME {
+	<span class="kw">pub </span>dwLowDateTime: u32,
+	<span class="kw">pub </span>dwHighDateTime: u32,
 }
 
-<span class="doccomment">/// [`LANGID`](https://docs.microsoft.com/en-us/windows/win32/intl/language-identifiers)</span>
-<span class="doccomment">/// language identifier.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LANGID</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u16</span>);
+<span class="doccomment">/// [`LANGID`](https://docs.microsoft.com/en-us/windows/win32/intl/language-identifiers)
+/// language identifier.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(transparent)]</span>
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>LANGID(<span class="kw">pub</span>(<span class="kw">crate</span>) u16);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LANGID</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">LANGID</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">v</span>.<span class="number">0</span>
+<span class="kw">impl </span>From&lt;LANGID&gt; <span class="kw">for </span>u16 {
+	<span class="kw">fn </span>from(v: LANGID) -&gt; <span class="self">Self </span>{
+		v.<span class="number">0
+	</span>}
+}
+
+<span class="kw">impl </span>LANGID {
+	<span class="doccomment">/// [`LANGID`](crate::LANGID) composed of
+	/// [`LANG::NEUTRAL`](crate::co::LANG::NEUTRAL) and
+	/// [`SUBLANG::SYS_DEFAULT`](crate::co::SUBLANG::SYS_DEFAULT).
+	</span><span class="kw">pub const </span>SYSTEM_DEFAULT: <span class="self">Self </span>= <span class="self">Self</span>::new(co::LANG::NEUTRAL, co::SUBLANG::SYS_DEFAULT);
+
+	<span class="doccomment">/// [`LANGID`](crate::LANGID) composed of
+	/// [`LANG::NEUTRAL`](crate::co::LANG::NEUTRAL) and
+	/// [`SUBLANG::DEFAULT`](crate::co::SUBLANG::DEFAULT).
+	</span><span class="kw">pub const </span>USER_DEFAULT: <span class="self">Self </span>= <span class="self">Self</span>::new(co::LANG::NEUTRAL, co::SUBLANG::DEFAULT);
+
+	<span class="doccomment">/// Creates a new `LANGID`. Originally
+	/// [`MAKELANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-makelangid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>new(lang: co::LANG, sublang: co::SUBLANG) -&gt; LANGID {
+		<span class="self">Self</span>((sublang.<span class="number">0 </span>&lt;&lt; <span class="number">10</span>) | lang.<span class="number">0</span>)
+	}
+
+	<span class="doccomment">/// Returns the primary language ID. Originally
+	/// [`PRIMARYLANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-primarylangid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>primary_lang_id(<span class="self">self</span>) -&gt; co::LANG {
+		co::LANG(<span class="self">self</span>.<span class="number">0 </span>&amp; <span class="number">0x3ff</span>)
+	}
+
+	<span class="doccomment">/// Returns the sublanguage ID. Originally
+	/// [`SUBLANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-sublangid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>sub_lang_id(<span class="self">self</span>) -&gt; co::SUBLANG {
+		co::SUBLANG(<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">10</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">LANGID</span> {
-	<span class="doccomment">/// [`LANGID`](crate::LANGID) composed of</span>
-	<span class="doccomment">/// [`LANG::NEUTRAL`](crate::co::LANG::NEUTRAL) and</span>
-	<span class="doccomment">/// [`SUBLANG::SYS_DEFAULT`](crate::co::SUBLANG::SYS_DEFAULT).</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SYSTEM_DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">co::LANG::NEUTRAL</span>, <span class="ident">co::SUBLANG::SYS_DEFAULT</span>);
+<span class="doccomment">/// [`LCID`](https://docs.microsoft.com/en-us/windows/win32/intl/locale-identifiers)
+/// locale identifier.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(transparent)]</span>
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>LCID(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
 
-	<span class="doccomment">/// [`LANGID`](crate::LANGID) composed of</span>
-	<span class="doccomment">/// [`LANG::NEUTRAL`](crate::co::LANG::NEUTRAL) and</span>
-	<span class="doccomment">/// [`SUBLANG::DEFAULT`](crate::co::SUBLANG::DEFAULT).</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">co::LANG::NEUTRAL</span>, <span class="ident">co::SUBLANG::DEFAULT</span>);
+<span class="kw">impl </span>LCID {
+	<span class="doccomment">/// [`LCID`](crate::LCID) composed of
+	/// [`LANGID::SYSTEM_DEFAULT`](crate::LANGID::SYSTEM_DEFAULT) and
+	/// [`SORT::DEFAULT`](crate::co::SORT::DEFAULT).
+	</span><span class="kw">pub const </span>SYSTEM_DEFAULT: <span class="self">Self </span>= <span class="self">Self</span>::new(LANGID::SYSTEM_DEFAULT, co::SORT::DEFAULT);
 
-	<span class="doccomment">/// Creates a new `LANGID`. Originally</span>
-	<span class="doccomment">/// [`MAKELANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-makelangid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">lang</span>: <span class="ident">co::LANG</span>, <span class="ident">sublang</span>: <span class="ident">co::SUBLANG</span>) -&gt; <span class="ident">LANGID</span> {
-		<span class="self">Self</span>((<span class="ident">sublang</span>.<span class="number">0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>) <span class="op">|</span> <span class="ident">lang</span>.<span class="number">0</span>)
+	<span class="doccomment">/// [`LCID`](crate::LCID) composed of
+	/// [`LANGID::USER_DEFAULT`](crate::LANGID::USER_DEFAULT) and
+	/// [`SORT::DEFAULT`](crate::co::SORT::DEFAULT).
+	</span><span class="kw">pub const </span>USER_DEFAULT: <span class="self">Self </span>= <span class="self">Self</span>::new(LANGID::USER_DEFAULT, co::SORT::DEFAULT);
+
+	<span class="doccomment">/// Creates a new `LCID`. Originally
+	/// [`MAKELCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-makelcid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>new(lang_id: LANGID, sort_id: co::SORT) -&gt; LCID {
+		<span class="self">Self</span>(((sort_id.<span class="number">0 </span><span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>) | lang_id.<span class="number">0 </span><span class="kw">as </span>u32)
 	}
 
-	<span class="doccomment">/// Returns the primary language ID. Originally</span>
-	<span class="doccomment">/// [`PRIMARYLANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-primarylangid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">primary_lang_id</span>(<span class="self">self</span>) -&gt; <span class="ident">co::LANG</span> {
-		<span class="ident">co::LANG</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0x3ff</span>)
+	<span class="doccomment">/// Returns the language identifier. Originally
+	/// [`LANGIDFROMLCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-langidfromlcid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>lang_id(<span class="self">self</span>) -&gt; LANGID {
+		LANGID(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as _</span>)
 	}
 
-	<span class="doccomment">/// Returns the sublanguage ID. Originally</span>
-	<span class="doccomment">/// [`SUBLANGID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-sublangid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">sub_lang_id</span>(<span class="self">self</span>) -&gt; <span class="ident">co::SUBLANG</span> {
-		<span class="ident">co::SUBLANG</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">10</span>)
-	}
-}
-
-<span class="doccomment">/// [`LCID`](https://docs.microsoft.com/en-us/windows/win32/intl/locale-identifiers)</span>
-<span class="doccomment">/// locale identifier.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LCID</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u32</span>);
-
-<span class="kw">impl</span> <span class="ident">LCID</span> {
-	<span class="doccomment">/// [`LCID`](crate::LCID) composed of</span>
-	<span class="doccomment">/// [`LANGID::SYSTEM_DEFAULT`](crate::LANGID::SYSTEM_DEFAULT) and</span>
-	<span class="doccomment">/// [`SORT::DEFAULT`](crate::co::SORT::DEFAULT).</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SYSTEM_DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">LANGID::SYSTEM_DEFAULT</span>, <span class="ident">co::SORT::DEFAULT</span>);
-
-	<span class="doccomment">/// [`LCID`](crate::LCID) composed of</span>
-	<span class="doccomment">/// [`LANGID::USER_DEFAULT`](crate::LANGID::USER_DEFAULT) and</span>
-	<span class="doccomment">/// [`SORT::DEFAULT`](crate::co::SORT::DEFAULT).</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">LANGID::USER_DEFAULT</span>, <span class="ident">co::SORT::DEFAULT</span>);
-
-	<span class="doccomment">/// Creates a new `LCID`. Originally</span>
-	<span class="doccomment">/// [`MAKELCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-makelcid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">lang_id</span>: <span class="ident">LANGID</span>, <span class="ident">sort_id</span>: <span class="ident">co::SORT</span>) -&gt; <span class="ident">LCID</span> {
-		<span class="self">Self</span>(((<span class="ident">sort_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>) <span class="op">|</span> <span class="ident">lang_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u32</span>)
-	}
-
-	<span class="doccomment">/// Returns the language identifier. Originally</span>
-	<span class="doccomment">/// [`LANGIDFROMLCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-langidfromlcid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">lang_id</span>(<span class="self">self</span>) -&gt; <span class="ident">LANGID</span> {
-		<span class="ident">LANGID</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)
-	}
-
-	<span class="doccomment">/// Returns the sort ID. Originally</span>
-	<span class="doccomment">/// [`SORTIDFROMLCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-sortidfromlcid)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">sort_id</span>(<span class="self">self</span>) -&gt; <span class="ident">co::SORT</span> {
-		<span class="ident">co::SORT</span>(((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">0xf</span>) <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// Returns the sort ID. Originally
+	/// [`SORTIDFROMLCID`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/nf-winnt-sortidfromlcid)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>sort_id(<span class="self">self</span>) -&gt; co::SORT {
+		co::SORT(((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xf</span>) <span class="kw">as _</span>)
 	}
 }
 
-<span class="doccomment">/// [`MEMORYSTATUSEX`](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-memorystatusex)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MEMORYSTATUSEX</span> {
-	<span class="ident">dwLength</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwMemoryLoad</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">ullTotalPhys</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullAvailPhys</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullTotalPageFile</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullAvailPageFile</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullTotalVirtual</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullAvailVirtual</span>: <span class="ident">u64</span>,
-	<span class="kw">pub</span> <span class="ident">ullAvailExtendedVirtual</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// [`MEMORYSTATUSEX`](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-memorystatusex)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>MEMORYSTATUSEX {
+	dwLength: u32,
+	<span class="kw">pub </span>dwMemoryLoad: u32,
+	<span class="kw">pub </span>ullTotalPhys: u64,
+	<span class="kw">pub </span>ullAvailPhys: u64,
+	<span class="kw">pub </span>ullTotalPageFile: u64,
+	<span class="kw">pub </span>ullAvailPageFile: u64,
+	<span class="kw">pub </span>ullTotalVirtual: u64,
+	<span class="kw">pub </span>ullAvailVirtual: u64,
+	<span class="kw">pub </span>ullAvailExtendedVirtual: u64,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">MEMORYSTATUSEX</span>, <span class="ident">dwLength</span>);
+<span class="macro">impl_default_with_size!</span>(MEMORYSTATUSEX, dwLength);
 
-<span class="doccomment">/// [`OSVERSIONINFOEX`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-osversioninfoexw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OSVERSIONINFOEX</span> {
-	<span class="ident">dwOSVersionInfoSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwMajorVersion</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwMinorVersion</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwBuildNumber</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwPlatformId</span>: <span class="ident">co::VER_PLATFORM</span>,
-	<span class="ident">szCSDVersion</span>: [<span class="ident">u16</span>; <span class="number">128</span>],
-	<span class="kw">pub</span> <span class="ident">wServicePackMajor</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wServicePackMinor</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wSuiteMask</span>: <span class="ident">co::VER_SUITE</span>,
-	<span class="kw">pub</span> <span class="ident">wProductType</span>: <span class="ident">co::VER_NT</span>,
-	<span class="ident">wReserved</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// [`OSVERSIONINFOEX`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-osversioninfoexw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>OSVERSIONINFOEX {
+	dwOSVersionInfoSize: u32,
+	<span class="kw">pub </span>dwMajorVersion: u32,
+	<span class="kw">pub </span>dwMinorVersion: u32,
+	<span class="kw">pub </span>dwBuildNumber: u32,
+	<span class="kw">pub </span>dwPlatformId: co::VER_PLATFORM,
+	szCSDVersion: [u16; <span class="number">128</span>],
+	<span class="kw">pub </span>wServicePackMajor: u16,
+	<span class="kw">pub </span>wServicePackMinor: u16,
+	<span class="kw">pub </span>wSuiteMask: co::VER_SUITE,
+	<span class="kw">pub </span>wProductType: co::VER_NT,
+	wReserved: u8,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">OSVERSIONINFOEX</span>, <span class="ident">dwOSVersionInfoSize</span>);
+<span class="macro">impl_default_with_size!</span>(OSVERSIONINFOEX, dwOSVersionInfoSize);
 
-<span class="kw">impl</span> <span class="ident">OSVERSIONINFOEX</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">szCSDVersion</span>, <span class="ident">set_szCSDVersion</span>);
+<span class="kw">impl </span>OSVERSIONINFOEX {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szCSDVersion, set_szCSDVersion);
 }
 
-<span class="doccomment">/// [`OVERLAPPED`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-overlapped)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OVERLAPPED</span> {
-	<span class="kw">pub</span> <span class="ident">Internal</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">InternalHigh</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">Pointer</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">hEvent</span>: <span class="ident">HEVENT</span>,
+<span class="doccomment">/// [`OVERLAPPED`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-overlapped)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>OVERLAPPED {
+	<span class="kw">pub </span>Internal: usize,
+	<span class="kw">pub </span>InternalHigh: usize,
+	<span class="kw">pub </span>Pointer: usize,
+	<span class="kw">pub </span>hEvent: HEVENT,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">OVERLAPPED</span>);
+<span class="macro">impl_default!</span>(OVERLAPPED);
 
-<span class="doccomment">/// [`PROCESS_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-process_information)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PROCESS_INFORMATION</span> {
-	<span class="kw">pub</span> <span class="ident">hProcess</span>: <span class="ident">HPROCESS</span>,
-	<span class="kw">pub</span> <span class="ident">hThread</span>: <span class="ident">HTHREAD</span>,
-	<span class="kw">pub</span> <span class="ident">dwProcessId</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwThreadId</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`PROCESS_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-process_information)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>PROCESS_INFORMATION {
+	<span class="kw">pub </span>hProcess: HPROCESS,
+	<span class="kw">pub </span>hThread: HTHREAD,
+	<span class="kw">pub </span>dwProcessId: u32,
+	<span class="kw">pub </span>dwThreadId: u32,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">PROCESS_INFORMATION</span>);
+<span class="macro">impl_default!</span>(PROCESS_INFORMATION);
 
-<span class="doccomment">/// [`SECURITY_DESCRIPTOR`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SECURITY_DESCRIPTOR</span> {
-	<span class="kw">pub</span> <span class="ident">Revision</span>: <span class="ident">u8</span>,
-   <span class="kw">pub</span> <span class="ident">Sbz1</span>: <span class="ident">u8</span>,
-   <span class="kw">pub</span> <span class="ident">Control</span>: <span class="ident">u16</span>,
-   <span class="kw">pub</span> <span class="ident">Owner</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-   <span class="kw">pub</span> <span class="ident">Group</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-   <span class="kw">pub</span> <span class="ident">Sacl</span>: <span class="kw-2">*mut</span> <span class="ident">ACL</span>,
-   <span class="kw">pub</span> <span class="ident">Dacl</span>: <span class="kw-2">*mut</span> <span class="ident">ACL</span>,
+<span class="doccomment">/// [`SECURITY_DESCRIPTOR`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>SECURITY_DESCRIPTOR {
+	<span class="kw">pub </span>Revision: u8,
+   <span class="kw">pub </span>Sbz1: u8,
+   <span class="kw">pub </span>Control: u16,
+   <span class="kw">pub </span>Owner: <span class="kw-2">*mut </span>std::ffi::c_void,
+   <span class="kw">pub </span>Group: <span class="kw-2">*mut </span>std::ffi::c_void,
+   <span class="kw">pub </span>Sacl: <span class="kw-2">*mut </span>ACL,
+   <span class="kw">pub </span>Dacl: <span class="kw-2">*mut </span>ACL,
 }
 
-<span class="doccomment">/// [`PROCESSENTRY32`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-processentry32w)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PROCESSENTRY32</span> {
-	<span class="ident">dwSize</span>: <span class="ident">u32</span>,
-	<span class="ident">cntUsage</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">th32ProcessID</span>: <span class="ident">u32</span>,
-	<span class="ident">th32DefaultHeapID</span>: <span class="ident">u64</span>,
-	<span class="ident">th32ModuleID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">cntThreads</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">th32ParentProcessID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">pcPriClassBase</span>: <span class="ident">i32</span>,
-	<span class="ident">dwFlags</span>: <span class="ident">u32</span>,
-	<span class="ident">szExeFile</span>: [<span class="ident">u16</span>; <span class="ident">MAX_PATH</span>],
+<span class="doccomment">/// [`PROCESSENTRY32`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-processentry32w)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>PROCESSENTRY32 {
+	dwSize: u32,
+	cntUsage: u32,
+	<span class="kw">pub </span>th32ProcessID: u32,
+	th32DefaultHeapID: u64,
+	th32ModuleID: u32,
+	<span class="kw">pub </span>cntThreads: u32,
+	<span class="kw">pub </span>th32ParentProcessID: u32,
+	<span class="kw">pub </span>pcPriClassBase: i32,
+	dwFlags: u32,
+	szExeFile: [u16; MAX_PATH],
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">PROCESSENTRY32</span>, <span class="ident">dwSize</span>);
+<span class="macro">impl_default_with_size!</span>(PROCESSENTRY32, dwSize);
 
-<span class="kw">impl</span> <span class="ident">PROCESSENTRY32</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">szExeFile</span>, <span class="ident">set_szExeFile</span>);
+<span class="kw">impl </span>PROCESSENTRY32 {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szExeFile, set_szExeFile);
 }
 
-<span class="doccomment">/// [`SECURITY_ATTRIBUTES`](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/aa379560(v=vs.85))</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SECURITY_ATTRIBUTES</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">nLength</span>: <span class="ident">u32</span>,
-	<span class="ident">lpSecurityDescriptor</span>: <span class="kw-2">*mut</span> <span class="ident">SECURITY_DESCRIPTOR</span>,
-	<span class="ident">bInheritHandle</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`SECURITY_ATTRIBUTES`](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/aa379560(v=vs.85))
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>SECURITY_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
+	nLength: u32,
+	lpSecurityDescriptor: <span class="kw-2">*mut </span>SECURITY_DESCRIPTOR,
+	bInheritHandle: i32,
 
-	<span class="ident">_lpSecurityDescriptor</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">SECURITY_DESCRIPTOR</span><span class="op">&gt;</span>,
+	_lpSecurityDescriptor: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>SECURITY_DESCRIPTOR&gt;,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">SECURITY_ATTRIBUTES</span>, <span class="ident">nLength</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default_with_size!</span>(SECURITY_ATTRIBUTES, nLength, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SECURITY_ATTRIBUTES</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lpSecurityDescriptor</span>, <span class="ident">set_lpSecurityDescriptor</span>, <span class="ident">SECURITY_DESCRIPTOR</span>);
-	<span class="macro">pub_fn_bool_get_set!</span>(<span class="ident">bInheritHandle</span>, <span class="ident">set_bInheritHandle</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SECURITY_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpSecurityDescriptor, set_lpSecurityDescriptor, SECURITY_DESCRIPTOR);
+	<span class="macro">pub_fn_bool_get_set!</span>(bInheritHandle, set_bInheritHandle);
 }
 
-<span class="doccomment">/// [`STARTUPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfow)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">STARTUPINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="ident">cb</span>: <span class="ident">u32</span>,
-	<span class="ident">lpReserved</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">lpDesktop</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">lpTitle</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dwX</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwY</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwXSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwYSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwXCountChars</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwYCountChars</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFillAttribute</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::STARTF</span>,
-	<span class="ident">wShowWindow</span>: <span class="ident">u16</span>, <span class="comment">// co::SW, should be 32-bit</span>
-	<span class="ident">cbReserved2</span>: <span class="ident">u16</span>,
-	<span class="ident">lpReserved2</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-	<span class="kw">pub</span> <span class="ident">hStdInput</span>: <span class="ident">HPIPE</span>,
-	<span class="kw">pub</span> <span class="ident">hStdOutput</span>: <span class="ident">HPIPE</span>,
-	<span class="kw">pub</span> <span class="ident">hStdError</span>: <span class="ident">HPIPE</span>,
+<span class="doccomment">/// [`STARTUPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfow)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>STARTUPINFO&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	cb: u32,
+	lpReserved: <span class="kw-2">*mut </span>u16,
+	lpDesktop: <span class="kw-2">*mut </span>u16,
+	lpTitle: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>dwX: u32,
+	<span class="kw">pub </span>dwY: u32,
+	<span class="kw">pub </span>dwXSize: u32,
+	<span class="kw">pub </span>dwYSize: u32,
+	<span class="kw">pub </span>dwXCountChars: u32,
+	<span class="kw">pub </span>dwYCountChars: u32,
+	<span class="kw">pub </span>dwFillAttribute: u32,
+	<span class="kw">pub </span>dwFlags: co::STARTF,
+	wShowWindow: u16, <span class="comment">// co::SW, should be 32-bit
+	</span>cbReserved2: u16,
+	lpReserved2: <span class="kw-2">*mut </span>u8,
+	<span class="kw">pub </span>hStdInput: HPIPE,
+	<span class="kw">pub </span>hStdOutput: HPIPE,
+	<span class="kw">pub </span>hStdError: HPIPE,
 
-	<span class="ident">_lpDesktop</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_lpTitle</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_lpDesktop: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+	_lpTitle: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">STARTUPINFO</span>, <span class="ident">cb</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
+<span class="macro">impl_default_with_size!</span>(STARTUPINFO, cb, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">STARTUPINFO</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lpDesktop</span>, <span class="ident">set_lpDesktop</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lpTitle</span>, <span class="ident">set_lpTitle</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; STARTUPINFO&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpDesktop, set_lpDesktop);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpTitle, set_lpTitle);
 
-	<span class="doccomment">/// Returns the `wShowWindow` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">wShowWindow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::SW</span> {
-		<span class="ident">co::SW</span>(<span class="self">self</span>.<span class="ident">wShowWindow</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// Returns the `wShowWindow` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>wShowWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::SW {
+		co::SW(<span class="self">self</span>.wShowWindow <span class="kw">as _</span>)
 	}
 
-	<span class="doccomment">/// Sets the `wShowWindow` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_wShowWindow</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::SW</span>) {
-		<span class="self">self</span>.<span class="ident">wShowWindow</span> <span class="op">=</span> <span class="ident">val</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>;
+	<span class="doccomment">/// Sets the `wShowWindow` field.
+	</span><span class="kw">pub fn </span>set_wShowWindow(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::SW) {
+		<span class="self">self</span>.wShowWindow = val.<span class="number">0 </span><span class="kw">as _</span>;
 	}
 }
 
-<span class="doccomment">/// [`SYSTEM_INFO`](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-system_info)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SYSTEM_INFO</span> {
-	<span class="kw">pub</span> <span class="ident">wProcessorArchitecture</span>: <span class="ident">co::PROCESSOR_ARCHITECTURE</span>,
-	<span class="ident">wReserved</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dwPageSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">lpMinimumApplicationAddress</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-	<span class="kw">pub</span> <span class="ident">lpMaximumApplicationAddress</span>: <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>,
-	<span class="kw">pub</span> <span class="ident">dwActiveProcessorMask</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">dwNumberOfProcessors</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwProcessorType</span>: <span class="ident">co::PROCESSOR</span>,
-	<span class="kw">pub</span> <span class="ident">dwAllocationGranularity</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">wProcessorLevel</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wProcessorRevision</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// [`SYSTEM_INFO`](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-system_info)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>SYSTEM_INFO {
+	<span class="kw">pub </span>wProcessorArchitecture: co::PROCESSOR_ARCHITECTURE,
+	wReserved: u16,
+	<span class="kw">pub </span>dwPageSize: u32,
+	<span class="kw">pub </span>lpMinimumApplicationAddress: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>lpMaximumApplicationAddress: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>dwActiveProcessorMask: usize,
+	<span class="kw">pub </span>dwNumberOfProcessors: u32,
+	<span class="kw">pub </span>dwProcessorType: co::PROCESSOR,
+	<span class="kw">pub </span>dwAllocationGranularity: u32,
+	<span class="kw">pub </span>wProcessorLevel: u16,
+	<span class="kw">pub </span>wProcessorRevision: u16,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">SYSTEM_INFO</span>);
+<span class="macro">impl_default!</span>(SYSTEM_INFO);
 
-<span class="doccomment">/// [`SYSTEMTIME`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SYSTEMTIME</span> {
-	<span class="kw">pub</span> <span class="ident">wYear</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wMonth</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wDayOfWeek</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wDay</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wHour</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wMinute</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wSecond</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">wMilliseconds</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// [`SYSTEMTIME`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>SYSTEMTIME {
+	<span class="kw">pub </span>wYear: u16,
+	<span class="kw">pub </span>wMonth: u16,
+	<span class="kw">pub </span>wDayOfWeek: u16,
+	<span class="kw">pub </span>wDay: u16,
+	<span class="kw">pub </span>wHour: u16,
+	<span class="kw">pub </span>wMinute: u16,
+	<span class="kw">pub </span>wSecond: u16,
+	<span class="kw">pub </span>wMilliseconds: u16,
 }
 
-<span class="doccomment">/// [`TIME_ZONE_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/timezoneapi/ns-timezoneapi-time_zone_information)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TIME_ZONE_INFORMATION</span> {
-	<span class="kw">pub</span> <span class="ident">bias</span>: <span class="ident">i32</span>,
-	<span class="ident">standardName</span>: [<span class="ident">u16</span>; <span class="number">32</span>],
-	<span class="kw">pub</span> <span class="ident">standardDate</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="kw">pub</span> <span class="ident">standardBias</span>: <span class="ident">i32</span>,
-	<span class="ident">daylightName</span>: [<span class="ident">u16</span>; <span class="number">32</span>],
-	<span class="kw">pub</span> <span class="ident">daylightDate</span>: <span class="ident">SYSTEMTIME</span>,
-	<span class="kw">pub</span> <span class="ident">daylightBias</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// [`TIME_ZONE_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/timezoneapi/ns-timezoneapi-time_zone_information)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>TIME_ZONE_INFORMATION {
+	<span class="kw">pub </span>bias: i32,
+	standardName: [u16; <span class="number">32</span>],
+	<span class="kw">pub </span>standardDate: SYSTEMTIME,
+	<span class="kw">pub </span>standardBias: i32,
+	daylightName: [u16; <span class="number">32</span>],
+	<span class="kw">pub </span>daylightDate: SYSTEMTIME,
+	<span class="kw">pub </span>daylightBias: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">TIME_ZONE_INFORMATION</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">standardName</span>, <span class="ident">set_standardName</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">daylightName</span>, <span class="ident">set_daylightName</span>);
+<span class="kw">impl </span>TIME_ZONE_INFORMATION {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(standardName, set_standardName);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(daylightName, set_daylightName);
 }
 
-<span class="doccomment">/// [`WIN32_FIND_DATA`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-win32_find_dataw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WIN32_FIND_DATA</span> {
-	<span class="kw">pub</span> <span class="ident">dwFileAttributes</span>: <span class="ident">co::FILE_ATTRIBUTE</span>,
-	<span class="kw">pub</span> <span class="ident">ftCreationTime</span>: <span class="ident">FILETIME</span>,
-	<span class="kw">pub</span> <span class="ident">ftLastAccessTime</span>: <span class="ident">FILETIME</span>,
-	<span class="kw">pub</span> <span class="ident">tLastWriteTime</span>: <span class="ident">FILETIME</span>,
-	<span class="ident">nFileSizeHigh</span>: <span class="ident">u32</span>,
-	<span class="ident">nFileSizeLow</span>: <span class="ident">u32</span>,
-	<span class="ident">dwReserved0</span>: <span class="ident">u32</span>,
-	<span class="ident">dwReserved1</span>: <span class="ident">u32</span>,
-	<span class="ident">cFileName</span>: [<span class="ident">u16</span>; <span class="ident">MAX_PATH</span>],
-	<span class="ident">cAlternateFileName</span>: [<span class="ident">u16</span>; <span class="number">14</span>],
+<span class="doccomment">/// [`WIN32_FIND_DATA`](https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-win32_find_dataw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>WIN32_FIND_DATA {
+	<span class="kw">pub </span>dwFileAttributes: co::FILE_ATTRIBUTE,
+	<span class="kw">pub </span>ftCreationTime: FILETIME,
+	<span class="kw">pub </span>ftLastAccessTime: FILETIME,
+	<span class="kw">pub </span>tLastWriteTime: FILETIME,
+	nFileSizeHigh: u32,
+	nFileSizeLow: u32,
+	dwReserved0: u32,
+	dwReserved1: u32,
+	cFileName: [u16; MAX_PATH],
+	cAlternateFileName: [u16; <span class="number">14</span>],
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">WIN32_FIND_DATA</span>);
+<span class="macro">impl_default!</span>(WIN32_FIND_DATA);
 
-<span class="kw">impl</span> <span class="ident">WIN32_FIND_DATA</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">cFileName</span>, <span class="ident">set_cFileName</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">cAlternateFileName</span>, <span class="ident">set_cAlternateFileName</span>);
+<span class="kw">impl </span>WIN32_FIND_DATA {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(cFileName, set_cFileName);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(cAlternateFileName, set_cAlternateFileName);
 
-	<span class="doccomment">/// Returns the nFileSizeHigh and nFileSizeLow fields.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nFileSize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-		<span class="ident">MAKEQWORD</span>(<span class="self">self</span>.<span class="ident">nFileSizeLow</span>, <span class="self">self</span>.<span class="ident">nFileSizeHigh</span>)
+	<span class="doccomment">/// Returns the nFileSizeHigh and nFileSizeLow fields.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>nFileSize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+		MAKEQWORD(<span class="self">self</span>.nFileSizeLow, <span class="self">self</span>.nFileSizeHigh)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

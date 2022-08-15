@@ -136,143 +136,143 @@
 <span id="136">136</span>
 <span id="137">137</span>
 <span id="138">138</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl</span>::{<span class="ident">IBaseFilter</span>, <span class="ident">IPin</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HANDLE</span>, <span class="ident">HRES</span>, <span class="ident">PCSTR</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HFILE</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs</span>::{<span class="ident">ok_to_hrresult</span>, <span class="ident">okfalse_to_hrresult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dshow_IFilterGraph</span>, <span class="ident">ole_IUnknown</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IFilterGraphVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{IBaseFilter, IPin};
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HANDLE, HRES, PCSTR};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HFILE, WString};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IFilterGraph, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::vt::IFilterGraphVT;
 
-<span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IGraphBuilderVT</span> {
-	<span class="kw">pub</span> <span class="ident">IFilterGraphVT</span>: <span class="ident">IFilterGraphVT</span>,
-	<span class="kw">pub</span> <span class="ident">Connect</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Render</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">RenderFile</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">AddSourceFilter</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">PCSTR</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetLogFile</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Abort</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">ShouldOperationContinue</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IGraphBuilderVT {
+	<span class="kw">pub </span>IFilterGraphVT: IFilterGraphVT,
+	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Render: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>RenderFile: <span class="kw">fn</span>(ComPtr, PCSTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>AddSourceFilter: <span class="kw">fn</span>(ComPtr, PCSTR, PCSTR, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>SetLogFile: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>Abort: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>ShouldOperationContinue: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IGraphBuilder`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-igraphbuilder)</span>
-<span class="doccomment">/// COM interface over [`IGraphBuilderVT`](crate::vt::IGraphBuilderVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, CoCreateInstance, IGraphBuilder};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let obj = CoCreateInstance::&lt;IGraphBuilder&gt;(</span>
-<span class="doccomment">///     &amp;co::CLSID::FilterGraph,</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     co::CLSCTX::INPROC_SERVER,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IGraphBuilder</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IGraphBuilder`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-igraphbuilder)
+/// COM interface over [`IGraphBuilderVT`](crate::vt::IGraphBuilderVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, CoCreateInstance, IGraphBuilder};
+///
+/// let obj = CoCreateInstance::&lt;IGraphBuilder&gt;(
+///     &amp;co::CLSID::FilterGraph,
+///     None,
+///     co::CLSCTX::INPROC_SERVER,
+/// )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IGraphBuilder(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IGraphBuilder</span>, <span class="string">&quot;56a868a9-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
-<span class="kw">impl</span> <span class="ident">dshow_IFilterGraph</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
-<span class="kw">impl</span> <span class="ident">dshow_IGraphBuilder</span> <span class="kw">for</span> <span class="ident">IGraphBuilder</span> {}
+<span class="macro">impl_iunknown!</span>(IGraphBuilder, <span class="string">&quot;56a868a9-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
+<span class="kw">impl </span>dshow_IFilterGraph <span class="kw">for </span>IGraphBuilder {}
+<span class="kw">impl </span>dshow_IGraphBuilder <span class="kw">for </span>IGraphBuilder {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IGraphBuilder`](crate::IGraphBuilder).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IGraphBuilder</span>: <span class="ident">dshow_IFilterGraph</span> {
-	<span class="doccomment">/// [`IGraphBuilder::Abort`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-abort)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Abort</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Abort</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IGraphBuilder`](crate::IGraphBuilder).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IGraphBuilder: dshow_IFilterGraph {
+	<span class="doccomment">/// [`IGraphBuilder::Abort`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-abort)
+	/// method.
+	</span><span class="kw">fn </span>Abort(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			ok_to_hrresult((vt.Abort)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IGraphBuilder::AddSourceFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-addsourcefilter)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">AddSourceFilter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IBaseFilter</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`IGraphBuilder::AddSourceFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-addsourcefilter)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>AddSourceFilter(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		file_name: <span class="kw-2">&amp;</span>str, filter_name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IBaseFilter&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">AddSourceFilter</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">file_name</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">filter_name</span>).<span class="ident">as_ptr</span>(),
-					<span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>,
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			ok_to_hrresult(
+				(vt.AddSourceFilter)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(file_name).as_ptr(),
+					WString::from_str(filter_name).as_ptr(),
+					<span class="kw-2">&amp;mut </span>ppv_queried,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IBaseFilter::from</span>(<span class="ident">ppv_queried</span>))
+			).map(|<span class="kw">_</span>| IBaseFilter::from(ppv_queried))
 		}
 	}
 
-	<span class="doccomment">/// [`IGraphBuilder::Connect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-connect)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pin_out</span>: <span class="kw-2">&amp;</span><span class="ident">IPin</span>, <span class="ident">pin_in</span>: <span class="kw-2">&amp;</span><span class="ident">IPin</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Connect</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">pin_out</span>.<span class="ident">ptr</span>(), <span class="ident">pin_in</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IGraphBuilder::Connect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-connect)
+	/// method.
+	</span><span class="kw">fn </span>Connect(<span class="kw-2">&amp;</span><span class="self">self</span>, pin_out: <span class="kw-2">&amp;</span>IPin, pin_in: <span class="kw-2">&amp;</span>IPin) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			ok_to_hrresult((vt.Connect)(<span class="self">self</span>.ptr(), pin_out.ptr(), pin_in.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IGraphBuilder::RenderFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-renderfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RenderFile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">RenderFile</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">file</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">std::ptr::null</span>(),
-				),
-			)
-		}
-	}
-
-	<span class="doccomment">/// [`IGraphBuilder::SetLogFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-setlogfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetLogFile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hfile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFILE</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetLogFile</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">hfile</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
+	<span class="doccomment">/// [`IGraphBuilder::RenderFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-renderfile)
+	/// method.
+	</span><span class="kw">fn </span>RenderFile(<span class="kw-2">&amp;</span><span class="self">self</span>, file: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			ok_to_hrresult(
+				(vt.RenderFile)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(file).as_ptr(),
+					std::ptr::null(),
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IGraphBuilder::ShouldOperationContinue`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-shouldoperationcontinue)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">ShouldOperationContinue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IGraphBuilderVT</span>);
-			<span class="ident">okfalse_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">ShouldOperationContinue</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IGraphBuilder::SetLogFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-setlogfile)
+	/// method.
+	</span><span class="kw">fn </span>SetLogFile(<span class="kw-2">&amp;</span><span class="self">self</span>, hfile: <span class="prelude-ty">Option</span>&lt;HFILE&gt;) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			ok_to_hrresult(
+				(vt.SetLogFile)(
+					<span class="self">self</span>.ptr(),
+					hfile.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+				),
+			)
+		}
+	}
+
+	<span class="doccomment">/// [`IGraphBuilder::ShouldOperationContinue`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-igraphbuilder-shouldoperationcontinue)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>ShouldOperationContinue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IGraphBuilderVT);
+			okfalse_to_hrresult((vt.ShouldOperationContinue)(<span class="self">self</span>.ptr()))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

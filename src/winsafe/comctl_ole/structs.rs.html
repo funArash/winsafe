@@ -129,136 +129,136 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl_ole::decl</span>::{<span class="ident">IconId</span>, <span class="ident">IconIdTdicon</span>, <span class="ident">PFTASKDIALOGCALLBACK</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::HINSTANCE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs</span>::{<span class="ident">IS_INTRESOURCE</span>, <span class="ident">MAKEINTRESOURCE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HICON</span>, <span class="ident">HWND</span>};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl_ole::decl::{IconId, IconIdTdicon, PFTASKDIALOGCALLBACK};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::HINSTANCE;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{IS_INTRESOURCE, MAKEINTRESOURCE};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HICON, HWND};
 
-<span class="doccomment">/// [`TASKDIALOG_BUTTON`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-taskdialog_button)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">nButtonID</span>: <span class="ident">i32</span>,
-	<span class="ident">pszButtonText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
+<span class="doccomment">/// [`TASKDIALOG_BUTTON`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-taskdialog_button)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))))]</span>
+<span class="attribute">#[repr(C, packed)]</span>
+<span class="kw">pub struct </span>TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;a</span>&gt; {
+	nButtonID: i32,
+	pszButtonText: <span class="kw-2">*mut </span>u16,
 
-	<span class="ident">_pszButtonText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszButtonText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default!</span>(<span class="ident">TASKDIALOG_BUTTON</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default!</span>(TASKDIALOG_BUTTON, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_resource_id_get_set!</span>(<span class="ident">nButtonID</span>, <span class="ident">set_nButtonID</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszButtonText</span>, <span class="ident">set_pszButtonText</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_resource_id_get_set!</span>(nButtonID, set_nButtonID);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszButtonText, set_pszButtonText);
 }
 
-<span class="doccomment">/// [`TASKDIALOGCONFIG`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-taskdialogconfig)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TASKDIALOGCONFIG</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span><span class="op">&gt;</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hwndParent</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hInstance</span>: <span class="ident">HINSTANCE</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::TDF</span>,
-	<span class="kw">pub</span> <span class="ident">dwCommonButtons</span>: <span class="ident">co::TDCBF</span>,
-	<span class="ident">pszWindowTitle</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszMainIcon</span>: <span class="kw-2">*const</span> <span class="ident">u16</span>, <span class="comment">// union with HICON</span>
-	<span class="ident">pszMainInstruction</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszContent</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">cButtons</span>: <span class="ident">u32</span>,
-	<span class="ident">pButtons</span>: <span class="kw-2">*mut</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">nDefaultButton</span>: <span class="ident">i32</span>, <span class="comment">// actually co::DLGID, which is u16</span>
-	<span class="ident">cRadioButtons</span>: <span class="ident">u32</span>,
-	<span class="ident">pRadioButtons</span>: <span class="kw-2">*mut</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;e</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">nDefaultRadioButton</span>: <span class="ident">i32</span>,
-	<span class="ident">pszVerificationText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszExpandedInformation</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszExpandedControlText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszCollapsedControlText</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">pszFooterIcon</span>: <span class="kw-2">*const</span> <span class="ident">u16</span>, <span class="comment">// union with HICON</span>
-	<span class="ident">pszFooter</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">pfCallback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PFTASKDIALOGCALLBACK</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">lpCallbackData</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">cxWidth</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// [`TASKDIALOGCONFIG`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-taskdialogconfig)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))))]</span>
+<span class="attribute">#[repr(C, packed)]</span>
+<span class="kw">pub struct </span>TASKDIALOGCONFIG&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>hwndParent: HWND,
+	<span class="kw">pub </span>hInstance: HINSTANCE,
+	<span class="kw">pub </span>dwFlags: co::TDF,
+	<span class="kw">pub </span>dwCommonButtons: co::TDCBF,
+	pszWindowTitle: <span class="kw-2">*mut </span>u16,
+	pszMainIcon: <span class="kw-2">*const </span>u16, <span class="comment">// union with HICON
+	</span>pszMainInstruction: <span class="kw-2">*mut </span>u16,
+	pszContent: <span class="kw-2">*mut </span>u16,
+	cButtons: u32,
+	pButtons: <span class="kw-2">*mut </span>TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;d</span>&gt;,
+	<span class="kw">pub </span>nDefaultButton: i32, <span class="comment">// actually co::DLGID, which is u16
+	</span>cRadioButtons: u32,
+	pRadioButtons: <span class="kw-2">*mut </span>TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;e</span>&gt;,
+	<span class="kw">pub </span>nDefaultRadioButton: i32,
+	pszVerificationText: <span class="kw-2">*mut </span>u16,
+	pszExpandedInformation: <span class="kw-2">*mut </span>u16,
+	pszExpandedControlText: <span class="kw-2">*mut </span>u16,
+	pszCollapsedControlText: <span class="kw-2">*mut </span>u16,
+	pszFooterIcon: <span class="kw-2">*const </span>u16, <span class="comment">// union with HICON
+	</span>pszFooter: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>pfCallback: <span class="prelude-ty">Option</span>&lt;PFTASKDIALOGCALLBACK&gt;,
+	<span class="kw">pub </span>lpCallbackData: isize,
+	<span class="kw">pub </span>cxWidth: u32,
 
-	<span class="ident">_pszWindowTitle</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszMainInstruction</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszContent</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pButtons</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;d</span> <span class="kw-2">mut</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">_pRadioButtons</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;e</span> <span class="kw-2">mut</span> <span class="ident">TASKDIALOG_BUTTON</span><span class="op">&lt;</span><span class="lifetime">&#39;e</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">_pszVerificationText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;f</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszExpandedInformation</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszExpandedControlText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;h</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszCollapsedControlText</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_pszFooter</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;j</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_pszWindowTitle: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+	_pszMainInstruction: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>u16&gt;,
+	_pszContent: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw-2">mut </span>u16&gt;,
+	_pButtons: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;d </span><span class="kw-2">mut </span>TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;d</span>&gt;&gt;,
+	_pRadioButtons: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;e </span><span class="kw-2">mut </span>TASKDIALOG_BUTTON&lt;<span class="lifetime">&#39;e</span>&gt;&gt;,
+	_pszVerificationText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;f </span><span class="kw-2">mut </span>u16&gt;,
+	_pszExpandedInformation: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span><span class="kw-2">mut </span>u16&gt;,
+	_pszExpandedControlText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;h </span><span class="kw-2">mut </span>u16&gt;,
+	_pszCollapsedControlText: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span><span class="kw-2">mut </span>u16&gt;,
+	_pszFooter: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;j </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">TASKDIALOGCONFIG</span>, <span class="ident">cbSize</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span>);
+<span class="macro">impl_default_with_size!</span>(TASKDIALOGCONFIG, cbSize, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span><span class="op">&gt;</span>
-	<span class="ident">TASKDIALOGCONFIG</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span>&gt;
+	TASKDIALOGCONFIG&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;e</span>, <span class="lifetime">&#39;f</span>, <span class="lifetime">&#39;g</span>, <span class="lifetime">&#39;h</span>, <span class="lifetime">&#39;i</span>, <span class="lifetime">&#39;j</span>&gt;
 {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">pszWindowTitle</span>, <span class="ident">set_pszWindowTitle</span>);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pszWindowTitle, set_pszWindowTitle);
 
-	<span class="doccomment">/// Returns the `pszMainIcon` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pszMainIcon</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IconIdTdicon</span> {
-		<span class="kw">if</span> <span class="ident">IS_INTRESOURCE</span>(<span class="self">self</span>.<span class="ident">pszMainIcon</span>) {
-			<span class="kw">if</span> <span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0xfffc</span> {
-				<span class="ident">IconIdTdicon::Tdicon</span>(<span class="ident">co::TD_ICON</span>(<span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="kw">as</span> <span class="kw">_</span>))
-			} <span class="kw">else</span> {
-				<span class="ident">IconIdTdicon::Id</span>(<span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// Returns the `pszMainIcon` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>pszMainIcon(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IconIdTdicon {
+		<span class="kw">if </span>IS_INTRESOURCE(<span class="self">self</span>.pszMainIcon) {
+			<span class="kw">if </span><span class="self">self</span>.pszMainIcon <span class="kw">as </span>u16 &gt;= <span class="number">0xfffc </span>{
+				IconIdTdicon::Tdicon(co::TD_ICON(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>))
+			} <span class="kw">else </span>{
+				IconIdTdicon::Id(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>)
 			}
-		} <span class="kw">else</span> {
-			<span class="ident">IconIdTdicon::Icon</span>(<span class="ident">HICON</span>(<span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="kw">as</span> <span class="kw">_</span>))
+		} <span class="kw">else </span>{
+			IconIdTdicon::Icon(HICON(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>))
 		}
 	}
 
-	<span class="doccomment">/// Sets the `pszMainIcon` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pszMainIcon</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">IconIdTdicon</span>) {
-		<span class="kw">match</span> <span class="ident">val</span> {
-			<span class="ident">IconIdTdicon::None</span> =&gt; <span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>(),
-			<span class="ident">IconIdTdicon::Icon</span>(<span class="ident">hicon</span>) =&gt; <span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="op">=</span> <span class="ident">hicon</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IconIdTdicon::Id</span>(<span class="ident">id</span>) =&gt; <span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="op">=</span> <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">IconIdTdicon::Tdicon</span>(<span class="ident">tdi</span>) =&gt; <span class="self">self</span>.<span class="ident">pszMainIcon</span> <span class="op">=</span> <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">tdi</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// Sets the `pszMainIcon` field.
+	</span><span class="kw">pub fn </span>set_pszMainIcon(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: IconIdTdicon) {
+		<span class="kw">match </span>val {
+			IconIdTdicon::None =&gt; <span class="self">self</span>.pszMainIcon = std::ptr::null_mut(),
+			IconIdTdicon::Icon(hicon) =&gt; <span class="self">self</span>.pszMainIcon = hicon.<span class="number">0 </span><span class="kw">as _</span>,
+			IconIdTdicon::Id(id) =&gt; <span class="self">self</span>.pszMainIcon = MAKEINTRESOURCE(id <span class="kw">as _</span>),
+			IconIdTdicon::Tdicon(tdi) =&gt; <span class="self">self</span>.pszMainIcon = MAKEINTRESOURCE(tdi.<span class="number">0 </span><span class="kw">as _</span>),
 		}
 	}
 
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, <span class="ident">pszMainInstruction</span>, <span class="ident">set_pszMainInstruction</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;c</span>, <span class="ident">pszContent</span>, <span class="ident">set_pszContent</span>);
-	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;d</span>, <span class="ident">pButtons</span>, <span class="ident">set_pButtons</span>, <span class="ident">cButtons</span>, <span class="ident">TASKDIALOG_BUTTON</span>);
-	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;e</span>, <span class="ident">pRadioButtons</span>, <span class="ident">set_pRadioButtons</span>, <span class="ident">cRadioButtons</span>, <span class="ident">TASKDIALOG_BUTTON</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;f</span>, <span class="ident">pszVerificationText</span>, <span class="ident">set_pszVerificationText</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;g</span>, <span class="ident">pszExpandedInformation</span>, <span class="ident">set_pszExpandedInformation</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;h</span>, <span class="ident">pszExpandedControlText</span>, <span class="ident">set_pszExpandedControlText</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;i</span>, <span class="ident">pszCollapsedControlText</span>, <span class="ident">set_pszCollapsedControlText</span>);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, pszMainInstruction, set_pszMainInstruction);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;c</span>, pszContent, set_pszContent);
+	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;d</span>, pButtons, set_pButtons, cButtons, TASKDIALOG_BUTTON);
+	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;e</span>, pRadioButtons, set_pRadioButtons, cRadioButtons, TASKDIALOG_BUTTON);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;f</span>, pszVerificationText, set_pszVerificationText);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;g</span>, pszExpandedInformation, set_pszExpandedInformation);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;h</span>, pszExpandedControlText, set_pszExpandedControlText);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;i</span>, pszCollapsedControlText, set_pszCollapsedControlText);
 
-	<span class="doccomment">/// Returns the `pszFooterIcon` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pszFooterIcon</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IconId</span> {
-		<span class="kw">if</span> <span class="ident">IS_INTRESOURCE</span>(<span class="self">self</span>.<span class="ident">pszFooterIcon</span>) {
-			<span class="ident">IconId::Id</span>(<span class="self">self</span>.<span class="ident">pszFooterIcon</span> <span class="kw">as</span> <span class="kw">_</span>)
-		} <span class="kw">else</span> {
-			<span class="ident">IconId::Icon</span>(<span class="ident">HICON</span>(<span class="self">self</span>.<span class="ident">pszFooterIcon</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="doccomment">/// Returns the `pszFooterIcon` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>pszFooterIcon(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IconId {
+		<span class="kw">if </span>IS_INTRESOURCE(<span class="self">self</span>.pszFooterIcon) {
+			IconId::Id(<span class="self">self</span>.pszFooterIcon <span class="kw">as _</span>)
+		} <span class="kw">else </span>{
+			IconId::Icon(HICON(<span class="self">self</span>.pszFooterIcon <span class="kw">as _</span>))
 		}
 	}
 
-	<span class="doccomment">/// Sets the `pszFooterIcon` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pszFooterIcon</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">IconId</span>) {
-		<span class="kw">match</span> <span class="ident">val</span> {
-			<span class="ident">IconId::None</span> =&gt; <span class="self">self</span>.<span class="ident">pszFooterIcon</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>(),
-			<span class="ident">IconId::Icon</span>(<span class="ident">hicon</span>) =&gt; <span class="self">self</span>.<span class="ident">pszFooterIcon</span> <span class="op">=</span> <span class="ident">hicon</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">IconId::Id</span>(<span class="ident">id</span>) =&gt; <span class="self">self</span>.<span class="ident">pszFooterIcon</span> <span class="op">=</span> <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// Sets the `pszFooterIcon` field.
+	</span><span class="kw">pub fn </span>set_pszFooterIcon(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: IconId) {
+		<span class="kw">match </span>val {
+			IconId::None =&gt; <span class="self">self</span>.pszFooterIcon = std::ptr::null_mut(),
+			IconId::Icon(hicon) =&gt; <span class="self">self</span>.pszFooterIcon = hicon.<span class="number">0 </span><span class="kw">as _</span>,
+			IconId::Id(id) =&gt; <span class="self">self</span>.pszFooterIcon = MAKEINTRESOURCE(id <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;j</span>, <span class="ident">pszFooter</span>, <span class="ident">set_pszFooter</span>);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;j</span>, pszFooter, set_pszFooter);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

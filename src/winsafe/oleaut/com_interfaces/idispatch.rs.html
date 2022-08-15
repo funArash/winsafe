@@ -71,78 +71,78 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::LCID</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oleaut::decl::ITypeInfo</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::LCID;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::ITypeInfo;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IDispatch`](crate::IDispatch) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IDispatchVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">GetTypeInfoCount</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetTypeInfo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetIDsOfNames</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Invoke</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">i32</span>, <span class="ident">PCVOID</span>, <span class="ident">u32</span>, <span class="ident">u16</span>, <span class="ident">PVOID</span>, <span class="ident">PVOID</span>, <span class="ident">PVOID</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IDispatch`](crate::IDispatch) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IDispatchVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>GetTypeInfoCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetTypeInfo: <span class="kw">fn</span>(ComPtr, u32, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetIDsOfNames: <span class="kw">fn</span>(ComPtr, PCVOID, PVOID, u32, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>Invoke: <span class="kw">fn</span>(ComPtr, i32, PCVOID, u32, u16, PVOID, PVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IDispatch`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nn-oaidl-idispatch)</span>
-<span class="doccomment">/// COM interface over [`IDispatchVT`](crate::vt::IDispatchVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IDispatch</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IDispatch`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nn-oaidl-idispatch)
+/// COM interface over [`IDispatchVT`](crate::vt::IDispatchVT).
+///
+/// Automatically calls
+/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IDispatch(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IDispatch</span>, <span class="string">&quot;00020400-0000-0000-c000-000000000046&quot;</span>);
-<span class="kw">impl</span> <span class="ident">oleaut_IDispatch</span> <span class="kw">for</span> <span class="ident">IDispatch</span> {}
+<span class="macro">impl_iunknown!</span>(IDispatch, <span class="string">&quot;00020400-0000-0000-c000-000000000046&quot;</span>);
+<span class="kw">impl </span>oleaut_IDispatch <span class="kw">for </span>IDispatch {}
 
-<span class="doccomment">/// This trait is enabled with the `oleaut` feature, and provides methods for</span>
-<span class="doccomment">/// [`IDispatch`](crate::IDispatch).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">oleaut_IDispatch</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IDispatch::GetTypeInfoCount`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfocount)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetTypeInfoCount</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IDispatchVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetTypeInfoCount</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">count</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">count</span>)
+<span class="doccomment">/// This trait is enabled with the `oleaut` feature, and provides methods for
+/// [`IDispatch`](crate::IDispatch).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
+<span class="kw">pub trait </span>oleaut_IDispatch: ole_IUnknown {
+	<span class="doccomment">/// [`IDispatch::GetTypeInfoCount`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfocount)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetTypeInfoCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
+			ok_to_hrresult((vt.GetTypeInfoCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
+		}.map(|<span class="kw">_</span>| count)
 
 	}
 
-	<span class="doccomment">/// [`IDispatch::GetTypeInfo`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfo)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetTypeInfo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info_type</span>: <span class="ident">u32</span>, <span class="ident">lcid</span>: <span class="ident">LCID</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">ITypeInfo</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IDispatchVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetTypeInfo</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">info_type</span>,
-					<span class="ident">lcid</span>.<span class="number">0</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>,
+	<span class="doccomment">/// [`IDispatch::GetTypeInfo`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfo)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetTypeInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info_type: u32, lcid: LCID) -&gt; HrResult&lt;ITypeInfo&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
+			ok_to_hrresult(
+				(vt.GetTypeInfo)(
+					<span class="self">self</span>.ptr(),
+					info_type,
+					lcid.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>ppv_queried,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ITypeInfo::from</span>(<span class="ident">ppv_queried</span>))
+			).map(|<span class="kw">_</span>| ITypeInfo::from(ppv_queried))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -63,70 +63,70 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">MONITORINFO</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>};
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{MONITORINFO, POINT, RECT};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HMONITOR</span>: <span class="string">&quot;user&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [display monitor](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hmonitor).</span>
-}
+<span class="macro">impl_handle!</span> { HMONITOR: <span class="string">&quot;user&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [display monitor](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hmonitor).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">user_Hmonitor</span> <span class="kw">for</span> <span class="ident">HMONITOR</span> {}
+<span class="kw">impl </span>user_Hmonitor <span class="kw">for </span>HMONITOR {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HMONITOR`](crate::HMONITOR).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hmonitor</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`GetMonitorInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmonitorinfow)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{HMONITOR, MONITORINFO};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let hmon: HMONITOR; // initialized somewhere</span>
-	<span class="doccomment">/// # let hmon = HMONITOR::NULL;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut mi = MONITORINFO::default();</span>
-	<span class="doccomment">/// hmon.GetMonitorInfo(&amp;mut mi)?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">GetMonitorInfo</span>(<span class="self">self</span>, <span class="ident">mi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MONITORINFO</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">user::ffi::GetMonitorInfoW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">mi</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HMONITOR`](crate::HMONITOR).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hmonitor: Handle {
+	<span class="doccomment">/// [`GetMonitorInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmonitorinfow)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{HMONITOR, MONITORINFO};
+	///
+	/// let hmon: HMONITOR; // initialized somewhere
+	/// # let hmon = HMONITOR::NULL;
+	///
+	/// let mut mi = MONITORINFO::default();
+	/// hmon.GetMonitorInfo(&amp;mut mi)?;
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>GetMonitorInfo(<span class="self">self</span>, mi: <span class="kw-2">&amp;mut </span>MONITORINFO) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetMonitorInfoW(<span class="self">self</span>.as_ptr(), mi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`MonitorFromPoint`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfrompoint)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">MonitorFromPoint</span>(<span class="ident">pt</span>: <span class="ident">POINT</span>, <span class="ident">flags</span>: <span class="ident">co::MONITOR</span>) -&gt; <span class="ident">HMONITOR</span> {
-		<span class="ident">HMONITOR</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::MonitorFromPoint</span>(<span class="ident">pt</span>.<span class="ident">x</span>, <span class="ident">pt</span>.<span class="ident">y</span>, <span class="ident">flags</span>.<span class="number">0</span>) })
+	<span class="doccomment">/// [`MonitorFromPoint`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfrompoint)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>MonitorFromPoint(pt: POINT, flags: co::MONITOR) -&gt; HMONITOR {
+		HMONITOR(<span class="kw">unsafe </span>{ user::ffi::MonitorFromPoint(pt.x, pt.y, flags.<span class="number">0</span>) })
 	}
 
-	<span class="doccomment">/// [`MonitorFromRect`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromrect)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">MonitorFromRect</span>(<span class="ident">rc</span>: <span class="ident">RECT</span>, <span class="ident">flags</span>: <span class="ident">co::MONITOR</span>) -&gt; <span class="ident">HMONITOR</span> {
-		<span class="ident">HMONITOR</span>(
-			<span class="kw">unsafe</span> { <span class="ident">user::ffi::MonitorFromRect</span>(<span class="kw-2">&amp;</span><span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">flags</span>.<span class="number">0</span>) },
+	<span class="doccomment">/// [`MonitorFromRect`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromrect)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>MonitorFromRect(rc: RECT, flags: co::MONITOR) -&gt; HMONITOR {
+		HMONITOR(
+			<span class="kw">unsafe </span>{ user::ffi::MonitorFromRect(<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, flags.<span class="number">0</span>) },
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

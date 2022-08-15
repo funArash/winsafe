@@ -49,56 +49,56 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">comdlg</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comdlg::decl::CHOOSECOLOR</span>;
+<span class="kw">use crate</span>::{co, comdlg};
+<span class="kw">use </span><span class="kw">crate</span>::comdlg::decl::CHOOSECOLOR;
 
-<span class="doccomment">/// [`ChooseColor`](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms646912(v=vs.85))</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, ChooseColor, CHOOSECOLOR, COLORREF, HWND};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let parent_hwnd: HWND; // initialized somewhere</span>
-<span class="doccomment">/// # let parent_hwnd = HWND::NULL;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut cc = CHOOSECOLOR::default();</span>
-<span class="doccomment">/// let mut custom_colors = [COLORREF::new(255, 255, 255); 16];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// cc.hwndOwner = parent_hwnd;</span>
-<span class="doccomment">/// cc.Flags = co::CC::ANYCOLOR | co::CC::FULLOPEN | co::CC::RGBINIT;</span>
-<span class="doccomment">/// cc.rgbResult = COLORREF::new(255, 0, 0); // color initially chosen</span>
-<span class="doccomment">/// cc.set_lpCustColors(Some(&amp;mut custom_colors));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// if ChooseColor(&amp;mut cc)? {</span>
-<span class="doccomment">///     println!(&quot;The color: {} {} {}&quot;,</span>
-<span class="doccomment">///         cc.rgbResult.GetRValue(),</span>
-<span class="doccomment">///         cc.rgbResult.GetGValue(),</span>
-<span class="doccomment">///         cc.rgbResult.GetBValue(),</span>
-<span class="doccomment">///     );</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, co::CDERR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comdlg&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ChooseColor</span>(<span class="ident">cc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CHOOSECOLOR</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">co::CDERR</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">comdlg::ffi::ChooseColorW</span>(<span class="ident">cc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) } {
-		<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">CommDlgExtendedError</span>() {
-			<span class="ident">co::CDERR::NoValue</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-			<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+<span class="doccomment">/// [`ChooseColor`](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms646912(v=vs.85))
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, ChooseColor, CHOOSECOLOR, COLORREF, HWND};
+///
+/// let parent_hwnd: HWND; // initialized somewhere
+/// # let parent_hwnd = HWND::NULL;
+///
+/// let mut cc = CHOOSECOLOR::default();
+/// let mut custom_colors = [COLORREF::new(255, 255, 255); 16];
+///
+/// cc.hwndOwner = parent_hwnd;
+/// cc.Flags = co::CC::ANYCOLOR | co::CC::FULLOPEN | co::CC::RGBINIT;
+/// cc.rgbResult = COLORREF::new(255, 0, 0); // color initially chosen
+/// cc.set_lpCustColors(Some(&amp;mut custom_colors));
+///
+/// if ChooseColor(&amp;mut cc)? {
+///     println!(&quot;The color: {} {} {}&quot;,
+///         cc.rgbResult.GetRValue(),
+///         cc.rgbResult.GetGValue(),
+///         cc.rgbResult.GetBValue(),
+///     );
+/// }
+/// # Ok::&lt;_, co::CDERR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comdlg&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ChooseColor(cc: <span class="kw-2">&amp;mut </span>CHOOSECOLOR) -&gt; <span class="prelude-ty">Result</span>&lt;bool, co::CDERR&gt; {
+	<span class="kw">match unsafe </span>{ comdlg::ffi::ChooseColorW(cc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) } {
+		<span class="number">0 </span>=&gt; <span class="kw">match </span>CommDlgExtendedError() {
+			co::CDERR::NoValue =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+			err =&gt; <span class="prelude-val">Err</span>(err),
 		},
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 	}
 }
 
-<span class="doccomment">/// [`CommDlgExtendedError`](https://docs.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-commdlgextendederror)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comdlg&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">CommDlgExtendedError</span>() -&gt; <span class="ident">co::CDERR</span> {
-	<span class="ident">co::CDERR</span>(<span class="kw">unsafe</span> { <span class="ident">comdlg::ffi::CommDlgExtendedError</span>() })
+<span class="doccomment">/// [`CommDlgExtendedError`](https://docs.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-commdlgextendederror)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comdlg&quot;</span>)))]</span>
+<span class="kw">pub fn </span>CommDlgExtendedError() -&gt; co::CDERR {
+	co::CDERR(<span class="kw">unsafe </span>{ comdlg::ffi::CommDlgExtendedError() })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

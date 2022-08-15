@@ -125,132 +125,132 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl::HTREEITEM</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HINSTANCE</span>, <span class="ident">IdStr</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HBITMAP</span>, <span class="ident">POINT</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HTREEITEM;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, IdStr, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, POINT};
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`TBADDBITMAP`](crate::TBADDBITMAP) `nID`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BmpIdbRes</span> {
-	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).</span>
-	<span class="ident">Bmp</span>(<span class="ident">HBITMAP</span>),
-	<span class="doccomment">/// A system-defined [`co::IDB`](crate::co::IDB) bitmap.</span>
-	<span class="ident">Idb</span>(<span class="ident">co::IDB</span>),
-	<span class="doccomment">/// A bitmap resource.</span>
-	<span class="ident">Res</span>(<span class="ident">IdStr</span>, <span class="ident">HINSTANCE</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`TBADDBITMAP`](crate::TBADDBITMAP) `nID`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>BmpIdbRes {
+	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).
+	</span>Bmp(HBITMAP),
+	<span class="doccomment">/// A system-defined [`co::IDB`](crate::co::IDB) bitmap.
+	</span>Idb(co::IDB),
+	<span class="doccomment">/// A bitmap resource.
+	</span>Res(IdStr, HINSTANCE),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`HWND::TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) `pszIcon`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IdTdiconStr</span> {
-	<span class="doccomment">/// No icon.</span>
-	<span class="prelude-val">None</span>,
-	<span class="doccomment">/// A resource ID.</span>
-	<span class="ident">Id</span>(<span class="ident">u16</span>),
-	<span class="doccomment">/// A predefined icon.</span>
-	<span class="ident">Tdicon</span>(<span class="ident">co::TD_ICON</span>),
-	<span class="doccomment">/// A resource string identifier.</span>
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`HWND::TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) `pszIcon`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IdTdiconStr {
+	<span class="doccomment">/// No icon.
+	</span><span class="prelude-val">None</span>,
+	<span class="doccomment">/// A resource ID.
+	</span>Id(u16),
+	<span class="doccomment">/// A predefined icon.
+	</span>Tdicon(co::TD_ICON),
+	<span class="doccomment">/// A resource string identifier.
+	</span>Str(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">IdTdiconStr</span> {
-	<span class="doccomment">/// Constructs the enum directly from a string.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">WString::from_str</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>IdTdiconStr {
+	<span class="doccomment">/// Constructs the enum directly from a string.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">std::ptr::null</span>(),
-			<span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Tdicon</span>(<span class="ident">tdi</span>) =&gt; <span class="ident">MAKEINTRESOURCE</span>(<span class="ident">tdi</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident"><span class="self">Self</span>::Str</span>(<span class="ident">ws</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">ws</span>.<span class="ident">as_ptr</span>() },
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::None =&gt; std::ptr::null(),
+			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
+			<span class="self">Self</span>::Tdicon(tdi) =&gt; MAKEINTRESOURCE(tdi.<span class="number">0 </span><span class="kw">as _</span>),
+			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
 		}
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`TBBUTTON`](crate::TBBUTTON) `iString`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexStr</span> {
-	<span class="ident">Index</span>(<span class="ident">u16</span>),
-	<span class="ident">Str</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`TBBUTTON`](crate::TBBUTTON) `iString`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub enum </span>IndexStr {
+	Index(u16),
+	Str(WString),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`hdm::SetHotDivider`](crate::msg::hdm::SetHotDivider) `value`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PtIdx</span> {
-	<span class="doccomment">/// X and Y coordinates of the pointer</span>
-	<span class="ident">Pt</span>(<span class="ident">POINT</span>),
-	<span class="doccomment">/// Index of the divider.</span>
-	<span class="ident">Idx</span>(<span class="ident">u32</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`hdm::SetHotDivider`](crate::msg::hdm::SetHotDivider) `value`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub enum </span>PtIdx {
+	<span class="doccomment">/// X and Y coordinates of the pointer
+	</span>Pt(POINT),
+	<span class="doccomment">/// Index of the divider.
+	</span>Idx(u32),
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`tbm::AddString`](crate::msg::tbm::AddString) `texts`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResStrs</span> {
-	<span class="doccomment">/// A resource string resource.</span>
-	<span class="ident">Res</span>(<span class="ident">IdStr</span>, <span class="ident">HINSTANCE</span>),
-	<span class="doccomment">/// A multi-string composed of null-separated strings. To use this field,</span>
-	<span class="doccomment">/// prefer the [`ResStrs::from_strs`](crate::ResStrs::from_strs) static</span>
-	<span class="doccomment">/// method.</span>
-	<span class="ident">Strs</span>(<span class="ident">WString</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`tbm::AddString`](crate::msg::tbm::AddString) `texts`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="kw">pub enum </span>ResStrs {
+	<span class="doccomment">/// A resource string resource.
+	</span>Res(IdStr, HINSTANCE),
+	<span class="doccomment">/// A multi-string composed of null-separated strings. To use this field,
+	/// prefer the [`ResStrs::from_strs`](crate::ResStrs::from_strs) static
+	/// method.
+	</span>Strs(WString),
 }
 
-<span class="kw">impl</span> <span class="ident">ResStrs</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_strs</span>(<span class="ident">texts</span>: <span class="kw-2">&amp;</span>[<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="ident">ResStrs</span> {
-		<span class="ident"><span class="self">Self</span>::Strs</span>(<span class="ident">WString::from_str_vec</span>(<span class="ident">texts</span>))
+<span class="kw">impl </span>ResStrs {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_strs(texts: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; ResStrs {
+		<span class="self">Self</span>::Strs(WString::from_str_vec(texts))
 	}
 }
 
-<span class="doccomment">/// Variant parameter for:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * [`TVINSERTSTRUCT`](crate::TVINSERTSTRUCT) `hInsertAfter`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TreeitemTvi</span> {
-	<span class="doccomment">/// Handle to a tree view item.</span>
-	<span class="ident">Treeitem</span>(<span class="ident">HTREEITEM</span>),
-	<span class="doccomment">/// One of the predefined values.</span>
-	<span class="ident">Tvi</span>(<span class="ident">co::TVI</span>),
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`TVINSERTSTRUCT`](crate::TVINSERTSTRUCT) `hInsertAfter`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">pub enum </span>TreeitemTvi {
+	<span class="doccomment">/// Handle to a tree view item.
+	</span>Treeitem(HTREEITEM),
+	<span class="doccomment">/// One of the predefined values.
+	</span>Tvi(co::TVI),
 }
 
-<span class="kw">impl</span> <span class="ident">TreeitemTvi</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_isize</span>(<span class="ident">val</span>: <span class="ident">isize</span>) -&gt; <span class="ident">TreeitemTvi</span> {
-		<span class="kw">match</span> <span class="ident">co::TVI</span>(<span class="ident">val</span>) {
-			<span class="ident">co::TVI::FIRST</span> =&gt; <span class="ident"><span class="self">Self</span>::Tvi</span>(<span class="ident">co::TVI::FIRST</span>),
-			<span class="ident">co::TVI::LAST</span> =&gt; <span class="ident"><span class="self">Self</span>::Tvi</span>(<span class="ident">co::TVI::LAST</span>),
-			<span class="ident">co::TVI::ROOT</span> =&gt; <span class="ident"><span class="self">Self</span>::Tvi</span>(<span class="ident">co::TVI::ROOT</span>),
-			<span class="ident">co::TVI::SORT</span> =&gt; <span class="ident"><span class="self">Self</span>::Tvi</span>(<span class="ident">co::TVI::SORT</span>),
-			<span class="ident">val</span> =&gt; <span class="ident"><span class="self">Self</span>::Treeitem</span>(<span class="ident">HTREEITEM</span>(<span class="ident">val</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)),
+<span class="kw">impl </span>TreeitemTvi {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>from_isize(val: isize) -&gt; TreeitemTvi {
+		<span class="kw">match </span>co::TVI(val) {
+			co::TVI::FIRST =&gt; <span class="self">Self</span>::Tvi(co::TVI::FIRST),
+			co::TVI::LAST =&gt; <span class="self">Self</span>::Tvi(co::TVI::LAST),
+			co::TVI::ROOT =&gt; <span class="self">Self</span>::Tvi(co::TVI::ROOT),
+			co::TVI::SORT =&gt; <span class="self">Self</span>::Tvi(co::TVI::SORT),
+			val =&gt; <span class="self">Self</span>::Treeitem(HTREEITEM(val.<span class="number">0 </span><span class="kw">as _</span>)),
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">isize</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident"><span class="self">Self</span>::Treeitem</span>(<span class="ident">htreeitem</span>) =&gt; <span class="ident">htreeitem</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident"><span class="self">Self</span>::Tvi</span>(<span class="ident">tvi</span>) =&gt; <span class="ident">tvi</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Treeitem(htreeitem) =&gt; htreeitem.<span class="number">0 </span><span class="kw">as _</span>,
+			<span class="self">Self</span>::Tvi(tvi) =&gt; tvi.<span class="number">0 </span><span class="kw">as _</span>,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -820,827 +820,827 @@
 <span id="820">820</span>
 <span id="821">821</span>
 <span id="822">822</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl::HFONT</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::func_store::FuncStore</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg</span>::{<span class="ident">wm</span>, <span class="ident">WndMsg</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSendRecv</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HICON</span>, <span class="ident">HMENU</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::HFONT;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::func_store::FuncStore;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSendRecv;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HICON, HMENU};
 
-<span class="doccomment">/// The result of processing a message.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">enum</span> <span class="ident">ProcessResult</span> {
-	<span class="doccomment">/// Message was not handled because no function was found.</span>
-	<span class="ident">NotHandled</span>,
-	<span class="doccomment">/// Message handled, and return value is meaningful.</span>
-	<span class="ident">HandledWithRet</span>(<span class="ident">isize</span>),
-	<span class="doccomment">/// Message handled, but you should return the default value (0 or FALSE).</span>
-	<span class="ident">HandledWithoutRet</span>,
+<span class="doccomment">/// The result of processing a message.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">enum </span>ProcessResult {
+	<span class="doccomment">/// Message was not handled because no function was found.
+	</span>NotHandled,
+	<span class="doccomment">/// Message handled, and return value is meaningful.
+	</span>HandledWithRet(isize),
+	<span class="doccomment">/// Message handled, but you should return the default value (0 or FALSE).
+	</span>HandledWithoutRet,
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// Exposes window</span>
-<span class="doccomment">/// [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// window.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WindowEvents</span> {
-	<span class="ident">msgs</span>: <span class="ident">FuncStore</span><span class="op">&lt;</span> <span class="comment">// ordinary WM messages</span>
-		<span class="ident">co::WM</span>,
-		<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// return value may be meaningful</span>
-	<span class="op">&gt;</span>,
+</span><span class="doccomment">/// Exposes window
+/// [messages](https://docs.microsoft.com/en-us/windows/win32/winmsg/about-messages-and-message-queues).
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// window.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>WindowEvents {
+	msgs: FuncStore&lt; <span class="comment">// ordinary WM messages
+		</span>co::WM,
+		Box&lt;<span class="kw">dyn </span>Fn(WndMsg) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt;&gt;, <span class="comment">// return value may be meaningful
+	</span>&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">WindowEvents</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">msgs</span>: <span class="ident">FuncStore::new</span>() }
+<span class="kw">impl </span>WindowEvents {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ msgs: FuncStore::new() }
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">is_empty</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.msgs.is_empty()
 	}
 
-	<span class="doccomment">/// Searches for the last added user function for the given message, and</span>
-	<span class="doccomment">/// runs if it exists, returning the result.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_one_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">ProcessResult</span><span class="op">&gt;</span>
+	<span class="doccomment">/// Searches for the last added user function for the given message, and
+	/// runs if it exists, returning the result.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>process_one_message(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		wm_any: WndMsg) -&gt; AnyResult&lt;ProcessResult&gt;
 	{
-		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">find</span>(<span class="ident">wm_any</span>.<span class="ident">msg_id</span>) {
-			<span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; { <span class="comment">// we have a stored function to handle this message</span>
-				<span class="kw">match</span> <span class="ident">func</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span> { <span class="comment">// execute user function</span>
-					<span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">ProcessResult::HandledWithRet</span>(<span class="ident">res</span>), <span class="comment">// meaningful return value</span>
-					<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::HandledWithoutRet</span>,
+		<span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self</span>.msgs.find(wm_any.msg_id) {
+			<span class="prelude-val">Some</span>(func) =&gt; { <span class="comment">// we have a stored function to handle this message
+				</span><span class="kw">match </span>func(wm_any)<span class="question-mark">? </span>{ <span class="comment">// execute user function
+					</span><span class="prelude-val">Some</span>(res) =&gt; ProcessResult::HandledWithRet(res), <span class="comment">// meaningful return value
+					</span><span class="prelude-val">None </span>=&gt; ProcessResult::HandledWithoutRet,
 				}
 			},
-			<span class="prelude-val">None</span> =&gt; <span class="ident">ProcessResult::NotHandled</span>, <span class="comment">// no stored function</span>
-		})
+			<span class="prelude-val">None </span>=&gt; ProcessResult::NotHandled, <span class="comment">// no stored function
+		</span>})
 	}
 
-	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of</span>
-	<span class="doccomment">/// them, discarding the results.</span>
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">process_all_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">wm_any</span>: <span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of
+	/// them, discarding the results.
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>process_all_messages(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		wm_any: WndMsg) -&gt; AnyResult&lt;()&gt;
 	{
-		<span class="kw">for</span> <span class="ident">func</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">find_all</span>(<span class="ident">wm_any</span>.<span class="ident">msg_id</span>) {
-			<span class="ident">func</span>(<span class="ident">wm_any</span>)<span class="question-mark">?</span>; <span class="comment">// execute each stored function</span>
-		}
+		<span class="kw">for </span>func <span class="kw">in </span><span class="self">self</span>.msgs.find_all(wm_any.msg_id) {
+			func(wm_any)<span class="question-mark">?</span>; <span class="comment">// execute each stored function
+		</span>}
 		<span class="prelude-val">Ok</span>(())
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">impl</span> <span class="ident">GuiEvents</span> <span class="kw">for</span> <span class="ident">WindowEvents</span> {
-	<span class="kw">fn</span> <span class="ident">wm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">co::WM</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+</span><span class="kw">impl </span>GuiEvents <span class="kw">for </span>WindowEvents {
+	<span class="kw">fn </span>wm&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: co::WM, func: F)
+		<span class="kw">where </span>F: Fn(WndMsg) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">msgs</span>.<span class="ident">push</span>(<span class="ident">ident</span>, <span class="ident">Box::new</span>(<span class="ident">func</span>));
+		<span class="self">self</span>.msgs.push(ident, Box::new(func));
 	}
 }
 
-<span class="doccomment">/// Exposes the basic window message methods of</span>
-<span class="doccomment">/// [`WindowEvents`](crate::gui::events::WindowEvents).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiEvents</span> {
-	<span class="doccomment">/// Event to any [window message](crate::co::WM).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Instead of using this event, you should always prefer the</span>
-	<span class="doccomment">/// specific events, which will give you the correct message parameters.</span>
-	<span class="doccomment">/// This generic method should be used only when you have a custom,</span>
-	<span class="doccomment">/// non-standard window message – which should be pretty rare.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Handling a custom, user-defined message:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, gui, msg, AnyResult};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let CUSTOM_MSG = co::WM::from(0x1234);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// wnd.on().wm(CUSTOM_MSG, {</span>
-	<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-	<span class="doccomment">///     move |p: msg::WndMsg| -&gt; AnyResult&lt;Option&lt;isize&gt;&gt; {</span>
-	<span class="doccomment">///         println!(&quot;HWND: {}, msg ID: {}&quot;, wnd.hwnd(), p.msg_id);</span>
-	<span class="doccomment">///         Ok(Some(0))</span>
-	<span class="doccomment">///     }</span>
-	<span class="doccomment">/// });</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">wm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">co::WM</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">WndMsg</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="doccomment">/// Exposes the basic window message methods of
+/// [`WindowEvents`](crate::gui::events::WindowEvents).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiEvents {
+	<span class="doccomment">/// Event to any [window message](crate::co::WM).
+	///
+	/// **Note:** Instead of using this event, you should always prefer the
+	/// specific events, which will give you the correct message parameters.
+	/// This generic method should be used only when you have a custom,
+	/// non-standard window message – which should be pretty rare.
+	///
+	/// # Examples
+	///
+	/// Handling a custom, user-defined message:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, gui, msg, AnyResult};
+	///
+	/// let wnd: gui::WindowMain; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	///
+	/// let CUSTOM_MSG = co::WM::from(0x1234);
+	///
+	/// wnd.on().wm(CUSTOM_MSG, {
+	///     let wnd = wnd.clone(); // to pass into the closure
+	///     move |p: msg::WndMsg| -&gt; AnyResult&lt;Option&lt;isize&gt;&gt; {
+	///         println!(&quot;HWND: {}, msg ID: {}&quot;, wnd.hwnd(), p.msg_id);
+	///         Ok(Some(0))
+	///     }
+	/// });
+	/// ```
+	</span><span class="kw">fn </span>wm&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: co::WM, func: F)
+		<span class="kw">where </span>F: Fn(WndMsg) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>;
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_activate</span>, <span class="ident">co::WM::ACTIVATE</span>, <span class="ident">wm::Activate</span>,
-		<span class="doccomment">/// [`WM_ACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-activate)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Default handling</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// If you handle this event, you&#39;ll overwrite the default handling in:</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// * non-dialog [`WindowMain`](crate::gui::WindowMain).</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_activate, co::WM::ACTIVATE, wm::Activate,
+		<span class="doccomment">/// [`WM_ACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-activate)
+		/// message.
+		///
+		/// # Default handling
+		///
+		/// If you handle this event, you&#39;ll overwrite the default handling in:
+		///
+		/// * non-dialog [`WindowMain`](crate::gui::WindowMain).
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_activate_app</span>, <span class="ident">co::WM::ACTIVATEAPP</span>, <span class="ident">wm::ActivateApp</span>,
-		<span class="doccomment">/// [`WM_ACTIVATEAPP`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-activateapp)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_activate_app, co::WM::ACTIVATEAPP, wm::ActivateApp,
+		<span class="doccomment">/// [`WM_ACTIVATEAPP`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-activateapp)
+		/// message.
+	</span>}
 
-	<span class="doccomment">/// [`WM_APPCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-appcommand)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_app_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::AppCommand</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_APPCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-appcommand)
+	/// message.
+	</span><span class="kw">fn </span>wm_app_command&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(wm::AppCommand) -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::APPCOMMAND</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-			<span class="ident">func</span>(<span class="ident">wm::AppCommand::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>;
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>)) <span class="comment">// TRUE</span>
-		});
+		<span class="self">self</span>.wm(co::WM::APPCOMMAND, <span class="kw">move </span>|p| {
+			func(wm::AppCommand::from_generic_wm(p))<span class="question-mark">?</span>;
+			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>)) <span class="comment">// TRUE
+		</span>});
 	}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_cancel_mode</span>, <span class="ident">co::WM::CANCELMODE</span>,
-		<span class="doccomment">/// [`WM_CANCELMODE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-cancelmode)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_cancel_mode, co::WM::CANCELMODE,
+		<span class="doccomment">/// [`WM_CANCELMODE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-cancelmode)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_capture_changed</span>, <span class="ident">co::WM::CAPTURECHANGED</span>, <span class="ident">wm::CaptureChanged</span>,
-		<span class="doccomment">/// [`WM_CAPTURECHANGED`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-capturechanged)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_capture_changed, co::WM::CAPTURECHANGED, wm::CaptureChanged,
+		<span class="doccomment">/// [`WM_CAPTURECHANGED`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-capturechanged)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_char</span>, <span class="ident">co::WM::CHAR</span>, <span class="ident">wm::Char</span>,
-		<span class="doccomment">/// [`WM_CHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-char)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_char, co::WM::CHAR, wm::Char,
+		<span class="doccomment">/// [`WM_CHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-char)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_child_activate</span>, <span class="ident">co::WM::CHILDACTIVATE</span>,
-		<span class="doccomment">/// [`WM_CHILDACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-childactivate)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_child_activate, co::WM::CHILDACTIVATE,
+		<span class="doccomment">/// [`WM_CHILDACTIVATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-childactivate)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_close</span>, <span class="ident">co::WM::CLOSE</span>,
-		<span class="doccomment">/// [`WM_CLOSE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-close)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Default handling</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// If you handle this event, you&#39;ll overwrite the default handling in:</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// * dialog [`WindowMain`](crate::gui::WindowMain);</span>
-		<span class="doccomment">/// * dialog [`WindowModal`](crate::gui::WindowModal);</span>
-		<span class="doccomment">/// * non-dialog [`WindowModal`](crate::gui::WindowModal).</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_close, co::WM::CLOSE,
+		<span class="doccomment">/// [`WM_CLOSE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-close)
+		/// message.
+		///
+		/// # Default handling
+		///
+		/// If you handle this event, you&#39;ll overwrite the default handling in:
+		///
+		/// * dialog [`WindowMain`](crate::gui::WindowMain);
+		/// * dialog [`WindowModal`](crate::gui::WindowModal);
+		/// * non-dialog [`WindowModal`](crate::gui::WindowModal).
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_context_menu</span>, <span class="ident">co::WM::CONTEXTMENU</span>,
-		<span class="doccomment">/// [`WM_CONTEXTMENU`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-contextmenu)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_context_menu, co::WM::CONTEXTMENU,
+		<span class="doccomment">/// [`WM_CONTEXTMENU`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-contextmenu)
+		/// message.
+	</span>}
 
-	<span class="doccomment">/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)</span>
-	<span class="doccomment">/// message, sent only to non-dialog windows. Dialog windows receive</span>
-	<span class="doccomment">/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)</span>
-	<span class="doccomment">/// instead.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// wnd.on().wm_create({</span>
-	<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-	<span class="doccomment">///     move |p: msg::wm::Create| -&gt; AnyResult&lt;i32&gt; {</span>
-	<span class="doccomment">///         println!(&quot;HWND: {}, client area: {}x{}&quot;,</span>
-	<span class="doccomment">///             wnd.hwnd(),</span>
-	<span class="doccomment">///             p.createstruct.cx,</span>
-	<span class="doccomment">///             p.createstruct.cy,</span>
-	<span class="doccomment">///         );</span>
-	<span class="doccomment">///         Ok(0)</span>
-	<span class="doccomment">///     }</span>
-	<span class="doccomment">/// });</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">wm_create</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::Create</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)
+	/// message, sent only to non-dialog windows. Dialog windows receive
+	/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)
+	/// instead.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{gui, msg, AnyResult};
+	///
+	/// let wnd: gui::WindowMain; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	///
+	/// wnd.on().wm_create({
+	///     let wnd = wnd.clone(); // to pass into the closure
+	///     move |p: msg::wm::Create| -&gt; AnyResult&lt;i32&gt; {
+	///         println!(&quot;HWND: {}, client area: {}x{}&quot;,
+	///             wnd.hwnd(),
+	///             p.createstruct.cx,
+	///             p.createstruct.cy,
+	///         );
+	///         Ok(0)
+	///     }
+	/// });
+	/// ```
+	</span><span class="kw">fn </span>wm_create&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(wm::Create) -&gt; AnyResult&lt;i32&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::CREATE</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::Create::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+		<span class="self">self</span>.wm(co::WM::CREATE,
+			<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(wm::Create::from_generic_wm(p))<span class="question-mark">? </span><span class="kw">as _</span>)));
 	}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_btn</span>, <span class="ident">co::WM::CTLCOLORBTN</span>, <span class="ident">wm::CtlColorBtn</span>,
-		<span class="doccomment">/// [`WM_CTLCOLORBTN`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorbtn)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_btn, co::WM::CTLCOLORBTN, wm::CtlColorBtn,
+		<span class="doccomment">/// [`WM_CTLCOLORBTN`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorbtn)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_dlg</span>, <span class="ident">co::WM::CTLCOLORDLG</span>, <span class="ident">wm::CtlColorDlg</span>,
-		<span class="doccomment">/// [`WM_CTLCOLORDLG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-ctlcolordlg)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_dlg, co::WM::CTLCOLORDLG, wm::CtlColorDlg,
+		<span class="doccomment">/// [`WM_CTLCOLORDLG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-ctlcolordlg)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_edit</span>, <span class="ident">co::WM::CTLCOLOREDIT</span>, <span class="ident">wm::CtlColorEdit</span>,
-		<span class="doccomment">/// [`WM_CTLCOLOREDIT`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcoloredit)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_edit, co::WM::CTLCOLOREDIT, wm::CtlColorEdit,
+		<span class="doccomment">/// [`WM_CTLCOLOREDIT`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcoloredit)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_list_box</span>, <span class="ident">co::WM::CTLCOLORLISTBOX</span>, <span class="ident">wm::CtlColorListBox</span>,
-		<span class="doccomment">/// [`WM_CTLCOLORLISTBOX`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorlistbox)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_list_box, co::WM::CTLCOLORLISTBOX, wm::CtlColorListBox,
+		<span class="doccomment">/// [`WM_CTLCOLORLISTBOX`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorlistbox)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_scroll_bar</span>, <span class="ident">co::WM::CTLCOLORSCROLLBAR</span>, <span class="ident">wm::CtlColorScrollBar</span>,
-		<span class="doccomment">/// [`WM_CTLCOLORSCROLLBAR`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorscrollbar)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_scroll_bar, co::WM::CTLCOLORSCROLLBAR, wm::CtlColorScrollBar,
+		<span class="doccomment">/// [`WM_CTLCOLORSCROLLBAR`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorscrollbar)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_ctlcolor!</span> { <span class="ident">wm_ctl_color_static</span>, <span class="ident">co::WM::CTLCOLORSTATIC</span>, <span class="ident">wm::CtlColorStatic</span>,
-		<span class="doccomment">/// [`WM_CTLCOLORSTATIC`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_ctlcolor!</span> { wm_ctl_color_static, co::WM::CTLCOLORSTATIC, wm::CtlColorStatic,
+		<span class="doccomment">/// [`WM_CTLCOLORSTATIC`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_dead_char</span>, <span class="ident">co::WM::DEADCHAR</span>, <span class="ident">wm::DeadChar</span>,
-		<span class="doccomment">/// [`WM_DEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-deadchar)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_dead_char, co::WM::DEADCHAR, wm::DeadChar,
+		<span class="doccomment">/// [`WM_DEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-deadchar)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_boolret!</span> { <span class="ident">wm_delete_item</span>, <span class="ident">co::WM::DELETEITEM</span>, <span class="ident">wm::DeleteItem</span>,
-		<span class="doccomment">/// [`WM_DELETEITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-deleteitem)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_boolret!</span> { wm_delete_item, co::WM::DELETEITEM, wm::DeleteItem,
+		<span class="doccomment">/// [`WM_DELETEITEM`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-deleteitem)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_destroy</span>, <span class="ident">co::WM::DESTROY</span>,
-		<span class="doccomment">/// [`WM_DESTROY`](crate::msg::wm::Destroy) message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_destroy(move || -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///     println!(&quot;Window is gone, goodbye!&quot;);</span>
-		<span class="doccomment">///     Ok(())</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_destroy, co::WM::DESTROY,
+		<span class="doccomment">/// [`WM_DESTROY`](crate::msg::wm::Destroy) message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_destroy(move || -&gt; AnyResult&lt;()&gt; {
+		///     println!(&quot;Window is gone, goodbye!&quot;);
+		///     Ok(())
+		/// });
+		/// ```
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_display_change</span>, <span class="ident">co::WM::DISPLAYCHANGE</span>, <span class="ident">wm::DisplayChange</span>,
-		<span class="doccomment">/// [`WM_DISPLAYCHANGE`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-displaychange)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_display_change, co::WM::DISPLAYCHANGE, wm::DisplayChange,
+		<span class="doccomment">/// [`WM_DISPLAYCHANGE`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-displaychange)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_drop_files</span>, <span class="ident">co::WM::DROPFILES</span>, <span class="ident">wm::DropFiles</span>,
-		<span class="doccomment">/// [`WM_DROPFILES`](https://docs.microsoft.com/en-us/windows/win32/shell/wm-dropfiles)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_drop_files(move |p: msg::wm::DropFiles| -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///     for dropped_file in p.hdrop.iter()? {</span>
-		<span class="doccomment">///         let dropped_file = dropped_file?;</span>
-		<span class="doccomment">///         println!(&quot;Dropped: {}&quot;, dropped_file);</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">///     Ok(())</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_drop_files, co::WM::DROPFILES, wm::DropFiles,
+		<span class="doccomment">/// [`WM_DROPFILES`](https://docs.microsoft.com/en-us/windows/win32/shell/wm-dropfiles)
+		/// message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, msg, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_drop_files(move |p: msg::wm::DropFiles| -&gt; AnyResult&lt;()&gt; {
+		///     for dropped_file in p.hdrop.iter()? {
+		///         let dropped_file = dropped_file?;
+		///         println!(&quot;Dropped: {}&quot;, dropped_file);
+		///     }
+		///     Ok(())
+		/// });
+		/// ```
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_enable</span>, <span class="ident">co::WM::ENABLE</span>, <span class="ident">wm::Enable</span>,
-		<span class="doccomment">/// [`WM_ENABLE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-enable)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_enable, co::WM::ENABLE, wm::Enable,
+		<span class="doccomment">/// [`WM_ENABLE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-enable)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_end_session</span>, <span class="ident">co::WM::ENDSESSION</span>, <span class="ident">wm::EndSession</span>,
-		<span class="doccomment">/// [`WM_ENDSESSION`](https://docs.microsoft.com/en-us/windows/win32/shutdown/wm-endsession)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_end_session, co::WM::ENDSESSION, wm::EndSession,
+		<span class="doccomment">/// [`WM_ENDSESSION`](https://docs.microsoft.com/en-us/windows/win32/shutdown/wm-endsession)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_enter_idle</span>, <span class="ident">co::WM::ENTERIDLE</span>, <span class="ident">wm::EnterIdle</span>,
-		<span class="doccomment">/// [`WM_ENTERIDLE`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-enteridle)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_enter_idle, co::WM::ENTERIDLE, wm::EnterIdle,
+		<span class="doccomment">/// [`WM_ENTERIDLE`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-enteridle)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_enter_menu_loop</span>, <span class="ident">co::WM::ENTERMENULOOP</span>, <span class="ident">wm::EnterMenuLoop</span>,
-		<span class="doccomment">/// [`WM_ENTERMENULOOP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-entermenuloop)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_enter_menu_loop, co::WM::ENTERMENULOOP, wm::EnterMenuLoop,
+		<span class="doccomment">/// [`WM_ENTERMENULOOP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-entermenuloop)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_enter_size_move</span>, <span class="ident">co::WM::ENTERSIZEMOVE</span>,
-		<span class="doccomment">/// [`WM_ENTERSIZEMOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-entersizemove)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_enter_size_move, co::WM::ENTERSIZEMOVE,
+		<span class="doccomment">/// [`WM_ENTERSIZEMOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-entersizemove)
+		/// message.
+	</span>}
 
-	<span class="doccomment">/// [`WM_ERASEBKGND`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-erasebkgnd)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_erase_bkgnd</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::EraseBkgnd</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_ERASEBKGND`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-erasebkgnd)
+	/// message.
+	</span><span class="kw">fn </span>wm_erase_bkgnd&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(wm::EraseBkgnd) -&gt; AnyResult&lt;i32&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::ERASEBKGND</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::EraseBkgnd::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+		<span class="self">self</span>.wm(co::WM::ERASEBKGND,
+			<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(wm::EraseBkgnd::from_generic_wm(p))<span class="question-mark">? </span><span class="kw">as _</span>)));
 	}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_exit_menu_loop</span>, <span class="ident">co::WM::EXITMENULOOP</span>, <span class="ident">wm::ExitMenuLoop</span>,
-		<span class="doccomment">/// [`WM_EXITMENULOOP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-exitmenuloop)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_exit_menu_loop, co::WM::EXITMENULOOP, wm::ExitMenuLoop,
+		<span class="doccomment">/// [`WM_EXITMENULOOP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-exitmenuloop)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_exit_size_move</span>, <span class="ident">co::WM::EXITSIZEMOVE</span>,
-		<span class="doccomment">/// [`WM_EXITSIZEMOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-exitsizemove)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_exit_size_move, co::WM::EXITSIZEMOVE,
+		<span class="doccomment">/// [`WM_EXITSIZEMOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-exitsizemove)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_coret!</span> { <span class="ident">wm_get_dlg_code</span>, <span class="ident">co::WM::GETDLGCODE</span>, <span class="ident">wm::GetDlgCode</span>, <span class="ident">co::DLGC</span>,
-		<span class="doccomment">/// [`WM_GETDLGCODE`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-getdlgcode)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_coret!</span> { wm_get_dlg_code, co::WM::GETDLGCODE, wm::GetDlgCode, co::DLGC,
+		<span class="doccomment">/// [`WM_GETDLGCODE`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-getdlgcode)
+		/// message.
+	</span>}
 
-	<span class="doccomment">/// [`WM_GETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getfont)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_get_font</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_GETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getfont)
+	/// message.
+	</span><span class="kw">fn </span>wm_get_font&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;HFONT&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETFONT</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or_default</span>())));
+		<span class="self">self</span>.wm(co::WM::GETFONT,
+			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default())));
 	}
 
-	<span class="doccomment">/// [`WM_GETHMENU`](https://docs.microsoft.com/en-us/windows/win32/winmsg/mn-gethmenu)</span>
-	<span class="doccomment">/// message. Originally has `MN` prefix.</span>
-	<span class="kw">fn</span> <span class="ident">wm_get_hmenu</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+	<span class="doccomment">/// [`WM_GETHMENU`](https://docs.microsoft.com/en-us/windows/win32/winmsg/mn-gethmenu)
+	/// message. Originally has `MN` prefix.
+	</span><span class="kw">fn </span>wm_get_hmenu&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;HMENU&gt;&gt; + <span class="lifetime">&#39;static
+	</span>{
+		<span class="self">self</span>.wm(co::WM::MN_GETHMENU,
+			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default())));
+	}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_get_min_max_info, co::WM::GETMINMAXINFO, wm::GetMinMaxInfo,
+		<span class="doccomment">/// [`WM_GETMINMAXINFO`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getminmaxinfo)
+		/// message.
+	</span>}
+
+	<span class="doccomment">/// [`WM_GETTEXT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettext)
+	/// message.
+	</span><span class="kw">fn </span>wm_get_text&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(wm::GetText) -&gt; AnyResult&lt;u32&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::MN_GETHMENU</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or_default</span>())));
+		<span class="self">self</span>.wm(co::WM::GETTEXT,
+			<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(wm::GetText::from_generic_wm(p))<span class="question-mark">? </span><span class="kw">as _</span>)));
 	}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_get_min_max_info</span>, <span class="ident">co::WM::GETMINMAXINFO</span>, <span class="ident">wm::GetMinMaxInfo</span>,
-		<span class="doccomment">/// [`WM_GETMINMAXINFO`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-getminmaxinfo)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="doccomment">/// [`WM_GETTEXT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettext)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_get_text</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::GetText</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`WM_GETTEXTLENGTH`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettextlength)
+	/// message.
+	</span><span class="kw">fn </span>wm_get_text_length&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;u32&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETTEXT</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="ident">wm::GetText::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
+		<span class="self">self</span>.wm(co::WM::GETTEXTLENGTH,
+			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">? </span><span class="kw">as _</span>)));
 	}
 
-	<span class="doccomment">/// [`WM_GETTEXTLENGTH`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-gettextlength)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_get_text_length</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_get_title_bar_info_ex, co::WM::GETTITLEBARINFOEX, wm::GetTitleBarInfoEx,
+		<span class="doccomment">/// [`WM_GETTITLEBARINFOEX`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-gettitlebarinfoex)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_help, co::WM::HELP, wm::Help,
+		<span class="doccomment">/// [`WM_HELP`](https://docs.microsoft.com/en-us/windows/win32/shell/wm-help)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_h_scroll, co::WM::HSCROLL, wm::HScroll,
+		<span class="doccomment">/// [`WM_HSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-hscroll)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_boolret!</span> { wm_init_dialog, co::WM::INITDIALOG, wm::InitDialog,
+		<span class="doccomment">/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)
+		/// message, sent only to dialog windows. Non-dialog windows receive
+		/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)
+		/// instead.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, msg, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_init_dialog({
+		///     let wnd = wnd.clone(); // to pass into the closure
+		///     move |p: msg::wm::InitDialog| -&gt; AnyResult&lt;bool&gt; {
+		///         println!(&quot;Focused HWND: {}&quot;, p.hwnd_focus);
+		///         Ok(true)
+		///     }
+		/// });
+		/// ```
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_init_menu_popup, co::WM::INITMENUPOPUP, wm::InitMenuPopup,
+		<span class="doccomment">/// [`WM_INITMENUPOPUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-initmenupopup)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_key_down, co::WM::KEYDOWN, wm::KeyDown,
+		<span class="doccomment">/// [`WM_KEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-keydown)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_key_up, co::WM::KEYUP, wm::KeyUp,
+		<span class="doccomment">/// [`WM_KEYUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-keyup)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_kill_focus, co::WM::KILLFOCUS, wm::KillFocus,
+		<span class="doccomment">/// [`WM_KILLFOCUS`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-killfocus)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_l_button_dbl_clk, co::WM::LBUTTONDBLCLK, wm::LButtonDblClk,
+		<span class="doccomment">/// [`WM_LBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondblclk)
+		/// message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, msg, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_l_button_dbl_clk({
+		///     let wnd = wnd.clone(); // to pass into the closure
+		///     move |p: msg::wm::LButtonDblClk| -&gt; AnyResult&lt;()&gt; {
+		///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);
+		///         Ok(())
+		///     }
+		/// });
+		/// ```
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_l_button_down, co::WM::LBUTTONDOWN, wm::LButtonDown,
+		<span class="doccomment">/// [`WM_LBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondown)
+		/// message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, msg, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_l_button_down({
+		///     let wnd = wnd.clone(); // to pass into the closure
+		///     move |p: msg::wm::LButtonDown| -&gt; AnyResult&lt;()&gt; {
+		///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);
+		///         Ok(())
+		///     }
+		/// });
+		/// ```
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_l_button_up, co::WM::LBUTTONUP, wm::LButtonUp,
+		<span class="doccomment">/// [`WM_LBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_m_button_dbl_clk, co::WM::MBUTTONDBLCLK, wm::MButtonDblClk,
+		<span class="doccomment">/// [`WM_MBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondblclk)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_m_button_down, co::WM::MBUTTONDOWN, wm::MButtonDown,
+		<span class="doccomment">/// [`WM_MBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondown)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_m_button_up, co::WM::MBUTTONUP, wm::MButtonUp,
+		<span class="doccomment">/// [`WM_MBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttonup)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_menu_command, co::WM::MENUCOMMAND, wm::MenuCommand,
+		<span class="doccomment">/// [`WM_MENUCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menucommand)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_coret!</span> { wm_menu_drag, co::WM::MENUDRAG, wm::MenuDrag, co::MND,
+		<span class="doccomment">/// [`WM_MENUDRAG`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menudrag)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_menu_r_button_up, co::WM::MENURBUTTONUP, wm::MenuRButtonUp,
+		<span class="doccomment">/// [`WM_MENURBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menurbuttonup)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_mouse_hover, co::WM::MOUSEHOVER, wm::MouseHover,
+		<span class="doccomment">/// [`WM_MOUSEHOVER`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousehover)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_mouse_leave, co::WM::MOUSELEAVE,
+		<span class="doccomment">/// [`WM_MOUSELEAVE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mouseleave)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_mouse_move, co::WM::MOUSEMOVE, wm::MouseMove,
+		<span class="doccomment">/// [`WM_MOUSEMOVE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_move, co::WM::MOVE, wm::Move,
+		<span class="doccomment">/// [`WM_MOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-move)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_moving, co::WM::MOVING, wm::Moving,
+		<span class="doccomment">/// [`WM_MOVING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-moving)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_coret!</span> { wm_nc_calc_size, co::WM::NCCALCSIZE, wm::NcCalcSize, co::WVR,
+		<span class="doccomment">/// [`WM_NCCALCSIZE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-nccalcsize)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_boolret!</span> { wm_nc_create, co::WM::NCCREATE, wm::NcCreate,
+		<span class="doccomment">/// [`WM_NCCREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-nccreate)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_nc_destroy, co::WM::NCDESTROY,
+		<span class="doccomment">/// [`WM_NCDESTROY`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-ncdestroy)
+		/// message.
+		///
+		/// # Default handling
+		///
+		/// If you handle this event, you&#39;ll overwrite the default handling in:
+		///
+		/// * non-dialog [`WindowMain`](crate::gui::WindowMain);
+		/// * dialog [`WindowMain`](crate::gui::WindowMain).
+	</span>}
+
+	<span class="macro">fn_wm_withparm_coret!</span> { wm_nc_hit_test, co::WM::NCHITTEST, wm::NcHitTest, co::HT,
+		<span class="doccomment">/// [`WM_NCHITTEST`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-nchittest)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_nc_paint, co::WM::NCPAINT, wm::NcPaint,
+		<span class="doccomment">/// [`WM_NCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-ncpaint)
+		/// message.
+		///
+		/// # Default handling
+		///
+		/// If you handle this event, you&#39;ll overwrite the default handling in:
+		///
+		/// * non-dialog [`WindowControl`](crate::gui::WindowControl);
+		/// * dialog [`WindowControl`](crate::gui::WindowControl).
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_next_dlg_ctl, co::WM::NEXTDLGCTL, wm::NextDlgCtl,
+		<span class="doccomment">/// [`WM_NEXTDLGCTL`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-nextdlgctl)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_null, co::WM::NULL,
+		<span class="doccomment">/// [`WM_NULL`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-null)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_paint, co::WM::PAINT,
+		<span class="doccomment">/// [`WM_PAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-paint)
+		/// message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, AnyResult, PAINTSTRUCT};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_paint({
+		///     let wnd = wnd.clone(); // to pass into the closure
+		///     move || -&gt; AnyResult&lt;()&gt; {
+		///         let mut ps = PAINTSTRUCT::default();
+		///         let hdc = wnd.hwnd().BeginPaint(&amp;mut ps)?;
+		///
+		///         wnd.hwnd().EndPaint(&amp;ps);
+		///         Ok(())
+		///     }
+		/// });
+		/// ```
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_parent_notify, co::WM::PARENTNOTIFY, wm::ParentNotify,
+		<span class="doccomment">/// [`WM_PARENTNOTIFY`](https://docs.microsoft.com/en-us/windows/win32/inputmsg/wm-parentnotify)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_noparm_boolret!</span> { wm_query_open, co::WM::QUERYOPEN,
+		<span class="doccomment">/// [`WM_QUERYOPEN`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-queryopen)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_r_button_dbl_clk, co::WM::RBUTTONDBLCLK, wm::RButtonDblClk,
+		<span class="doccomment">/// [`WM_RBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondblclk)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_r_button_down, co::WM::RBUTTONDOWN, wm::RButtonDown,
+		<span class="doccomment">/// [`WM_RBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondown)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_r_button_up, co::WM::RBUTTONUP, wm::RButtonUp,
+		<span class="doccomment">/// [`WM_RBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttonup)
+	</span>}
+
+	<span class="macro">fn_wm_withparm_boolret!</span> { wm_set_cursor, co::WM::SETCURSOR, wm::SetCursor,
+		<span class="doccomment">/// [`WM_SETCURSOR`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-setcursor)
+		/// message.
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_set_focus, co::WM::SETFOCUS, wm::SetFocus,
+		<span class="doccomment">/// [`WM_SETFOCUS`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-setfocus)
+		/// message.
+		///
+		/// # Default handling
+		///
+		/// If you handle this event, you&#39;ll overwrite the default handling in:
+		///
+		/// * non-dialog [`WindowMain`](crate::gui::WindowMain);
+		/// * non-dialog [`WindowModal`](crate::gui::WindowModal).
+	</span>}
+
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_set_font, co::WM::SETFONT, wm::SetFont,
+		<span class="doccomment">/// [`WM_SETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-setfont)
+		/// message.
+	</span>}
+
+	<span class="doccomment">/// [`WM_SETICON`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-seticon)
+	/// message.
+	</span><span class="kw">fn </span>wm_set_icon&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(wm::SetIcon) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;HICON&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::GETTEXTLENGTH</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="kw">_</span>)));
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_get_title_bar_info_ex</span>, <span class="ident">co::WM::GETTITLEBARINFOEX</span>, <span class="ident">wm::GetTitleBarInfoEx</span>,
-		<span class="doccomment">/// [`WM_GETTITLEBARINFOEX`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-gettitlebarinfoex)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_help</span>, <span class="ident">co::WM::HELP</span>, <span class="ident">wm::Help</span>,
-		<span class="doccomment">/// [`WM_HELP`](https://docs.microsoft.com/en-us/windows/win32/shell/wm-help)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_h_scroll</span>, <span class="ident">co::WM::HSCROLL</span>, <span class="ident">wm::HScroll</span>,
-		<span class="doccomment">/// [`WM_HSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-hscroll)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_boolret!</span> { <span class="ident">wm_init_dialog</span>, <span class="ident">co::WM::INITDIALOG</span>, <span class="ident">wm::InitDialog</span>,
-		<span class="doccomment">/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)</span>
-		<span class="doccomment">/// message, sent only to dialog windows. Non-dialog windows receive</span>
-		<span class="doccomment">/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)</span>
-		<span class="doccomment">/// instead.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_init_dialog({</span>
-		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::InitDialog| -&gt; AnyResult&lt;bool&gt; {</span>
-		<span class="doccomment">///         println!(&quot;Focused HWND: {}&quot;, p.hwnd_focus);</span>
-		<span class="doccomment">///         Ok(true)</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_init_menu_popup</span>, <span class="ident">co::WM::INITMENUPOPUP</span>, <span class="ident">wm::InitMenuPopup</span>,
-		<span class="doccomment">/// [`WM_INITMENUPOPUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-initmenupopup)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_key_down</span>, <span class="ident">co::WM::KEYDOWN</span>, <span class="ident">wm::KeyDown</span>,
-		<span class="doccomment">/// [`WM_KEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-keydown)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_key_up</span>, <span class="ident">co::WM::KEYUP</span>, <span class="ident">wm::KeyUp</span>,
-		<span class="doccomment">/// [`WM_KEYUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-keyup)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_kill_focus</span>, <span class="ident">co::WM::KILLFOCUS</span>, <span class="ident">wm::KillFocus</span>,
-		<span class="doccomment">/// [`WM_KILLFOCUS`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-killfocus)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_l_button_dbl_clk</span>, <span class="ident">co::WM::LBUTTONDBLCLK</span>, <span class="ident">wm::LButtonDblClk</span>,
-		<span class="doccomment">/// [`WM_LBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondblclk)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_l_button_dbl_clk({</span>
-		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::LButtonDblClk| -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);</span>
-		<span class="doccomment">///         Ok(())</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_l_button_down</span>, <span class="ident">co::WM::LBUTTONDOWN</span>, <span class="ident">wm::LButtonDown</span>,
-		<span class="doccomment">/// [`WM_LBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondown)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_l_button_down({</span>
-		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::LButtonDown| -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///         println!(&quot;Point: {}x{}&quot;, p.coords.x, p.coords.y);</span>
-		<span class="doccomment">///         Ok(())</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_l_button_up</span>, <span class="ident">co::WM::LBUTTONUP</span>, <span class="ident">wm::LButtonUp</span>,
-		<span class="doccomment">/// [`WM_LBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_m_button_dbl_clk</span>, <span class="ident">co::WM::MBUTTONDBLCLK</span>, <span class="ident">wm::MButtonDblClk</span>,
-		<span class="doccomment">/// [`WM_MBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondblclk)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_m_button_down</span>, <span class="ident">co::WM::MBUTTONDOWN</span>, <span class="ident">wm::MButtonDown</span>,
-		<span class="doccomment">/// [`WM_MBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondown)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_m_button_up</span>, <span class="ident">co::WM::MBUTTONUP</span>, <span class="ident">wm::MButtonUp</span>,
-		<span class="doccomment">/// [`WM_MBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttonup)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_menu_command</span>, <span class="ident">co::WM::MENUCOMMAND</span>, <span class="ident">wm::MenuCommand</span>,
-		<span class="doccomment">/// [`WM_MENUCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menucommand)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_coret!</span> { <span class="ident">wm_menu_drag</span>, <span class="ident">co::WM::MENUDRAG</span>, <span class="ident">wm::MenuDrag</span>, <span class="ident">co::MND</span>,
-		<span class="doccomment">/// [`WM_MENUDRAG`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menudrag)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_menu_r_button_up</span>, <span class="ident">co::WM::MENURBUTTONUP</span>, <span class="ident">wm::MenuRButtonUp</span>,
-		<span class="doccomment">/// [`WM_MENURBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-menurbuttonup)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_mouse_hover</span>, <span class="ident">co::WM::MOUSEHOVER</span>, <span class="ident">wm::MouseHover</span>,
-		<span class="doccomment">/// [`WM_MOUSEHOVER`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousehover)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_mouse_leave</span>, <span class="ident">co::WM::MOUSELEAVE</span>,
-		<span class="doccomment">/// [`WM_MOUSELEAVE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mouseleave)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_mouse_move</span>, <span class="ident">co::WM::MOUSEMOVE</span>, <span class="ident">wm::MouseMove</span>,
-		<span class="doccomment">/// [`WM_MOUSEMOVE`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_move</span>, <span class="ident">co::WM::MOVE</span>, <span class="ident">wm::Move</span>,
-		<span class="doccomment">/// [`WM_MOVE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-move)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_moving</span>, <span class="ident">co::WM::MOVING</span>, <span class="ident">wm::Moving</span>,
-		<span class="doccomment">/// [`WM_MOVING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-moving)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_coret!</span> { <span class="ident">wm_nc_calc_size</span>, <span class="ident">co::WM::NCCALCSIZE</span>, <span class="ident">wm::NcCalcSize</span>, <span class="ident">co::WVR</span>,
-		<span class="doccomment">/// [`WM_NCCALCSIZE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-nccalcsize)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_boolret!</span> { <span class="ident">wm_nc_create</span>, <span class="ident">co::WM::NCCREATE</span>, <span class="ident">wm::NcCreate</span>,
-		<span class="doccomment">/// [`WM_NCCREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-nccreate)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_nc_destroy</span>, <span class="ident">co::WM::NCDESTROY</span>,
-		<span class="doccomment">/// [`WM_NCDESTROY`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-ncdestroy)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Default handling</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// If you handle this event, you&#39;ll overwrite the default handling in:</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// * non-dialog [`WindowMain`](crate::gui::WindowMain);</span>
-		<span class="doccomment">/// * dialog [`WindowMain`](crate::gui::WindowMain).</span>
-	}
-
-	<span class="macro">fn_wm_withparm_coret!</span> { <span class="ident">wm_nc_hit_test</span>, <span class="ident">co::WM::NCHITTEST</span>, <span class="ident">wm::NcHitTest</span>, <span class="ident">co::HT</span>,
-		<span class="doccomment">/// [`WM_NCHITTEST`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-nchittest)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_nc_paint</span>, <span class="ident">co::WM::NCPAINT</span>, <span class="ident">wm::NcPaint</span>,
-		<span class="doccomment">/// [`WM_NCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-ncpaint)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Default handling</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// If you handle this event, you&#39;ll overwrite the default handling in:</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// * non-dialog [`WindowControl`](crate::gui::WindowControl);</span>
-		<span class="doccomment">/// * dialog [`WindowControl`](crate::gui::WindowControl).</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_next_dlg_ctl</span>, <span class="ident">co::WM::NEXTDLGCTL</span>, <span class="ident">wm::NextDlgCtl</span>,
-		<span class="doccomment">/// [`WM_NEXTDLGCTL`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-nextdlgctl)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_null</span>, <span class="ident">co::WM::NULL</span>,
-		<span class="doccomment">/// [`WM_NULL`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-null)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_paint</span>, <span class="ident">co::WM::PAINT</span>,
-		<span class="doccomment">/// [`WM_PAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-paint)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, AnyResult, PAINTSTRUCT};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_paint({</span>
-		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///         let mut ps = PAINTSTRUCT::default();</span>
-		<span class="doccomment">///         let hdc = wnd.hwnd().BeginPaint(&amp;mut ps)?;</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">///         wnd.hwnd().EndPaint(&amp;ps);</span>
-		<span class="doccomment">///         Ok(())</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_parent_notify</span>, <span class="ident">co::WM::PARENTNOTIFY</span>, <span class="ident">wm::ParentNotify</span>,
-		<span class="doccomment">/// [`WM_PARENTNOTIFY`](https://docs.microsoft.com/en-us/windows/win32/inputmsg/wm-parentnotify)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_noparm_boolret!</span> { <span class="ident">wm_query_open</span>, <span class="ident">co::WM::QUERYOPEN</span>,
-		<span class="doccomment">/// [`WM_QUERYOPEN`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-queryopen)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_r_button_dbl_clk</span>, <span class="ident">co::WM::RBUTTONDBLCLK</span>, <span class="ident">wm::RButtonDblClk</span>,
-		<span class="doccomment">/// [`WM_RBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondblclk)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_r_button_down</span>, <span class="ident">co::WM::RBUTTONDOWN</span>, <span class="ident">wm::RButtonDown</span>,
-		<span class="doccomment">/// [`WM_RBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondown)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_r_button_up</span>, <span class="ident">co::WM::RBUTTONUP</span>, <span class="ident">wm::RButtonUp</span>,
-		<span class="doccomment">/// [`WM_RBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttonup)</span>
-	}
-
-	<span class="macro">fn_wm_withparm_boolret!</span> { <span class="ident">wm_set_cursor</span>, <span class="ident">co::WM::SETCURSOR</span>, <span class="ident">wm::SetCursor</span>,
-		<span class="doccomment">/// [`WM_SETCURSOR`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-setcursor)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_set_focus</span>, <span class="ident">co::WM::SETFOCUS</span>, <span class="ident">wm::SetFocus</span>,
-		<span class="doccomment">/// [`WM_SETFOCUS`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-setfocus)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Default handling</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// If you handle this event, you&#39;ll overwrite the default handling in:</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// * non-dialog [`WindowMain`](crate::gui::WindowMain);</span>
-		<span class="doccomment">/// * non-dialog [`WindowModal`](crate::gui::WindowModal).</span>
-	}
-
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_set_font</span>, <span class="ident">co::WM::SETFONT</span>, <span class="ident">wm::SetFont</span>,
-		<span class="doccomment">/// [`WM_SETFONT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-setfont)</span>
-		<span class="doccomment">/// message.</span>
-	}
-
-	<span class="doccomment">/// [`WM_SETICON`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-seticon)</span>
-	<span class="doccomment">/// message.</span>
-	<span class="kw">fn</span> <span class="ident">wm_set_icon</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">wm::SetIcon</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	{
-		<span class="self">self</span>.<span class="ident">wm</span>(<span class="ident">co::WM::SETICON</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span>
+		<span class="self">self</span>.wm(co::WM::SETICON, <span class="kw">move </span>|p|
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-				<span class="ident">func</span>(<span class="ident">wm::SetIcon::from_generic_wm</span>(<span class="ident">p</span>))<span class="question-mark">?</span>
-					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">unwrap_or_default</span>(),
+				func(wm::SetIcon::from_generic_wm(p))<span class="question-mark">?
+					</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default(),
 			))
 		);
 	}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_set_redraw</span>, <span class="ident">co::WM::SETREDRAW</span>, <span class="ident">wm::SetRedraw</span>,
-		<span class="doccomment">/// [`WM_SETREDRAW`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-setredraw)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_set_redraw, co::WM::SETREDRAW, wm::SetRedraw,
+		<span class="doccomment">/// [`WM_SETREDRAW`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-setredraw)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_boolret!</span> { <span class="ident">wm_set_text</span>, <span class="ident">co::WM::SETTEXT</span>, <span class="ident">wm::SetText</span>,
-		<span class="doccomment">/// [`WM_SETTEXT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-settext)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_boolret!</span> { wm_set_text, co::WM::SETTEXT, wm::SetText,
+		<span class="doccomment">/// [`WM_SETTEXT`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-settext)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_show_window</span>, <span class="ident">co::WM::SHOWWINDOW</span>, <span class="ident">wm::ShowWindow</span>,
-		<span class="doccomment">/// [`WM_SHOWWINDOW`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-showwindow)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_show_window, co::WM::SHOWWINDOW, wm::ShowWindow,
+		<span class="doccomment">/// [`WM_SHOWWINDOW`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-showwindow)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_size</span>, <span class="ident">co::WM::SIZE</span>, <span class="ident">wm::Size</span>,
-		<span class="doccomment">/// [`WM_SIZE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-size)</span>
-		<span class="doccomment">/// message.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, msg, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// wnd.on().wm_size({</span>
-		<span class="doccomment">///     let wnd = wnd.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move |p: msg::wm::Size| -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///         println!(&quot;HWND: {}, client area: {}x{}&quot;,</span>
-		<span class="doccomment">///             wnd.hwnd(),</span>
-		<span class="doccomment">///             p.client_area.cx,</span>
-		<span class="doccomment">///             p.client_area.cy,</span>
-		<span class="doccomment">///         );</span>
-		<span class="doccomment">///         Ok(())</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_size, co::WM::SIZE, wm::Size,
+		<span class="doccomment">/// [`WM_SIZE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-size)
+		/// message.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, msg, AnyResult};
+		///
+		/// let wnd: gui::WindowMain; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		///
+		/// wnd.on().wm_size({
+		///     let wnd = wnd.clone(); // to pass into the closure
+		///     move |p: msg::wm::Size| -&gt; AnyResult&lt;()&gt; {
+		///         println!(&quot;HWND: {}, client area: {}x{}&quot;,
+		///             wnd.hwnd(),
+		///             p.client_area.cx,
+		///             p.client_area.cy,
+		///         );
+		///         Ok(())
+		///     }
+		/// });
+		/// ```
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sizing</span>, <span class="ident">co::WM::SIZING</span>, <span class="ident">wm::Sizing</span>,
-		<span class="doccomment">/// [`WM_SIZING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-sizing)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sizing, co::WM::SIZING, wm::Sizing,
+		<span class="doccomment">/// [`WM_SIZING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-sizing)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_style_changed</span>, <span class="ident">co::WM::STYLECHANGED</span>, <span class="ident">wm::StyleChanged</span>,
-		<span class="doccomment">/// [`WM_STYLECHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-stylechanged)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_style_changed, co::WM::STYLECHANGED, wm::StyleChanged,
+		<span class="doccomment">/// [`WM_STYLECHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-stylechanged)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_style_changing</span>, <span class="ident">co::WM::STYLECHANGING</span>, <span class="ident">wm::StyleChanging</span>,
-		<span class="doccomment">/// [`WM_STYLECHANGING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-stylechanging)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_style_changing, co::WM::STYLECHANGING, wm::StyleChanging,
+		<span class="doccomment">/// [`WM_STYLECHANGING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-stylechanging)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_sync_paint</span>, <span class="ident">co::WM::SYNCPAINT</span>,
-		<span class="doccomment">/// [`WM_SYNCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-syncpaint)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_sync_paint, co::WM::SYNCPAINT,
+		<span class="doccomment">/// [`WM_SYNCPAINT`](https://docs.microsoft.com/en-us/windows/win32/gdi/wm-syncpaint)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sys_char</span>, <span class="ident">co::WM::SYSCHAR</span>, <span class="ident">wm::SysChar</span>,
-		<span class="doccomment">/// [`WM_SYSCHAR`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-syschar)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sys_char, co::WM::SYSCHAR, wm::SysChar,
+		<span class="doccomment">/// [`WM_SYSCHAR`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-syschar)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sys_command</span>, <span class="ident">co::WM::SYSCOMMAND</span>, <span class="ident">wm::SysCommand</span>,
-		<span class="doccomment">/// [`WM_SYSCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-syscommand)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sys_command, co::WM::SYSCOMMAND, wm::SysCommand,
+		<span class="doccomment">/// [`WM_SYSCOMMAND`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-syscommand)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sys_dead_char</span>, <span class="ident">co::WM::SYSDEADCHAR</span>, <span class="ident">wm::SysDeadChar</span>,
-		<span class="doccomment">/// [`WM_SYSDEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-sysdeadchar)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sys_dead_char, co::WM::SYSDEADCHAR, wm::SysDeadChar,
+		<span class="doccomment">/// [`WM_SYSDEADCHAR`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-sysdeadchar)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sys_key_down</span>, <span class="ident">co::WM::SYSKEYDOWN</span>, <span class="ident">wm::SysKeyDown</span>,
-		<span class="doccomment">/// [`WM_SYSKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-syskeydown)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sys_key_down, co::WM::SYSKEYDOWN, wm::SysKeyDown,
+		<span class="doccomment">/// [`WM_SYSKEYDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-syskeydown)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_sys_key_up</span>, <span class="ident">co::WM::SYSKEYUP</span>, <span class="ident">wm::SysKeyUp</span>,
-		<span class="doccomment">/// [`WM_SYSKEYUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-syskeyup)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_sys_key_up, co::WM::SYSKEYUP, wm::SysKeyUp,
+		<span class="doccomment">/// [`WM_SYSKEYUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-syskeyup)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_noret!</span> { <span class="ident">wm_theme_changed</span>, <span class="ident">co::WM::THEMECHANGED</span>,
-		<span class="doccomment">/// [`WM_THEMECHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-themechanged)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_noret!</span> { wm_theme_changed, co::WM::THEMECHANGED,
+		<span class="doccomment">/// [`WM_THEMECHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-themechanged)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_uninit_menu_popup</span>, <span class="ident">co::WM::UNINITMENUPOPUP</span>, <span class="ident">wm::UninitMenuPopup</span>,
-		<span class="doccomment">/// [`WM_UNINITMENUPOPUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-uninitmenupopup)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_uninit_menu_popup, co::WM::UNINITMENUPOPUP, wm::UninitMenuPopup,
+		<span class="doccomment">/// [`WM_UNINITMENUPOPUP`](https://docs.microsoft.com/en-us/windows/win32/menurc/wm-uninitmenupopup)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_noparm_boolret!</span> { <span class="ident">wm_undo</span>, <span class="ident">co::WM::UNDO</span>,
-		<span class="doccomment">/// [`WM_UNDO`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-undo)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_noparm_boolret!</span> { wm_undo, co::WM::UNDO,
+		<span class="doccomment">/// [`WM_UNDO`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-undo)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_v_scroll</span>, <span class="ident">co::WM::VSCROLL</span>, <span class="ident">wm::VScroll</span>,
-		<span class="doccomment">/// [`WM_VSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-vscroll)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_v_scroll, co::WM::VSCROLL, wm::VScroll,
+		<span class="doccomment">/// [`WM_VSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/wm-vscroll)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_window_pos_changed</span>, <span class="ident">co::WM::WINDOWPOSCHANGED</span>, <span class="ident">wm::WindowPosChanged</span>,
-		<span class="doccomment">/// [`WM_WINDOWPOSCHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-windowposchanged)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_window_pos_changed, co::WM::WINDOWPOSCHANGED, wm::WindowPosChanged,
+		<span class="doccomment">/// [`WM_WINDOWPOSCHANGED`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-windowposchanged)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_window_pos_changing</span>, <span class="ident">co::WM::WINDOWPOSCHANGING</span>, <span class="ident">wm::WindowPosChanging</span>,
-		<span class="doccomment">/// [`WM_WINDOWPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-windowposchanging)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_window_pos_changing, co::WM::WINDOWPOSCHANGING, wm::WindowPosChanging,
+		<span class="doccomment">/// [`WM_WINDOWPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-windowposchanging)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_x_button_dbl_clk</span>, <span class="ident">co::WM::XBUTTONDBLCLK</span>, <span class="ident">wm::XButtonDblClk</span>,
-		<span class="doccomment">/// [`WM_XBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondblclk)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_x_button_dbl_clk, co::WM::XBUTTONDBLCLK, wm::XButtonDblClk,
+		<span class="doccomment">/// [`WM_XBUTTONDBLCLK`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondblclk)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_x_button_down</span>, <span class="ident">co::WM::XBUTTONDOWN</span>, <span class="ident">wm::XButtonDown</span>,
-		<span class="doccomment">/// [`WM_XBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_x_button_down, co::WM::XBUTTONDOWN, wm::XButtonDown,
+		<span class="doccomment">/// [`WM_XBUTTONDOWN`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown)
+		/// message.
+	</span>}
 
-	<span class="macro">fn_wm_withparm_noret!</span> { <span class="ident">wm_x_button_up</span>, <span class="ident">co::WM::XBUTTONUP</span>, <span class="ident">wm::XButtonUp</span>,
-		<span class="doccomment">/// [`WM_XBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttonup)</span>
-		<span class="doccomment">/// message.</span>
-	}
+	<span class="macro">fn_wm_withparm_noret!</span> { wm_x_button_up, co::WM::XBUTTONUP, wm::XButtonUp,
+		<span class="doccomment">/// [`WM_XBUTTONUP`](https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttonup)
+		/// message.
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

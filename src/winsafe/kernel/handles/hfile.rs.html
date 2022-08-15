@@ -270,277 +270,277 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{
-	<span class="ident">BY_HANDLE_FILE_INFORMATION</span>, <span class="ident">GetLastError</span>, <span class="ident">HFILEMAP</span>, <span class="ident">HIDWORD</span>, <span class="ident">LODWORD</span>,
-	<span class="ident">OVERLAPPED</span>, <span class="ident">SECURITY_ATTRIBUTES</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>,
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	BY_HANDLE_FILE_INFORMATION, GetLastError, HFILEMAP, HIDWORD, LODWORD,
+	OVERLAPPED, SECURITY_ATTRIBUTES, SysResult, WString,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs</span>::{<span class="ident">bool_to_winresult</span>, <span class="ident">INVALID_HANDLE_VALUE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">HandleClose</span>};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, INVALID_HANDLE_VALUE};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HFILE</span>: <span class="string">&quot;kernel&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [file](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hfile).</span>
-	<span class="doccomment">/// Originally just a `HANDLE`.</span>
-}
+<span class="macro">impl_handle!</span> { HFILE: <span class="string">&quot;kernel&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [file](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hfile).
+	/// Originally just a `HANDLE`.
+</span>}
 
-<span class="kw">impl</span> <span class="ident">HandleClose</span> <span class="kw">for</span> <span class="ident">HFILE</span> {}
-<span class="kw">impl</span> <span class="ident">kernel_Hfile</span> <span class="kw">for</span> <span class="ident">HFILE</span> {}
+<span class="kw">impl </span>HandleClose <span class="kw">for </span>HFILE {}
+<span class="kw">impl </span>kernel_Hfile <span class="kw">for </span>HFILE {}
 
-<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
-<span class="doccomment">/// [`HFILE`](crate::HFILE).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Hfile</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CreateFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HFILE::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Opening an existing file as read-only:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HFILE};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let (hfile, status) = HFILE::CreateFile(</span>
-	<span class="doccomment">///     &quot;C:\\Temp\\test.txt&quot;,</span>
-	<span class="doccomment">///     co::GENERIC::READ,</span>
-	<span class="doccomment">///     co::FILE_SHARE::READ,</span>
-	<span class="doccomment">///     None,</span>
-	<span class="doccomment">///     co::DISPOSITION::OPEN_EXISTING,</span>
-	<span class="doccomment">///     co::FILE_ATTRIBUTE::NORMAL,</span>
-	<span class="doccomment">///     None,</span>
-	<span class="doccomment">/// )?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hfile.CloseHandle()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Opening a file for read and write. If the file doesn&#39;t exist, create it:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HFILE};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let (hfile, status) = HFILE::CreateFile(</span>
-	<span class="doccomment">///     &quot;C:\\Temp\\test.txt&quot;,</span>
-	<span class="doccomment">///     co::GENERIC::READ | co::GENERIC::WRITE,</span>
-	<span class="doccomment">///     co::FILE_SHARE::NoValue,</span>
-	<span class="doccomment">///     None,</span>
-	<span class="doccomment">///     co::DISPOSITION::OPEN_ALWAYS,</span>
-	<span class="doccomment">///     co::FILE_ATTRIBUTE::NORMAL,</span>
-	<span class="doccomment">///     None,</span>
-	<span class="doccomment">/// )?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hfile.CloseHandle()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateFile</span>(
-		<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-		<span class="ident">desired_access</span>: <span class="ident">co::GENERIC</span>,
-		<span class="ident">share_mode</span>: <span class="ident">co::FILE_SHARE</span>,
-		<span class="ident">security_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">SECURITY_ATTRIBUTES</span><span class="op">&gt;</span>,
-		<span class="ident">creation_disposition</span>: <span class="ident">co::DISPOSITION</span>,
-		<span class="ident">flags_and_attrs</span>: <span class="ident">co::FILE_ATTRIBUTE</span>,
-		<span class="ident">hfile_template</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HFILE</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>(<span class="ident">HFILE</span>, <span class="ident">co::ERROR</span>)<span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
+/// [`HFILE`](crate::HFILE).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>kernel_Hfile: Handle {
+	<span class="doccomment">/// [`CreateFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HFILE::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.
+	///
+	/// # Examples
+	///
+	/// Opening an existing file as read-only:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HFILE};
+	///
+	/// let (hfile, status) = HFILE::CreateFile(
+	///     &quot;C:\\Temp\\test.txt&quot;,
+	///     co::GENERIC::READ,
+	///     co::FILE_SHARE::READ,
+	///     None,
+	///     co::DISPOSITION::OPEN_EXISTING,
+	///     co::FILE_ATTRIBUTE::NORMAL,
+	///     None,
+	/// )?;
+	///
+	/// hfile.CloseHandle()?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	///
+	/// Opening a file for read and write. If the file doesn&#39;t exist, create it:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HFILE};
+	///
+	/// let (hfile, status) = HFILE::CreateFile(
+	///     &quot;C:\\Temp\\test.txt&quot;,
+	///     co::GENERIC::READ | co::GENERIC::WRITE,
+	///     co::FILE_SHARE::NoValue,
+	///     None,
+	///     co::DISPOSITION::OPEN_ALWAYS,
+	///     co::FILE_ATTRIBUTE::NORMAL,
+	///     None,
+	/// )?;
+	///
+	/// hfile.CloseHandle()?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateFile(
+		file_name: <span class="kw-2">&amp;</span>str,
+		desired_access: co::GENERIC,
+		share_mode: co::FILE_SHARE,
+		security_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
+		creation_disposition: co::DISPOSITION,
+		flags_and_attrs: co::FILE_ATTRIBUTE,
+		hfile_template: <span class="prelude-ty">Option</span>&lt;HFILE&gt;) -&gt; SysResult&lt;(HFILE, co::ERROR)&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::CreateFileW</span>(
-				<span class="ident">WString::from_str</span>(<span class="ident">file_name</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">desired_access</span>.<span class="number">0</span>,
-				<span class="ident">share_mode</span>.<span class="number">0</span>,
-				<span class="ident">security_attrs</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-				<span class="ident">creation_disposition</span>.<span class="number">0</span>,
-				<span class="ident">flags_and_attrs</span>.<span class="number">0</span>,
-				<span class="ident">hfile_template</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-			) <span class="kw">as</span> <span class="kw">_</span>
-		} {
-			<span class="ident">INVALID_HANDLE_VALUE</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">ptr</span> =&gt; <span class="prelude-val">Ok</span>((<span class="ident">HFILE</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw">_</span>), <span class="ident">GetLastError</span>())),
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::CreateFileW(
+				WString::from_str(file_name).as_ptr(),
+				desired_access.<span class="number">0</span>,
+				share_mode.<span class="number">0</span>,
+				security_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				creation_disposition.<span class="number">0</span>,
+				flags_and_attrs.<span class="number">0</span>,
+				hfile_template.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+			) <span class="kw">as _
+		</span>} {
+			INVALID_HANDLE_VALUE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			ptr =&gt; <span class="prelude-val">Ok</span>((HFILE(ptr <span class="kw">as _</span>), GetLastError())),
 		}
 	}
 
-	<span class="doccomment">/// [`CreateFileMapping`](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-createfilemappingw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HFILEMAP::CloseHandle`](crate::prelude::HandleClose::CloseHandle)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateFileMapping</span>(<span class="self">self</span>,
-		<span class="ident">mapping_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">SECURITY_ATTRIBUTES</span><span class="op">&gt;</span>,
-		<span class="ident">protect</span>: <span class="ident">co::PAGE</span>,
-		<span class="ident">max_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-		<span class="ident">mapping_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HFILEMAP</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`CreateFileMapping`](https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-createfilemappingw)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HFILEMAP::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateFileMapping(<span class="self">self</span>,
+		mapping_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
+		protect: co::PAGE,
+		max_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HFILEMAP&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">kernel::ffi::CreateFileMappingFromApp</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">mapping_attrs</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-				<span class="ident">protect</span>.<span class="number">0</span>,
-				<span class="ident">max_size</span>.<span class="ident">unwrap_or_default</span>(),
-				<span class="ident">WString::from_opt_str</span>(<span class="ident">mapping_name</span>).<span class="ident">as_ptr</span>(),
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HFILEMAP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			kernel::ffi::CreateFileMappingFromApp(
+				<span class="self">self</span>.as_ptr(),
+				mapping_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				protect.<span class="number">0</span>,
+				max_size.unwrap_or_default(),
+				WString::from_opt_str(mapping_name).as_ptr(),
+			).as_mut()
+		}.map(|ptr| HFILEMAP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`GetFileInformationByHandle`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileinformationbyhandle)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GetFileInformationByHandle</span>(<span class="self">self</span>,
-		<span class="ident">fi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BY_HANDLE_FILE_INFORMATION</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetFileInformationByHandle`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileinformationbyhandle)
+	/// method.
+	</span><span class="kw">fn </span>GetFileInformationByHandle(<span class="self">self</span>,
+		fi: <span class="kw-2">&amp;mut </span>BY_HANDLE_FILE_INFORMATION) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::GetFileInformationByHandle</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">fi</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::GetFileInformationByHandle(
+					<span class="self">self</span>.as_ptr(), fi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`GetFileSizeEx`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfilesizeex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetFileSizeEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz_buf</span> <span class="op">=</span> <span class="number">0</span>;
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetFileSizeEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">sz_buf</span>) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">sz_buf</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// [`GetFileSizeEx`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfilesizeex)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetFileSizeEx(<span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz_buf = <span class="number">0</span>;
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetFileSizeEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz_buf) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(sz_buf <span class="kw">as _</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`GetFileType`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfiletype)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetFileType</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::FILE_TYPE</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">co::FILE_TYPE</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetFileType</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }) {
-			<span class="ident">co::FILE_TYPE::UNKNOWN</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-				<span class="ident">co::ERROR::SUCCESS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::FILE_TYPE::UNKNOWN</span>), <span class="comment">// actual unknown type</span>
-				<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+	<span class="doccomment">/// [`GetFileType`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfiletype)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetFileType(<span class="self">self</span>) -&gt; SysResult&lt;co::FILE_TYPE&gt; {
+		<span class="kw">match </span>co::FILE_TYPE(<span class="kw">unsafe </span>{ kernel::ffi::GetFileType(<span class="self">self</span>.as_ptr()) }) {
+			co::FILE_TYPE::UNKNOWN =&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(co::FILE_TYPE::UNKNOWN), <span class="comment">// actual unknown type
+				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
-			<span class="ident">ty</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ty</span>),
+			ty =&gt; <span class="prelude-val">Ok</span>(ty),
 		}
 	}
 
-	<span class="doccomment">/// [`LockFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HFILE::UnlockFile`](crate::prelude::kernel_Hfile::UnlockFile) call.</span>
-	<span class="kw">fn</span> <span class="ident">LockFile</span>(<span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">u64</span>, <span class="ident">num_bytes_to_lock</span>: <span class="ident">u64</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::LockFile</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">LODWORD</span>(<span class="ident">offset</span>),
-					<span class="ident">HIDWORD</span>(<span class="ident">offset</span>),
-					<span class="ident">LODWORD</span>(<span class="ident">num_bytes_to_lock</span>),
-					<span class="ident">HIDWORD</span>(<span class="ident">num_bytes_to_lock</span>),
+	<span class="doccomment">/// [`LockFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HFILE::UnlockFile`](crate::prelude::kernel_Hfile::UnlockFile) call.
+	</span><span class="kw">fn </span>LockFile(<span class="self">self</span>, offset: u64, num_bytes_to_lock: u64) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::LockFile(
+					<span class="self">self</span>.as_ptr(),
+					LODWORD(offset),
+					HIDWORD(offset),
+					LODWORD(num_bytes_to_lock),
+					HIDWORD(num_bytes_to_lock),
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`ReadFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the number of bytes read.</span>
-	<span class="kw">fn</span> <span class="ident">ReadFile</span>(<span class="self">self</span>,
-		<span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-		<span class="ident">overlapped</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">OVERLAPPED</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`ReadFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)
+	/// method.
+	///
+	/// Returns the number of bytes read.
+	</span><span class="kw">fn </span>ReadFile(<span class="self">self</span>,
+		buffer: <span class="kw-2">&amp;mut </span>[u8],
+		overlapped: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>OVERLAPPED&gt;) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_read</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::ReadFile</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">bytes_read</span>,
-					<span class="ident">overlapped</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+		<span class="kw">let </span><span class="kw-2">mut </span>bytes_read = u32::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::ReadFile(
+					<span class="self">self</span>.as_ptr(),
+					buffer.as_mut_ptr() <span class="kw">as _</span>,
+					buffer.len() <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>bytes_read,
+					overlapped.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">bytes_read</span>)
+		).map(|<span class="kw">_</span>| bytes_read)
 	}
 
-	<span class="doccomment">/// [`SetEndOfFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setendoffile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetEndOfFile</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::SetEndOfFile</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`SetEndOfFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setendoffile)
+	/// method.
+	</span><span class="kw">fn </span>SetEndOfFile(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SetEndOfFile(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`SetFilePointerEx`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilepointerex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetFilePointerEx</span>(<span class="self">self</span>,
-		<span class="ident">distance_to_move</span>: <span class="ident">i64</span>,
-		<span class="ident">move_method</span>: <span class="ident">co::FILE_STARTING_POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`SetFilePointerEx`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilepointerex)
+	/// method.
+	</span><span class="kw">fn </span>SetFilePointerEx(<span class="self">self</span>,
+		distance_to_move: i64,
+		move_method: co::FILE_STARTING_POINT) -&gt; SysResult&lt;i64&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_offset</span> <span class="op">=</span> <span class="ident">i64::default</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>new_offset = i64::default();
 
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::SetFilePointerEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">distance_to_move</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">new_offset</span>,
-					<span class="ident">move_method</span>.<span class="number">0</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::SetFilePointerEx(
+					<span class="self">self</span>.as_ptr(),
+					distance_to_move,
+					<span class="kw-2">&amp;mut </span>new_offset,
+					move_method.<span class="number">0</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">new_offset</span>)
+		).map(|<span class="kw">_</span>| new_offset)
 	}
 
-	<span class="doccomment">/// [`UnlockFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">UnlockFile</span>(<span class="self">self</span>,
-		<span class="ident">offset</span>: <span class="ident">u64</span>, <span class="ident">num_bytes_to_lock</span>: <span class="ident">u64</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`UnlockFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)
+	/// method.
+	</span><span class="kw">fn </span>UnlockFile(<span class="self">self</span>,
+		offset: u64, num_bytes_to_lock: u64) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::UnlockFile</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">LODWORD</span>(<span class="ident">offset</span>),
-					<span class="ident">HIDWORD</span>(<span class="ident">offset</span>),
-					<span class="ident">LODWORD</span>(<span class="ident">num_bytes_to_lock</span>),
-					<span class="ident">HIDWORD</span>(<span class="ident">num_bytes_to_lock</span>),
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::UnlockFile(
+					<span class="self">self</span>.as_ptr(),
+					LODWORD(offset),
+					HIDWORD(offset),
+					LODWORD(num_bytes_to_lock),
+					HIDWORD(num_bytes_to_lock),
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`WriteFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the number of bytes written.</span>
-	<span class="kw">fn</span> <span class="ident">WriteFile</span>(<span class="self">self</span>,
-		<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">overlapped</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">OVERLAPPED</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`WriteFile`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile)
+	/// method.
+	///
+	/// Returns the number of bytes written.
+	</span><span class="kw">fn </span>WriteFile(<span class="self">self</span>,
+		data: <span class="kw-2">&amp;</span>[u8], overlapped: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>OVERLAPPED&gt;) -&gt; SysResult&lt;u32&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_written</span> <span class="op">=</span> <span class="ident">u32::default</span>();
+		<span class="kw">let </span><span class="kw-2">mut </span>bytes_written = u32::default();
 
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::WriteFile</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">bytes_written</span>,
-					<span class="ident">overlapped</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::WriteFile(
+					<span class="self">self</span>.as_ptr(),
+					data.as_ptr() <span class="kw">as _</span>,
+					data.len() <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>bytes_written,
+					overlapped.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">bytes_written</span>)
+		).map(|<span class="kw">_</span>| bytes_written)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

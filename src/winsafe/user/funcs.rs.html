@@ -703,710 +703,710 @@
 <span id="703">703</span>
 <span id="704">704</span>
 <span id="705">705</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">DISPLAY_DEVICE</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">HINSTANCE</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::MsgSend</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">ATOM</span>, <span class="ident">COLORREF</span>, <span class="ident">DEVMODE</span>, <span class="ident">GmidxEnum</span>, <span class="ident">GUITHREADINFO</span>, <span class="ident">HWND</span>, <span class="ident">MSG</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>,
-	<span class="ident">SIZE</span>, <span class="ident">TRACKMOUSEEVENT</span>, <span class="ident">WNDCLASSEX</span>,
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	ATOM, COLORREF, DEVMODE, DISPLAY_DEVICE, GmidxEnum, GUITHREADINFO, HWND,
+	MSG, POINT, RECT, SIZE, TRACKMOUSEEVENT, WNDCLASSEX,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs::ASFW_ANY</span>;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::ASFW_ANY;
 
-<span class="doccomment">/// [`AdjustWindowRectEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-adjustwindowrectex)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">AdjustWindowRectEx</span>(
-	<span class="ident">rc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RECT</span>, <span class="ident">style</span>: <span class="ident">co::WS</span>,
-	<span class="ident">has_menu</span>: <span class="ident">bool</span>, <span class="ident">ex_style</span>: <span class="ident">co::WS_EX</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// [`AdjustWindowRectEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-adjustwindowrectex)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>AdjustWindowRectEx(
+	rc: <span class="kw-2">&amp;mut </span>RECT, style: co::WS,
+	has_menu: bool, ex_style: co::WS_EX) -&gt; SysResult&lt;()&gt;
 {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::AdjustWindowRectEx</span>(
-				<span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">style</span>.<span class="number">0</span>,
-				<span class="ident">has_menu</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">ex_style</span>.<span class="number">0</span>,
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::AdjustWindowRectEx(
+				rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				style.<span class="number">0</span>,
+				has_menu <span class="kw">as _</span>,
+				ex_style.<span class="number">0</span>,
 			)
 		},
 	)
 }
 
-<span class="doccomment">/// [`AllowSetForegroundWindow`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-allowsetforegroundwindow)</span>
-<span class="doccomment">/// function</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">AllowSetForegroundWindow</span>(<span class="ident">process_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::AllowSetForegroundWindow</span>(<span class="ident">process_id</span>.<span class="ident">unwrap_or</span>(<span class="ident">ASFW_ANY</span>))
+<span class="doccomment">/// [`AllowSetForegroundWindow`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-allowsetforegroundwindow)
+/// function
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>AllowSetForegroundWindow(process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::AllowSetForegroundWindow(process_id.unwrap_or(ASFW_ANY))
 		},
 	)
 }
 
-<span class="doccomment">/// [`AnyPopup`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-anypopup)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">AnyPopup</span>() -&gt; <span class="ident">bool</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::AnyPopup</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+<span class="doccomment">/// [`AnyPopup`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-anypopup)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>AnyPopup() -&gt; bool {
+	<span class="kw">unsafe </span>{ user::ffi::AnyPopup() != <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// [`AttachThreadInput`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">AttachThreadInput</span>(
-	<span class="ident">attach_id</span>: <span class="ident">u32</span>, <span class="ident">attach_to_id</span>: <span class="ident">u32</span>, <span class="ident">do_attach</span>: <span class="ident">bool</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// [`AttachThreadInput`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>AttachThreadInput(
+	attach_id: u32, attach_to_id: u32, do_attach: bool) -&gt; SysResult&lt;()&gt;
 {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::AttachThreadInput</span>(<span class="ident">attach_id</span>, <span class="ident">attach_to_id</span>, <span class="ident">do_attach</span> <span class="kw">as</span> <span class="kw">_</span>)
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::AttachThreadInput(attach_id, attach_to_id, do_attach <span class="kw">as _</span>)
 		},
 	)
 }
 
-<span class="doccomment">/// [`ChangeDisplaySettings`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsw)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ChangeDisplaySettings</span>(
-	<span class="ident">dev_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DEVMODE</span><span class="op">&gt;</span>,
-	<span class="ident">flags</span>: <span class="ident">co::CDS</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">co::DISP_CHANGE</span>, <span class="ident">co::DISP_CHANGE</span><span class="op">&gt;</span>
+<span class="doccomment">/// [`ChangeDisplaySettings`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsw)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ChangeDisplaySettings(
+	dev_mode: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DEVMODE&gt;,
+	flags: co::CDS) -&gt; <span class="prelude-ty">Result</span>&lt;co::DISP_CHANGE, co::DISP_CHANGE&gt;
 {
-	<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::ChangeDisplaySettingsW</span>(
-			<span class="ident">dev_mode</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">dm</span><span class="op">|</span> <span class="ident">dm</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">flags</span>.<span class="number">0</span>
+	<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
+		user::ffi::ChangeDisplaySettingsW(
+			dev_mode.map_or(std::ptr::null_mut(), |dm| dm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			flags.<span class="number">0
+		</span>)
+	};
+
+	<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
+		<span class="prelude-val">Err</span>(co::DISP_CHANGE(ret))
+	} <span class="kw">else </span>{
+		<span class="prelude-val">Ok</span>(co::DISP_CHANGE(ret))
+	}
+}
+
+<span class="doccomment">/// [`ChangeDisplaySettingsEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsexw)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ChangeDisplaySettingsEx(
+	device_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	dev_mode: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>DEVMODE&gt;,
+	flags: co::CDS) -&gt; <span class="prelude-ty">Result</span>&lt;co::DISP_CHANGE, co::DISP_CHANGE&gt;
+{
+	<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
+		user::ffi::ChangeDisplaySettingsExW(
+			WString::from_opt_str(device_name).as_ptr(),
+			dev_mode.map_or(std::ptr::null_mut(), |dm| dm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			std::ptr::null_mut(),
+			flags.<span class="number">0</span>,
+			std::ptr::null_mut(),
 		)
 	};
 
-	<span class="kw">if</span> <span class="ident">ret</span> <span class="op">&lt;</span> <span class="number">0</span> {
-		<span class="prelude-val">Err</span>(<span class="ident">co::DISP_CHANGE</span>(<span class="ident">ret</span>))
-	} <span class="kw">else</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">co::DISP_CHANGE</span>(<span class="ident">ret</span>))
+	<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
+		<span class="prelude-val">Err</span>(co::DISP_CHANGE(ret))
+	} <span class="kw">else </span>{
+		<span class="prelude-val">Ok</span>(co::DISP_CHANGE(ret))
 	}
 }
 
-<span class="doccomment">/// [`ChangeDisplaySettingsEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsexw)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ChangeDisplaySettingsEx</span>(
-	<span class="ident">device_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-	<span class="ident">dev_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">DEVMODE</span><span class="op">&gt;</span>,
-	<span class="ident">flags</span>: <span class="ident">co::CDS</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">co::DISP_CHANGE</span>, <span class="ident">co::DISP_CHANGE</span><span class="op">&gt;</span>
-{
-	<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::ChangeDisplaySettingsExW</span>(
-			<span class="ident">WString::from_opt_str</span>(<span class="ident">device_name</span>).<span class="ident">as_ptr</span>(),
-			<span class="ident">dev_mode</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">dm</span><span class="op">|</span> <span class="ident">dm</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">std::ptr::null_mut</span>(),
-			<span class="ident">flags</span>.<span class="number">0</span>,
-			<span class="ident">std::ptr::null_mut</span>(),
-		)
-	};
-
-	<span class="kw">if</span> <span class="ident">ret</span> <span class="op">&lt;</span> <span class="number">0</span> {
-		<span class="prelude-val">Err</span>(<span class="ident">co::DISP_CHANGE</span>(<span class="ident">ret</span>))
-	} <span class="kw">else</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">co::DISP_CHANGE</span>(<span class="ident">ret</span>))
-	}
-}
-
-<span class="doccomment">/// [`ClipCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clipcursor)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ClipCursor</span>(<span class="ident">rc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RECT</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::ClipCursor</span>(
-				<span class="ident">rc</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+<span class="doccomment">/// [`ClipCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clipcursor)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ClipCursor(rc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RECT&gt;) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::ClipCursor(
+				rc.map_or(std::ptr::null(), |lp| lp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 			)
 		},
 	)
 }
 
-<span class="doccomment">/// [`CloseClipboard`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">CloseClipboard</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::CloseClipboard</span>() })
+<span class="doccomment">/// [`CloseClipboard`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>CloseClipboard() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::CloseClipboard() })
 }
 
-<span class="doccomment">/// [`DispatchMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dispatchmessagew)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is used internally in window loops. Avoid using it in other</span>
-<span class="doccomment">/// situations.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">DispatchMessage</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">MSG</span>) -&gt; <span class="ident">isize</span> {
-	<span class="ident">user::ffi::DispatchMessageW</span>(<span class="ident">msg</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+<span class="doccomment">/// [`DispatchMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dispatchmessagew)
+/// function.
+///
+/// This function is used internally in window loops. Avoid using it in other
+/// situations.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub unsafe fn </span>DispatchMessage(msg: <span class="kw-2">&amp;</span>MSG) -&gt; isize {
+	user::ffi::DispatchMessageW(msg <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
 }
 
-<span class="doccomment">/// [`EmptyClipboard`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-emptyclipboard)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EmptyClipboard</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::EmptyClipboard</span>() })
+<span class="doccomment">/// [`EmptyClipboard`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-emptyclipboard)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EmptyClipboard() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EmptyClipboard() })
 }
 
-<span class="doccomment">/// [`EndMenu`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endmenu)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EndMenu</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::EndMenu</span>() })
+<span class="doccomment">/// [`EndMenu`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endmenu)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EndMenu() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EndMenu() })
 }
 
-<span class="doccomment">/// [`EnumDisplayDevices`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaydevicesw)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, DISPLAY_DEVICE, EnumDisplayDevices};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut dide = DISPLAY_DEVICE::default();</span>
-<span class="doccomment">/// let mut dev_num: u32 = 0;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// loop {</span>
-<span class="doccomment">///     let is_good = EnumDisplayDevices(</span>
-<span class="doccomment">///         None, dev_num, &amp;mut dide, co::EDD::NoValue)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     if !is_good {</span>
-<span class="doccomment">///         break;</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     println!(&quot;{}: {} - {}&quot;,</span>
-<span class="doccomment">///         dev_num, dide.DeviceName(), dide.DeviceString());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     dev_num += 1; // advance to next display device</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EnumDisplayDevices</span>(
-	<span class="ident">device_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-	<span class="ident">device_num</span>: <span class="ident">u32</span>,
-	<span class="ident">display_device</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DISPLAY_DEVICE</span>,
-	<span class="ident">flags</span>: <span class="ident">co::EDD</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+<span class="doccomment">/// [`EnumDisplayDevices`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaydevicesw)
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, DISPLAY_DEVICE, EnumDisplayDevices};
+///
+/// let mut dide = DISPLAY_DEVICE::default();
+/// let mut dev_num: u32 = 0;
+///
+/// loop {
+///     let is_good = EnumDisplayDevices(
+///         None, dev_num, &amp;mut dide, co::EDD::NoValue)?;
+///
+///     if !is_good {
+///         break;
+///     }
+///
+///     println!(&quot;{}: {} - {}&quot;,
+///         dev_num, dide.DeviceName(), dide.DeviceString());
+///
+///     dev_num += 1; // advance to next display device
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EnumDisplayDevices(
+	device_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	device_num: u32,
+	display_device: <span class="kw-2">&amp;mut </span>DISPLAY_DEVICE,
+	flags: co::EDD) -&gt; SysResult&lt;bool&gt;
 {
-	<span class="kw">match</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::EnumDisplayDevicesW</span>(
-			<span class="ident">WString::from_opt_str</span>(<span class="ident">device_name</span>).<span class="ident">as_ptr</span>(),
-			<span class="ident">device_num</span>,
-			<span class="ident">display_device</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">flags</span>.<span class="number">0</span>,
+	<span class="kw">match unsafe </span>{
+		user::ffi::EnumDisplayDevicesW(
+			WString::from_opt_str(device_name).as_ptr(),
+			device_num,
+			display_device <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			flags.<span class="number">0</span>,
 		)
 	} {
-		<span class="comment">// Empirical tests have shown that two different error codes can be</span>
-		<span class="comment">// returned to signal the end of the loop, so we consider both.</span>
-		<span class="comment">// https://github.com/rodrigocfd/winsafe/issues/36</span>
-		<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-			<span class="ident">co::ERROR::PROC_NOT_FOUND</span> <span class="op">|</span> <span class="ident">co::ERROR::ENVVAR_NOT_FOUND</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-			<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>), <span class="comment">// actual error</span>
-		},
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+		<span class="comment">// Empirical tests have shown that two different error codes can be
+		// returned to signal the end of the loop, so we consider both.
+		// https://github.com/rodrigocfd/winsafe/issues/36
+		</span><span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+			co::ERROR::PROC_NOT_FOUND | co::ERROR::ENVVAR_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+			err =&gt; <span class="prelude-val">Err</span>(err), <span class="comment">// actual error
+		</span>},
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 	}
 }
 
-<span class="doccomment">/// [`EnumDisplaySettings`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Iterating graphics modes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{DEVMODE, EnumDisplaySettings, GmidxEnum};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut dm = DEVMODE::default();</span>
-<span class="doccomment">/// let mut graphics_mode_idx: u32 = 0;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// loop {</span>
-<span class="doccomment">///     let is_good = EnumDisplaySettings(</span>
-<span class="doccomment">///         None,</span>
-<span class="doccomment">///         GmidxEnum::Gmidx(graphics_mode_idx),</span>
-<span class="doccomment">///         &amp;mut dm,</span>
-<span class="doccomment">///     )?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     if !is_good {</span>
-<span class="doccomment">///         break;</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     println!(&quot;{}: {}, {}, {}&quot;,</span>
-<span class="doccomment">///         graphics_mode_idx,</span>
-<span class="doccomment">///         dm.dmDeviceName(), dm.dmDisplayFrequency, dm.dmBitsPerPel);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     graphics_mode_idx += 1;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Retrieving from the predefined enum.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, DEVMODE, EnumDisplaySettings, GmidxEnum};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut dm = DEVMODE::default();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// EnumDisplaySettings(</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     GmidxEnum::Enum(co::ENUM_SETTINGS::CURRENT),</span>
-<span class="doccomment">///     &amp;mut dm,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;{}, {}, {}&quot;,</span>
-<span class="doccomment">///     dm.dmDeviceName(), dm.dmDisplayFrequency, dm.dmBitsPerPel);</span>
-<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EnumDisplaySettings</span>(
-	<span class="ident">device_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-	<span class="ident">mode_num</span>: <span class="ident">GmidxEnum</span>,
-	<span class="ident">dev_mode</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DEVMODE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+<span class="doccomment">/// [`EnumDisplaySettings`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsw)
+/// function.
+///
+/// # Examples
+///
+/// Iterating graphics modes.
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{DEVMODE, EnumDisplaySettings, GmidxEnum};
+///
+/// let mut dm = DEVMODE::default();
+/// let mut graphics_mode_idx: u32 = 0;
+///
+/// loop {
+///     let is_good = EnumDisplaySettings(
+///         None,
+///         GmidxEnum::Gmidx(graphics_mode_idx),
+///         &amp;mut dm,
+///     )?;
+///
+///     if !is_good {
+///         break;
+///     }
+///
+///     println!(&quot;{}: {}, {}, {}&quot;,
+///         graphics_mode_idx,
+///         dm.dmDeviceName(), dm.dmDisplayFrequency, dm.dmBitsPerPel);
+///
+///     graphics_mode_idx += 1;
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+///
+/// Retrieving from the predefined enum.
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, DEVMODE, EnumDisplaySettings, GmidxEnum};
+///
+/// let mut dm = DEVMODE::default();
+///
+/// EnumDisplaySettings(
+///     None,
+///     GmidxEnum::Enum(co::ENUM_SETTINGS::CURRENT),
+///     &amp;mut dm,
+/// )?;
+///
+/// println!(&quot;{}, {}, {}&quot;,
+///     dm.dmDeviceName(), dm.dmDisplayFrequency, dm.dmBitsPerPel);
+/// # Ok::&lt;_, co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EnumDisplaySettings(
+	device_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	mode_num: GmidxEnum,
+	dev_mode: <span class="kw-2">&amp;mut </span>DEVMODE) -&gt; SysResult&lt;bool&gt;
 {
-	<span class="kw">match</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::EnumDisplaySettingsW</span>(
-			<span class="ident">WString::from_opt_str</span>(<span class="ident">device_name</span>).<span class="ident">as_ptr</span>(),
-			<span class="ident">mode_num</span>.<span class="ident">as_u32</span>(),
-			<span class="ident">dev_mode</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="kw">match unsafe </span>{
+		user::ffi::EnumDisplaySettingsW(
+			WString::from_opt_str(device_name).as_ptr(),
+			mode_num.as_u32(),
+			dev_mode <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		)
 	} {
-		<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-			<span class="ident">co::ERROR::PROC_NOT_FOUND</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false</span>
-			<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+			co::ERROR::PROC_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false
+			</span>err =&gt; <span class="prelude-val">Err</span>(err),
 		},
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 	}
 }
 
-<span class="doccomment">/// [`EnumDisplaySettingsEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsexw)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EnumDisplaySettingsEx</span>(
-	<span class="ident">device_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-	<span class="ident">mode_num</span>: <span class="ident">GmidxEnum</span>,
-	<span class="ident">dev_mode</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DEVMODE</span>,
-	<span class="ident">flags</span>: <span class="ident">co::EDS</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+<span class="doccomment">/// [`EnumDisplaySettingsEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaysettingsexw)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EnumDisplaySettingsEx(
+	device_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	mode_num: GmidxEnum,
+	dev_mode: <span class="kw-2">&amp;mut </span>DEVMODE,
+	flags: co::EDS) -&gt; SysResult&lt;bool&gt;
 {
-	<span class="kw">match</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::EnumDisplaySettingsExW</span>(
-			<span class="ident">WString::from_opt_str</span>(<span class="ident">device_name</span>).<span class="ident">as_ptr</span>(),
-			<span class="ident">mode_num</span>.<span class="ident">as_u32</span>(),
-			<span class="ident">dev_mode</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">flags</span>.<span class="number">0</span>,
+	<span class="kw">match unsafe </span>{
+		user::ffi::EnumDisplaySettingsExW(
+			WString::from_opt_str(device_name).as_ptr(),
+			mode_num.as_u32(),
+			dev_mode <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			flags.<span class="number">0</span>,
 		)
 	} {
-		<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-			<span class="ident">co::ERROR::PROC_NOT_FOUND</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false</span>
-			<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+			co::ERROR::PROC_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false
+			</span>err =&gt; <span class="prelude-val">Err</span>(err),
 		},
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 	}
 }
 
-<span class="doccomment">/// [`EnumWindows`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumwindows)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{EnumWindows, HWND};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// EnumWindows(|hwnd: HWND| -&gt; bool {</span>
-<span class="doccomment">///     println!(&quot;HWND: {}&quot;, hwnd);</span>
-<span class="doccomment">///     true</span>
-<span class="doccomment">/// })?;</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EnumWindows</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">HWND</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// [`EnumWindows`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumwindows)
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{EnumWindows, HWND};
+///
+/// EnumWindows(|hwnd: HWND| -&gt; bool {
+///     println!(&quot;HWND: {}&quot;, hwnd);
+///     true
+/// })?;
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>EnumWindows&lt;F&gt;(func: F) -&gt; SysResult&lt;()&gt;
+	<span class="kw">where </span>F: Fn(HWND) -&gt; bool,
 {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::EnumWindows</span>(
-				<span class="ident">enum_windows_proc</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="kw-2">&amp;</span><span class="ident">func</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::EnumWindows(
+				enum_windows_proc::&lt;F&gt; <span class="kw">as _</span>,
+				<span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 			)
 		},
 	)
 }
-<span class="kw">extern</span> <span class="string">&quot;system&quot;</span> <span class="kw">fn</span> <span class="ident">enum_windows_proc</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">lparam</span>: <span class="ident">isize</span>) -&gt; <span class="ident">BOOL</span>
-	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">HWND</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">extern </span><span class="string">&quot;system&quot; </span><span class="kw">fn </span>enum_windows_proc&lt;F&gt;(hwnd: HWND, lparam: isize) -&gt; BOOL
+	<span class="kw">where </span>F: Fn(HWND) -&gt; bool,
 {
-	<span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">lparam</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">F</span>) };
-	<span class="ident">func</span>(<span class="ident">hwnd</span>) <span class="kw">as</span> <span class="kw">_</span>
+	<span class="kw">let </span>func = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(lparam <span class="kw">as </span><span class="kw-2">*const </span>F) };
+	func(hwnd) <span class="kw">as _
+</span>}
+
+<span class="doccomment">/// [`GetAsyncKeyState`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getasynckeystate)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetAsyncKeyState(virt_key: co::VK) -&gt; bool {
+	<span class="kw">unsafe </span>{ user::ffi::GetAsyncKeyState(virt_key.<span class="number">0 </span><span class="kw">as _</span>) != <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// [`GetAsyncKeyState`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getasynckeystate)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetAsyncKeyState</span>(<span class="ident">virt_key</span>: <span class="ident">co::VK</span>) -&gt; <span class="ident">bool</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetAsyncKeyState</span>(<span class="ident">virt_key</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+<span class="doccomment">/// [`GetClipboardSequenceNumber`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboardsequencenumber)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetClipboardSequenceNumber() -&gt; u32 {
+	<span class="kw">unsafe </span>{ user::ffi::GetClipboardSequenceNumber() }
 }
 
-<span class="doccomment">/// [`GetClipboardSequenceNumber`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboardsequencenumber)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetClipboardSequenceNumber</span>() -&gt; <span class="ident">u32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetClipboardSequenceNumber</span>() }
+<span class="doccomment">/// [`GetClipCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipcursor)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetClipCursor() -&gt; SysResult&lt;RECT&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::GetClipCursor(<span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+	).map(|<span class="kw">_</span>| rc)
 }
 
-<span class="doccomment">/// [`GetClipCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipcursor)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetClipCursor</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">RECT</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetClipCursor</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) },
-	).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">rc</span>)
+<span class="doccomment">/// [`GetCursorPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetCursorPos() -&gt; SysResult&lt;POINT&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::GetCursorPos(<span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+	).map(|<span class="kw">_</span>| pt)
 }
 
-<span class="doccomment">/// [`GetCursorPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetCursorPos</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetCursorPos</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) },
-	).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">pt</span>)
+<span class="doccomment">/// [`GetDialogBaseUnits`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogbaseunits)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetDialogBaseUnits() -&gt; i32 {
+	<span class="kw">unsafe </span>{ user::ffi::GetDialogBaseUnits() }
 }
 
-<span class="doccomment">/// [`GetDialogBaseUnits`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogbaseunits)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetDialogBaseUnits</span>() -&gt; <span class="ident">i32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetDialogBaseUnits</span>() }
+<span class="doccomment">/// [`GetDoubleClickTime`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdoubleclicktime)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetDoubleClickTime() -&gt; u32 {
+	<span class="kw">unsafe </span>{ user::ffi::GetDoubleClickTime() }
 }
 
-<span class="doccomment">/// [`GetDoubleClickTime`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdoubleclicktime)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetDoubleClickTime</span>() -&gt; <span class="ident">u32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetDoubleClickTime</span>() }
-}
-
-<span class="doccomment">/// [`GetGUIThreadInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getguithreadinfo)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{GetGUIThreadInfo, GUITHREADINFO, HWND};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let hwnd: HWND; // initialized somewhere</span>
-<span class="doccomment">/// # let hwnd = HWND::NULL;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (thread_id, _) = hwnd.GetWindowThreadProcessId();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut gti = GUITHREADINFO::default();</span>
-<span class="doccomment">/// GetGUIThreadInfo(thread_id, &amp;mut gti)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;Caret rect: {}&quot;, gti.rcCaret);</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetGUIThreadInfo</span>(
-	<span class="ident">thread_id</span>: <span class="ident">u32</span>, <span class="ident">gti</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GUITHREADINFO</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// [`GetGUIThreadInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getguithreadinfo)
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{GetGUIThreadInfo, GUITHREADINFO, HWND};
+///
+/// let hwnd: HWND; // initialized somewhere
+/// # let hwnd = HWND::NULL;
+///
+/// let (thread_id, _) = hwnd.GetWindowThreadProcessId();
+///
+/// let mut gti = GUITHREADINFO::default();
+/// GetGUIThreadInfo(thread_id, &amp;mut gti)?;
+///
+/// println!(&quot;Caret rect: {}&quot;, gti.rcCaret);
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>GetGUIThreadInfo(
+	thread_id: u32, gti: <span class="kw-2">&amp;mut </span>GUITHREADINFO) -&gt; SysResult&lt;()&gt;
 {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetGUIThreadInfo</span>(<span class="ident">thread_id</span>, <span class="ident">gti</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) }
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::GetGUIThreadInfo(thread_id, gti <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 	)
 }
 
-<span class="doccomment">/// [`GetMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmessagew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetMessage</span>(
-	<span class="ident">msg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MSG</span>, <span class="ident">hwnd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span>,
-	<span class="ident">msg_filter_min</span>: <span class="ident">u32</span>, <span class="ident">msg_filter_max</span>: <span class="ident">u32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+<span class="doccomment">/// [`GetMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmessagew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>GetMessage(
+	msg: <span class="kw-2">&amp;mut </span>MSG, hwnd: <span class="prelude-ty">Option</span>&lt;HWND&gt;,
+	msg_filter_min: u32, msg_filter_max: u32) -&gt; SysResult&lt;bool&gt;
 {
-	<span class="kw">match</span> <span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::GetMessageW</span>(
-			<span class="ident">msg</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">hwnd</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-			<span class="ident">msg_filter_min</span>, <span class="ident">msg_filter_max</span>,
+	<span class="kw">match unsafe </span>{
+		user::ffi::GetMessageW(
+			msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			hwnd.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+			msg_filter_min, msg_filter_max,
 		)
 	} {
-		<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-		<span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+		-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+		<span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 	}
 }
 
-<span class="doccomment">/// [`GetMenuCheckMarkDimensions`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenucheckmarkdimensions)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetMenuCheckMarkDimensions</span>() -&gt; <span class="ident">SIZE</span> {
-	<span class="ident">SIZE::from_u32</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetMenuCheckMarkDimensions</span>() } <span class="kw">as</span> <span class="kw">_</span>)
+<span class="doccomment">/// [`GetMenuCheckMarkDimensions`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenucheckmarkdimensions)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetMenuCheckMarkDimensions() -&gt; SIZE {
+	SIZE::from_u32(<span class="kw">unsafe </span>{ user::ffi::GetMenuCheckMarkDimensions() } <span class="kw">as _</span>)
 }
 
-<span class="doccomment">/// [`GetMessagePos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmessagepos)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetMessagePos</span>() -&gt; <span class="ident">POINT</span> {
-	<span class="ident">POINT::from_u32</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetMessagePos</span>() })
+<span class="doccomment">/// [`GetMessagePos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmessagepos)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetMessagePos() -&gt; POINT {
+	POINT::from_u32(<span class="kw">unsafe </span>{ user::ffi::GetMessagePos() })
 }
 
-<span class="doccomment">/// [`GetQueueStatus`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getqueuestatus)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetQueueStatus</span>(<span class="ident">flags</span>: <span class="ident">co::QS</span>) -&gt; <span class="ident">u32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetQueueStatus</span>(<span class="ident">flags</span>.<span class="number">0</span>) }
+<span class="doccomment">/// [`GetQueueStatus`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getqueuestatus)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetQueueStatus(flags: co::QS) -&gt; u32 {
+	<span class="kw">unsafe </span>{ user::ffi::GetQueueStatus(flags.<span class="number">0</span>) }
 }
 
-<span class="doccomment">/// [`GetSysColor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolor)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetSysColor</span>(<span class="ident">index</span>: <span class="ident">co::COLOR</span>) -&gt; <span class="ident">COLORREF</span> {
-	<span class="ident">COLORREF</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetSysColor</span>(<span class="ident">index</span>.<span class="number">0</span>) })
+<span class="doccomment">/// [`GetSysColor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolor)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetSysColor(index: co::COLOR) -&gt; COLORREF {
+	COLORREF(<span class="kw">unsafe </span>{ user::ffi::GetSysColor(index.<span class="number">0</span>) })
 }
 
-<span class="doccomment">/// [`GetSystemMetrics`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">GetSystemMetrics</span>(<span class="ident">index</span>: <span class="ident">co::SM</span>) -&gt; <span class="ident">i32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::GetSystemMetrics</span>(<span class="ident">index</span>.<span class="number">0</span>) }
+<span class="doccomment">/// [`GetSystemMetrics`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>GetSystemMetrics(index: co::SM) -&gt; i32 {
+	<span class="kw">unsafe </span>{ user::ffi::GetSystemMetrics(index.<span class="number">0</span>) }
 }
 
-<span class="doccomment">/// [`InSendMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessage)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">InSendMessage</span>() -&gt; <span class="ident">bool</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::InSendMessage</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+<span class="doccomment">/// [`InSendMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessage)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>InSendMessage() -&gt; bool {
+	<span class="kw">unsafe </span>{ user::ffi::InSendMessage() != <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// [`InSendMessageEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessageex)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** This function doesn&#39;t exist in x32.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">InSendMessageEx</span>() -&gt; <span class="ident">co::ISMEX</span> {
-	<span class="ident">co::ISMEX</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::InSendMessageEx</span>()})
+<span class="doccomment">/// [`InSendMessageEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessageex)
+/// function.
+///
+/// **Note:** This function doesn&#39;t exist in x32.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>InSendMessageEx() -&gt; co::ISMEX {
+	co::ISMEX(<span class="kw">unsafe </span>{ user::ffi::InSendMessageEx()})
 }
 
-<span class="doccomment">/// [`IsGUIThread`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-isguithread)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">IsGUIThread</span>(<span class="ident">convert_to_gui_thread</span>: <span class="ident">bool</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">user::ffi::IsGUIThread</span>(<span class="ident">convert_to_gui_thread</span> <span class="kw">as</span> <span class="kw">_</span>) };
-	<span class="kw">if</span> <span class="ident">convert_to_gui_thread</span> {
-		<span class="kw">match</span> <span class="ident">r</span> {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-			<span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-			<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR</span>(<span class="ident">err</span> <span class="kw">as</span> <span class="kw">_</span>)),
+<span class="doccomment">/// [`IsGUIThread`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-isguithread)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>IsGUIThread(convert_to_gui_thread: bool) -&gt; SysResult&lt;bool&gt; {
+	<span class="kw">let </span>r = <span class="kw">unsafe </span>{ user::ffi::IsGUIThread(convert_to_gui_thread <span class="kw">as _</span>) };
+	<span class="kw">if </span>convert_to_gui_thread {
+		<span class="kw">match </span>r {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+			<span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+			err =&gt; <span class="prelude-val">Err</span>(co::ERROR(err <span class="kw">as _</span>)),
 		}
-	} <span class="kw">else</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+	} <span class="kw">else </span>{
+		<span class="prelude-val">Ok</span>(r != <span class="number">0</span>)
 	}
 }
 
-<span class="doccomment">/// [`IsWow64Message`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswow64message)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">IsWow64Message</span>() -&gt; <span class="ident">bool</span> {
-	<span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">user::ffi::IsWow64Message</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>}
+<span class="doccomment">/// [`IsWow64Message`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswow64message)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[must_use]</span>
+<span class="kw">pub fn </span>IsWow64Message() -&gt; bool {
+	<span class="kw">return unsafe </span>{ user::ffi::IsWow64Message() != <span class="number">0</span>}
 }
 
-<span class="doccomment">/// [`LockSetForegroundWindow`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-locksetforegroundwindow)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">LockSetForegroundWindow</span>(<span class="ident">lock_code</span>: <span class="ident">co::LSFW</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::LockSetForegroundWindow</span>(<span class="ident">lock_code</span>.<span class="number">0</span>) },
+<span class="doccomment">/// [`LockSetForegroundWindow`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-locksetforegroundwindow)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>LockSetForegroundWindow(lock_code: co::LSFW) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::LockSetForegroundWindow(lock_code.<span class="number">0</span>) },
 	)
 }
 
-<span class="doccomment">/// [`PeekMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">PeekMessage</span>(
-	<span class="ident">msg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MSG</span>, <span class="ident">hwnd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span>,
-	<span class="ident">msg_filter_min</span>: <span class="ident">u32</span>, <span class="ident">msg_filter_max</span>: <span class="ident">u32</span>, <span class="ident">remove_msg</span>: <span class="ident">co::PM</span>) -&gt; <span class="ident">bool</span>
+<span class="doccomment">/// [`PeekMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>PeekMessage(
+	msg: <span class="kw-2">&amp;mut </span>MSG, hwnd: <span class="prelude-ty">Option</span>&lt;HWND&gt;,
+	msg_filter_min: u32, msg_filter_max: u32, remove_msg: co::PM) -&gt; bool
 {
-	<span class="kw">unsafe</span> {
-		<span class="ident">user::ffi::PeekMessageW</span>(
-			<span class="ident">msg</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">hwnd</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-			<span class="ident">msg_filter_min</span>,
-			<span class="ident">msg_filter_max</span>,
-			<span class="ident">remove_msg</span>.<span class="number">0</span>,
-		) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-	}
+	<span class="kw">unsafe </span>{
+		user::ffi::PeekMessageW(
+			msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			hwnd.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+			msg_filter_min,
+			msg_filter_max,
+			remove_msg.<span class="number">0</span>,
+		) != <span class="number">0
+	</span>}
 }
 
-<span class="doccomment">/// [`PostQuitMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postquitmessage)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">PostQuitMessage</span>(<span class="ident">exit_code</span>: <span class="ident">i32</span>) {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::PostQuitMessage</span>(<span class="ident">exit_code</span>) }
+<span class="doccomment">/// [`PostQuitMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postquitmessage)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>PostQuitMessage(exit_code: i32) {
+	<span class="kw">unsafe </span>{ user::ffi::PostQuitMessage(exit_code) }
 }
 
-<span class="doccomment">/// [`PostThreadMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postthreadmessagew)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">PostThreadMessage</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">thread_id</span>: <span class="ident">u32</span>, <span class="ident">msg</span>: <span class="ident">M</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">MsgSend</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// [`PostThreadMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postthreadmessagew)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>PostThreadMessage&lt;M&gt;(thread_id: u32, msg: M) -&gt; SysResult&lt;()&gt;
+	<span class="kw">where </span>M: MsgSend + Send + Copy + <span class="lifetime">&#39;static</span>,
 {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>;
-	<span class="kw">let</span> <span class="ident">wm_any</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">as_generic_wm</span>();
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::PostThreadMessageW</span>(
-				<span class="ident">thread_id</span>, <span class="ident">wm_any</span>.<span class="ident">msg_id</span>.<span class="number">0</span>, <span class="ident">wm_any</span>.<span class="ident">wparam</span>, <span class="ident">wm_any</span>.<span class="ident">lparam</span>,
+	<span class="kw">let </span><span class="kw-2">mut </span>msg = msg;
+	<span class="kw">let </span>wm_any = msg.as_generic_wm();
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::PostThreadMessageW(
+				thread_id, wm_any.msg_id.<span class="number">0</span>, wm_any.wparam, wm_any.lparam,
 			)
 		}
 	)
 }
 
-<span class="doccomment">/// [`RegisterClassEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerclassexw)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">RegisterClassEx</span>(<span class="ident">wcx</span>: <span class="kw-2">&amp;</span><span class="ident">WNDCLASSEX</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">ATOM</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">user::ffi::RegisterClassExW</span>(<span class="ident">wcx</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) } {
-		<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-		<span class="ident">atom</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ATOM</span>(<span class="ident">atom</span>)),
+<span class="doccomment">/// [`RegisterClassEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerclassexw)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>RegisterClassEx(wcx: <span class="kw-2">&amp;</span>WNDCLASSEX) -&gt; SysResult&lt;ATOM&gt; {
+	<span class="kw">match unsafe </span>{ user::ffi::RegisterClassExW(wcx <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) } {
+		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+		atom =&gt; <span class="prelude-val">Ok</span>(ATOM(atom)),
 	}
 }
 
-<span class="doccomment">/// [`ReleaseCapture`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-releasecapture)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ReleaseCapture</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::ReleaseCapture</span>() })
+<span class="doccomment">/// [`ReleaseCapture`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-releasecapture)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ReleaseCapture() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::ReleaseCapture() })
 }
 
-<span class="doccomment">/// [`SetCaretBlinkTime`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcaretblinktime)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SetCaretBlinkTime</span>(<span class="ident">milliseconds</span>: <span class="ident">u32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetCaretBlinkTime</span>(<span class="ident">milliseconds</span>) },
+<span class="doccomment">/// [`SetCaretBlinkTime`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcaretblinktime)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SetCaretBlinkTime(milliseconds: u32) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::SetCaretBlinkTime(milliseconds) },
 	)
 }
 
-<span class="doccomment">/// [`SetCaretPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcaretpos)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SetCaretPos</span>(<span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetCaretPos</span>(<span class="ident">x</span>, <span class="ident">y</span>) })
+<span class="doccomment">/// [`SetCaretPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcaretpos)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SetCaretPos(x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::SetCaretPos(x, y) })
 }
 
-<span class="doccomment">/// [`SetClipboardData`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setclipboarddata)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SetClipboardData</span>(<span class="ident">format</span>: <span class="ident">co::CF</span>, <span class="ident">hmem</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">u8</span><span class="op">&gt;</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetClipboardData</span>(<span class="ident">format</span>.<span class="number">0</span>, <span class="ident">hmem</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">as_mut</span>() }
-		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hmem</span><span class="op">|</span> <span class="ident">hmem</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
-		.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+<span class="doccomment">/// [`SetClipboardData`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setclipboarddata)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SetClipboardData(format: co::CF, hmem: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt; {
+	<span class="kw">unsafe </span>{ user::ffi::SetClipboardData(format.<span class="number">0</span>, hmem <span class="kw">as _</span>).as_mut() }
+		.map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+		.ok_or_else(|| GetLastError())
 }
 
-<span class="doccomment">/// [`SetCursorPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcursorpos)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SetCursorPos</span>(<span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetCursorPos</span>(<span class="ident">x</span>, <span class="ident">y</span>) })
+<span class="doccomment">/// [`SetCursorPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcursorpos)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SetCursorPos(x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::SetCursorPos(x, y) })
 }
 
-<span class="doccomment">/// [`SetProcessDPIAware`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setprocessdpiaware)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SetProcessDPIAware</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::SetProcessDPIAware</span>() })
+<span class="doccomment">/// [`SetProcessDPIAware`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setprocessdpiaware)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SetProcessDPIAware() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::SetProcessDPIAware() })
 }
 
-<span class="doccomment">/// [`ShowCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showcursor)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ShowCursor</span>(<span class="ident">show</span>: <span class="ident">bool</span>) -&gt; <span class="ident">i32</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::ShowCursor</span>(<span class="ident">show</span> <span class="kw">as</span> <span class="kw">_</span>) }
+<span class="doccomment">/// [`ShowCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showcursor)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>ShowCursor(show: bool) -&gt; i32 {
+	<span class="kw">unsafe </span>{ user::ffi::ShowCursor(show <span class="kw">as _</span>) }
 }
 
-<span class="doccomment">/// [`SoundSentry`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-soundsentry)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SoundSentry</span>() -&gt; <span class="ident">bool</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::SoundSentry</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+<span class="doccomment">/// [`SoundSentry`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-soundsentry)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>SoundSentry() -&gt; bool {
+	<span class="kw">unsafe </span>{ user::ffi::SoundSentry() != <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// [`SystemParametersInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** The `pv_param` type varies according to `action`. If you set it</span>
-<span class="doccomment">/// wrong, you&#39;re likely to cause a buffer overrun.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">SystemParametersInfo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-	<span class="ident">action</span>: <span class="ident">co::SPI</span>,
-	<span class="ident">ui_param</span>: <span class="ident">u32</span>,
-	<span class="ident">pv_param</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-	<span class="ident">win_ini</span>: <span class="ident">co::SPIF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// [`SystemParametersInfo`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfow)
+/// function.
+///
+/// **Note:** The `pv_param` type varies according to `action`. If you set it
+/// wrong, you&#39;re likely to cause a buffer overrun.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub unsafe fn </span>SystemParametersInfo&lt;T&gt;(
+	action: co::SPI,
+	ui_param: u32,
+	pv_param: <span class="kw-2">&amp;mut </span>T,
+	win_ini: co::SPIF) -&gt; SysResult&lt;()&gt;
 {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="ident">user::ffi::SystemParametersInfoW</span>(
-			<span class="ident">action</span>.<span class="number">0</span>,
-			<span class="ident">ui_param</span>,
-			<span class="ident">pv_param</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">win_ini</span>.<span class="number">0</span>,
+	bool_to_sysresult(
+		user::ffi::SystemParametersInfoW(
+			action.<span class="number">0</span>,
+			ui_param,
+			pv_param <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			win_ini.<span class="number">0</span>,
 		),
 	)
 }
 
-<span class="doccomment">/// [`TrackMouseEvent`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-trackmouseevent)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">TrackMouseEvent</span>(<span class="ident">tme</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TRACKMOUSEEVENT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::TrackMouseEvent</span>(<span class="ident">tme</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) },
+<span class="doccomment">/// [`TrackMouseEvent`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-trackmouseevent)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>TrackMouseEvent(tme: <span class="kw-2">&amp;mut </span>TRACKMOUSEEVENT) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ user::ffi::TrackMouseEvent(tme <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 	)
 }
 
-<span class="doccomment">/// [`TranslateMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-translatemessage)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">TranslateMessage</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">MSG</span>) -&gt; <span class="ident">bool</span> {
-	<span class="kw">unsafe</span> { <span class="ident">user::ffi::TranslateMessage</span>(<span class="ident">msg</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+<span class="doccomment">/// [`TranslateMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-translatemessage)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>TranslateMessage(msg: <span class="kw-2">&amp;</span>MSG) -&gt; bool {
+	<span class="kw">unsafe </span>{ user::ffi::TranslateMessage(msg <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) != <span class="number">0 </span>}
 }
 
-<span class="doccomment">/// [`UnregisterClass`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unregisterclassw)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">UnregisterClass</span>(<span class="ident">class_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">hinst</span>: <span class="ident">HINSTANCE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::UnregisterClassW</span>(
-				<span class="ident">WString::from_str</span>(<span class="ident">class_name</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">hinst</span>.<span class="number">0</span>,
+<span class="doccomment">/// [`UnregisterClass`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unregisterclassw)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>UnregisterClass(class_name: <span class="kw-2">&amp;</span>str, hinst: HINSTANCE) -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			user::ffi::UnregisterClassW(
+				WString::from_str(class_name).as_ptr(),
+				hinst.<span class="number">0</span>,
 			)
 		},
 	)
 }
 
-<span class="doccomment">/// [`WaitMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-waitmessage)</span>
-<span class="doccomment">/// function.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">WaitMessage</span>() -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-	<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::WaitMessage</span>() })
+<span class="doccomment">/// [`WaitMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-waitmessage)
+/// function.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub fn </span>WaitMessage() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::WaitMessage() })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

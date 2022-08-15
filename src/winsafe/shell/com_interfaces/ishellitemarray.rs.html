@@ -166,173 +166,173 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::mem::ManuallyDrop;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IShellItem</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::shell::decl::IShellItem;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IShellItemArray`](crate::IShellItemArray) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellItemArrayVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">BindToHandler</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">PCVOID</span>, <span class="ident">PCVOID</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetPropertyStore</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>, <span class="ident">PCVOID</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetPropertyDescriptionList</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">PCVOID</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetAttributes</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetCount</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetItemAt</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">EnumItems</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IShellItemArray`](crate::IShellItemArray) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IShellItemArrayVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>BindToHandler: <span class="kw">fn</span>(ComPtr, PVOID, PCVOID, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetPropertyStore: <span class="kw">fn</span>(ComPtr, u32, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetPropertyDescriptionList: <span class="kw">fn</span>(ComPtr, PVOID, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetAttributes: <span class="kw">fn</span>(ComPtr, u32, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetItemAt: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>EnumItems: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PVOID) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IShellItemArray`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ishellitemarray)</span>
-<span class="doccomment">/// COM interface over [`IShellItemArrayVT`](crate::vt::IShellItemArrayVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellItemArray</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IShellItemArray`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ishellitemarray)
+/// COM interface over [`IShellItemArrayVT`](crate::vt::IShellItemArrayVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IShellItemArray(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IShellItemArray</span>, <span class="string">&quot;b63ea76d-1f85-456f-a19c-48159efa858b&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IShellItemArray</span> <span class="kw">for</span> <span class="ident">IShellItemArray</span> {}
+<span class="macro">impl_iunknown!</span>(IShellItemArray, <span class="string">&quot;b63ea76d-1f85-456f-a19c-48159efa858b&quot;</span>);
+<span class="kw">impl </span>shell_IShellItemArray <span class="kw">for </span>IShellItemArray {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`IShellItemArray`](crate::IShellItemArray).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IShellItemArray</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements</span>
-	<span class="doccomment">/// by calling</span>
-	<span class="doccomment">/// [`IShellItemArray::GetCount`](crate::prelude::shell_IShellItemArray::GetCount)</span>
-	<span class="doccomment">/// and</span>
-	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](crate::prelude::shell_IShellItemArray::GetItemAt)</span>
-	<span class="doccomment">/// consecutively.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Iterating over the [`IShellItem`](crate::IShellItem) objects:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, IShellItemArray};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let ish_arr: IShellItemArray; // initialized somewhere</span>
-	<span class="doccomment">/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for ish_item in ish_arr.iter()? {</span>
-	<span class="doccomment">///     let ish_item = ish_item?;</span>
-	<span class="doccomment">///     println!(&quot;Path: {}&quot;,</span>
-	<span class="doccomment">///         ish_item.GetDisplayName(co::SIGDN::FILESYSPATH)?);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Collecting the file paths into a</span>
-	<span class="doccomment">/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HrResult, IShellItemArray};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let ish_arr: IShellItemArray; // initialized somewhere</span>
-	<span class="doccomment">/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let paths = ish_arr.iter()?</span>
-	<span class="doccomment">///     .map(|shi|</span>
-	<span class="doccomment">///         shi.and_then(|shi|</span>
-	<span class="doccomment">///             shi.GetDisplayName(co::SIGDN::FILESYSPATH),</span>
-	<span class="doccomment">///         ),</span>
-	<span class="doccomment">///     )</span>
-	<span class="doccomment">///     .collect::&lt;HrResult&lt;Vec&lt;_&gt;&gt;&gt;()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ShellItemIter::new</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">ptr</span>() })<span class="question-mark">?</span>))
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`IShellItemArray`](crate::IShellItemArray).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IShellItemArray: ole_IUnknown {
+	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements
+	/// by calling
+	/// [`IShellItemArray::GetCount`](crate::prelude::shell_IShellItemArray::GetCount)
+	/// and
+	/// [`IShellItemArray::GetItemAt`](crate::prelude::shell_IShellItemArray::GetItemAt)
+	/// consecutively.
+	///
+	/// # Examples
+	///
+	/// Iterating over the [`IShellItem`](crate::IShellItem) objects:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, IShellItemArray};
+	///
+	/// let ish_arr: IShellItemArray; // initialized somewhere
+	/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });
+	///
+	/// for ish_item in ish_arr.iter()? {
+	///     let ish_item = ish_item?;
+	///     println!(&quot;Path: {}&quot;,
+	///         ish_item.GetDisplayName(co::SIGDN::FILESYSPATH)?);
+	/// }
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	///
+	/// Collecting the file paths into a
+	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HrResult, IShellItemArray};
+	///
+	/// let ish_arr: IShellItemArray; // initialized somewhere
+	/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });
+	///
+	/// let paths = ish_arr.iter()?
+	///     .map(|shi|
+	///         shi.and_then(|shi|
+	///             shi.GetDisplayName(co::SIGDN::FILESYSPATH),
+	///         ),
+	///     )
+	///     .collect::&lt;HrResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; HrResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IShellItem&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+		<span class="prelude-val">Ok</span>(Box::new(ShellItemIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() })<span class="question-mark">?</span>))
 	}
 
-	<span class="doccomment">/// [`IShellItemArray::GetCount`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getcount)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetCount</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellItemArrayVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetCount</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">count</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">count</span>)
+	<span class="doccomment">/// [`IShellItemArray::GetCount`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getcount)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellItemArrayVT);
+			ok_to_hrresult((vt.GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
+		}.map(|<span class="kw">_</span>| count)
 	}
 
-	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getitemat)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer using</span>
-	<span class="doccomment">/// [`IShellItemArrayT::iter`](crate::prelude::shell_IShellItemArray::iter).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetItemAt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellItemArrayVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetItemAt</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">index</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>))
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IShellItem::from</span>(<span class="ident">ppv_queried</span>))
+	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getitemat)
+	/// method.
+	///
+	/// Prefer using
+	/// [`IShellItemArrayT::iter`](crate::prelude::shell_IShellItemArray::iter).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetItemAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;IShellItem&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellItemArrayVT);
+			ok_to_hrresult((vt.GetItemAt)(<span class="self">self</span>.ptr(), index, <span class="kw-2">&amp;mut </span>ppv_queried))
+				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
 		}
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">struct</span> <span class="ident">ShellItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">array</span>: <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">IShellItemArray</span><span class="op">&gt;</span>,
-	<span class="ident">count</span>: <span class="ident">u32</span>,
-	<span class="ident">current</span>: <span class="ident">u32</span>,
-	<span class="ident">_owner</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+</span><span class="kw">struct </span>ShellItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	array: ManuallyDrop&lt;IShellItemArray&gt;,
+	count: u32,
+	current: u32,
+	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ShellItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>ShellItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = HrResult&lt;IShellItem&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">count</span> {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">self</span>.current == <span class="self">self</span>.count {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">array</span>.<span class="ident">GetItemAt</span>(<span class="self">self</span>.<span class="ident">current</span>) {
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span>; <span class="comment">// no further iterations will be made</span>
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
+		<span class="kw">match </span><span class="self">self</span>.array.GetItemAt(<span class="self">self</span>.current) {
+			<span class="prelude-val">Err</span>(e) =&gt; {
+				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made
+				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
 			},
-			<span class="prelude-val">Ok</span>(<span class="ident">shell_item</span>) =&gt; {
-				<span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">shell_item</span>))
+			<span class="prelude-val">Ok</span>(shell_item) =&gt; {
+				<span class="self">self</span>.current += <span class="number">1</span>;
+				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(shell_item))
 			},
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ShellItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">com_ptr</span>: <span class="ident">ComPtr</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">IShellItemArray</span>(<span class="ident">com_ptr</span>));
-		<span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">array</span>.<span class="ident">GetCount</span>()<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ShellItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(com_ptr: ComPtr) -&gt; HrResult&lt;<span class="self">Self</span>&gt; {
+		<span class="kw">let </span>array = ManuallyDrop::new(IShellItemArray(com_ptr));
+		<span class="kw">let </span>count = array.GetCount()<span class="question-mark">?</span>;
 
-		<span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-			<span class="ident">array</span>,
-			<span class="ident">count</span>,
-			<span class="ident">current</span>: <span class="number">0</span>,
-			<span class="ident">_owner</span>: <span class="ident">PhantomData</span>,
+		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+			array,
+			count,
+			current: <span class="number">0</span>,
+			_owner: PhantomData,
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -86,93 +86,93 @@
 <span id="86">86</span>
 <span id="87">87</span>
 <span id="88">88</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IMFGetService`](crate::IMFGetService) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IMFGetServiceVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">GetService</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>, <span class="ident">PCVOID</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IMFGetService`](crate::IMFGetService) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IMFGetServiceVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>GetService: <span class="kw">fn</span>(ComPtr, PCVOID, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IMFGetService`](https://docs.microsoft.com/en-us/windows/win32/api/mfidl/nn-mfidl-imfgetservice)</span>
-<span class="doccomment">/// COM interface over [`IMFGetServiceVT`](crate::vt::IMFGetServiceVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{IBaseFilter, IMFGetService};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let vmr: IBaseFilter; // initialized somewhere</span>
-<span class="doccomment">/// # let vmr = IBaseFilter::from(unsafe { winsafe::ComPtr::null() });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let get_svc = vmr.QueryInterface::&lt;IMFGetService&gt;()?;</span>
-<span class="doccomment">/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IMFGetService</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IMFGetService`](https://docs.microsoft.com/en-us/windows/win32/api/mfidl/nn-mfidl-imfgetservice)
+/// COM interface over [`IMFGetServiceVT`](crate::vt::IMFGetServiceVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{IBaseFilter, IMFGetService};
+///
+/// let vmr: IBaseFilter; // initialized somewhere
+/// # let vmr = IBaseFilter::from(unsafe { winsafe::ComPtr::null() });
+///
+/// let get_svc = vmr.QueryInterface::&lt;IMFGetService&gt;()?;
+/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IMFGetService(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IMFGetService</span>, <span class="string">&quot;fa993888-4383-415a-a930-dd472a8cf6f7&quot;</span>);
-<span class="kw">impl</span> <span class="ident">dshow_IMFGetService</span> <span class="kw">for</span> <span class="ident">IMFGetService</span> {}
+<span class="macro">impl_iunknown!</span>(IMFGetService, <span class="string">&quot;fa993888-4383-415a-a930-dd472a8cf6f7&quot;</span>);
+<span class="kw">impl </span>dshow_IMFGetService <span class="kw">for </span>IMFGetService {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IMFGetService`](crate::IMFGetService).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IMFGetService</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IMFGetService::GetService`](https://docs.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-imfgetservice-getservice)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, IMFGetService, IMFVideoDisplayControl};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let get_svc: IMFGetService; // initialized somewhere</span>
-	<span class="doccomment">/// # let get_svc = IMFGetService::from(unsafe { winsafe::ComPtr::null() });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let controller_evr = get_svc</span>
-	<span class="doccomment">///     .GetService::&lt;IMFVideoDisplayControl&gt;(</span>
-	<span class="doccomment">///         &amp;co::DSHOW_SERVICE::MR_VIDEO_RENDER_SERVICE,</span>
-	<span class="doccomment">///     )?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetService</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service_id</span>: <span class="kw-2">&amp;</span><span class="ident">co::DSHOW_SERVICE</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-		<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">ole_IUnknown</span>,
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IMFGetService`](crate::IMFGetService).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IMFGetService: ole_IUnknown {
+	<span class="doccomment">/// [`IMFGetService::GetService`](https://docs.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-imfgetservice-getservice)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, IMFGetService, IMFVideoDisplayControl};
+	///
+	/// let get_svc: IMFGetService; // initialized somewhere
+	/// # let get_svc = IMFGetService::from(unsafe { winsafe::ComPtr::null() });
+	///
+	/// let controller_evr = get_svc
+	///     .GetService::&lt;IMFVideoDisplayControl&gt;(
+	///         &amp;co::DSHOW_SERVICE::MR_VIDEO_RENDER_SERVICE,
+	///     )?;
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetService&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, service_id: <span class="kw-2">&amp;</span>co::DSHOW_SERVICE) -&gt; HrResult&lt;T&gt;
+		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFGetServiceVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetService</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">service_id</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;</span><span class="ident">T::IID</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>,
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFGetServiceVT);
+			ok_to_hrresult(
+				(vt.GetService)(
+					<span class="self">self</span>.ptr(),
+					service_id <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>ppv_queried,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">T::from</span>(<span class="ident">ppv_queried</span>))
+			).map(|<span class="kw">_</span>| T::from(ppv_queried))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

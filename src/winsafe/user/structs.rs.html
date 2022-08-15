@@ -952,959 +952,959 @@
 <span id="952">952</span>
 <span id="953">953</span>
 <span id="954">954</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">HINSTANCE</span>, <span class="ident">HIWORD</span>, <span class="ident">LCID</span>, <span class="ident">LOBYTE</span>, <span class="ident">LOWORD</span>, <span class="ident">MAKEDWORD</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">DispfNup</span>, <span class="ident">HBITMAP</span>, <span class="ident">HBRUSH</span>, <span class="ident">HCURSOR</span>, <span class="ident">HDC</span>, <span class="ident">HICON</span>, <span class="ident">HMENU</span>, <span class="ident">HWND</span>, <span class="ident">HwndHmenu</span>,
-	<span class="ident">HwndPlace</span>, <span class="ident">WNDPROC</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, HIWORD, LCID, LOBYTE, LOWORD, MAKEDWORD};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	DispfNup, HBITMAP, HBRUSH, HCURSOR, HDC, HICON, HMENU, HWND, HwndHmenu,
+	HwndPlace, WNDPROC,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::privs</span>::{
-	<span class="ident">CCHDEVICENAME</span>, <span class="ident">CCHFORMNAME</span>, <span class="ident">CCHILDREN_TITLEBAR</span>, <span class="ident">DM_SPECVERSION</span>,
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::{
+	CCHDEVICENAME, CCHFORMNAME, CCHILDREN_TITLEBAR, DM_SPECVERSION,
 };
 
-<span class="doccomment">/// [`ACCEL`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-accel)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ACCEL</span> {
-	<span class="kw">pub</span> <span class="ident">fVirt</span>: <span class="ident">co::ACCELF</span>,
-	<span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">co::VK</span>,
-	<span class="kw">pub</span> <span class="ident">cmd</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// [`ACCEL`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-accel)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>ACCEL {
+	<span class="kw">pub </span>fVirt: co::ACCELF,
+	<span class="kw">pub </span>key: co::VK,
+	<span class="kw">pub </span>cmd: u16,
 }
 
-<span class="doccomment">/// [`ALTTABINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-alttabinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ALTTABINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">cItems</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cColumns</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cRows</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iColFocus</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">iRowFocus</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cxItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cyItem</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">ptStart</span>: <span class="ident">POINT</span>,
+<span class="doccomment">/// [`ALTTABINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-alttabinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>ALTTABINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>cItems: i32,
+	<span class="kw">pub </span>cColumns: i32,
+	<span class="kw">pub </span>cRows: i32,
+	<span class="kw">pub </span>iColFocus: i32,
+	<span class="kw">pub </span>iRowFocus: i32,
+	<span class="kw">pub </span>cxItem: i32,
+	<span class="kw">pub </span>cyItem: i32,
+	<span class="kw">pub </span>ptStart: POINT,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">ALTTABINFO</span>, <span class="ident">cbSize</span>);
+<span class="macro">impl_default_with_size!</span>(ALTTABINFO, cbSize);
 
-<span class="doccomment">/// [`ATOM`](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#atom)</span>
-<span class="doccomment">/// returned by [`RegisterClassEx`](crate::RegisterClassEx).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ATOM</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u16</span>);
+<span class="doccomment">/// [`ATOM`](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#atom)
+/// returned by [`RegisterClassEx`](crate::RegisterClassEx).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(transparent)]</span>
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>ATOM(<span class="kw">pub</span>(<span class="kw">crate</span>) u16);
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">ATOM</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ATOM {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
 	}
 }
 
-<span class="doccomment">/// [`COLORREF`](https://docs.microsoft.com/en-us/windows/win32/gdi/colorref)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">COLORREF</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u32</span>);
+<span class="doccomment">/// [`COLORREF`](https://docs.microsoft.com/en-us/windows/win32/gdi/colorref)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(transparent)]</span>
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>COLORREF(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">co::CLR</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">COLORREF</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">co::CLR</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">v</span>.<span class="number">0</span>)
+<span class="kw">impl </span>From&lt;co::CLR&gt; <span class="kw">for </span>COLORREF {
+	<span class="kw">fn </span>from(v: co::CLR) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(v.<span class="number">0</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">COLORREF</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;R {}, G {}, B {}&quot;</span>,
-			<span class="self">self</span>.<span class="ident">GetRValue</span>(), <span class="self">self</span>.<span class="ident">GetGValue</span>(), <span class="self">self</span>.<span class="ident">GetBValue</span>())
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>COLORREF {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;R {}, G {}, B {}&quot;</span>,
+			<span class="self">self</span>.GetRValue(), <span class="self">self</span>.GetGValue(), <span class="self">self</span>.GetBValue())
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">COLORREF</span> {
-	<span class="doccomment">/// Creates a new `COLORREF` object with the given color intensities.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::COLORREF;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let color = COLORREF::new(0xff, 0x80, 0x00);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">red</span>: <span class="ident">u8</span>, <span class="ident">green</span>: <span class="ident">u8</span>, <span class="ident">blue</span>: <span class="ident">u8</span>) -&gt; <span class="ident">COLORREF</span> {
-		<span class="self">Self</span>(<span class="ident">red</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">|</span> ((<span class="ident">green</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> ((<span class="ident">blue</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>))
+<span class="kw">impl </span>COLORREF {
+	<span class="doccomment">/// Creates a new `COLORREF` object with the given color intensities.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::COLORREF;
+	///
+	/// let color = COLORREF::new(0xff, 0x80, 0x00);
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>new(red: u8, green: u8, blue: u8) -&gt; COLORREF {
+		<span class="self">Self</span>(red <span class="kw">as </span>u32 | ((green <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>) | ((blue <span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>))
 	}
 
-	<span class="doccomment">/// Creates an array of `COLORREF` objects with the given color intensities.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::COLORREF;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let colors: [COLORREF; 2] = COLORREF::new_array(&amp;[</span>
-	<span class="doccomment">///     (0xff, 0xb2, 0x80),</span>
-	<span class="doccomment">///     (0x00, 0xa0, 0x40),</span>
-	<span class="doccomment">/// ]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_array</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">rgbs</span>: <span class="kw-2">&amp;</span>[(<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>); <span class="ident">N</span>]) -&gt; [<span class="ident">COLORREF</span>; <span class="ident">N</span>] {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arr</span> <span class="op">=</span> [<span class="ident"><span class="self">Self</span>::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>); <span class="ident">N</span>];
-		<span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">rgb</span>) <span class="kw">in</span> <span class="ident">rgbs</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-			<span class="ident">arr</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">rgb</span>.<span class="number">0</span>, <span class="ident">rgb</span>.<span class="number">1</span>, <span class="ident">rgb</span>.<span class="number">2</span>);
+	<span class="doccomment">/// Creates an array of `COLORREF` objects with the given color intensities.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::COLORREF;
+	///
+	/// let colors: [COLORREF; 2] = COLORREF::new_array(&amp;[
+	///     (0xff, 0xb2, 0x80),
+	///     (0x00, 0xa0, 0x40),
+	/// ]);
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_array&lt;<span class="kw">const </span>N: usize&gt;(rgbs: <span class="kw-2">&amp;</span>[(u8, u8, u8); N]) -&gt; [COLORREF; N] {
+		<span class="kw">let </span><span class="kw-2">mut </span>arr = [<span class="self">Self</span>::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>); N];
+		<span class="kw">for </span>(i, rgb) <span class="kw">in </span>rgbs.iter().enumerate() {
+			arr[i] = <span class="self">Self</span>::new(rgb.<span class="number">0</span>, rgb.<span class="number">1</span>, rgb.<span class="number">2</span>);
 		}
-		<span class="ident">arr</span>
+		arr
 	}
 
-	<span class="doccomment">/// Retrieves the red intensity. Originally</span>
-	<span class="doccomment">/// [`GetRValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getrvalue)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">GetRValue</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		<span class="ident">LOBYTE</span>(<span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="number">0</span>))
+	<span class="doccomment">/// Retrieves the red intensity. Originally
+	/// [`GetRValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getrvalue)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>GetRValue(<span class="self">self</span>) -&gt; u8 {
+		LOBYTE(LOWORD(<span class="self">self</span>.<span class="number">0</span>))
 	}
 
-	<span class="doccomment">/// Retrieves the green intensity. Originally</span>
-	<span class="doccomment">/// [`GetGValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getgvalue)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">GetGValue</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		<span class="ident">LOBYTE</span>(<span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>))
+	<span class="doccomment">/// Retrieves the green intensity. Originally
+	/// [`GetGValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getgvalue)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>GetGValue(<span class="self">self</span>) -&gt; u8 {
+		LOBYTE(LOWORD(<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">8</span>))
 	}
 
-	<span class="doccomment">/// Retrieves the blue intensity. Originally</span>
-	<span class="doccomment">/// [`GetBValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbvalue)</span>
-	<span class="doccomment">/// macro.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">GetBValue</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		<span class="ident">LOBYTE</span>(<span class="ident">LOWORD</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>))
-	}
-}
-
-<span class="doccomment">/// [`COMBOBOXINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-comboboxinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">COMBOBOXINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcItem</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">rcButton</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">stateButton</span>: <span class="ident">co::STATE_SYSTEM</span>,
-	<span class="kw">pub</span> <span class="ident">hwndCombo</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndItem</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndList</span>: <span class="ident">HWND</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">COMBOBOXINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`COMPAREITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-compareitemstruct)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">COMPAREITEMSTRUCT</span> {
-	<span class="kw">pub</span> <span class="ident">CtlType</span>: <span class="ident">co::ODT_C</span>,
-	<span class="kw">pub</span> <span class="ident">CtlID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hwndItem</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">itemID1</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">itemData1</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">itemID2</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">itemData2</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">dwLocaleId</span>: <span class="ident">LCID</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">COMPAREITEMSTRUCT</span>);
-
-<span class="doccomment">/// [`CREATESTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-createstructw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CREATESTRUCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">lpCreateParams</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">hInstance</span>: <span class="ident">HINSTANCE</span>,
-	<span class="kw">pub</span> <span class="ident">hMenu</span>: <span class="ident">HMENU</span>,
-	<span class="kw">pub</span> <span class="ident">hwndParent</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">cy</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cx</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">style</span>: <span class="ident">co::WS</span>,
-	<span class="ident">lpszName</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="ident">lpszClass</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dwExStyle</span>: <span class="ident">co::WS_EX</span>,
-
-	<span class="ident">_lpszName</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-	<span class="ident">_lpszClass</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">CREATESTRUCT</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">CREATESTRUCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lpszName</span>, <span class="ident">set_lpszName</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, <span class="ident">lpszClass</span>, <span class="ident">set_lpszClass</span>);
-}
-
-<span class="doccomment">/// [`DELETEITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-deleteitemstruct)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DELETEITEMSTRUCT</span> {
-	<span class="kw">pub</span> <span class="ident">CtlType</span>: <span class="ident">co::ODT_C</span>,
-	<span class="kw">pub</span> <span class="ident">CtlID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">itemID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hwndItem</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">itemData</span>: <span class="ident">usize</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">DELETEITEMSTRUCT</span>);
-
-<span class="doccomment">/// [`DEVMODE`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-devmodew)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DEVMODE</span> {
-	<span class="ident">dmDeviceName</span>: [<span class="ident">u16</span>; <span class="ident">CCHDEVICENAME</span>],
-	<span class="ident">dmSpecVersion</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dmDriverVersion</span>: <span class="ident">u16</span>,
-	<span class="ident">dmSize</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dmDriverExtra</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dmFields</span>: <span class="ident">co::DM</span>,
-	<span class="ident">union0</span>: <span class="ident">DEVMODE_union0</span>,
-	<span class="kw">pub</span> <span class="ident">dmColor</span>: <span class="ident">co::DMCOLOR</span>,
-	<span class="kw">pub</span> <span class="ident">dmDuplex</span>: <span class="ident">co::DMDUP</span>,
-	<span class="kw">pub</span> <span class="ident">dmYResolution</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dmTTOption</span>: <span class="ident">co::DMTT</span>,
-	<span class="ident">dmCollate</span>: <span class="ident">i16</span>,
-	<span class="ident">dmFormName</span>: [<span class="ident">u16</span>; <span class="ident">CCHFORMNAME</span>],
-	<span class="kw">pub</span> <span class="ident">dmLogPixels</span>: <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">dmBitsPerPel</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dmPelsWidth</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dmPelsHeight</span>: <span class="ident">u32</span>,
-	<span class="ident">union1</span>: <span class="ident">DEVMODE_union1</span>,
-	<span class="kw">pub</span> <span class="ident">dmDisplayFrequency</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dmICMMethod</span>: <span class="ident">co::DMICMMETHOD</span>,
-	<span class="kw">pub</span> <span class="ident">dmICMIntent</span>: <span class="ident">co::DMICM</span>,
-	<span class="kw">pub</span> <span class="ident">dmMediaType</span>: <span class="ident">co::DMMEDIA</span>,
-	<span class="kw">pub</span> <span class="ident">dmDitherType</span>: <span class="ident">co::DMDITHER</span>,
-	<span class="ident">dmReserved1</span>: <span class="ident">u32</span>,
-	<span class="ident">dmReserved2</span>: <span class="ident">u32</span>,
-	<span class="ident">dmPanningWidth</span>: <span class="ident">u32</span>,
-	<span class="ident">dmPanningHeight</span>: <span class="ident">u32</span>,
-}
-
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DEVMODE_printer</span> {
-	<span class="ident">dmOrientation</span>: <span class="ident">co::DMORIENT</span>,
-	<span class="ident">dmPaperSize</span>: <span class="ident">co::DMPAPER</span>,
-	<span class="ident">dmPaperLength</span>: <span class="ident">i16</span>,
-	<span class="ident">dmPaperWidth</span>: <span class="ident">i16</span>,
-	<span class="ident">dmScale</span>: <span class="ident">i16</span>,
-	<span class="ident">dmCopies</span>: <span class="ident">i16</span>,
-	<span class="ident">dmDefaultSource</span>: <span class="ident">co::DMBIN</span>,
-	<span class="ident">dmPrintQuality</span>: <span class="ident">co::DMRES</span>,
-}
-
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DEVMODE_display</span> {
-	<span class="ident">dmPosition</span>: <span class="ident">POINT</span>,
-	<span class="ident">dmDisplayOrientation</span>: <span class="ident">co::DMDO</span>,
-	<span class="ident">dmDisplayFixedOutput</span>: <span class="ident">co::DMDFO</span>,
-}
-
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">union</span> <span class="ident">DEVMODE_union0</span> {
-	<span class="ident">printer</span>: <span class="ident">DEVMODE_printer</span>,
-	<span class="ident">display</span>: <span class="ident">DEVMODE_display</span>,
-}
-
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">union</span> <span class="ident">DEVMODE_union1</span> {
-	<span class="ident">dmDisplayFlags</span>: <span class="ident">co::DMDISPLAYFLAGS</span>,
-	<span class="ident">dnNup</span>: <span class="ident">co::DMNUP</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DEVMODE</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::mem::zeroed</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() };
-		<span class="ident">obj</span>.<span class="ident">dmSpecVersion</span> <span class="op">=</span> <span class="ident">DM_SPECVERSION</span>;
-		<span class="ident">obj</span>.<span class="ident">dmDriverVersion</span> <span class="op">=</span> <span class="ident">DM_SPECVERSION</span>;
-		<span class="ident">obj</span>.<span class="ident">dmSize</span> <span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw">_</span>;
-		<span class="ident">obj</span>
+	<span class="doccomment">/// Retrieves the blue intensity. Originally
+	/// [`GetBValue`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbvalue)
+	/// macro.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>GetBValue(<span class="self">self</span>) -&gt; u8 {
+		LOBYTE(LOWORD(<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>))
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">DEVMODE</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">dmDeviceName</span>, <span class="ident">set_dmDeviceName</span>);
-	<span class="macro">pub_fn_bool_get_set!</span>(<span class="ident">dmCollate</span>, <span class="ident">set_dmCollate</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">dmFormName</span>, <span class="ident">set_dmFormName</span>);
+<span class="doccomment">/// [`COMBOBOXINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-comboboxinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>COMBOBOXINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>rcItem: RECT,
+	<span class="kw">pub </span>rcButton: RECT,
+	<span class="kw">pub </span>stateButton: co::STATE_SYSTEM,
+	<span class="kw">pub </span>hwndCombo: HWND,
+	<span class="kw">pub </span>hwndItem: HWND,
+	<span class="kw">pub </span>hwndList: HWND,
+}
 
-	<span class="doccomment">/// Sets the `dmDisplayFlags` or the `dmNup` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmDisplayFlags_dmNup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">DispfNup</span>) {
-		<span class="kw">match</span> <span class="ident">val</span> {
-			<span class="ident">DispfNup::Dispf</span>(<span class="ident">val</span>) =&gt; <span class="self">self</span>.<span class="ident">union1</span>.<span class="ident">dmDisplayFlags</span> <span class="op">=</span> <span class="ident">val</span>,
-			<span class="ident">DispfNup::Nup</span>(<span class="ident">val</span>) =&gt; <span class="self">self</span>.<span class="ident">union1</span>.<span class="ident">dnNup</span> <span class="op">=</span> <span class="ident">val</span>,
-		}
-	}
+<span class="macro">impl_default_with_size!</span>(COMBOBOXINFO, cbSize);
 
-	<span class="doccomment">/// Returns the `dmOrientation` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmOrientation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMORIENT</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmOrientation</span> }
-	}
+<span class="doccomment">/// [`COMPAREITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-compareitemstruct)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>COMPAREITEMSTRUCT {
+	<span class="kw">pub </span>CtlType: co::ODT_C,
+	<span class="kw">pub </span>CtlID: u32,
+	<span class="kw">pub </span>hwndItem: HWND,
+	<span class="kw">pub </span>itemID1: u32,
+	<span class="kw">pub </span>itemData1: usize,
+	<span class="kw">pub </span>itemID2: u32,
+	<span class="kw">pub </span>itemData2: usize,
+	<span class="kw">pub </span>dwLocaleId: LCID,
+}
 
-	<span class="doccomment">/// Sets the `dmOrientation` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmOrientation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMORIENT</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmOrientation</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+<span class="macro">impl_default!</span>(COMPAREITEMSTRUCT);
 
-	<span class="doccomment">/// Returns the `dmPaperSize` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmPaperSize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMPAPER</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperSize</span> }
-	}
+<span class="doccomment">/// [`CREATESTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-createstructw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>CREATESTRUCT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="kw">pub </span>lpCreateParams: isize,
+	<span class="kw">pub </span>hInstance: HINSTANCE,
+	<span class="kw">pub </span>hMenu: HMENU,
+	<span class="kw">pub </span>hwndParent: HWND,
+	<span class="kw">pub </span>cy: i32,
+	<span class="kw">pub </span>cx: i32,
+	<span class="kw">pub </span>y: i32,
+	<span class="kw">pub </span>x: i32,
+	<span class="kw">pub </span>style: co::WS,
+	lpszName: <span class="kw-2">*mut </span>u16,
+	lpszClass: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>dwExStyle: co::WS_EX,
 
-	<span class="doccomment">/// Sets the `dmPaperSize` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmPaperSize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMPAPER</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperSize</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+	_lpszName: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+	_lpszClass: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>u16&gt;,
+}
 
-	<span class="doccomment">/// Returns the `dmPaperLength` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmPaperLength</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperLength</span> }
-	}
+<span class="macro">impl_default!</span>(CREATESTRUCT, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
 
-	<span class="doccomment">/// Sets the `dmPaperLength` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmPaperLength</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">i16</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperLength</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; CREATESTRUCT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpszName, set_lpszName);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, lpszClass, set_lpszClass);
+}
 
-	<span class="doccomment">/// Returns the `dmPaperWidth` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmPaperWidth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperWidth</span> }
-	}
+<span class="doccomment">/// [`DELETEITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-deleteitemstruct)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>DELETEITEMSTRUCT {
+	<span class="kw">pub </span>CtlType: co::ODT_C,
+	<span class="kw">pub </span>CtlID: u32,
+	<span class="kw">pub </span>itemID: u32,
+	<span class="kw">pub </span>hwndItem: HWND,
+	<span class="kw">pub </span>itemData: usize,
+}
 
-	<span class="doccomment">/// Sets the `dmPaperWidth` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmPaperWidth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">i16</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPaperWidth</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+<span class="macro">impl_default!</span>(DELETEITEMSTRUCT);
 
-	<span class="doccomment">/// Returns the `dmScale` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmScale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmScale</span> }
-	}
+<span class="doccomment">/// [`DEVMODE`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-devmodew)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>DEVMODE {
+	dmDeviceName: [u16; CCHDEVICENAME],
+	dmSpecVersion: u16,
+	<span class="kw">pub </span>dmDriverVersion: u16,
+	dmSize: u16,
+	<span class="kw">pub </span>dmDriverExtra: u16,
+	<span class="kw">pub </span>dmFields: co::DM,
+	union0: DEVMODE_union0,
+	<span class="kw">pub </span>dmColor: co::DMCOLOR,
+	<span class="kw">pub </span>dmDuplex: co::DMDUP,
+	<span class="kw">pub </span>dmYResolution: u16,
+	<span class="kw">pub </span>dmTTOption: co::DMTT,
+	dmCollate: i16,
+	dmFormName: [u16; CCHFORMNAME],
+	<span class="kw">pub </span>dmLogPixels: u16,
+	<span class="kw">pub </span>dmBitsPerPel: u32,
+	<span class="kw">pub </span>dmPelsWidth: u32,
+	<span class="kw">pub </span>dmPelsHeight: u32,
+	union1: DEVMODE_union1,
+	<span class="kw">pub </span>dmDisplayFrequency: u32,
+	<span class="kw">pub </span>dmICMMethod: co::DMICMMETHOD,
+	<span class="kw">pub </span>dmICMIntent: co::DMICM,
+	<span class="kw">pub </span>dmMediaType: co::DMMEDIA,
+	<span class="kw">pub </span>dmDitherType: co::DMDITHER,
+	dmReserved1: u32,
+	dmReserved2: u32,
+	dmPanningWidth: u32,
+	dmPanningHeight: u32,
+}
 
-	<span class="doccomment">/// Sets the `dmScale` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmScale</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">i16</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmScale</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">struct </span>DEVMODE_printer {
+	dmOrientation: co::DMORIENT,
+	dmPaperSize: co::DMPAPER,
+	dmPaperLength: i16,
+	dmPaperWidth: i16,
+	dmScale: i16,
+	dmCopies: i16,
+	dmDefaultSource: co::DMBIN,
+	dmPrintQuality: co::DMRES,
+}
 
-	<span class="doccomment">/// Returns the `dmCopies` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmCopies</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmCopies</span> }
-	}
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone, Copy)]</span>
+<span class="kw">struct </span>DEVMODE_display {
+	dmPosition: POINT,
+	dmDisplayOrientation: co::DMDO,
+	dmDisplayFixedOutput: co::DMDFO,
+}
 
-	<span class="doccomment">/// Sets the `dmCopies` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmCopies</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">i16</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmCopies</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">union </span>DEVMODE_union0 {
+	printer: DEVMODE_printer,
+	display: DEVMODE_display,
+}
 
-	<span class="doccomment">/// Returns the `dmDefaultSource` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmDefaultSource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMBIN</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmDefaultSource</span> }
-	}
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">union </span>DEVMODE_union1 {
+	dmDisplayFlags: co::DMDISPLAYFLAGS,
+	dnNup: co::DMNUP,
+}
 
-	<span class="doccomment">/// Sets the `dmDefaultSource` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmDefaultSource</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMBIN</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmDefaultSource</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
-
-	<span class="doccomment">/// Returns the `dmPrintQuality` printer field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmPrintQuality</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMRES</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPrintQuality</span> }
-	}
-
-	<span class="doccomment">/// Sets the `dmPrintQuality` printer field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmPrintQuality</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMRES</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">printer</span>.<span class="ident">dmPrintQuality</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
-
-	<span class="doccomment">/// Returns the `dmPosition` display field, which is part of an union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmPosition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">POINT</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmPosition</span> }
-	}
-
-	<span class="doccomment">/// Sets the `dmPosition` display field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmPosition</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">POINT</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmPosition</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
-
-	<span class="doccomment">/// Returns the `dmDisplayOrientation` display field, which is part of an</span>
-	<span class="doccomment">/// union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmDisplayOrientation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMDO</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmDisplayOrientation</span> }
-	}
-
-	<span class="doccomment">/// Sets the `dmDisplayOrientation` display field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmDisplayOrientation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMDO</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmDisplayOrientation</span> <span class="op">=</span> <span class="ident">val</span>;
-	}
-
-	<span class="doccomment">/// Returns the `dmDisplayFixedOutput` display field, which is part of an</span>
-	<span class="doccomment">/// union.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">dmDisplayFixedOutput</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::DMDFO</span> {
-		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmDisplayFixedOutput</span> }
-	}
-
-	<span class="doccomment">/// Sets the `dmDisplayFixedOutput` display field, which is part of an union.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dmDisplayFixedOutput</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">co::DMDFO</span>) {
-		<span class="self">self</span>.<span class="ident">union0</span>.<span class="ident">display</span>.<span class="ident">dmDisplayFixedOutput</span> <span class="op">=</span> <span class="ident">val</span>;
+<span class="kw">impl </span>Default <span class="kw">for </span>DEVMODE {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;<span class="self">Self</span>&gt;() };
+		obj.dmSpecVersion = DM_SPECVERSION;
+		obj.dmDriverVersion = DM_SPECVERSION;
+		obj.dmSize = std::mem::size_of::&lt;<span class="self">Self</span>&gt;() <span class="kw">as _</span>;
+		obj
 	}
 }
 
-<span class="doccomment">/// [`DISPLAY_DEVICE`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicew)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DISPLAY_DEVICE</span> {
-	<span class="ident">cb</span>: <span class="ident">u32</span>,
-	<span class="ident">DeviceName</span>: [<span class="ident">u16</span>; <span class="number">32</span>],
-	<span class="ident">DeviceString</span>: [<span class="ident">u16</span>; <span class="number">128</span>],
-	<span class="kw">pub</span> <span class="ident">StateFlags</span>: <span class="ident">co::DISPLAY_DEVICE</span>,
-	<span class="ident">DeviceID</span>: [<span class="ident">u16</span>; <span class="number">128</span>],
-	<span class="ident">DeviceKey</span>: [<span class="ident">u16</span>; <span class="number">128</span>],
-}
+<span class="kw">impl </span>DEVMODE {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(dmDeviceName, set_dmDeviceName);
+	<span class="macro">pub_fn_bool_get_set!</span>(dmCollate, set_dmCollate);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(dmFormName, set_dmFormName);
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">DISPLAY_DEVICE</span>, <span class="ident">cb</span>);
-
-<span class="kw">impl</span> <span class="ident">DISPLAY_DEVICE</span> {
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">DeviceName</span>, <span class="ident">set_DeviceName</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">DeviceString</span>, <span class="ident">set_DeviceString</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">DeviceID</span>, <span class="ident">set_DeviceID</span>);
-	<span class="macro">pub_fn_string_arr_get_set!</span>(<span class="ident">DeviceKey</span>, <span class="ident">set_DeviceKey</span>);
-}
-
-<span class="doccomment">/// [`DRAWITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-drawitemstruct)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DRAWITEMSTRUCT</span> {
-	<span class="kw">pub</span> <span class="ident">CtlType</span>: <span class="ident">co::ODT</span>,
-	<span class="kw">pub</span> <span class="ident">CtlID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">itemID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">itemAction</span>: <span class="ident">co::ODA</span>,
-	<span class="kw">pub</span> <span class="ident">itemState</span>: <span class="ident">co::ODS</span>,
-	<span class="kw">pub</span> <span class="ident">hwndItem</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hDC</span>: <span class="ident">HDC</span>,
-	<span class="kw">pub</span> <span class="ident">rcItem</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">itemData</span>: <span class="ident">usize</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">DRAWITEMSTRUCT</span>);
-
-<span class="doccomment">/// [`MSG`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msg)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MSG</span> {
-	<span class="kw">pub</span> <span class="ident">hwnd</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">co::WM</span>,
-	<span class="kw">pub</span> <span class="ident">wParam</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">lParam</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">pt</span>: <span class="ident">POINT</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">MSG</span>);
-
-<span class="doccomment">/// [`GUITHREADINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-guithreadinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GUITHREADINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::GUI</span>,
-	<span class="kw">pub</span> <span class="ident">hwndActive</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndFocus</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndCapture</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndMenuOwner</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndMoveSize</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">hwndCaret</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">rcCaret</span>: <span class="ident">RECT</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">GUITHREADINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`HELPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-helpinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HELPINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">iContextType</span>: <span class="ident">co::HELPINFO</span>,
-	<span class="kw">pub</span> <span class="ident">iCtrlId</span>: <span class="ident">i32</span>,
-	<span class="ident">hItemHandle</span>: <span class="ident">usize</span>, <span class="comment">// HWND|HMENU</span>
-	<span class="kw">pub</span> <span class="ident">dwContextId</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">MousePos</span>: <span class="ident">POINT</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">HELPINFO</span> {
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hItemHandle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HwndHmenu</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">iContextType</span> {
-			<span class="ident">co::HELPINFO::WINDOW</span> =&gt; <span class="ident">HwndHmenu::Hwnd</span>(<span class="ident">HWND</span>(<span class="self">self</span>.<span class="ident">hItemHandle</span> <span class="kw">as</span> <span class="kw">_</span>)),
-			<span class="kw">_</span> =&gt; <span class="ident">HwndHmenu::Hmenu</span>(<span class="ident">HMENU</span>(<span class="self">self</span>.<span class="ident">hItemHandle</span> <span class="kw">as</span> <span class="kw">_</span>)),
-		}
-	}
-}
-
-<span class="doccomment">/// [`MENUBARINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menubarinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MENUBARINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcBar</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">hMenu</span>: <span class="ident">HMENU</span>,
-	<span class="kw">pub</span> <span class="ident">hwndMenu</span>: <span class="ident">HWND</span>,
-	<span class="ident">fBarFocused</span>: <span class="ident">BOOL</span>,
-	<span class="ident">fFocused</span>: <span class="ident">BOOL</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">MENUBARINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="kw">impl</span> <span class="ident">MENUBARINFO</span> {
-	<span class="macro">pub_fn_bool_get_set!</span>(<span class="ident">fBarFocused</span>, <span class="ident">set_fBarFocused</span>);
-	<span class="macro">pub_fn_bool_get_set!</span>(<span class="ident">fFocused</span>, <span class="ident">set_fFocused</span>);
-}
-
-<span class="doccomment">/// [`MENUINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menuinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MENUINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">fMask</span>: <span class="ident">co::MIM</span>,
-	<span class="kw">pub</span> <span class="ident">dwStyle</span>: <span class="ident">co::MNS</span>,
-	<span class="kw">pub</span> <span class="ident">cyMax</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hbrBack</span>: <span class="ident">HBRUSH</span>,
-	<span class="kw">pub</span> <span class="ident">dwContextHelpID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwMenuData</span>: <span class="ident">usize</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">MENUINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`MENUITEMINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menuiteminfow)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MENUITEMINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">fMask</span>: <span class="ident">co::MIIM</span>,
-	<span class="kw">pub</span> <span class="ident">fType</span>: <span class="ident">co::MFT</span>,
-	<span class="kw">pub</span> <span class="ident">fState</span>: <span class="ident">co::MFS</span>,
-	<span class="kw">pub</span> <span class="ident">wID</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hSubMenu</span>: <span class="ident">HMENU</span>,
-	<span class="kw">pub</span> <span class="ident">hbmpChecked</span>: <span class="ident">HBITMAP</span>,
-	<span class="kw">pub</span> <span class="ident">hbmpUnchecked</span>: <span class="ident">HBITMAP</span>,
-	<span class="kw">pub</span> <span class="ident">dwItemData</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">dwTypeData</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">cch</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">hbmpItem</span>: <span class="ident">HBITMAP</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">MENUITEMINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`MINMAXINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-minmaxinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MINMAXINFO</span> {
-	<span class="ident">ptReserved</span>: <span class="ident">POINT</span>,
-	<span class="doccomment">/// The maximized width (x member) and the maximized height (y member) of</span>
-	<span class="doccomment">/// the window. For top-level windows, this value is based on the width of</span>
-	<span class="doccomment">/// the primary monitor.</span>
-	<span class="kw">pub</span> <span class="ident">ptMaxSize</span>: <span class="ident">POINT</span>,
-	<span class="doccomment">/// The position of the left side of the maximized window (x member) and the</span>
-	<span class="doccomment">/// position of the top of the maximized window (y member). For top-level</span>
-	<span class="doccomment">/// windows, this value is based on the position of the primary monitor.</span>
-	<span class="kw">pub</span> <span class="ident">ptMaxPosition</span>: <span class="ident">POINT</span>,
-	<span class="doccomment">/// The minimum tracking width (x member) and the minimum tracking height (y</span>
-	<span class="doccomment">/// member) of the window. This value can be obtained programmatically from</span>
-	<span class="doccomment">/// the system metrics [`SM::CXMINTRACK`](crate::co::SM::CXMINTRACK) and</span>
-	<span class="doccomment">/// [`SM::CYMINTRACK`](crate::co::SM::CYMINTRACK) (see the</span>
-	<span class="doccomment">/// [`GetSystemMetrics`](crate::GetSystemMetrics) function).</span>
-	<span class="kw">pub</span> <span class="ident">ptMinTrackSize</span>: <span class="ident">POINT</span>,
-	<span class="doccomment">/// The maximum tracking width (x member) and the maximum tracking height (y</span>
-	<span class="doccomment">/// member) of the window. This value is based on the size of the virtual</span>
-	<span class="doccomment">/// screen and can be obtained programmatically from the system metrics</span>
-	<span class="doccomment">/// [`SM::CXMAXTRACK`](crate::co::SM::CXMAXTRACK) and</span>
-	<span class="doccomment">/// [`SM::CYMAXTRACK`](crate::co::SM::CYMAXTRACK) (see the</span>
-	<span class="doccomment">/// [`GetSystemMetrics`](crate::GetSystemMetrics) function).</span>
-	<span class="kw">pub</span> <span class="ident">ptMaxTrackSize</span>: <span class="ident">POINT</span>,
-}
-
-<span class="doccomment">/// [`MONITORINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-monitorinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MONITORINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcMonitor</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">rcWork</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::MONITORINFOF</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">MONITORINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`NCCALCSIZE_PARAMS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nccalcsize_params)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NCCALCSIZE_PARAMS</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span> <span class="ident">rgrc</span>: [<span class="ident">RECT</span>; <span class="number">3</span>],
-	<span class="ident">lppos</span>: <span class="kw-2">*mut</span> <span class="ident">WINDOWPOS</span>,
-
-	<span class="ident">_lppos</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">WINDOWPOS</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NCCALCSIZE_PARAMS</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lppos</span>, <span class="ident">set_lppos</span>, <span class="ident">WINDOWPOS</span>);
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">NCCALCSIZE_PARAMS</span>, <span class="lifetime">&#39;a</span>);
-
-<span class="doccomment">/// [`PAINTSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-paintstruct)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PAINTSTRUCT</span> {
-	<span class="kw">pub</span> <span class="ident">hdc</span>: <span class="ident">HDC</span>,
-	<span class="kw">pub</span> <span class="ident">fErase</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcPaint</span>: <span class="ident">RECT</span>,
-	<span class="ident">fRestore</span>: <span class="ident">u32</span>,
-	<span class="ident">fIncUpdate</span>: <span class="ident">u32</span>,
-	<span class="ident">rgbReserved</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">PAINTSTRUCT</span>);
-
-<span class="doccomment">/// [`POINT`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">POINT</span> {
-	<span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">i32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">POINT</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;x {}, y {}&quot;</span>, <span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>)
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">POINT</span> {
-	<span class="doccomment">/// Creates a new `POINT`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">POINT</span> {
-		<span class="self">Self</span> { <span class="ident">x</span>, <span class="ident">y</span> }
-	}
-
-	<span class="doccomment">/// Creates a new `POINT` by splitting `val` into two `u16` values, with</span>
-	<span class="doccomment">/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="ident">POINT</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">LOWORD</span>(<span class="ident">val</span>) <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">HIWORD</span>(<span class="ident">val</span>) <span class="kw">as</span> <span class="kw">_</span>)
-	}
-
-	<span class="doccomment">/// Tells whether the struct contains exactly the given values.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">x</span> <span class="op">==</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">y</span> <span class="op">==</span> <span class="ident">y</span>
-	}
-
-	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `x` and `y`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">into_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="ident">MAKEDWORD</span>(<span class="self">self</span>.<span class="ident">x</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="self">self</span>.<span class="ident">y</span> <span class="kw">as</span> <span class="kw">_</span>)
-	}
-}
-
-<span class="doccomment">/// [`RECT`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RECT</span> {
-	<span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">top</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">bottom</span>: <span class="ident">i32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">RECT</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;left {}, top {}, right {}, bottom {}&quot;</span>,
-			<span class="self">self</span>.<span class="ident">left</span>, <span class="self">self</span>.<span class="ident">top</span>, <span class="self">self</span>.<span class="ident">right</span>, <span class="self">self</span>.<span class="ident">bottom</span>)
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">RECT</span> {
-	<span class="doccomment">/// Tells whether the struct contains exactly the given values.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">left</span>: <span class="ident">i32</span>, <span class="ident">top</span>: <span class="ident">i32</span>, <span class="ident">right</span>: <span class="ident">i32</span>, <span class="ident">bottom</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">left</span> <span class="op">==</span> <span class="ident">left</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">top</span> <span class="op">==</span> <span class="ident">top</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">right</span> <span class="op">==</span> <span class="ident">right</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">bottom</span> <span class="op">==</span> <span class="ident">bottom</span>
-	}
-}
-
-<span class="doccomment">/// [`SCROLLINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-scrollinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SCROLLINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">fMask</span>: <span class="ident">co::SIF</span>,
-	<span class="kw">pub</span> <span class="ident">nMin</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">nMax</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">nPage</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">nPos</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">nTrackPos</span>: <span class="ident">i32</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">SCROLLINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`SIZE`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-size)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SIZE</span> {
-	<span class="kw">pub</span> <span class="ident">cx</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cy</span>: <span class="ident">i32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">SIZE</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cx {}, cy {}&quot;</span>, <span class="self">self</span>.<span class="ident">cx</span>, <span class="self">self</span>.<span class="ident">cy</span>)
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">SIZE</span> {
-	<span class="doccomment">/// Creates a new `SIZE`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cx</span>: <span class="ident">i32</span>, <span class="ident">cy</span>: <span class="ident">i32</span>) -&gt; <span class="ident">SIZE</span> {
-		<span class="self">Self</span> { <span class="ident">cx</span>, <span class="ident">cy</span> }
-	}
-
-	<span class="doccomment">/// Creates a new `SIZE` by splitting `val` into two `u16` values, with</span>
-	<span class="doccomment">/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="ident">SIZE</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">LOWORD</span>(<span class="ident">val</span>) <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">HIWORD</span>(<span class="ident">val</span>) <span class="kw">as</span> <span class="kw">_</span>)
-	}
-
-	<span class="doccomment">/// Tells whether the struct contains exactly the given values.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">i32</span>, <span class="ident">cy</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">cx</span> <span class="op">==</span> <span class="ident">cx</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">cy</span> <span class="op">==</span> <span class="ident">cy</span>
-	}
-
-	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `cx` and `cy`.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">into_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="ident">MAKEDWORD</span>(<span class="self">self</span>.<span class="ident">cx</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="self">self</span>.<span class="ident">cy</span> <span class="kw">as</span> <span class="kw">_</span>)
-	}
-}
-
-<span class="doccomment">/// [`STYLESTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-stylestruct)</span>
-<span class="doccomment">/// struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">STYLESTRUCT</span> {
-	<span class="ident">styleOld</span>: <span class="ident">u32</span>, <span class="comment">// both fields contain WS and WS_EX mixed</span>
-	<span class="ident">styleNew</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">STYLESTRUCT</span> {
-	<span class="doccomment">/// Returns the [`WS`](crate::co::WS) of `styleOld` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">styleOld_WS</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::WS</span> {
-		<span class="ident">co::WS</span>(<span class="self">self</span>.<span class="ident">styleOld</span>)
-	}
-
-	<span class="doccomment">/// Returns the [`WS_EX`](crate::co::WS_EX) of `styleOld` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">styleOld_WSEX</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::WS_EX</span> {
-		<span class="ident">co::WS_EX</span>(<span class="self">self</span>.<span class="ident">styleOld</span>)
-	}
-
-	<span class="doccomment">/// Returns the [`WS`](crate::co::WS) of `styleNew` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">styleNew_WS</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::WS</span> {
-		<span class="ident">co::WS</span>(<span class="self">self</span>.<span class="ident">styleNew</span>)
-	}
-
-	<span class="doccomment">/// Returns the [`WS_EX`](crate::co::WS_EX) of `styleNew` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">styleNew_WSEX</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">co::WS_EX</span> {
-		<span class="ident">co::WS_EX</span>(<span class="self">self</span>.<span class="ident">styleNew</span>)
-	}
-}
-
-<span class="doccomment">/// [`TITLEBARINFOEX`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-titlebarinfoex)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TITLEBARINFOEX</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcTitleBar</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">rgstate</span>: [<span class="ident">co::STATE_SYSTEM</span>; <span class="ident">CCHILDREN_TITLEBAR</span> <span class="op">+</span> <span class="number">1</span>],
-	<span class="kw">pub</span> <span class="ident">rgrect</span>: [<span class="ident">RECT</span>; <span class="ident">CCHILDREN_TITLEBAR</span> <span class="op">+</span> <span class="number">1</span>],
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">TITLEBARINFOEX</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`TRACKMOUSEEVENT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-trackmouseevent)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TRACKMOUSEEVENT</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">dwFlags</span>: <span class="ident">co::TME</span>,
-	<span class="kw">pub</span> <span class="ident">hwndTrack</span>: <span class="ident">HWND</span>,
-	<span class="kw">pub</span> <span class="ident">dwHoverTime</span>: <span class="ident">u32</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">TRACKMOUSEEVENT</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`WINDOWINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowinfo)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WINDOWINFO</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">rcWindow</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">rcClient</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">dwStyle</span>: <span class="ident">co::WS</span>,
-	<span class="kw">pub</span> <span class="ident">dwExStyle</span>: <span class="ident">co::WS_EX</span>,
-	<span class="kw">pub</span> <span class="ident">dwWindowStatus</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">cxWindowBorders</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">cyWindowBorders</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">atomWindowType</span>: <span class="ident">ATOM</span>,
-	<span class="kw">pub</span> <span class="ident">wCreatorVersion</span>: <span class="ident">u16</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">WINDOWINFO</span>, <span class="ident">cbSize</span>);
-
-<span class="doccomment">/// [`WINDOWPLACEMENT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowplacement)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WINDOWPLACEMENT</span> {
-	<span class="ident">length</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::WPF</span>,
-	<span class="kw">pub</span> <span class="ident">showCmd</span>: <span class="ident">co::SW</span>,
-	<span class="kw">pub</span> <span class="ident">ptMinPosition</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">ptMaxPosition</span>: <span class="ident">POINT</span>,
-	<span class="kw">pub</span> <span class="ident">rcNormalPosition</span>: <span class="ident">RECT</span>,
-	<span class="kw">pub</span> <span class="ident">rcDevice</span>: <span class="ident">RECT</span>,
-}
-
-<span class="macro">impl_default_with_size!</span>(<span class="ident">WINDOWPLACEMENT</span>, <span class="ident">length</span>);
-
-<span class="doccomment">/// [`WINDOWPOS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowpos)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WINDOWPOS</span> {
-	<span class="kw">pub</span> <span class="ident">hwnd</span>: <span class="ident">HWND</span>,
-	<span class="ident">hwndInsertAfter</span>: <span class="ident">isize</span>,
-	<span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cx</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cy</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">co::SWP</span>,
-}
-
-<span class="macro">impl_default!</span>(<span class="ident">WINDOWPOS</span>);
-
-<span class="kw">impl</span> <span class="ident">WINDOWPOS</span> {
-	<span class="doccomment">/// Returns the `hwndInsertAfter` field.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hwndInsertAfter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HwndPlace</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">hwndInsertAfter</span> {
-			<span class="number">0</span> <span class="op">|</span> <span class="number">1</span> <span class="op">|</span> <span class="op">-</span><span class="number">1</span> <span class="op">|</span> <span class="op">-</span><span class="number">2</span> =&gt; <span class="ident">HwndPlace::Place</span>(<span class="ident">co::HWND_PLACE</span>(<span class="self">self</span>.<span class="ident">hwndInsertAfter</span>)),
-			<span class="kw">_</span> =&gt; <span class="ident">HwndPlace::Hwnd</span>(<span class="ident">HWND</span>(<span class="self">self</span>.<span class="ident">hwndInsertAfter</span> <span class="kw">as</span> <span class="kw">_</span>)),
+	<span class="doccomment">/// Sets the `dmDisplayFlags` or the `dmNup` field.
+	</span><span class="kw">pub fn </span>set_dmDisplayFlags_dmNup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: DispfNup) {
+		<span class="kw">match </span>val {
+			DispfNup::Dispf(val) =&gt; <span class="self">self</span>.union1.dmDisplayFlags = val,
+			DispfNup::Nup(val) =&gt; <span class="self">self</span>.union1.dnNup = val,
 		}
 	}
 
-	<span class="doccomment">/// Sets the `hwndInsertAfter` field.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_hwndInsertAfter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HwndPlace</span>) {
-		<span class="self">self</span>.<span class="ident">hwndInsertAfter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">hwnd</span> {
-			<span class="ident">HwndPlace::Hwnd</span>(<span class="ident">h</span>) =&gt; <span class="ident">h</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">HwndPlace::Place</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">into</span>(),
-			<span class="ident">HwndPlace::None</span> =&gt; <span class="number">0</span>,
+	<span class="doccomment">/// Returns the `dmOrientation` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmOrientation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMORIENT {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmOrientation }
+	}
+
+	<span class="doccomment">/// Sets the `dmOrientation` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmOrientation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMORIENT) {
+		<span class="self">self</span>.union0.printer.dmOrientation = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmPaperSize` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmPaperSize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMPAPER {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmPaperSize }
+	}
+
+	<span class="doccomment">/// Sets the `dmPaperSize` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmPaperSize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMPAPER) {
+		<span class="self">self</span>.union0.printer.dmPaperSize = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmPaperLength` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmPaperLength(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmPaperLength }
+	}
+
+	<span class="doccomment">/// Sets the `dmPaperLength` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmPaperLength(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: i16) {
+		<span class="self">self</span>.union0.printer.dmPaperLength = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmPaperWidth` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmPaperWidth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmPaperWidth }
+	}
+
+	<span class="doccomment">/// Sets the `dmPaperWidth` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmPaperWidth(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: i16) {
+		<span class="self">self</span>.union0.printer.dmPaperWidth = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmScale` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmScale(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmScale }
+	}
+
+	<span class="doccomment">/// Sets the `dmScale` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmScale(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: i16) {
+		<span class="self">self</span>.union0.printer.dmScale = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmCopies` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmCopies(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmCopies }
+	}
+
+	<span class="doccomment">/// Sets the `dmCopies` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmCopies(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: i16) {
+		<span class="self">self</span>.union0.printer.dmCopies = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmDefaultSource` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmDefaultSource(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMBIN {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmDefaultSource }
+	}
+
+	<span class="doccomment">/// Sets the `dmDefaultSource` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmDefaultSource(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMBIN) {
+		<span class="self">self</span>.union0.printer.dmDefaultSource = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmPrintQuality` printer field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmPrintQuality(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMRES {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.printer.dmPrintQuality }
+	}
+
+	<span class="doccomment">/// Sets the `dmPrintQuality` printer field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmPrintQuality(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMRES) {
+		<span class="self">self</span>.union0.printer.dmPrintQuality = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmPosition` display field, which is part of an union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; POINT {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.display.dmPosition }
+	}
+
+	<span class="doccomment">/// Sets the `dmPosition` display field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmPosition(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: POINT) {
+		<span class="self">self</span>.union0.display.dmPosition = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmDisplayOrientation` display field, which is part of an
+	/// union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmDisplayOrientation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMDO {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.display.dmDisplayOrientation }
+	}
+
+	<span class="doccomment">/// Sets the `dmDisplayOrientation` display field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmDisplayOrientation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMDO) {
+		<span class="self">self</span>.union0.display.dmDisplayOrientation = val;
+	}
+
+	<span class="doccomment">/// Returns the `dmDisplayFixedOutput` display field, which is part of an
+	/// union.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>dmDisplayFixedOutput(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::DMDFO {
+		<span class="kw">unsafe </span>{ <span class="self">self</span>.union0.display.dmDisplayFixedOutput }
+	}
+
+	<span class="doccomment">/// Sets the `dmDisplayFixedOutput` display field, which is part of an union.
+	</span><span class="kw">pub fn </span>set_dmDisplayFixedOutput(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: co::DMDFO) {
+		<span class="self">self</span>.union0.display.dmDisplayFixedOutput = val;
+	}
+}
+
+<span class="doccomment">/// [`DISPLAY_DEVICE`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-display_devicew)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>DISPLAY_DEVICE {
+	cb: u32,
+	DeviceName: [u16; <span class="number">32</span>],
+	DeviceString: [u16; <span class="number">128</span>],
+	<span class="kw">pub </span>StateFlags: co::DISPLAY_DEVICE,
+	DeviceID: [u16; <span class="number">128</span>],
+	DeviceKey: [u16; <span class="number">128</span>],
+}
+
+<span class="macro">impl_default_with_size!</span>(DISPLAY_DEVICE, cb);
+
+<span class="kw">impl </span>DISPLAY_DEVICE {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(DeviceName, set_DeviceName);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(DeviceString, set_DeviceString);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(DeviceID, set_DeviceID);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(DeviceKey, set_DeviceKey);
+}
+
+<span class="doccomment">/// [`DRAWITEMSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-drawitemstruct)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>DRAWITEMSTRUCT {
+	<span class="kw">pub </span>CtlType: co::ODT,
+	<span class="kw">pub </span>CtlID: u32,
+	<span class="kw">pub </span>itemID: u32,
+	<span class="kw">pub </span>itemAction: co::ODA,
+	<span class="kw">pub </span>itemState: co::ODS,
+	<span class="kw">pub </span>hwndItem: HWND,
+	<span class="kw">pub </span>hDC: HDC,
+	<span class="kw">pub </span>rcItem: RECT,
+	<span class="kw">pub </span>itemData: usize,
+}
+
+<span class="macro">impl_default!</span>(DRAWITEMSTRUCT);
+
+<span class="doccomment">/// [`MSG`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msg)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>MSG {
+	<span class="kw">pub </span>hwnd: HWND,
+	<span class="kw">pub </span>message: co::WM,
+	<span class="kw">pub </span>wParam: usize,
+	<span class="kw">pub </span>lParam: isize,
+	<span class="kw">pub </span>time: u32,
+	<span class="kw">pub </span>pt: POINT,
+}
+
+<span class="macro">impl_default!</span>(MSG);
+
+<span class="doccomment">/// [`GUITHREADINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-guithreadinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>GUITHREADINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>flags: co::GUI,
+	<span class="kw">pub </span>hwndActive: HWND,
+	<span class="kw">pub </span>hwndFocus: HWND,
+	<span class="kw">pub </span>hwndCapture: HWND,
+	<span class="kw">pub </span>hwndMenuOwner: HWND,
+	<span class="kw">pub </span>hwndMoveSize: HWND,
+	<span class="kw">pub </span>hwndCaret: HWND,
+	<span class="kw">pub </span>rcCaret: RECT,
+}
+
+<span class="macro">impl_default_with_size!</span>(GUITHREADINFO, cbSize);
+
+<span class="doccomment">/// [`HELPINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-helpinfo)
+/// struct.
+///
+/// You cannot directly instantiate this object.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>HELPINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>iContextType: co::HELPINFO,
+	<span class="kw">pub </span>iCtrlId: i32,
+	hItemHandle: usize, <span class="comment">// HWND|HMENU
+	</span><span class="kw">pub </span>dwContextId: u32,
+	<span class="kw">pub </span>MousePos: POINT,
+}
+
+<span class="kw">impl </span>HELPINFO {
+	<span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>hItemHandle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HwndHmenu {
+		<span class="kw">match </span><span class="self">self</span>.iContextType {
+			co::HELPINFO::WINDOW =&gt; HwndHmenu::Hwnd(HWND(<span class="self">self</span>.hItemHandle <span class="kw">as _</span>)),
+			<span class="kw">_ </span>=&gt; HwndHmenu::Hmenu(HMENU(<span class="self">self</span>.hItemHandle <span class="kw">as _</span>)),
+		}
+	}
+}
+
+<span class="doccomment">/// [`MENUBARINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menubarinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>MENUBARINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>rcBar: RECT,
+	<span class="kw">pub </span>hMenu: HMENU,
+	<span class="kw">pub </span>hwndMenu: HWND,
+	fBarFocused: BOOL,
+	fFocused: BOOL,
+}
+
+<span class="macro">impl_default_with_size!</span>(MENUBARINFO, cbSize);
+
+<span class="kw">impl </span>MENUBARINFO {
+	<span class="macro">pub_fn_bool_get_set!</span>(fBarFocused, set_fBarFocused);
+	<span class="macro">pub_fn_bool_get_set!</span>(fFocused, set_fFocused);
+}
+
+<span class="doccomment">/// [`MENUINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menuinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>MENUINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>fMask: co::MIM,
+	<span class="kw">pub </span>dwStyle: co::MNS,
+	<span class="kw">pub </span>cyMax: u32,
+	<span class="kw">pub </span>hbrBack: HBRUSH,
+	<span class="kw">pub </span>dwContextHelpID: u32,
+	<span class="kw">pub </span>dwMenuData: usize,
+}
+
+<span class="macro">impl_default_with_size!</span>(MENUINFO, cbSize);
+
+<span class="doccomment">/// [`MENUITEMINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-menuiteminfow)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>MENUITEMINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>fMask: co::MIIM,
+	<span class="kw">pub </span>fType: co::MFT,
+	<span class="kw">pub </span>fState: co::MFS,
+	<span class="kw">pub </span>wID: u32,
+	<span class="kw">pub </span>hSubMenu: HMENU,
+	<span class="kw">pub </span>hbmpChecked: HBITMAP,
+	<span class="kw">pub </span>hbmpUnchecked: HBITMAP,
+	<span class="kw">pub </span>dwItemData: usize,
+	<span class="kw">pub </span>dwTypeData: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>cch: u32,
+	<span class="kw">pub </span>hbmpItem: HBITMAP,
+}
+
+<span class="macro">impl_default_with_size!</span>(MENUITEMINFO, cbSize);
+
+<span class="doccomment">/// [`MINMAXINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-minmaxinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Eq, PartialEq)]</span>
+<span class="kw">pub struct </span>MINMAXINFO {
+	ptReserved: POINT,
+	<span class="doccomment">/// The maximized width (x member) and the maximized height (y member) of
+	/// the window. For top-level windows, this value is based on the width of
+	/// the primary monitor.
+	</span><span class="kw">pub </span>ptMaxSize: POINT,
+	<span class="doccomment">/// The position of the left side of the maximized window (x member) and the
+	/// position of the top of the maximized window (y member). For top-level
+	/// windows, this value is based on the position of the primary monitor.
+	</span><span class="kw">pub </span>ptMaxPosition: POINT,
+	<span class="doccomment">/// The minimum tracking width (x member) and the minimum tracking height (y
+	/// member) of the window. This value can be obtained programmatically from
+	/// the system metrics [`SM::CXMINTRACK`](crate::co::SM::CXMINTRACK) and
+	/// [`SM::CYMINTRACK`](crate::co::SM::CYMINTRACK) (see the
+	/// [`GetSystemMetrics`](crate::GetSystemMetrics) function).
+	</span><span class="kw">pub </span>ptMinTrackSize: POINT,
+	<span class="doccomment">/// The maximum tracking width (x member) and the maximum tracking height (y
+	/// member) of the window. This value is based on the size of the virtual
+	/// screen and can be obtained programmatically from the system metrics
+	/// [`SM::CXMAXTRACK`](crate::co::SM::CXMAXTRACK) and
+	/// [`SM::CYMAXTRACK`](crate::co::SM::CYMAXTRACK) (see the
+	/// [`GetSystemMetrics`](crate::GetSystemMetrics) function).
+	</span><span class="kw">pub </span>ptMaxTrackSize: POINT,
+}
+
+<span class="doccomment">/// [`MONITORINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-monitorinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>MONITORINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>rcMonitor: RECT,
+	<span class="kw">pub </span>rcWork: RECT,
+	<span class="kw">pub </span>dwFlags: co::MONITORINFOF,
+}
+
+<span class="macro">impl_default_with_size!</span>(MONITORINFO, cbSize);
+
+<span class="doccomment">/// [`NCCALCSIZE_PARAMS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nccalcsize_params)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>NCCALCSIZE_PARAMS&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>rgrc: [RECT; <span class="number">3</span>],
+	lppos: <span class="kw-2">*mut </span>WINDOWPOS,
+
+	_lppos: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>WINDOWPOS&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NCCALCSIZE_PARAMS&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lppos, set_lppos, WINDOWPOS);
+}
+
+<span class="macro">impl_default!</span>(NCCALCSIZE_PARAMS, <span class="lifetime">&#39;a</span>);
+
+<span class="doccomment">/// [`PAINTSTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-paintstruct)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>PAINTSTRUCT {
+	<span class="kw">pub </span>hdc: HDC,
+	<span class="kw">pub </span>fErase: u32,
+	<span class="kw">pub </span>rcPaint: RECT,
+	fRestore: u32,
+	fIncUpdate: u32,
+	rgbReserved: [u8; <span class="number">32</span>],
+}
+
+<span class="macro">impl_default!</span>(PAINTSTRUCT);
+
+<span class="doccomment">/// [`POINT`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq, Hash)]</span>
+<span class="kw">pub struct </span>POINT {
+	<span class="kw">pub </span>x: i32,
+	<span class="kw">pub </span>y: i32,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>POINT {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;x {}, y {}&quot;</span>, <span class="self">self</span>.x, <span class="self">self</span>.y)
+	}
+}
+
+<span class="kw">impl </span>POINT {
+	<span class="doccomment">/// Creates a new `POINT`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>new(x: i32, y: i32) -&gt; POINT {
+		<span class="self">Self </span>{ x, y }
+	}
+
+	<span class="doccomment">/// Creates a new `POINT` by splitting `val` into two `u16` values, with
+	/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>from_u32(val: u32) -&gt; POINT {
+		<span class="self">Self</span>::new(LOWORD(val) <span class="kw">as _</span>, HIWORD(val) <span class="kw">as _</span>)
+	}
+
+	<span class="doccomment">/// Tells whether the struct contains exactly the given values.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>is(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; bool {
+		<span class="self">self</span>.x == x &amp;&amp; <span class="self">self</span>.y == y
+	}
+
+	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `x` and `y`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>into_u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		MAKEDWORD(<span class="self">self</span>.x <span class="kw">as _</span>, <span class="self">self</span>.y <span class="kw">as _</span>)
+	}
+}
+
+<span class="doccomment">/// [`RECT`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-rect)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq, Hash)]</span>
+<span class="kw">pub struct </span>RECT {
+	<span class="kw">pub </span>left: i32,
+	<span class="kw">pub </span>top: i32,
+	<span class="kw">pub </span>right: i32,
+	<span class="kw">pub </span>bottom: i32,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>RECT {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;left {}, top {}, right {}, bottom {}&quot;</span>,
+			<span class="self">self</span>.left, <span class="self">self</span>.top, <span class="self">self</span>.right, <span class="self">self</span>.bottom)
+	}
+}
+
+<span class="kw">impl </span>RECT {
+	<span class="doccomment">/// Tells whether the struct contains exactly the given values.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>is(<span class="kw-2">&amp;</span><span class="self">self</span>, left: i32, top: i32, right: i32, bottom: i32) -&gt; bool {
+		<span class="self">self</span>.left == left &amp;&amp; <span class="self">self</span>.top == top &amp;&amp; <span class="self">self</span>.right == right &amp;&amp; <span class="self">self</span>.bottom == bottom
+	}
+}
+
+<span class="doccomment">/// [`SCROLLINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-scrollinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>SCROLLINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>fMask: co::SIF,
+	<span class="kw">pub </span>nMin: i32,
+	<span class="kw">pub </span>nMax: i32,
+	<span class="kw">pub </span>nPage: u32,
+	<span class="kw">pub </span>nPos: i32,
+	<span class="kw">pub </span>nTrackPos: i32,
+}
+
+<span class="macro">impl_default_with_size!</span>(SCROLLINFO, cbSize);
+
+<span class="doccomment">/// [`SIZE`](https://docs.microsoft.com/en-us/windows/win32/api/windef/ns-windef-size)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default, Clone, Copy, Eq, PartialEq, Hash)]</span>
+<span class="kw">pub struct </span>SIZE {
+	<span class="kw">pub </span>cx: i32,
+	<span class="kw">pub </span>cy: i32,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>SIZE {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;cx {}, cy {}&quot;</span>, <span class="self">self</span>.cx, <span class="self">self</span>.cy)
+	}
+}
+
+<span class="kw">impl </span>SIZE {
+	<span class="doccomment">/// Creates a new `SIZE`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>new(cx: i32, cy: i32) -&gt; SIZE {
+		<span class="self">Self </span>{ cx, cy }
+	}
+
+	<span class="doccomment">/// Creates a new `SIZE` by splitting `val` into two `u16` values, with
+	/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>from_u32(val: u32) -&gt; SIZE {
+		<span class="self">Self</span>::new(LOWORD(val) <span class="kw">as _</span>, HIWORD(val) <span class="kw">as _</span>)
+	}
+
+	<span class="doccomment">/// Tells whether the struct contains exactly the given values.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>is(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: i32, cy: i32) -&gt; bool {
+		<span class="self">self</span>.cx == cx &amp;&amp; <span class="self">self</span>.cy == cy
+	}
+
+	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `cx` and `cy`.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>into_u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		MAKEDWORD(<span class="self">self</span>.cx <span class="kw">as _</span>, <span class="self">self</span>.cy <span class="kw">as _</span>)
+	}
+}
+
+<span class="doccomment">/// [`STYLESTRUCT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-stylestruct)
+/// struct.
+///
+/// You cannot directly instantiate this object.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="attribute">#[derive(Default)]</span>
+<span class="kw">pub struct </span>STYLESTRUCT {
+	styleOld: u32, <span class="comment">// both fields contain WS and WS_EX mixed
+	</span>styleNew: u32,
+}
+
+<span class="kw">impl </span>STYLESTRUCT {
+	<span class="doccomment">/// Returns the [`WS`](crate::co::WS) of `styleOld` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>styleOld_WS(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WS {
+		co::WS(<span class="self">self</span>.styleOld)
+	}
+
+	<span class="doccomment">/// Returns the [`WS_EX`](crate::co::WS_EX) of `styleOld` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>styleOld_WSEX(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WS_EX {
+		co::WS_EX(<span class="self">self</span>.styleOld)
+	}
+
+	<span class="doccomment">/// Returns the [`WS`](crate::co::WS) of `styleNew` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>styleNew_WS(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WS {
+		co::WS(<span class="self">self</span>.styleNew)
+	}
+
+	<span class="doccomment">/// Returns the [`WS_EX`](crate::co::WS_EX) of `styleNew` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>styleNew_WSEX(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WS_EX {
+		co::WS_EX(<span class="self">self</span>.styleNew)
+	}
+}
+
+<span class="doccomment">/// [`TITLEBARINFOEX`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-titlebarinfoex)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TITLEBARINFOEX {
+	cbSize: u32,
+	<span class="kw">pub </span>rcTitleBar: RECT,
+	<span class="kw">pub </span>rgstate: [co::STATE_SYSTEM; CCHILDREN_TITLEBAR + <span class="number">1</span>],
+	<span class="kw">pub </span>rgrect: [RECT; CCHILDREN_TITLEBAR + <span class="number">1</span>],
+}
+
+<span class="macro">impl_default_with_size!</span>(TITLEBARINFOEX, cbSize);
+
+<span class="doccomment">/// [`TRACKMOUSEEVENT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-trackmouseevent)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>TRACKMOUSEEVENT {
+	cbSize: u32,
+	<span class="kw">pub </span>dwFlags: co::TME,
+	<span class="kw">pub </span>hwndTrack: HWND,
+	<span class="kw">pub </span>dwHoverTime: u32,
+}
+
+<span class="macro">impl_default_with_size!</span>(TRACKMOUSEEVENT, cbSize);
+
+<span class="doccomment">/// [`WINDOWINFO`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>WINDOWINFO {
+	cbSize: u32,
+	<span class="kw">pub </span>rcWindow: RECT,
+	<span class="kw">pub </span>rcClient: RECT,
+	<span class="kw">pub </span>dwStyle: co::WS,
+	<span class="kw">pub </span>dwExStyle: co::WS_EX,
+	<span class="kw">pub </span>dwWindowStatus: u32,
+	<span class="kw">pub </span>cxWindowBorders: u32,
+	<span class="kw">pub </span>cyWindowBorders: u32,
+	<span class="kw">pub </span>atomWindowType: ATOM,
+	<span class="kw">pub </span>wCreatorVersion: u16,
+}
+
+<span class="macro">impl_default_with_size!</span>(WINDOWINFO, cbSize);
+
+<span class="doccomment">/// [`WINDOWPLACEMENT`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowplacement)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>WINDOWPLACEMENT {
+	length: u32,
+	<span class="kw">pub </span>flags: co::WPF,
+	<span class="kw">pub </span>showCmd: co::SW,
+	<span class="kw">pub </span>ptMinPosition: POINT,
+	<span class="kw">pub </span>ptMaxPosition: POINT,
+	<span class="kw">pub </span>rcNormalPosition: RECT,
+	<span class="kw">pub </span>rcDevice: RECT,
+}
+
+<span class="macro">impl_default_with_size!</span>(WINDOWPLACEMENT, length);
+
+<span class="doccomment">/// [`WINDOWPOS`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowpos)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>WINDOWPOS {
+	<span class="kw">pub </span>hwnd: HWND,
+	hwndInsertAfter: isize,
+	<span class="kw">pub </span>x: i32,
+	<span class="kw">pub </span>y: i32,
+	<span class="kw">pub </span>cx: i32,
+	<span class="kw">pub </span>cy: i32,
+	<span class="kw">pub </span>flags: co::SWP,
+}
+
+<span class="macro">impl_default!</span>(WINDOWPOS);
+
+<span class="kw">impl </span>WINDOWPOS {
+	<span class="doccomment">/// Returns the `hwndInsertAfter` field.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>hwndInsertAfter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HwndPlace {
+		<span class="kw">match </span><span class="self">self</span>.hwndInsertAfter {
+			<span class="number">0 </span>| <span class="number">1 </span>| -<span class="number">1 </span>| -<span class="number">2 </span>=&gt; HwndPlace::Place(co::HWND_PLACE(<span class="self">self</span>.hwndInsertAfter)),
+			<span class="kw">_ </span>=&gt; HwndPlace::Hwnd(HWND(<span class="self">self</span>.hwndInsertAfter <span class="kw">as _</span>)),
+		}
+	}
+
+	<span class="doccomment">/// Sets the `hwndInsertAfter` field.
+	</span><span class="kw">pub fn </span>set_hwndInsertAfter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, hwnd: HwndPlace) {
+		<span class="self">self</span>.hwndInsertAfter = <span class="kw">match </span>hwnd {
+			HwndPlace::Hwnd(h) =&gt; h.<span class="number">0 </span><span class="kw">as _</span>,
+			HwndPlace::Place(v) =&gt; v.into(),
+			HwndPlace::None =&gt; <span class="number">0</span>,
 		};
 	}
 }
 
-<span class="doccomment">/// [`WNDCLASSEX`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-wndclassexw)</span>
-<span class="doccomment">/// struct.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WNDCLASSEX</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">cbSize</span>: <span class="ident">u32</span>,
-	<span class="kw">pub</span> <span class="ident">style</span>: <span class="ident">co::CS</span>,
-	<span class="kw">pub</span> <span class="ident">lpfnWndProc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WNDPROC</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">cbClsExtra</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">cbWndExtra</span>: <span class="ident">i32</span>,
-	<span class="kw">pub</span> <span class="ident">hInstance</span>: <span class="ident">HINSTANCE</span>,
-	<span class="kw">pub</span> <span class="ident">hIcon</span>: <span class="ident">HICON</span>,
-	<span class="kw">pub</span> <span class="ident">hCursor</span>: <span class="ident">HCURSOR</span>,
-	<span class="kw">pub</span> <span class="ident">hbrBackground</span>: <span class="ident">HBRUSH</span>,
-	<span class="ident">lpszMenuName</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>, <span class="comment">// u16 resource ID</span>
-	<span class="ident">lpszClassName</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
-	<span class="kw">pub</span> <span class="ident">hIconSm</span>: <span class="ident">HICON</span>,
+<span class="doccomment">/// [`WNDCLASSEX`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-wndclassexw)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>WNDCLASSEX&lt;<span class="lifetime">&#39;a</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>style: co::CS,
+	<span class="kw">pub </span>lpfnWndProc: <span class="prelude-ty">Option</span>&lt;WNDPROC&gt;,
+	<span class="kw">pub </span>cbClsExtra: i32,
+	<span class="kw">pub </span>cbWndExtra: i32,
+	<span class="kw">pub </span>hInstance: HINSTANCE,
+	<span class="kw">pub </span>hIcon: HICON,
+	<span class="kw">pub </span>hCursor: HCURSOR,
+	<span class="kw">pub </span>hbrBackground: HBRUSH,
+	lpszMenuName: <span class="kw-2">*mut </span>u16, <span class="comment">// u16 resource ID
+	</span>lpszClassName: <span class="kw-2">*mut </span>u16,
+	<span class="kw">pub </span>hIconSm: HICON,
 
-	<span class="ident">_lpszClassName</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">u16</span><span class="op">&gt;</span>,
+	_lpszClassName: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
 }
 
-<span class="macro">impl_default_with_size!</span>(<span class="ident">WNDCLASSEX</span>, <span class="ident">cbSize</span>, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_default_with_size!</span>(WNDCLASSEX, cbSize, <span class="lifetime">&#39;a</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">WNDCLASSEX</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="macro">pub_fn_resource_id_get_set!</span>(<span class="ident">lpszMenuName</span>, <span class="ident">set_lpszMenuName</span>);
-	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, <span class="ident">lpszClassName</span>, <span class="ident">set_lpszClassName</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; WNDCLASSEX&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_resource_id_get_set!</span>(lpszMenuName, set_lpszMenuName);
+	<span class="macro">pub_fn_string_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpszClassName, set_lpszClassName);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

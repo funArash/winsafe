@@ -81,88 +81,88 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">comctl_ole</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl_ole::decl::TASKDIALOGCONFIG</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::BOOL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl::HrResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
+<span class="kw">use crate</span>::{co, comctl_ole};
+<span class="kw">use </span><span class="kw">crate</span>::comctl_ole::decl::TASKDIALOGCONFIG;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 
-<span class="doccomment">/// [`TaskDialogIndirect`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-taskdialogindirect)</span>
-<span class="doccomment">/// function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns:</span>
-<span class="doccomment">/// * the selected `co::DLGID` button;</span>
-<span class="doccomment">/// * if `pRadioButtons` of [`TASKDIALOGCONFIG`](crate::TASKDIALOGCONFIG) struct</span>
-<span class="doccomment">/// was set, the `u16` control ID of one of the specified radio buttons;</span>
-<span class="doccomment">/// otherwise zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you don&#39;t need all customizations, consider the</span>
-<span class="doccomment">/// [`TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{</span>
-<span class="doccomment">///     co, HWND, IconIdTdicon, TASKDIALOG_BUTTON, TASKDIALOGCONFIG,</span>
-<span class="doccomment">///     TaskDialogIndirect, WString,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let hwnd: HWND; // initialized somewhere</span>
-<span class="doccomment">/// # let hwnd = HWND::NULL;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut tdc = TASKDIALOGCONFIG::default();</span>
-<span class="doccomment">/// tdc.hwndParent = hwnd;</span>
-<span class="doccomment">/// tdc.dwCommonButtons = co::TDCBF::YES | co::TDCBF::NO;</span>
-<span class="doccomment">/// tdc.set_pszMainIcon(IconIdTdicon::Tdicon(co::TD_ICON::INFORMATION));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut title = WString::from_str(&quot;Title&quot;);</span>
-<span class="doccomment">/// tdc.set_pszWindowTitle(Some(&amp;mut title));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut header = WString::from_str(&quot;Header&quot;);</span>
-<span class="doccomment">/// tdc.set_pszMainInstruction(Some(&amp;mut header));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut body = WString::from_str(&quot;Body&quot;);</span>
-<span class="doccomment">/// tdc.set_pszContent(Some(&amp;mut body));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A custom button to appear before Yes and No.</span>
-<span class="doccomment">/// let mut btn1 = TASKDIALOG_BUTTON::default();</span>
-<span class="doccomment">/// let mut btn1_text = WString::from_str(&quot;Hello&quot;);</span>
-<span class="doccomment">/// btn1.set_pszButtonText(Some(&amp;mut btn1_text));</span>
-<span class="doccomment">/// btn1.set_nButtonID(333); // this ID is returned if user clicks this button</span>
-<span class="doccomment">/// let btns_slice = &amp;mut [btn1];</span>
-<span class="doccomment">/// tdc.set_pButtons(Some(btns_slice));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// TaskDialogIndirect(&amp;tdc, None)?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;comctl&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ole&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">TaskDialogIndirect</span>(
-	<span class="ident">task_config</span>: <span class="kw-2">&amp;</span><span class="ident">TASKDIALOGCONFIG</span>,
-	<span class="ident">verification_flag_checked</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">bool</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">co::DLGID</span>, <span class="ident">u16</span>)<span class="op">&gt;</span>
+<span class="doccomment">/// [`TaskDialogIndirect`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-taskdialogindirect)
+/// function.
+///
+/// Returns:
+/// * the selected `co::DLGID` button;
+/// * if `pRadioButtons` of [`TASKDIALOGCONFIG`](crate::TASKDIALOGCONFIG) struct
+/// was set, the `u16` control ID of one of the specified radio buttons;
+/// otherwise zero.
+///
+/// If you don&#39;t need all customizations, consider the
+/// [`TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) method.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{
+///     co, HWND, IconIdTdicon, TASKDIALOG_BUTTON, TASKDIALOGCONFIG,
+///     TaskDialogIndirect, WString,
+/// };
+///
+/// let hwnd: HWND; // initialized somewhere
+/// # let hwnd = HWND::NULL;
+///
+/// let mut tdc = TASKDIALOGCONFIG::default();
+/// tdc.hwndParent = hwnd;
+/// tdc.dwCommonButtons = co::TDCBF::YES | co::TDCBF::NO;
+/// tdc.set_pszMainIcon(IconIdTdicon::Tdicon(co::TD_ICON::INFORMATION));
+///
+/// let mut title = WString::from_str(&quot;Title&quot;);
+/// tdc.set_pszWindowTitle(Some(&amp;mut title));
+///
+/// let mut header = WString::from_str(&quot;Header&quot;);
+/// tdc.set_pszMainInstruction(Some(&amp;mut header));
+///
+/// let mut body = WString::from_str(&quot;Body&quot;);
+/// tdc.set_pszContent(Some(&amp;mut body));
+///
+/// // A custom button to appear before Yes and No.
+/// let mut btn1 = TASKDIALOG_BUTTON::default();
+/// let mut btn1_text = WString::from_str(&quot;Hello&quot;);
+/// btn1.set_pszButtonText(Some(&amp;mut btn1_text));
+/// btn1.set_nButtonID(333); // this ID is returned if user clicks this button
+/// let btns_slice = &amp;mut [btn1];
+/// tdc.set_pButtons(Some(btns_slice));
+///
+/// TaskDialogIndirect(&amp;tdc, None)?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))))]</span>
+<span class="kw">pub fn </span>TaskDialogIndirect(
+	task_config: <span class="kw-2">&amp;</span>TASKDIALOGCONFIG,
+	verification_flag_checked: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>bool&gt;) -&gt; HrResult&lt;(co::DLGID, u16)&gt;
 {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pn_button</span> <span class="op">=</span> <span class="ident">i32::default</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pn_radio_button</span> <span class="op">=</span> <span class="ident">i32::default</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pf_bool</span>: <span class="ident">BOOL</span> <span class="op">=</span> <span class="number">0</span>;
+	<span class="kw">let </span><span class="kw-2">mut </span>pn_button = i32::default();
+	<span class="kw">let </span><span class="kw-2">mut </span>pn_radio_button = i32::default();
+	<span class="kw">let </span><span class="kw-2">mut </span>pf_bool: BOOL = <span class="number">0</span>;
 
-	<span class="ident">ok_to_hrresult</span>(
-		<span class="kw">unsafe</span> {
-			<span class="ident">comctl_ole::ffi::TaskDialogIndirect</span>(
-				<span class="ident">task_config</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="kw-2">&amp;mut</span> <span class="ident">pn_button</span>,
-				<span class="kw-2">&amp;mut</span> <span class="ident">pn_radio_button</span>,
-				<span class="ident">verification_flag_checked</span>.<span class="ident">as_ref</span>()
-					.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">pf_bool</span>),
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
+			comctl_ole::ffi::TaskDialogIndirect(
+				task_config <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				<span class="kw-2">&amp;mut </span>pn_button,
+				<span class="kw-2">&amp;mut </span>pn_radio_button,
+				verification_flag_checked.as_ref()
+					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| <span class="kw-2">&amp;mut </span>pf_bool),
 			)
 		},
 	)<span class="question-mark">?</span>;
 
-	<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pf</span>) <span class="op">=</span> <span class="ident">verification_flag_checked</span> {
-		<span class="kw-2">*</span><span class="ident">pf</span> <span class="op">=</span> <span class="ident">pf_bool</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+	<span class="kw">if let </span><span class="prelude-val">Some</span>(pf) = verification_flag_checked {
+		<span class="kw-2">*</span>pf = pf_bool != <span class="number">0</span>;
 	}
-	<span class="prelude-val">Ok</span>((<span class="ident">co::DLGID</span>(<span class="ident">pn_button</span> <span class="kw">as</span> <span class="kw">_</span>), <span class="ident">pn_radio_button</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="prelude-val">Ok</span>((co::DLGID(pn_button <span class="kw">as _</span>), pn_radio_button <span class="kw">as _</span>))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -73,80 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">kernel</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">HandleClose</span>};
+<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HACCESSTOKEN</span>: <span class="string">&quot;kernel&quot;</span>;
-	<span class="doccomment">/// Handle to an</span>
-	<span class="doccomment">/// [access token](https://docs.microsoft.com/en-us/windows/win32/secgloss/a-gly).</span>
-	<span class="doccomment">/// Originally just a `HANDLE`.</span>
-}
+<span class="macro">impl_handle!</span> { HACCESSTOKEN: <span class="string">&quot;kernel&quot;</span>;
+	<span class="doccomment">/// Handle to an
+	/// [access token](https://docs.microsoft.com/en-us/windows/win32/secgloss/a-gly).
+	/// Originally just a `HANDLE`.
+</span>}
 
-<span class="kw">impl</span> <span class="ident">HandleClose</span> <span class="kw">for</span> <span class="ident">HACCESSTOKEN</span> {}
-<span class="kw">impl</span> <span class="ident">kernel_Haccesstoken</span> <span class="kw">for</span> <span class="ident">HACCESSTOKEN</span> {}
+<span class="kw">impl </span>HandleClose <span class="kw">for </span>HACCESSTOKEN {}
+<span class="kw">impl </span>kernel_Haccesstoken <span class="kw">for </span>HACCESSTOKEN {}
 
-<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for</span>
-<span class="doccomment">/// [`HACCESSTOKEN`](crate::HACCESSTOKEN).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">kernel_Haccesstoken</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`DuplicateToken`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetoken)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">DuplicateToken</span>(<span class="self">self</span>,
-		<span class="ident">level</span>: <span class="ident">co::SECURITY_IMPERSONATION</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HACCESSTOKEN</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
+/// [`HACCESSTOKEN`](crate::HACCESSTOKEN).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
+<span class="kw">pub trait </span>kernel_Haccesstoken: Handle {
+	<span class="doccomment">/// [`DuplicateToken`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetoken)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>DuplicateToken(<span class="self">self</span>,
+		level: co::SECURITY_IMPERSONATION) -&gt; SysResult&lt;HACCESSTOKEN&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">HACCESSTOKEN::NULL</span>;
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">kernel::ffi::DuplicateToken</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">level</span>.<span class="number">0</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">handle</span>.<span class="number">0</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::DuplicateToken(
+					<span class="self">self</span>.as_ptr(),
+					level.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">handle</span>)
+		).map(|<span class="kw">_</span>| handle)
 	}
 
-	<span class="doccomment">/// [`GetCurrentProcessToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocesstoken)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetCurrentProcessToken</span>() -&gt; <span class="ident">HACCESSTOKEN</span> {
-		<span class="ident">HACCESSTOKEN</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetCurrentProcessToken</span>() })
+	<span class="doccomment">/// [`GetCurrentProcessToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocesstoken)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetCurrentProcessToken() -&gt; HACCESSTOKEN {
+		HACCESSTOKEN(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcessToken() })
 	}
 
-	<span class="doccomment">/// [`GetCurrentThreadEffectiveToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadeffectivetoken)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetCurrentThreadEffectiveToken</span>() -&gt; <span class="ident">HACCESSTOKEN</span> {
-		<span class="ident">HACCESSTOKEN</span>(<span class="kw">unsafe</span> { <span class="ident">kernel::ffi::GetCurrentThreadEffectiveToken</span>() })
+	<span class="doccomment">/// [`GetCurrentThreadEffectiveToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadeffectivetoken)
+	/// static method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetCurrentThreadEffectiveToken() -&gt; HACCESSTOKEN {
+		HACCESSTOKEN(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThreadEffectiveToken() })
 	}
 
-	<span class="doccomment">/// [`IsTokenRestricted`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-istokenrestricted)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">IsTokenRestricted</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">kernel::ffi::IsTokenRestricted</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-				<span class="ident">co::ERROR::SUCCESS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false</span>
-				<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+	<span class="doccomment">/// [`IsTokenRestricted`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-istokenrestricted)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>IsTokenRestricted(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
+		<span class="kw">match unsafe </span>{ kernel::ffi::IsTokenRestricted(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false
+				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

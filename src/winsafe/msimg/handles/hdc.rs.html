@@ -41,48 +41,48 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WinResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msimg</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">HDC</span>, <span class="ident">POINT</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::msimg;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HDC, POINT, SIZE};
 
-<span class="kw">impl</span> <span class="ident">msimg_Hdc</span> <span class="kw">for</span> <span class="ident">HDC</span> {}
+<span class="kw">impl </span>msimg_Hdc <span class="kw">for </span>HDC {}
 
-<span class="doccomment">/// This trait is enabled with the `msimg` feature, and provides methods for</span>
-<span class="doccomment">/// [`HDC`](crate::HDC).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;msimg&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">msimg_Hdc</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`TransparentBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-transparentblt)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">TransparentBlt</span>(<span class="self">self</span>,
-		<span class="ident">dest_top_left</span>: <span class="ident">POINT</span>, <span class="ident">dest_sz</span>: <span class="ident">SIZE</span>,
-		<span class="ident">hdc_src</span>: <span class="ident">HDC</span>,
-		<span class="ident">src_top_left</span>: <span class="ident">POINT</span>, <span class="ident">src_sz</span>: <span class="ident">SIZE</span>,
-		<span class="ident">color_transparent</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `msimg` feature, and provides methods for
+/// [`HDC`](crate::HDC).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;msimg&quot;</span>)))]</span>
+<span class="kw">pub trait </span>msimg_Hdc: Handle {
+	<span class="doccomment">/// [`TransparentBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-transparentblt)
+	/// method.
+	</span><span class="kw">fn </span>TransparentBlt(<span class="self">self</span>,
+		dest_top_left: POINT, dest_sz: SIZE,
+		hdc_src: HDC,
+		src_top_left: POINT, src_sz: SIZE,
+		color_transparent: COLORREF) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">msimg::ffi::TransparentBlt</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">dest_top_left</span>.<span class="ident">x</span>, <span class="ident">dest_top_left</span>.<span class="ident">y</span>,
-					<span class="ident">dest_sz</span>.<span class="ident">cx</span>, <span class="ident">dest_sz</span>.<span class="ident">cy</span>,
-					<span class="ident">hdc_src</span>.<span class="number">0</span>,
-					<span class="ident">src_top_left</span>.<span class="ident">x</span>, <span class="ident">src_top_left</span>.<span class="ident">y</span>,
-					<span class="ident">src_sz</span>.<span class="ident">cx</span>, <span class="ident">src_sz</span>.<span class="ident">cy</span>,
-					<span class="ident">color_transparent</span>.<span class="number">0</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				msimg::ffi::TransparentBlt(
+					<span class="self">self</span>.as_ptr(),
+					dest_top_left.x, dest_top_left.y,
+					dest_sz.cx, dest_sz.cy,
+					hdc_src.<span class="number">0</span>,
+					src_top_left.x, src_top_left.y,
+					src_sz.cx, src_sz.cy,
+					color_transparent.<span class="number">0</span>,
 				)
 			},
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

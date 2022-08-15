@@ -275,282 +275,282 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any::Any</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events</span>::{<span class="ident">WindowEvents</span>, <span class="ident">WindowEventsAll</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::wm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::user_Hwnd</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">HwndFocus</span>};
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::{WindowEvents, WindowEventsAll};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::msg::wm;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::user_Hwnd;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, HwndFocus};
 
-<span class="doccomment">/// Any window. Exposes the underlying window handle.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiWindow</span> {
-	<span class="doccomment">/// Returns the underlying handle for this control.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that the handle is initially null, receiving an actual value only</span>
-	<span class="doccomment">/// after the control is physically created, what usually happens right</span>
-	<span class="doccomment">/// before</span>
-	<span class="doccomment">/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)</span>
-	<span class="doccomment">/// or</span>
-	<span class="doccomment">/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)</span>
-	<span class="doccomment">/// events.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">hwnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HWND</span>;
+<span class="doccomment">/// Any window. Exposes the underlying window handle.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiWindow {
+	<span class="doccomment">/// Returns the underlying handle for this control.
+	///
+	/// Note that the handle is initially null, receiving an actual value only
+	/// after the control is physically created, what usually happens right
+	/// before
+	/// [`WM_CREATE`](https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-create)
+	/// or
+	/// [`WM_INITDIALOG`](https://docs.microsoft.com/en-us/windows/win32/dlgbox/wm-initdialog)
+	/// events.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HWND;
 
-	<span class="doccomment">/// Converts a reference to the</span>
-	<span class="doccomment">/// [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html) trait. This is</span>
-	<span class="doccomment">/// useful when storing a collection of polymorphic controls, because `Any`</span>
-	<span class="doccomment">/// allows downcasting.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use std::sync::Arc;</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let parent: gui::WindowMain; // initialized somewhere</span>
-	<span class="doccomment">/// # let parent = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let ctrls: Vec&lt;Arc&lt;dyn GuiNativeControl&gt;&gt; = vec![</span>
-	<span class="doccomment">///     Arc::new( gui::Edit::new(&amp;parent, gui::EditOpts::default()) ),</span>
-	<span class="doccomment">///     Arc::new( gui::Button::new(&amp;parent, gui::ButtonOpts::default()) ),</span>
-	<span class="doccomment">/// ];</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let edit = ctrls[0].as_any().downcast_ref::&lt;gui::Edit&gt;()</span>
-	<span class="doccomment">///     .expect(&quot;This Edit downcast should never fail.&quot;);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// edit.set_text(&quot;Foo&quot;);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">as_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Any</span>;
+	<span class="doccomment">/// Converts a reference to the
+	/// [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html) trait. This is
+	/// useful when storing a collection of polymorphic controls, because `Any`
+	/// allows downcasting.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use std::sync::Arc;
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let parent: gui::WindowMain; // initialized somewhere
+	/// # let parent = gui::WindowMain::new(gui::WindowMainOpts::default());
+	///
+	/// let ctrls: Vec&lt;Arc&lt;dyn GuiNativeControl&gt;&gt; = vec![
+	///     Arc::new( gui::Edit::new(&amp;parent, gui::EditOpts::default()) ),
+	///     Arc::new( gui::Button::new(&amp;parent, gui::ButtonOpts::default()) ),
+	/// ];
+	///
+	/// let edit = ctrls[0].as_any().downcast_ref::&lt;gui::Edit&gt;()
+	///     .expect(&quot;This Edit downcast should never fail.&quot;);
+	///
+	/// edit.set_text(&quot;Foo&quot;);
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any;
 }
 
-<span class="doccomment">/// Any window which can get/set text.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiWindowText</span>: <span class="ident">GuiWindow</span> {
-	<span class="doccomment">/// Sets the text by calling</span>
-	<span class="doccomment">/// [`HWND::SetWindowText`](crate::prelude::user_Hwnd::SetWindowText).</span>
-	<span class="kw">fn</span> <span class="ident">set_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SetWindowText</span>(<span class="ident">text</span>).<span class="ident">unwrap</span>();
+<span class="doccomment">/// Any window which can get/set text.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiWindowText: GuiWindow {
+	<span class="doccomment">/// Sets the text by calling
+	/// [`HWND::SetWindowText`](crate::prelude::user_Hwnd::SetWindowText).
+	</span><span class="kw">fn </span>set_text(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+		<span class="self">self</span>.hwnd().SetWindowText(text).unwrap();
 	}
 
-	<span class="doccomment">/// Retrieves the text by calling</span>
-	<span class="doccomment">/// [`HWND::GetWindowText`](crate::prelude::user_Hwnd::GetWindowText).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-		<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">GetWindowText</span>().<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Retrieves the text by calling
+	/// [`HWND::GetWindowText`](crate::prelude::user_Hwnd::GetWindowText).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+		<span class="self">self</span>.hwnd().GetWindowText().unwrap()
 	}
 }
 
-<span class="doccomment">/// Any window which can host child controls.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiParent</span>: <span class="ident">GuiWindow</span> {
-	<span class="doccomment">/// Exposes the window events and control notifications.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the window is already created. Events must be set before</span>
-	<span class="doccomment">/// window creation.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEventsAll</span>;
+<span class="doccomment">/// Any window which can host child controls.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiParent: GuiWindow {
+	<span class="doccomment">/// Exposes the window events and control notifications.
+	///
+	/// # Panics
+	///
+	/// Panics if the window is already created. Events must be set before
+	/// window creation.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll;
 
-	<span class="doccomment">/// Returns a pointer to the inner base window structure.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Used internally by the library.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span>;
+	<span class="doccomment">/// Returns a pointer to the inner base window structure.
+	///
+	/// Used internally by the library.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">unsafe fn </span>as_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
 }
 
-<span class="doccomment">/// Allows a window to spawn new threads which can return errors, and run</span>
-<span class="doccomment">/// closures in the original UI thread.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiThread</span>: <span class="ident">GuiParent</span> {
-	<span class="doccomment">/// This method calls</span>
-	<span class="doccomment">/// [`std::thread::spawn`](https://doc.rust-lang.org/std/thread/fn.spawn.html),</span>
-	<span class="doccomment">/// but it allows the returning of an error value. This error value will be</span>
-	<span class="doccomment">/// forwarded to the original UI thread, allowing it to be caught at</span>
-	<span class="doccomment">/// [`WindowMain::run_main`](crate::gui::WindowMain::run_main).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// It&#39;s a way to ensure that, upon an unexpected error, you application</span>
-	<span class="doccomment">/// will be terminated gracefully.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The example below shows the event of a</span>
-	<span class="doccomment">/// [button click](crate::gui::events::ButtonEvents::bn_clicked) which</span>
-	<span class="doccomment">/// spawns a new thread.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, AnyResult, GetCurrentThreadId};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// let btn: gui::Button;</span>
-	<span class="doccomment">/// # let btn = gui::Button::new(&amp;wnd, gui::ButtonOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// btn.on().bn_clicked({</span>
-	<span class="doccomment">///     let wnd = wnd.clone();</span>
-	<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
-	<span class="doccomment">///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///         wnd.spawn_new_thread({</span>
-	<span class="doccomment">///             let wnd = wnd.clone();</span>
-	<span class="doccomment">///             move || {</span>
-	<span class="doccomment">///                 println!(&quot;This is another thread: {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///                 if 1 != 2 {</span>
-	<span class="doccomment">///                     Err(&quot;Unexpected condition, goodbye.&quot;.into())</span>
-	<span class="doccomment">///                 } else {</span>
-	<span class="doccomment">///                     Ok(())</span>
-	<span class="doccomment">///                 }</span>
-	<span class="doccomment">///             }</span>
-	<span class="doccomment">///         });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///         Ok(())</span>
-	<span class="doccomment">///     }</span>
-	<span class="doccomment">/// });</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="doccomment">/// Allows a window to spawn new threads which can return errors, and run
+/// closures in the original UI thread.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiThread: GuiParent {
+	<span class="doccomment">/// This method calls
+	/// [`std::thread::spawn`](https://doc.rust-lang.org/std/thread/fn.spawn.html),
+	/// but it allows the returning of an error value. This error value will be
+	/// forwarded to the original UI thread, allowing it to be caught at
+	/// [`WindowMain::run_main`](crate::gui::WindowMain::run_main).
+	///
+	/// It&#39;s a way to ensure that, upon an unexpected error, you application
+	/// will be terminated gracefully.
+	///
+	/// # Examples
+	///
+	/// The example below shows the event of a
+	/// [button click](crate::gui::events::ButtonEvents::bn_clicked) which
+	/// spawns a new thread.
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{gui, AnyResult, GetCurrentThreadId};
+	///
+	/// let wnd: gui::WindowMain; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// let btn: gui::Button;
+	/// # let btn = gui::Button::new(&amp;wnd, gui::ButtonOpts::default());
+	///
+	/// btn.on().bn_clicked({
+	///     let wnd = wnd.clone();
+	///     move || -&gt; AnyResult&lt;()&gt; {
+	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
+	///
+	///         wnd.spawn_new_thread({
+	///             let wnd = wnd.clone();
+	///             move || {
+	///                 println!(&quot;This is another thread: {:#x}&quot;, GetCurrentThreadId());
+	///                 if 1 != 2 {
+	///                     Err(&quot;Unexpected condition, goodbye.&quot;.into())
+	///                 } else {
+	///                     Ok(())
+	///                 }
+	///             }
+	///         });
+	///
+	///         Ok(())
+	///     }
+	/// });
+	/// ```
+	</span><span class="kw">fn </span>spawn_new_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>;
 
-	<span class="doccomment">/// Runs a closure synchronously in the window&#39;s original UI thread,</span>
-	<span class="doccomment">/// allowing UI updates without the risk of a deadlock.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Rationale</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If you perform a very long task in the UI thread, the UI freezes until</span>
-	<span class="doccomment">/// the task is complete – this may cause the impression that your</span>
-	<span class="doccomment">/// application crashed. That&#39;s why long tasks should be performed in</span>
-	<span class="doccomment">/// parallel threads. However, at some point you&#39;ll want to update the UI to</span>
-	<span class="doccomment">/// reflect the task progress, but if you update the UI from another thread</span>
-	<span class="doccomment">/// (different from the original UI thread), the UI may deadlock, and you</span>
-	<span class="doccomment">/// application crashes.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This is what this `run_ui_thread` does, step-by-step:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// 1. blocks current thread;</span>
-	<span class="doccomment">/// 2. switches to the window&#39;s original UI thread;</span>
-	<span class="doccomment">/// 3. runs the given `FnOnce`;</span>
-	<span class="doccomment">/// 4. switches back to the first thread, which is then unblocked.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// When working in a parallel thread, you **must** call `run_ui_thread` to</span>
-	<span class="doccomment">/// update the UI.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The example below shows the event of a</span>
-	<span class="doccomment">/// [button click](crate::gui::events::ButtonEvents::bn_clicked) which</span>
-	<span class="doccomment">/// starts a long task in a parallel thread. As it progresses, the status is</span>
-	<span class="doccomment">/// printed at the windows&#39;s titlebar.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{gui, AnyResult, GetCurrentThreadId, Sleep};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let wnd: gui::WindowMain; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// let btn: gui::Button;</span>
-	<span class="doccomment">/// # let btn = gui::Button::new(&amp;wnd, gui::ButtonOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// btn.on().bn_clicked({</span>
-	<span class="doccomment">///     let wnd = wnd.clone();</span>
-	<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
-	<span class="doccomment">///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///         std::thread::spawn({</span>
-	<span class="doccomment">///             let wnd = wnd.clone();</span>
-	<span class="doccomment">///             move || {</span>
-	<span class="doccomment">///                 println!(&quot;Parallel task starts at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///                 Sleep(2000);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///                 wnd.run_ui_thread({</span>
-	<span class="doccomment">///                     let wnd = wnd.clone();</span>
-	<span class="doccomment">///                     move || -&gt; AnyResult&lt;()&gt; {</span>
-	<span class="doccomment">///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///                         wnd.hwnd().SetWindowText(&quot;Status... 50%&quot;)?;</span>
-	<span class="doccomment">///                         Ok(())</span>
-	<span class="doccomment">///                     }</span>
-	<span class="doccomment">///                 });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///                 println!(&quot;Parallel task keeps going at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///                 Sleep(2000);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///                 wnd.run_ui_thread({</span>
-	<span class="doccomment">///                     let wnd = wnd.clone();</span>
-	<span class="doccomment">///                     move || -&gt; AnyResult&lt;()&gt; {</span>
-	<span class="doccomment">///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());</span>
-	<span class="doccomment">///                         wnd.hwnd().SetWindowText(&quot;Status... 100%&quot;)?;</span>
-	<span class="doccomment">///                         Ok(())</span>
-	<span class="doccomment">///                     }</span>
-	<span class="doccomment">///                 });</span>
-	<span class="doccomment">///             }</span>
-	<span class="doccomment">///         });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///         Ok(())</span>
-	<span class="doccomment">///     }</span>
-	<span class="doccomment">/// });</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+	<span class="doccomment">/// Runs a closure synchronously in the window&#39;s original UI thread,
+	/// allowing UI updates without the risk of a deadlock.
+	///
+	/// # Rationale
+	///
+	/// If you perform a very long task in the UI thread, the UI freezes until
+	/// the task is complete – this may cause the impression that your
+	/// application crashed. That&#39;s why long tasks should be performed in
+	/// parallel threads. However, at some point you&#39;ll want to update the UI to
+	/// reflect the task progress, but if you update the UI from another thread
+	/// (different from the original UI thread), the UI may deadlock, and you
+	/// application crashes.
+	///
+	/// This is what this `run_ui_thread` does, step-by-step:
+	///
+	/// 1. blocks current thread;
+	/// 2. switches to the window&#39;s original UI thread;
+	/// 3. runs the given `FnOnce`;
+	/// 4. switches back to the first thread, which is then unblocked.
+	///
+	/// When working in a parallel thread, you **must** call `run_ui_thread` to
+	/// update the UI.
+	///
+	/// # Examples
+	///
+	/// The example below shows the event of a
+	/// [button click](crate::gui::events::ButtonEvents::bn_clicked) which
+	/// starts a long task in a parallel thread. As it progresses, the status is
+	/// printed at the windows&#39;s titlebar.
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{gui, AnyResult, GetCurrentThreadId, Sleep};
+	///
+	/// let wnd: gui::WindowMain; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// let btn: gui::Button;
+	/// # let btn = gui::Button::new(&amp;wnd, gui::ButtonOpts::default());
+	///
+	/// btn.on().bn_clicked({
+	///     let wnd = wnd.clone();
+	///     move || -&gt; AnyResult&lt;()&gt; {
+	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
+	///
+	///         std::thread::spawn({
+	///             let wnd = wnd.clone();
+	///             move || {
+	///                 println!(&quot;Parallel task starts at {:#x}&quot;, GetCurrentThreadId());
+	///                 Sleep(2000);
+	///
+	///                 wnd.run_ui_thread({
+	///                     let wnd = wnd.clone();
+	///                     move || -&gt; AnyResult&lt;()&gt; {
+	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
+	///                         wnd.hwnd().SetWindowText(&quot;Status... 50%&quot;)?;
+	///                         Ok(())
+	///                     }
+	///                 });
+	///
+	///                 println!(&quot;Parallel task keeps going at {:#x}&quot;, GetCurrentThreadId());
+	///                 Sleep(2000);
+	///
+	///                 wnd.run_ui_thread({
+	///                     let wnd = wnd.clone();
+	///                     move || -&gt; AnyResult&lt;()&gt; {
+	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
+	///                         wnd.hwnd().SetWindowText(&quot;Status... 100%&quot;)?;
+	///                         Ok(())
+	///                     }
+	///                 });
+	///             }
+	///         });
+	///
+	///         Ok(())
+	///     }
+	/// });
+	/// ```
+	</span><span class="kw">fn </span>run_ui_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>;
 }
 
-<span class="doccomment">/// Any child window.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiChild</span>: <span class="ident">GuiWindow</span> {
-	<span class="doccomment">/// Returns the control ID, which is defined at control creation.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The control ID should be unique within a parent.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">ctrl_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span>;
+<span class="doccomment">/// Any child window.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiChild: GuiWindow {
+	<span class="doccomment">/// Returns the control ID, which is defined at control creation.
+	///
+	/// The control ID should be unique within a parent.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16;
 }
 
-<span class="doccomment">/// Any child window which can be focused.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiChildFocus</span>: <span class="ident">GuiChild</span> {
-	<span class="doccomment">/// Focus the control by sending a</span>
-	<span class="doccomment">/// [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) message. This is</span>
-	<span class="doccomment">/// preferable to the</span>
-	<span class="doccomment">/// [`HWND::SetFocus`](crate::prelude::user_Hwnd::SetFocus) method, because</span>
-	<span class="doccomment">/// it takes care of border highlighting, like the native</span>
-	<span class="doccomment">/// [`Button`](crate::gui::Button) control needs.</span>
-	<span class="kw">fn</span> <span class="ident">focus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="kw">let</span> <span class="ident">hparent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">GetParent</span>().<span class="ident">unwrap</span>();
-		<span class="ident">hparent</span>.<span class="ident">SendMessage</span>(<span class="ident">wm::NextDlgCtl</span> {
-			<span class="ident">hwnd_focus</span>: <span class="ident">HwndFocus::Hwnd</span>(<span class="self">self</span>.<span class="ident">hwnd</span>()),
+<span class="doccomment">/// Any child window which can be focused.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiChildFocus: GuiChild {
+	<span class="doccomment">/// Focus the control by sending a
+	/// [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) message. This is
+	/// preferable to the
+	/// [`HWND::SetFocus`](crate::prelude::user_Hwnd::SetFocus) method, because
+	/// it takes care of border highlighting, like the native
+	/// [`Button`](crate::gui::Button) control needs.
+	</span><span class="kw">fn </span>focus(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="kw">let </span>hparent = <span class="self">self</span>.hwnd().GetParent().unwrap();
+		hparent.SendMessage(wm::NextDlgCtl {
+			hwnd_focus: HwndFocus::Hwnd(<span class="self">self</span>.hwnd()),
 		});
 	}
 }
 
-<span class="doccomment">/// Any native control, which can be subclassed.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiNativeControl</span>: <span class="ident">GuiChild</span> {
-	<span class="doccomment">/// Exposes the subclass events. If at least one event exists, the control</span>
-	<span class="doccomment">/// will be</span>
-	<span class="doccomment">/// [subclassed](https://docs.microsoft.com/en-us/windows/win32/controls/subclassing-overview).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Subclassing may impact performance, use with care.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the control or the parent window are already created. Events</span>
-	<span class="doccomment">/// must be set before control and parent window creation.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">on_subclass</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEvents</span>;
+<span class="doccomment">/// Any native control, which can be subclassed.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiNativeControl: GuiChild {
+	<span class="doccomment">/// Exposes the subclass events. If at least one event exists, the control
+	/// will be
+	/// [subclassed](https://docs.microsoft.com/en-us/windows/win32/controls/subclassing-overview).
+	///
+	/// **Note:** Subclassing may impact performance, use with care.
+	///
+	/// # Panics
+	///
+	/// Panics if the control or the parent window are already created. Events
+	/// must be set before control and parent window creation.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>on_subclass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEvents;
 }
 
-<span class="doccomment">/// Events of a native control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GuiNativeControlEvents</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Exposes the specific control events.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the control is already created. Events must be set before</span>
-	<span class="doccomment">/// control creation.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">E</span>;
+<span class="doccomment">/// Events of a native control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub trait </span>GuiNativeControlEvents&lt;E&gt; {
+	<span class="doccomment">/// Exposes the specific control events.
+	///
+	/// # Panics
+	///
+	/// Panics if the control is already created. Events must be set before
+	/// control creation.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>E;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

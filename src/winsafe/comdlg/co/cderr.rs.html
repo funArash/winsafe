@@ -74,81 +74,81 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_upper_case_globals</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_upper_case_globals)]</span>
 
-<span class="macro">const_no_debug_display!</span> { <span class="ident">CDERR</span>: <span class="ident">u32</span>: <span class="string">&quot;comdlg&quot;</span>;
-	<span class="doccomment">/// Common dialog box</span>
-	<span class="doccomment">/// [error codes](https://docs.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-commdlgextendederror).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Also includes `PDERR`, `CFERR`, `FNERR` and `FRERR` prefixes.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Implements the standard</span>
-	<span class="doccomment">/// [`Error`](https://doc.rust-lang.org/beta/std/error/trait.Error.html)</span>
-	<span class="doccomment">/// trait.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that there is no way to obtain the textual error description for a</span>
-	<span class="doccomment">/// common dialog box error, since</span>
-	<span class="doccomment">/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)</span>
-	<span class="doccomment">/// offers no support to it.</span>
+<span class="macro">const_no_debug_display!</span> { CDERR: u32: <span class="string">&quot;comdlg&quot;</span>;
+	<span class="doccomment">/// Common dialog box
+	/// [error codes](https://docs.microsoft.com/en-us/windows/win32/api/commdlg/nf-commdlg-commdlgextendederror).
+	///
+	/// Also includes `PDERR`, `CFERR`, `FNERR` and `FRERR` prefixes.
+	///
+	/// Implements the standard
+	/// [`Error`](https://doc.rust-lang.org/beta/std/error/trait.Error.html)
+	/// trait.
+	///
+	/// Note that there is no way to obtain the textual error description for a
+	/// common dialog box error, since
+	/// [`FormatMessage`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)
+	/// offers no support to it.
+</span>}
+
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>CDERR {
+	<span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+		<span class="prelude-val">None
+	</span>}
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">CDERR</span> {
-	<span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-		<span class="prelude-val">None</span>
-	}
-}
-
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">CDERR</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="number">0xffff</span> {
-			<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{:#010x} {}] Common dialog error.&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
-		} <span class="kw">else</span> {
-			<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{:#06x} {}] Common dialog error.&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>CDERR {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&gt; <span class="number">0xffff </span>{
+			<span class="macro">write!</span>(f, <span class="string">&quot;[{:#010x} {}] Common dialog error.&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
+		} <span class="kw">else </span>{
+			<span class="macro">write!</span>(f, <span class="string">&quot;[{:#06x} {}] Common dialog error.&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
 		}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CDERR</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-		<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>) <span class="comment">// delegate to Debug trait</span>
-	}
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>CDERR {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		&lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="self">self</span>, f) <span class="comment">// delegate to Debug trait
+	</span>}
 }
 
-<span class="macro">const_values!</span> { <span class="ident">CDERR</span>;
+<span class="macro">const_values!</span> { CDERR;
 	=&gt;
-	<span class="doccomment">/// None of the actual values (zero).</span>
-	<span class="ident">NoValue</span> <span class="number">0</span>
-	<span class="ident">DIALOGFAILURE</span> <span class="number">0xffff</span>
-	<span class="ident">FINDRESFAILURE</span> <span class="number">0x0006</span>
-	<span class="ident">INITIALIZATION</span> <span class="number">0x0002</span>
-	<span class="ident">LOADRESFAILURE</span> <span class="number">0x0007</span>
-	<span class="ident">LOADSTRFAILURE</span> <span class="number">0x0005</span>
-	<span class="ident">LOCKRESFAILURE</span> <span class="number">0x0008</span>
-	<span class="ident">MEMALLOCFAILURE</span> <span class="number">0x0009</span>
-	<span class="ident">MEMLOCKFAILURE</span> <span class="number">0x000a</span>
-	<span class="ident">NOHINSTANCE</span> <span class="number">0x0004</span>
-	<span class="ident">NOHOOK</span> <span class="number">0x000b</span>
-	<span class="ident">NOTEMPLATE</span> <span class="number">0x0003</span>
-	<span class="ident">REGISTERMSGFAIL</span> <span class="number">0x000c</span>
-	<span class="ident">STRUCTSIZE</span> <span class="number">0x0001</span>
-	<span class="ident">PD_CREATEICFAILURE</span> <span class="number">0x100a</span>
-	<span class="ident">PD_DEFAULTDIFFERENT</span> <span class="number">0x100c</span>
-	<span class="ident">PD_DNDMMISMATCH</span> <span class="number">0x1009</span>
-	<span class="ident">PD_GETDEVMODEFAIL</span> <span class="number">0x1005</span>
-	<span class="ident">PD_INITFAILURE</span> <span class="number">0x1006</span>
-	<span class="ident">PD_LOADDRVFAILURE</span> <span class="number">0x1004</span>
-	<span class="ident">PD_NODEFAULTPRN</span> <span class="number">0x1008</span>
-	<span class="ident">PD_NODEVICES</span> <span class="number">0x1007</span>
-	<span class="ident">PD_PARSEFAILURE</span> <span class="number">0x1002</span>
-	<span class="ident">PD_PRINTERNOTFOUND</span> <span class="number">0x100b</span>
-	<span class="ident">PD_RETDEFFAILURE</span> <span class="number">0x1003</span>
-	<span class="ident">PD_SETUPFAILURE</span> <span class="number">0x1001</span>
-	<span class="ident">CF_MAXLESSTHANMIN</span> <span class="number">0x2002</span>
-	<span class="ident">CF_NOFONTS</span> <span class="number">0x2001</span>
-	<span class="ident">FN_BUFFERTOOSMALL</span> <span class="number">0x3003</span>
-	<span class="ident">FN_INVALIDFILENAME</span> <span class="number">0x3002</span>
-	<span class="ident">FN_SUBCLASSFAILURE</span> <span class="number">0x3001</span>
-	<span class="ident">FR_BUFFERLENGTHZERO</span> <span class="number">0x4001</span>
-}
+	<span class="doccomment">/// None of the actual values (zero).
+	</span>NoValue <span class="number">0
+	</span>DIALOGFAILURE <span class="number">0xffff
+	</span>FINDRESFAILURE <span class="number">0x0006
+	</span>INITIALIZATION <span class="number">0x0002
+	</span>LOADRESFAILURE <span class="number">0x0007
+	</span>LOADSTRFAILURE <span class="number">0x0005
+	</span>LOCKRESFAILURE <span class="number">0x0008
+	</span>MEMALLOCFAILURE <span class="number">0x0009
+	</span>MEMLOCKFAILURE <span class="number">0x000a
+	</span>NOHINSTANCE <span class="number">0x0004
+	</span>NOHOOK <span class="number">0x000b
+	</span>NOTEMPLATE <span class="number">0x0003
+	</span>REGISTERMSGFAIL <span class="number">0x000c
+	</span>STRUCTSIZE <span class="number">0x0001
+	</span>PD_CREATEICFAILURE <span class="number">0x100a
+	</span>PD_DEFAULTDIFFERENT <span class="number">0x100c
+	</span>PD_DNDMMISMATCH <span class="number">0x1009
+	</span>PD_GETDEVMODEFAIL <span class="number">0x1005
+	</span>PD_INITFAILURE <span class="number">0x1006
+	</span>PD_LOADDRVFAILURE <span class="number">0x1004
+	</span>PD_NODEFAULTPRN <span class="number">0x1008
+	</span>PD_NODEVICES <span class="number">0x1007
+	</span>PD_PARSEFAILURE <span class="number">0x1002
+	</span>PD_PRINTERNOTFOUND <span class="number">0x100b
+	</span>PD_RETDEFFAILURE <span class="number">0x1003
+	</span>PD_SETUPFAILURE <span class="number">0x1001
+	</span>CF_MAXLESSTHANMIN <span class="number">0x2002
+	</span>CF_NOFONTS <span class="number">0x2001
+	</span>FN_BUFFERTOOSMALL <span class="number">0x3003
+	</span>FN_INVALIDFILENAME <span class="number">0x3002
+	</span>FN_SUBCLASSFAILURE <span class="number">0x3001
+	</span>FR_BUFFERLENGTHZERO <span class="number">0x4001
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

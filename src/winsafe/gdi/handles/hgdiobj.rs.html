@@ -30,37 +30,37 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">gdi</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
+<span class="kw">use crate</span>::{co, gdi};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="doccomment">/// Any</span>
-<span class="doccomment">/// [`HGDIOBJ`](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hgdiobj)</span>
-<span class="doccomment">/// handle, which is the base handle for</span>
-<span class="doccomment">/// [GDI objects](https://docs.microsoft.com/en-us/windows/win32/sysinfo/gdi-objects).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is enabled with the `gdi` feature.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">gdi_Hgdiobj</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DeleteObject</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::DeleteObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">GetLastError</span>() {
-				<span class="ident">co::ERROR::SUCCESS</span> =&gt; <span class="prelude-val">Ok</span>(()), <span class="comment">// not really an error</span>
-				<span class="ident">err</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+<span class="doccomment">/// Any
+/// [`HGDIOBJ`](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hgdiobj)
+/// handle, which is the base handle for
+/// [GDI objects](https://docs.microsoft.com/en-us/windows/win32/sysinfo/gdi-objects).
+///
+/// This trait is enabled with the `gdi` feature.
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub trait </span>gdi_Hgdiobj: Handle {
+	<span class="doccomment">/// [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject)
+	/// method.
+	</span><span class="kw">fn </span>DeleteObject(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::DeleteObject(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()), <span class="comment">// not really an error
+				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

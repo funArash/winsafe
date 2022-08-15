@@ -60,67 +60,67 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">HwndPlace</span>, <span class="ident">POINT</span>, <span class="ident">SIZE</span>};
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, HwndPlace, POINT, SIZE};
 
-<span class="macro">impl_handle!</span> { <span class="ident">HDWP</span>: <span class="string">&quot;user32&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [deferred window position](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdwp).</span>
-}
+<span class="macro">impl_handle!</span> { HDWP: <span class="string">&quot;user32&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [deferred window position](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdwp).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">user_Hdwp</span> <span class="kw">for</span> <span class="ident">HDWP</span> {}
+<span class="kw">impl </span>user_Hdwp <span class="kw">for </span>HDWP {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HDWP`](crate::HDWP).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hdwp</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`BeginDeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-begindeferwindowpos)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HDWP::EndDeferWindowPos`](crate::prelude::user_Hdwp::EndDeferWindowPos)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">BeginDeferWindowPos</span>(<span class="ident">num_windows</span>: <span class="ident">u32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HDWP</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">user::ffi::BeginDeferWindowPos</span>(<span class="ident">num_windows</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HDWP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HDWP`](crate::HDWP).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hdwp: Handle {
+	<span class="doccomment">/// [`BeginDeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-begindeferwindowpos)
+	/// static method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HDWP::EndDeferWindowPos`](crate::prelude::user_Hdwp::EndDeferWindowPos)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>BeginDeferWindowPos(num_windows: u32) -&gt; SysResult&lt;HDWP&gt; {
+		<span class="kw">unsafe </span>{ user::ffi::BeginDeferWindowPos(num_windows <span class="kw">as _</span>).as_mut() }
+			.map(|ptr| HDWP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`DeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-deferwindowpos)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DeferWindowPos</span>(<span class="self">self</span>,
-		<span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">hwnd_insert_after</span>: <span class="ident">HwndPlace</span>,
-		<span class="ident">top_left</span>: <span class="ident">POINT</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">flags</span>: <span class="ident">co::SWP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HDWP</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`DeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-deferwindowpos)
+	/// method.
+	</span><span class="kw">fn </span>DeferWindowPos(<span class="self">self</span>,
+		hwnd: HWND, hwnd_insert_after: HwndPlace,
+		top_left: POINT, sz: SIZE, flags: co::SWP) -&gt; SysResult&lt;HDWP&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::DeferWindowPos</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">hwnd</span>.<span class="number">0</span>,
-				<span class="ident">hwnd_insert_after</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">top_left</span>.<span class="ident">x</span>, <span class="ident">top_left</span>.<span class="ident">y</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>,
-				<span class="ident">flags</span>.<span class="number">0</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HDWP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			user::ffi::DeferWindowPos(
+				<span class="self">self</span>.as_ptr(),
+				hwnd.<span class="number">0</span>,
+				hwnd_insert_after.as_ptr(),
+				top_left.x, top_left.y, sz.cx, sz.cy,
+				flags.<span class="number">0</span>,
+			).as_mut()
+		}.map(|ptr| HDWP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`EndDeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enddeferwindowpos)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">EndDeferWindowPos</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">user::ffi::EndDeferWindowPos</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`EndDeferWindowPos`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enddeferwindowpos)
+	/// method.
+	</span><span class="kw">fn </span>EndDeferWindowPos(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EndDeferWindowPos(<span class="self">self</span>.as_ptr()) })
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

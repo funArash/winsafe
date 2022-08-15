@@ -884,891 +884,891 @@
 <span id="884">884</span>
 <span id="885">885</span>
 <span id="886">886</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">gdi</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::decl</span>::{<span class="ident">BITMAPINFO</span>, <span class="ident">HFONT</span>, <span class="ident">HPEN</span>, <span class="ident">TEXTMETRIC</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gdi::privs</span>::{<span class="ident">CLR_INVALID</span>, <span class="ident">GDI_ERROR</span>, <span class="ident">LF_FACESIZE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">COLORREF</span>, <span class="ident">HBITMAP</span>, <span class="ident">HBRUSH</span>, <span class="ident">HDC</span>, <span class="ident">HRGN</span>, <span class="ident">POINT</span>, <span class="ident">RECT</span>, <span class="ident">SIZE</span>,
+<span class="kw">use crate</span>::{co, gdi};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{BITMAPINFO, HFONT, HPEN, TEXTMETRIC};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::privs::{CLR_INVALID, GDI_ERROR, LF_FACESIZE};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	COLORREF, HBITMAP, HBRUSH, HDC, HRGN, POINT, RECT, SIZE,
 };
 
-<span class="kw">impl</span> <span class="ident">gdi_Hdc</span> <span class="kw">for</span> <span class="ident">HDC</span> {}
+<span class="kw">impl </span>gdi_Hdc <span class="kw">for </span>HDC {}
 
-<span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for</span>
-<span class="doccomment">/// [`HDC`](crate::HDC).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gdi&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">gdi_Hdc</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`AborthPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-abortpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">AbortPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::AbortPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+<span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
+/// [`HDC`](crate::HDC).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gdi&quot;</span>)))]</span>
+<span class="kw">pub trait </span>gdi_Hdc: Handle {
+	<span class="doccomment">/// [`AborthPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-abortpath)
+	/// method.
+	</span><span class="kw">fn </span>AbortPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::AbortPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`AngleArc`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-anglearc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">AngleArc</span>(<span class="self">self</span>,
-		<span class="ident">center</span>: <span class="ident">POINT</span>, <span class="ident">radius</span>: <span class="ident">u32</span>,
-		<span class="ident">start_angle</span>: <span class="ident">f32</span>, <span class="ident">sweep_angle</span>: <span class="ident">f32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`AngleArc`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-anglearc)
+	/// method.
+	</span><span class="kw">fn </span>AngleArc(<span class="self">self</span>,
+		center: POINT, radius: u32,
+		start_angle: f32, sweep_angle: f32) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::AngleArc</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">center</span>.<span class="ident">x</span>, <span class="ident">center</span>.<span class="ident">y</span>,
-					<span class="ident">radius</span>, <span class="ident">start_angle</span>, <span class="ident">sweep_angle</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::AngleArc(
+					<span class="self">self</span>.as_ptr(),
+					center.x, center.y,
+					radius, start_angle, sweep_angle,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`Arc`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Arc</span>(<span class="self">self</span>,
-		<span class="ident">bound</span>: <span class="ident">RECT</span>, <span class="ident">radialStart</span>: <span class="ident">POINT</span>, <span class="ident">radialEnd</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`Arc`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arc)
+	/// method.
+	</span><span class="kw">fn </span>Arc(<span class="self">self</span>,
+		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Arc</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bound</span>.<span class="ident">left</span>, <span class="ident">bound</span>.<span class="ident">top</span>,
-					<span class="ident">bound</span>.<span class="ident">right</span>, <span class="ident">bound</span>.<span class="ident">bottom</span>,
-					<span class="ident">radialStart</span>.<span class="ident">x</span>, <span class="ident">radialStart</span>.<span class="ident">y</span>,
-					<span class="ident">radialEnd</span>.<span class="ident">x</span>, <span class="ident">radialEnd</span>.<span class="ident">y</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Arc(
+					<span class="self">self</span>.as_ptr(),
+					bound.left, bound.top,
+					bound.right, bound.bottom,
+					radialStart.x, radialStart.y,
+					radialEnd.x, radialEnd.y,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`ArcTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arcto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">ArcTo</span>(<span class="self">self</span>,
-		<span class="ident">bound</span>: <span class="ident">RECT</span>, <span class="ident">radialStart</span>: <span class="ident">POINT</span>, <span class="ident">radialEnd</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`ArcTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arcto)
+	/// method.
+	</span><span class="kw">fn </span>ArcTo(<span class="self">self</span>,
+		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::ArcTo</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bound</span>.<span class="ident">left</span>, <span class="ident">bound</span>.<span class="ident">top</span>,
-					<span class="ident">bound</span>.<span class="ident">right</span>, <span class="ident">bound</span>.<span class="ident">bottom</span>,
-					<span class="ident">radialStart</span>.<span class="ident">x</span>, <span class="ident">radialStart</span>.<span class="ident">y</span>,
-					<span class="ident">radialEnd</span>.<span class="ident">x</span>, <span class="ident">radialEnd</span>.<span class="ident">y</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::ArcTo(
+					<span class="self">self</span>.as_ptr(),
+					bound.left, bound.top,
+					bound.right, bound.bottom,
+					radialStart.x, radialStart.y,
+					radialEnd.x, radialEnd.y,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`BeginPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-beginpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">BeginPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::BeginPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`BeginPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-beginpath)
+	/// method.
+	</span><span class="kw">fn </span>BeginPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::BeginPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`BitBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">BitBlt</span>(<span class="self">self</span>,
-		<span class="ident">dest_pos</span>: <span class="ident">POINT</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>,
-		<span class="ident">hdc_src</span>: <span class="ident">HDC</span>, <span class="ident">src_src</span>: <span class="ident">POINT</span>, <span class="ident">rop</span>: <span class="ident">co::ROP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`BitBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt)
+	/// method.
+	</span><span class="kw">fn </span>BitBlt(<span class="self">self</span>,
+		dest_pos: POINT, sz: SIZE,
+		hdc_src: HDC, src_src: POINT, rop: co::ROP) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::BitBlt</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">dest_pos</span>.<span class="ident">x</span>, <span class="ident">dest_pos</span>.<span class="ident">y</span>,
-					<span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>,
-					<span class="ident">hdc_src</span>.<span class="number">0</span>,
-					<span class="ident">src_src</span>.<span class="ident">x</span>, <span class="ident">src_src</span>.<span class="ident">y</span>,
-					<span class="ident">rop</span>.<span class="number">0</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::BitBlt(
+					<span class="self">self</span>.as_ptr(),
+					dest_pos.x, dest_pos.y,
+					sz.cx, sz.cy,
+					hdc_src.<span class="number">0</span>,
+					src_src.x, src_src.y,
+					rop.<span class="number">0</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`CancelDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-canceldc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">CancelDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::CancelDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`CancelDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-canceldc)
+	/// method.
+	</span><span class="kw">fn </span>CancelDC(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::CancelDC(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`Chord`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-chord)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Chord</span>(<span class="self">self</span>,
-		<span class="ident">bounds</span>: <span class="ident">RECT</span>, <span class="ident">start_radial</span>: <span class="ident">POINT</span>, <span class="ident">end_radial</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`Chord`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-chord)
+	/// method.
+	</span><span class="kw">fn </span>Chord(<span class="self">self</span>,
+		bounds: RECT, start_radial: POINT, end_radial: POINT) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Chord</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bounds</span>.<span class="ident">left</span>, <span class="ident">bounds</span>.<span class="ident">top</span>, <span class="ident">bounds</span>.<span class="ident">right</span>, <span class="ident">bounds</span>.<span class="ident">bottom</span>,
-					<span class="ident">start_radial</span>.<span class="ident">x</span>, <span class="ident">start_radial</span>.<span class="ident">y</span>,
-					<span class="ident">end_radial</span>.<span class="ident">x</span>, <span class="ident">end_radial</span>.<span class="ident">y</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Chord(
+					<span class="self">self</span>.as_ptr(),
+					bounds.left, bounds.top, bounds.right, bounds.bottom,
+					start_radial.x, start_radial.y,
+					end_radial.x, end_radial.y,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`CloseFigure`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-closefigure)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">CloseFigure</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::CloseFigure</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`CloseFigure`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-closefigure)
+	/// method.
+	</span><span class="kw">fn </span>CloseFigure(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::CloseFigure(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`CreateCompatibleBitmap`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatiblebitmap)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateCompatibleBitmap</span>(<span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">i32</span>, <span class="ident">cy</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">gdi::ffi::CreateCompatibleBitmap</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">cx</span>, <span class="ident">cy</span>).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBITMAP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`CreateCompatibleBitmap`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatiblebitmap)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateCompatibleBitmap(<span class="self">self</span>, cx: i32, cy: i32) -&gt; SysResult&lt;HBITMAP&gt; {
+		<span class="kw">unsafe </span>{
+			gdi::ffi::CreateCompatibleBitmap(<span class="self">self</span>.as_ptr(), cx, cy).as_mut()
+		}.map(|ptr| HBITMAP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`CreateCompatibleDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatibledc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HDC::DeleteDC`](crate::prelude::gdi_Hdc::DeleteDC) call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">CreateCompatibleDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HDC</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::CreateCompatibleDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HDC</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`CreateCompatibleDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatibledc)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HDC::DeleteDC`](crate::prelude::gdi_Hdc::DeleteDC) call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>CreateCompatibleDC(<span class="self">self</span>) -&gt; SysResult&lt;HDC&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::CreateCompatibleDC(<span class="self">self</span>.as_ptr()).as_mut() }
+			.map(|ptr| HDC(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`DeleteDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deletedc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DeleteDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::DeleteDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`DeleteDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deletedc)
+	/// method.
+	</span><span class="kw">fn </span>DeleteDC(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::DeleteDC(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`Ellipse`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ellipse)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Ellipse</span>(<span class="self">self</span>, <span class="ident">bound</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Ellipse</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bound</span>.<span class="ident">left</span>, <span class="ident">bound</span>.<span class="ident">top</span>,
-					<span class="ident">bound</span>.<span class="ident">right</span>, <span class="ident">bound</span>.<span class="ident">bottom</span>,
+	<span class="doccomment">/// [`Ellipse`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ellipse)
+	/// method.
+	</span><span class="kw">fn </span>Ellipse(<span class="self">self</span>, bound: RECT) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Ellipse(
+					<span class="self">self</span>.as_ptr(),
+					bound.left, bound.top,
+					bound.right, bound.bottom,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`EndPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-endpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">EndPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::EndPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`EndPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-endpath)
+	/// method.
+	</span><span class="kw">fn </span>EndPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::EndPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`FillPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">FillPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::FillPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`FillPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillpath)
+	/// method.
+	</span><span class="kw">fn </span>FillPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::FillPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`FillRect`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-fillrect)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">FillRect</span>(<span class="self">self</span>, <span class="ident">rc</span>: <span class="ident">RECT</span>, <span class="ident">hbr</span>: <span class="ident">HBRUSH</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">gdi::ffi::FillRect</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;</span><span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">hbr</span>.<span class="number">0</span>)
+	<span class="doccomment">/// [`FillRect`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-fillrect)
+	/// method.
+	</span><span class="kw">fn </span>FillRect(<span class="self">self</span>, rc: RECT, hbr: HBRUSH) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">match unsafe </span>{
+			gdi::ffi::FillRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, hbr.<span class="number">0</span>)
 		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
 		}
 	}
 
-	<span class="doccomment">/// [`FillRgn`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillrgn)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">FillRgn</span>(<span class="self">self</span>, <span class="ident">rgn</span>: <span class="ident">HRGN</span>, <span class="ident">brush</span>: <span class="ident">HBRUSH</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::FillRgn</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">rgn</span>.<span class="ident">as_ptr</span>(), <span class="ident">brush</span>.<span class="ident">as_ptr</span>())
+	<span class="doccomment">/// [`FillRgn`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillrgn)
+	/// method.
+	</span><span class="kw">fn </span>FillRgn(<span class="self">self</span>, rgn: HRGN, brush: HBRUSH) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::FillRgn(<span class="self">self</span>.as_ptr(), rgn.as_ptr(), brush.as_ptr())
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`FlattenPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-flattenpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">FlattenPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::FlattenPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`FlattenPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-flattenpath)
+	/// method.
+	</span><span class="kw">fn </span>FlattenPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::FlattenPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`FrameRgn`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-framergn)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">FrameRgn</span>(<span class="self">self</span>,
-		<span class="ident">rgn</span>: <span class="ident">HRGN</span>, <span class="ident">brush</span>: <span class="ident">HBRUSH</span>, <span class="ident">w</span>: <span class="ident">i32</span>, <span class="ident">h</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`FrameRgn`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-framergn)
+	/// method.
+	</span><span class="kw">fn </span>FrameRgn(<span class="self">self</span>,
+		rgn: HRGN, brush: HBRUSH, w: i32, h: i32) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::FrameRgn</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">rgn</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">brush</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">w</span>, <span class="ident">h</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::FrameRgn(
+					<span class="self">self</span>.as_ptr(),
+					rgn.as_ptr(),
+					brush.as_ptr(),
+					w, h,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`GetBkMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbkmode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetBkMode</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::BKMODE</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetBkMode</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::BKMODE</span>(<span class="ident">v</span>)),
+	<span class="doccomment">/// [`GetBkMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbkmode)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetBkMode(<span class="self">self</span>) -&gt; SysResult&lt;co::BKMODE&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::GetBkMode(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetDCBrushColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcbrushcolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetDCBrushColor</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetDCBrushColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">color</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">color</span>)),
+	<span class="doccomment">/// [`GetDCBrushColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcbrushcolor)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetDCBrushColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCBrushColor(<span class="self">self</span>.as_ptr()) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetDCPenColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcpencolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetDCPenColor</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetDCPenColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">color</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">color</span>)),
+	<span class="doccomment">/// [`GetDCPenColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcpencolor)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetDCPenColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCPenColor(<span class="self">self</span>.as_ptr()) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetDIBits`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdibits)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** If `bmpDataBuf` is smaller than needed, you&#39;ll have a buffer</span>
-	<span class="doccomment">/// overflow.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Taking a screenshot and saving to file:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::{self as w, prelude::*, co};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let cx_screen = w::GetSystemMetrics(co::SM::CXSCREEN);</span>
-	<span class="doccomment">/// let cy_screen = w::GetSystemMetrics(co::SM::CYSCREEN);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let hdc_screen = w::HWND::DESKTOP.GetDC()?;</span>
-	<span class="doccomment">/// let hbmp = hdc_screen.CreateCompatibleBitmap(cx_screen, cy_screen)?;</span>
-	<span class="doccomment">/// let hdc_mem = hdc_screen.CreateCompatibleDC()?;</span>
-	<span class="doccomment">/// let hbmp_old = hdc_mem.SelectObjectBitmap(hbmp)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hdc_mem.BitBlt(w::POINT::new(0, 0), w::SIZE::new(cx_screen, cy_screen),</span>
-	<span class="doccomment">///     hdc_screen, w::POINT::new(0, 0), co::ROP::SRCCOPY)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bmp_obj = w::BITMAP::default();</span>
-	<span class="doccomment">/// hbmp.GetObject(&amp;mut bmp_obj)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bi = w::BITMAPINFO::default();</span>
-	<span class="doccomment">/// bi.bmiHeader.biWidth = cx_screen;</span>
-	<span class="doccomment">/// bi.bmiHeader.biHeight = cy_screen;</span>
-	<span class="doccomment">/// bi.bmiHeader.biPlanes = 1;</span>
-	<span class="doccomment">/// bi.bmiHeader.biBitCount = 32;</span>
-	<span class="doccomment">/// bi.bmiHeader.biCompression = co::BI::RGB;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bmp_size = (bmp_obj.bmWidth * (bi.bmiHeader.biBitCount as i32) + 31)</span>
-	<span class="doccomment">///     / 32 * 4 * bmp_obj.bmHeight;</span>
-	<span class="doccomment">/// let mut data_buf = vec![0u8; bmp_size as _];</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///     hdc_screen.GetDIBits(hbmp, 0, cy_screen as _,</span>
-	<span class="doccomment">///         Some(&amp;mut data_buf), &amp;mut bi, co::DIB::RGB_COLORS)?;</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bfh = w::BITMAPFILEHEADER::default();</span>
-	<span class="doccomment">/// bfh.bfOffBits = (std::mem::size_of::&lt;w::BITMAPFILEHEADER&gt;()</span>
-	<span class="doccomment">///     + std::mem::size_of::&lt;w::BITMAPINFOHEADER&gt;()) as _;</span>
-	<span class="doccomment">/// bfh.bfSize = bfh.bfOffBits + (bmp_size as u32);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let fo = w::File::open(&quot;C:\\Users\\Rodrigo\\Desktop\\foo.bmp&quot;,</span>
-	<span class="doccomment">///     w::FileAccess::OpenOrCreateReadWrite)?;</span>
-	<span class="doccomment">/// fo.write(bfh.serialize())?;</span>
-	<span class="doccomment">/// fo.write(bi.bmiHeader.serialize())?;</span>
-	<span class="doccomment">/// fo.write(&amp;data_buf)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// hdc_mem.SelectObjectBitmap(hbmp_old)?;</span>
-	<span class="doccomment">/// hdc_mem.DeleteDC()?;</span>
-	<span class="doccomment">/// hbmp.DeleteObject()?;</span>
-	<span class="doccomment">/// w::HWND::DESKTOP.ReleaseDC(hdc_screen)?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">GetDIBits</span>(<span class="self">self</span>,
-		<span class="ident">hbm</span>: <span class="ident">HBITMAP</span>, <span class="ident">firstScanLine</span>: <span class="ident">u32</span>, <span class="ident">numScanLines</span>: <span class="ident">u32</span>,
-		<span class="ident">bmpDataBuf</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">bmi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BITMAPINFO</span>,
-		<span class="ident">usage</span>: <span class="ident">co::DIB</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`GetDIBits`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdibits)
+	/// method.
+	///
+	/// **Note:** If `bmpDataBuf` is smaller than needed, you&#39;ll have a buffer
+	/// overflow.
+	///
+	/// # Examples
+	///
+	/// Taking a screenshot and saving to file:
+	///
+	/// ```rust,no_run
+	/// use winsafe::{self as w, prelude::*, co};
+	///
+	/// let cx_screen = w::GetSystemMetrics(co::SM::CXSCREEN);
+	/// let cy_screen = w::GetSystemMetrics(co::SM::CYSCREEN);
+	///
+	/// let hdc_screen = w::HWND::DESKTOP.GetDC()?;
+	/// let hbmp = hdc_screen.CreateCompatibleBitmap(cx_screen, cy_screen)?;
+	/// let hdc_mem = hdc_screen.CreateCompatibleDC()?;
+	/// let hbmp_old = hdc_mem.SelectObjectBitmap(hbmp)?;
+	///
+	/// hdc_mem.BitBlt(w::POINT::new(0, 0), w::SIZE::new(cx_screen, cy_screen),
+	///     hdc_screen, w::POINT::new(0, 0), co::ROP::SRCCOPY)?;
+	///
+	/// let mut bmp_obj = w::BITMAP::default();
+	/// hbmp.GetObject(&amp;mut bmp_obj)?;
+	///
+	/// let mut bi = w::BITMAPINFO::default();
+	/// bi.bmiHeader.biWidth = cx_screen;
+	/// bi.bmiHeader.biHeight = cy_screen;
+	/// bi.bmiHeader.biPlanes = 1;
+	/// bi.bmiHeader.biBitCount = 32;
+	/// bi.bmiHeader.biCompression = co::BI::RGB;
+	///
+	/// let bmp_size = (bmp_obj.bmWidth * (bi.bmiHeader.biBitCount as i32) + 31)
+	///     / 32 * 4 * bmp_obj.bmHeight;
+	/// let mut data_buf = vec![0u8; bmp_size as _];
+	///
+	/// unsafe {
+	///     hdc_screen.GetDIBits(hbmp, 0, cy_screen as _,
+	///         Some(&amp;mut data_buf), &amp;mut bi, co::DIB::RGB_COLORS)?;
+	/// }
+	///
+	/// let mut bfh = w::BITMAPFILEHEADER::default();
+	/// bfh.bfOffBits = (std::mem::size_of::&lt;w::BITMAPFILEHEADER&gt;()
+	///     + std::mem::size_of::&lt;w::BITMAPINFOHEADER&gt;()) as _;
+	/// bfh.bfSize = bfh.bfOffBits + (bmp_size as u32);
+	///
+	/// let fo = w::File::open(&quot;C:\\Users\\Rodrigo\\Desktop\\foo.bmp&quot;,
+	///     w::FileAccess::OpenOrCreateReadWrite)?;
+	/// fo.write(bfh.serialize())?;
+	/// fo.write(bi.bmiHeader.serialize())?;
+	/// fo.write(&amp;data_buf)?;
+	///
+	/// hdc_mem.SelectObjectBitmap(hbmp_old)?;
+	/// hdc_mem.DeleteDC()?;
+	/// hbmp.DeleteObject()?;
+	/// w::HWND::DESKTOP.ReleaseDC(hdc_screen)?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">unsafe fn </span>GetDIBits(<span class="self">self</span>,
+		hbm: HBITMAP, firstScanLine: u32, numScanLines: u32,
+		bmpDataBuf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt;, bmi: <span class="kw-2">&amp;mut </span>BITMAPINFO,
+		usage: co::DIB) -&gt; SysResult&lt;i32&gt;
 	{
-		<span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">gdi::ffi::GetDIBits</span>(
-			<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-			<span class="ident">hbm</span>.<span class="ident">as_ptr</span>(),
-			<span class="ident">firstScanLine</span>, <span class="ident">numScanLines</span>,
-			<span class="ident">bmpDataBuf</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>),
-			<span class="ident">bmi</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-			<span class="ident">usage</span>.<span class="number">0</span>,
+		<span class="kw">let </span>ret = gdi::ffi::GetDIBits(
+			<span class="self">self</span>.as_ptr(),
+			hbm.as_ptr(),
+			firstScanLine, numScanLines,
+			bmpDataBuf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr() <span class="kw">as _</span>),
+			bmi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+			usage.<span class="number">0</span>,
 		);
 
-		<span class="kw">if</span> <span class="ident">co::ERROR</span>(<span class="ident">ret</span> <span class="kw">as</span> <span class="kw">_</span>) <span class="op">==</span> <span class="ident">co::ERROR::INVALID_PARAMETER</span> {
-			<span class="prelude-val">Err</span>(<span class="ident">co::ERROR::INVALID_PARAMETER</span>)
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> {
-			<span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>())
-		} <span class="kw">else</span> {
-			<span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+		<span class="kw">if </span>co::ERROR(ret <span class="kw">as _</span>) == co::ERROR::INVALID_PARAMETER {
+			<span class="prelude-val">Err</span>(co::ERROR::INVALID_PARAMETER)
+		} <span class="kw">else if </span>ret == <span class="number">0 </span>{
+			<span class="prelude-val">Err</span>(GetLastError())
+		} <span class="kw">else </span>{
+			<span class="prelude-val">Ok</span>(ret)
 		}
 	}
 
-	<span class="doccomment">/// [`GetDeviceCaps`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetDeviceCaps</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">co::GDC</span>) -&gt; <span class="ident">i32</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetDeviceCaps</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">index</span>.<span class="number">0</span>) }
+	<span class="doccomment">/// [`GetDeviceCaps`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetDeviceCaps(<span class="self">self</span>, index: co::GDC) -&gt; i32 {
+		<span class="kw">unsafe </span>{ gdi::ffi::GetDeviceCaps(<span class="self">self</span>.as_ptr(), index.<span class="number">0</span>) }
 	}
 
-	<span class="doccomment">/// [`GetStretchBltMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstretchbltmode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetStretchBltMode</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::STRETCH_MODE</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetStretchBltMode</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">sm</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::STRETCH_MODE</span>(<span class="ident">sm</span>)),
+	<span class="doccomment">/// [`GetStretchBltMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstretchbltmode)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetStretchBltMode(<span class="self">self</span>) -&gt; SysResult&lt;co::STRETCH_MODE&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::GetStretchBltMode(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			sm =&gt; <span class="prelude-val">Ok</span>(co::STRETCH_MODE(sm)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetTextColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextcolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetTextColor</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetTextColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">color</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">color</span>)),
+	<span class="doccomment">/// [`GetTextColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextcolor)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetTextColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::GetTextColor(<span class="self">self</span>.as_ptr()) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetTextExtentPoint32`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextextentpoint32w)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetTextExtentPoint32</span>(<span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::GetTextExtentPoint32W</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">text</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`GetTextExtentPoint32`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextextentpoint32w)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetTextExtentPoint32(<span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetTextExtentPoint32W(
+					<span class="self">self</span>.as_ptr(),
+					WString::from_str(text).as_ptr(),
+					text.chars().count() <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>sz <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`GetTextFace`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacew)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetTextFace</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">LF_FACESIZE</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">gdi::ffi::GetTextFaceW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>())
+	<span class="doccomment">/// [`GetTextFace`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacew)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetTextFace(<span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(LF_FACESIZE + <span class="number">1</span>);
+		<span class="kw">match unsafe </span>{
+			gdi::ffi::GetTextFaceW(<span class="self">self</span>.as_ptr(), buf.len() <span class="kw">as _</span>, buf.as_mut_ptr())
 		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">v</span>),
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">to_string</span>())
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(v),
+		}.map(|<span class="kw">_</span>| buf.to_string())
 	}
 
-	<span class="doccomment">/// [`GetTextMetrics`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextmetricsw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">GetTextMetrics</span>(<span class="self">self</span>, <span class="ident">tm</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TEXTMETRIC</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::GetTextMetricsW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">tm</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>) },
+	<span class="doccomment">/// [`GetTextMetrics`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextmetricsw)
+	/// method.
+	</span><span class="kw">fn </span>GetTextMetrics(<span class="self">self</span>, tm: <span class="kw-2">&amp;mut </span>TEXTMETRIC) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ gdi::ffi::GetTextMetricsW(<span class="self">self</span>.as_ptr(), tm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
 	}
 
-	<span class="doccomment">/// [`GetViewportExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportextex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetViewportExtEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::GetViewportExtEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`GetViewportExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportextex)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetViewportExtEx(<span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetViewportExtEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`GetViewportOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportorgex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetViewportOrgEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::GetViewportOrgEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`GetViewportOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportorgex)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetViewportOrgEx(<span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetViewportOrgEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">pt</span>)
+		).map(|<span class="kw">_</span>| pt)
 	}
 
-	<span class="doccomment">/// [`GetWindowExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindowextex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetWindowExtEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::GetWindowExtEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`GetWindowExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindowextex)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetWindowExtEx(<span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetWindowExtEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`GetWindowOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindoworgex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetWindowOrgEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::GetWindowOrgEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`GetWindowOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindoworgex)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetWindowOrgEx(<span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetWindowOrgEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">pt</span>)
+		).map(|<span class="kw">_</span>| pt)
 	}
 
-	<span class="doccomment">/// [`LineTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-lineto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">LineTo</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::LineTo</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>) })
+	<span class="doccomment">/// [`LineTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-lineto)
+	/// method.
+	</span><span class="kw">fn </span>LineTo(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::LineTo(<span class="self">self</span>.as_ptr(), x, y) })
 	}
 
-	<span class="doccomment">/// [`MoveToEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-movetoex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">MoveToEx</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>, <span class="ident">pt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">POINT</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::MoveToEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">x</span>, <span class="ident">y</span>,
-					<span class="ident">pt</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">lp</span><span class="op">|</span> <span class="ident">lp</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// [`MoveToEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-movetoex)
+	/// method.
+	</span><span class="kw">fn </span>MoveToEx(<span class="self">self</span>, x: i32, y: i32, pt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>POINT&gt;) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::MoveToEx(
+					<span class="self">self</span>.as_ptr(),
+					x, y,
+					pt.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PatBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-patblt)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">PatBlt</span>(<span class="self">self</span>, <span class="ident">top_left</span>: <span class="ident">POINT</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">rop</span>: <span class="ident">co::ROP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::PatBlt</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">top_left</span>.<span class="ident">x</span>, <span class="ident">top_left</span>.<span class="ident">y</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">rop</span>.<span class="number">0</span>,
+	<span class="doccomment">/// [`PatBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-patblt)
+	/// method.
+	</span><span class="kw">fn </span>PatBlt(<span class="self">self</span>, top_left: POINT, sz: SIZE, rop: co::ROP) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::PatBlt(
+					<span class="self">self</span>.as_ptr(), top_left.x, top_left.y, sz.cx, sz.cy, rop.<span class="number">0</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PathToRegion`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pathtoregion)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">PathToRegion</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HRGN</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::PathToRegion</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HRGN</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`PathToRegion`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pathtoregion)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>PathToRegion(<span class="self">self</span>) -&gt; SysResult&lt;HRGN&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::PathToRegion(<span class="self">self</span>.as_ptr()).as_mut() }
+			.map(|ptr| HRGN(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`Pie`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pie)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Pie</span>(<span class="self">self</span>,
-		<span class="ident">bounds</span>: <span class="ident">RECT</span>, <span class="ident">radial_1</span>: <span class="ident">POINT</span>, <span class="ident">radial_2</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`Pie`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pie)
+	/// method.
+	</span><span class="kw">fn </span>Pie(<span class="self">self</span>,
+		bounds: RECT, radial_1: POINT, radial_2: POINT) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Pie</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bounds</span>.<span class="ident">left</span>, <span class="ident">bounds</span>.<span class="ident">top</span>, <span class="ident">bounds</span>.<span class="ident">right</span>, <span class="ident">bounds</span>.<span class="ident">bottom</span>,
-					<span class="ident">radial_1</span>.<span class="ident">x</span>, <span class="ident">radial_1</span>.<span class="ident">y</span>,
-					<span class="ident">radial_2</span>.<span class="ident">y</span>, <span class="ident">radial_2</span>.<span class="ident">y</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Pie(
+					<span class="self">self</span>.as_ptr(),
+					bounds.left, bounds.top, bounds.right, bounds.bottom,
+					radial_1.x, radial_1.y,
+					radial_2.y, radial_2.y,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PolyBezier`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezier)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">PolyBezier</span>(<span class="self">self</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span>[<span class="ident">POINT</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::PolyBezier</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pts</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">pts</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`PolyBezier`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezier)
+	/// method.
+	</span><span class="kw">fn </span>PolyBezier(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::PolyBezier(
+					<span class="self">self</span>.as_ptr(), pts.as_ptr() <span class="kw">as _</span>, pts.len() <span class="kw">as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PolyBezierTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezierto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">PolyBezierTo</span>(<span class="self">self</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span>[<span class="ident">POINT</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::PolyBezierTo</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pts</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">pts</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`PolyBezierTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezierto)
+	/// method.
+	</span><span class="kw">fn </span>PolyBezierTo(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::PolyBezierTo(
+					<span class="self">self</span>.as_ptr(), pts.as_ptr() <span class="kw">as _</span>, pts.len() <span class="kw">as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`Polyline`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polyline)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Polyline</span>(<span class="self">self</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span>[<span class="ident">POINT</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Polyline</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pts</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">pts</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>)
+	<span class="doccomment">/// [`Polyline`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polyline)
+	/// method.
+	</span><span class="kw">fn </span>Polyline(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Polyline(<span class="self">self</span>.as_ptr(), pts.as_ptr() <span class="kw">as _</span>, pts.len() <span class="kw">as _</span>)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PolylineTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polylineto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">PolylineTo</span>(<span class="self">self</span>, <span class="ident">pts</span>: <span class="kw-2">&amp;</span>[<span class="ident">POINT</span>]) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::PolylineTo</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">pts</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">pts</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`PolylineTo`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polylineto)
+	/// method.
+	</span><span class="kw">fn </span>PolylineTo(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::PolylineTo(
+					<span class="self">self</span>.as_ptr(), pts.as_ptr() <span class="kw">as _</span>, pts.len() <span class="kw">as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`PtVisible`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ptvisible)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">PtVisible</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::PtVisible</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>) } {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+	<span class="doccomment">/// [`PtVisible`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ptvisible)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>PtVisible(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;bool&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::PtVisible(<span class="self">self</span>.as_ptr(), x, y) } {
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 		}
 	}
 
-	<span class="doccomment">/// [`RealizePalette`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-realizepalette)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RealizePalette</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::RealizePalette</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="ident">GDI_ERROR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">num</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">num</span>),
+	<span class="doccomment">/// [`RealizePalette`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-realizepalette)
+	/// method.
+	</span><span class="kw">fn </span>RealizePalette(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::RealizePalette(<span class="self">self</span>.as_ptr()) } {
+			GDI_ERROR =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			num =&gt; <span class="prelude-val">Ok</span>(num),
 		}
 	}
 
-	<span class="doccomment">/// [`Rectangle`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-rectangle)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Rectangle</span>(<span class="self">self</span>, <span class="ident">bounds</span>: <span class="ident">RECT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::Rectangle</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bounds</span>.<span class="ident">left</span>, <span class="ident">bounds</span>.<span class="ident">top</span>, <span class="ident">bounds</span>.<span class="ident">right</span>, <span class="ident">bounds</span>.<span class="ident">bottom</span>)
+	<span class="doccomment">/// [`Rectangle`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-rectangle)
+	/// method.
+	</span><span class="kw">fn </span>Rectangle(<span class="self">self</span>, bounds: RECT) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::Rectangle(<span class="self">self</span>.as_ptr(),
+					bounds.left, bounds.top, bounds.right, bounds.bottom)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`RestoreDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-restoredc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RestoreDC</span>(<span class="self">self</span>, <span class="ident">saved_dc</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::RestoreDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">saved_dc</span>) })
+	<span class="doccomment">/// [`RestoreDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-restoredc)
+	/// method.
+	</span><span class="kw">fn </span>RestoreDC(<span class="self">self</span>, saved_dc: i32) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::RestoreDC(<span class="self">self</span>.as_ptr(), saved_dc) })
 	}
 
-	<span class="doccomment">/// [`RoundRect`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-roundrect)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RoundRect</span>(<span class="self">self</span>, <span class="ident">bounds</span>: <span class="ident">RECT</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::RoundRect</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">bounds</span>.<span class="ident">left</span>, <span class="ident">bounds</span>.<span class="ident">top</span>, <span class="ident">bounds</span>.<span class="ident">right</span>, <span class="ident">bounds</span>.<span class="ident">bottom</span>,
-					<span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>,
+	<span class="doccomment">/// [`RoundRect`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-roundrect)
+	/// method.
+	</span><span class="kw">fn </span>RoundRect(<span class="self">self</span>, bounds: RECT, sz: SIZE) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::RoundRect(
+					<span class="self">self</span>.as_ptr(),
+					bounds.left, bounds.top, bounds.right, bounds.bottom,
+					sz.cx, sz.cy,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`SaveDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-savedc)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SaveDC</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SaveDC</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">v</span>),
+	<span class="doccomment">/// [`SaveDC`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-savedc)
+	/// method.
+	</span><span class="kw">fn </span>SaveDC(<span class="self">self</span>) -&gt; SysResult&lt;i32&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SaveDC(<span class="self">self</span>.as_ptr()) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(v),
 		}
 	}
 
-	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)</span>
-	<span class="doccomment">/// method for [`HBITMAP`](crate::HBITMAP).</span>
-	<span class="kw">fn</span> <span class="ident">SelectObjectBitmap</span>(<span class="self">self</span>, <span class="ident">hbmp</span>: <span class="ident">HBITMAP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SelectObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hbmp</span>.<span class="number">0</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBITMAP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
+	/// method for [`HBITMAP`](crate::HBITMAP).
+	</span><span class="kw">fn </span>SelectObjectBitmap(<span class="self">self</span>, hbmp: HBITMAP) -&gt; SysResult&lt;HBITMAP&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbmp.<span class="number">0</span>).as_mut() }
+			.map(|ptr| HBITMAP(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)</span>
-	<span class="doccomment">/// method for [`HBRUSH`](crate::HBRUSH).</span>
-	<span class="kw">fn</span> <span class="ident">SelectObjectBrush</span>(<span class="self">self</span>, <span class="ident">hbr</span>: <span class="ident">HBRUSH</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBRUSH</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SelectObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hbr</span>.<span class="number">0</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBRUSH</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
+	/// method for [`HBRUSH`](crate::HBRUSH).
+	</span><span class="kw">fn </span>SelectObjectBrush(<span class="self">self</span>, hbr: HBRUSH) -&gt; SysResult&lt;HBRUSH&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbr.<span class="number">0</span>).as_mut() }
+			.map(|ptr| HBRUSH(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)</span>
-	<span class="doccomment">/// method for [`HFONT`](crate::HFONT).</span>
-	<span class="kw">fn</span> <span class="ident">SelectObjectFont</span>(<span class="self">self</span>, <span class="ident">hfont</span>: <span class="ident">HFONT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HFONT</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SelectObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hfont</span>.<span class="number">0</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HFONT</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
+	/// method for [`HFONT`](crate::HFONT).
+	</span><span class="kw">fn </span>SelectObjectFont(<span class="self">self</span>, hfont: HFONT) -&gt; SysResult&lt;HFONT&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hfont.<span class="number">0</span>).as_mut() }
+			.map(|ptr| HFONT(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)</span>
-	<span class="doccomment">/// method for [`HPEN`](crate::HPEN).</span>
-	<span class="kw">fn</span> <span class="ident">SelectObjectPen</span>(<span class="self">self</span>, <span class="ident">hpen</span>: <span class="ident">HPEN</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HPEN</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SelectObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hpen</span>.<span class="number">0</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HPEN</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
+	/// method for [`HPEN`](crate::HPEN).
+	</span><span class="kw">fn </span>SelectObjectPen(<span class="self">self</span>, hpen: HPEN) -&gt; SysResult&lt;HPEN&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hpen.<span class="number">0</span>).as_mut() }
+			.map(|ptr| HPEN(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)</span>
-	<span class="doccomment">/// method for [`HRGN`](crate::HRGN).</span>
-	<span class="kw">fn</span> <span class="ident">SelectObjectRgn</span>(<span class="self">self</span>, <span class="ident">hrgn</span>: <span class="ident">HRGN</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::REGION</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SelectObject</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">hrgn</span>.<span class="number">0</span>).<span class="ident">as_mut</span>() }
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">co::REGION</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+	<span class="doccomment">/// [`SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
+	/// method for [`HRGN`](crate::HRGN).
+	</span><span class="kw">fn </span>SelectObjectRgn(<span class="self">self</span>, hrgn: HRGN) -&gt; SysResult&lt;co::REGION&gt; {
+		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hrgn.<span class="number">0</span>).as_mut() }
+			.map(|ptr| co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`SetArcDirection`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setarcdirection)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetArcDirection</span>(<span class="self">self</span>, <span class="ident">dir</span>: <span class="ident">co::AD</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::AD</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetArcDirection</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">dir</span>.<span class="number">0</span>) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::AD</span>(<span class="ident">v</span>)),
+	<span class="doccomment">/// [`SetArcDirection`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setarcdirection)
+	/// method.
+	</span><span class="kw">fn </span>SetArcDirection(<span class="self">self</span>, dir: co::AD) -&gt; SysResult&lt;co::AD&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetArcDirection(<span class="self">self</span>.as_ptr(), dir.<span class="number">0</span>) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(co::AD(v)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetBkMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkmode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetBkMode</span>(<span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">co::BKMODE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::BKMODE</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetBkMode</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">mode</span>.<span class="number">0</span>) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::BKMODE</span>(<span class="ident">v</span>)),
+	<span class="doccomment">/// [`SetBkMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkmode)
+	/// method.
+	</span><span class="kw">fn </span>SetBkMode(<span class="self">self</span>, mode: co::BKMODE) -&gt; SysResult&lt;co::BKMODE&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetBrushOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbrushorgex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetBrushOrgEx</span>(<span class="self">self</span>, <span class="ident">new_origin</span>: <span class="ident">POINT</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_origin</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::SetBrushOrgEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">new_origin</span>.<span class="ident">x</span>, <span class="ident">new_origin</span>.<span class="ident">y</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">old_origin</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`SetBrushOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbrushorgex)
+	/// method.
+	</span><span class="kw">fn </span>SetBrushOrgEx(<span class="self">self</span>, new_origin: POINT) -&gt; SysResult&lt;POINT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>old_origin = POINT::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::SetBrushOrgEx(
+					<span class="self">self</span>.as_ptr(),
+					new_origin.x, new_origin.y,
+					<span class="kw-2">&amp;mut </span>old_origin <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">old_origin</span>)
+		).map(|<span class="kw">_</span>| old_origin)
 	}
 
-	<span class="doccomment">/// [`SetDCBrushColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcbrushcolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetDCBrushColor</span>(<span class="self">self</span>, <span class="ident">color</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetDCBrushColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">color</span>.<span class="number">0</span>) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">old</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">old</span>)),
+	<span class="doccomment">/// [`SetDCBrushColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcbrushcolor)
+	/// method.
+	</span><span class="kw">fn </span>SetDCBrushColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCBrushColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetDCPenColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcpencolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetDCPenColor</span>(<span class="self">self</span>, <span class="ident">color</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetDCPenColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">color</span>.<span class="number">0</span>) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">old</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">old</span>)),
+	<span class="doccomment">/// [`SetDCPenColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcpencolor)
+	/// method.
+	</span><span class="kw">fn </span>SetDCPenColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCPenColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetGraphicsMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setgraphicsmode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetGraphicsMode</span>(<span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">co::GM</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::GM</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetGraphicsMode</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">mode</span>.<span class="number">0</span>) } {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">v</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::GM</span>(<span class="ident">v</span>))
+	<span class="doccomment">/// [`SetGraphicsMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setgraphicsmode)
+	/// method.
+	</span><span class="kw">fn </span>SetGraphicsMode(<span class="self">self</span>, mode: co::GM) -&gt; SysResult&lt;co::GM&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetGraphicsMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			v =&gt; <span class="prelude-val">Ok</span>(co::GM(v))
 		}
 	}
 
-	<span class="doccomment">/// [`SetStretchBltMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setstretchbltmode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetStretchBltMode</span>(<span class="self">self</span>,
-		<span class="ident">mode</span>: <span class="ident">co::STRETCH_MODE</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::STRETCH_MODE</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`SetStretchBltMode`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setstretchbltmode)
+	/// method.
+	</span><span class="kw">fn </span>SetStretchBltMode(<span class="self">self</span>,
+		mode: co::STRETCH_MODE) -&gt; SysResult&lt;co::STRETCH_MODE&gt;
 	{
-		<span class="kw">match</span> <span class="ident">co::ERROR</span>(
-			<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetStretchBltMode</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">mode</span>.<span class="number">0</span>) } <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="kw">match </span>co::ERROR(
+			<span class="kw">unsafe </span>{ gdi::ffi::SetStretchBltMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } <span class="kw">as _</span>,
 		) {
-			<span class="ident">co::ERROR::INVALID_PARAMETER</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">co::ERROR::INVALID_PARAMETER</span>),
-			<span class="ident">err_val</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::STRETCH_MODE</span>(<span class="ident">err_val</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)),
+			co::ERROR::INVALID_PARAMETER =&gt; <span class="prelude-val">Err</span>(co::ERROR::INVALID_PARAMETER),
+			err_val =&gt; <span class="prelude-val">Ok</span>(co::STRETCH_MODE(err_val.<span class="number">0 </span><span class="kw">as _</span>)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetTextAlign`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextalign)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetTextAlign</span>(<span class="self">self</span>, <span class="ident">align</span>: <span class="ident">co::TA</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">co::TA</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetTextAlign</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">align</span>.<span class="number">0</span>) } {
-			<span class="ident">GDI_ERROR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">ta</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">co::TA</span>(<span class="ident">ta</span>)),
+	<span class="doccomment">/// [`SetTextAlign`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextalign)
+	/// method.
+	</span><span class="kw">fn </span>SetTextAlign(<span class="self">self</span>, align: co::TA) -&gt; SysResult&lt;co::TA&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextAlign(<span class="self">self</span>.as_ptr(), align.<span class="number">0</span>) } {
+			GDI_ERROR =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			ta =&gt; <span class="prelude-val">Ok</span>(co::TA(ta)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetTextColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextcolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetTextColor</span>(<span class="self">self</span>, <span class="ident">color</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetTextColor</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">color</span>.<span class="number">0</span>) } {
-			<span class="ident">CLR_INVALID</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">old</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">COLORREF</span>(<span class="ident">old</span>)),
+	<span class="doccomment">/// [`SetTextColor`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextcolor)
+	/// method.
+	</span><span class="kw">fn </span>SetTextColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
 		}
 	}
 
-	<span class="doccomment">/// [`SetTextJustification`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextjustification)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetTextJustification</span>(<span class="self">self</span>, <span class="ident">extra</span>: <span class="ident">i32</span>, <span class="ident">count</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::SetTextJustification</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">extra</span>, <span class="ident">count</span>) },
+	<span class="doccomment">/// [`SetTextJustification`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextjustification)
+	/// method.
+	</span><span class="kw">fn </span>SetTextJustification(<span class="self">self</span>, extra: i32, count: i32) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ gdi::ffi::SetTextJustification(<span class="self">self</span>.as_ptr(), extra, count) },
 		)
 	}
 
-	<span class="doccomment">/// [`SetViewportExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportextex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetViewportExtEx</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::SetViewportExtEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`SetViewportExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportextex)
+	/// method.
+	</span><span class="kw">fn </span>SetViewportExtEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::SetViewportExtEx(
+					<span class="self">self</span>.as_ptr(), x, y, <span class="kw-2">&amp;mut </span>sz <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`SetViewportOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportorgex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetViewportOrgEx</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::SetViewportOrgEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`SetViewportOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportorgex)
+	/// method.
+	</span><span class="kw">fn </span>SetViewportOrgEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::SetViewportOrgEx(
+					<span class="self">self</span>.as_ptr(), x, y, <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">pt</span>)
+		).map(|<span class="kw">_</span>| pt)
 	}
 
-	<span class="doccomment">/// [`SetWindowExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindowextex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetWindowExtEx</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">SIZE</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::SetWindowExtEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`SetWindowExtEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindowextex)
+	/// method.
+	</span><span class="kw">fn </span>SetWindowExtEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::SetWindowExtEx(
+					<span class="self">self</span>.as_ptr(), x, y, <span class="kw-2">&amp;mut </span>sz <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">sz</span>)
+		).map(|<span class="kw">_</span>| sz)
 	}
 
-	<span class="doccomment">/// [`SetWindowOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindoworgex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetWindowOrgEx</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">POINT</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pt</span> <span class="op">=</span> <span class="ident">POINT::default</span>();
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::SetWindowOrgEx</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">x</span>, <span class="ident">y</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`SetWindowOrgEx`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindoworgex)
+	/// method.
+	</span><span class="kw">fn </span>SetWindowOrgEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::SetWindowOrgEx(
+					<span class="self">self</span>.as_ptr(), x, y, <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">pt</span>)
+		).map(|<span class="kw">_</span>| pt)
 	}
 
-	<span class="doccomment">/// [`StretchBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchblt)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">StretchBlt</span>(<span class="self">self</span>,
-		<span class="ident">pos_dest</span>: <span class="ident">POINT</span>, <span class="ident">sz_dest</span>: <span class="ident">SIZE</span>,
-		<span class="ident">hdc_src</span>: <span class="ident">HDC</span>,
-		<span class="ident">pt_src</span>: <span class="ident">POINT</span>, <span class="ident">sz_src</span>: <span class="ident">SIZE</span>,
-		<span class="ident">rop</span>: <span class="ident">co::ROP</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`StretchBlt`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchblt)
+	/// method.
+	</span><span class="kw">fn </span>StretchBlt(<span class="self">self</span>,
+		pos_dest: POINT, sz_dest: SIZE,
+		hdc_src: HDC,
+		pt_src: POINT, sz_src: SIZE,
+		rop: co::ROP) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::StretchBlt</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">pos_dest</span>.<span class="ident">x</span>, <span class="ident">pos_dest</span>.<span class="ident">y</span>,
-					<span class="ident">sz_dest</span>.<span class="ident">cx</span>, <span class="ident">sz_dest</span>.<span class="ident">cy</span>,
-					<span class="ident">hdc_src</span>.<span class="number">0</span>,
-					<span class="ident">pt_src</span>.<span class="ident">x</span>, <span class="ident">pt_src</span>.<span class="ident">y</span>,
-					<span class="ident">sz_src</span>.<span class="ident">cx</span>, <span class="ident">sz_src</span>.<span class="ident">cy</span>,
-					<span class="ident">rop</span>.<span class="number">0</span>,
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::StretchBlt(
+					<span class="self">self</span>.as_ptr(),
+					pos_dest.x, pos_dest.y,
+					sz_dest.cx, sz_dest.cy,
+					hdc_src.<span class="number">0</span>,
+					pt_src.x, pt_src.y,
+					sz_src.cx, sz_src.cy,
+					rop.<span class="number">0</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`StrokeAndFillPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokeandfillpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">StrokeAndFillPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::StrokeAndFillPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`StrokeAndFillPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokeandfillpath)
+	/// method.
+	</span><span class="kw">fn </span>StrokeAndFillPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::StrokeAndFillPath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`StrokePath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokepath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">StrokePath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::StrokePath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`StrokePath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokepath)
+	/// method.
+	</span><span class="kw">fn </span>StrokePath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::StrokePath(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`TextOut`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-textoutw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">TextOut</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="ident">gdi::ffi::TextOutW</span>(
-					<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-					<span class="ident">x</span>, <span class="ident">y</span>,
-					<span class="ident">WString::from_str</span>(<span class="ident">text</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`TextOut`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-textoutw)
+	/// method.
+	</span><span class="kw">fn </span>TextOut(<span class="self">self</span>, x: i32, y: i32, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::TextOutW(
+					<span class="self">self</span>.as_ptr(),
+					x, y,
+					WString::from_str(text).as_ptr(),
+					text.len() <span class="kw">as _</span>,
 				)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`UpdateColors`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-updatecolors)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">UpdateColors</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::UpdateColors</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`UpdateColors`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-updatecolors)
+	/// method.
+	</span><span class="kw">fn </span>UpdateColors(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::UpdateColors(<span class="self">self</span>.as_ptr()) })
 	}
 
-	<span class="doccomment">/// [`WidenPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-widenpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">WidenPath</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>  {
-		<span class="ident">bool_to_winresult</span>(<span class="kw">unsafe</span> { <span class="ident">gdi::ffi::WidenPath</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) })
+	<span class="doccomment">/// [`WidenPath`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-widenpath)
+	/// method.
+	</span><span class="kw">fn </span>WidenPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt;  {
+		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::WidenPath(<span class="self">self</span>.as_ptr()) })
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

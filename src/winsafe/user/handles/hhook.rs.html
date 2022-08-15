@@ -58,65 +58,65 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">HINSTANCE</span>, <span class="ident">WinResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::bool_to_winresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HOOKPROC</span>;
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HOOKPROC;
 
-<span class="macro">impl_handle!</span> { <span class="ident">HHOOK</span>: <span class="string">&quot;user&quot;</span>;
-	<span class="doccomment">/// Handle to a</span>
-	<span class="doccomment">/// [hook](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hhook).</span>
-}
+<span class="macro">impl_handle!</span> { HHOOK: <span class="string">&quot;user&quot;</span>;
+	<span class="doccomment">/// Handle to a
+	/// [hook](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hhook).
+</span>}
 
-<span class="kw">impl</span> <span class="ident">user_Hhook</span> <span class="kw">for</span> <span class="ident">HHOOK</span> {}
+<span class="kw">impl </span>user_Hhook <span class="kw">for </span>HHOOK {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HHOOK`](crate::HHOOK).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hhook</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CallNextHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-callnexthookex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">CallNextHookEx</span>(<span class="self">self</span>,
-		<span class="ident">code</span>: <span class="ident">co::WH</span>, <span class="ident">wparam</span>: <span class="ident">usize</span>, <span class="ident">lparam</span>: <span class="ident">isize</span>) -&gt; <span class="ident">isize</span>
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HHOOK`](crate::HHOOK).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hhook: Handle {
+	<span class="doccomment">/// [`CallNextHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-callnexthookex)
+	/// method.
+	</span><span class="kw">fn </span>CallNextHookEx(<span class="self">self</span>,
+		code: co::WH, wparam: usize, lparam: isize) -&gt; isize
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::CallNextHookEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">code</span>.<span class="number">0</span>, <span class="ident">wparam</span>, <span class="ident">lparam</span>)
+		<span class="kw">unsafe </span>{
+			user::ffi::CallNextHookEx(<span class="self">self</span>.as_ptr(), code.<span class="number">0</span>, wparam, lparam)
 		}
 	}
 
-	<span class="doccomment">/// [`SetWindowsHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexw)</span>
-	<span class="doccomment">/// static method.</span>
-	<span class="kw">fn</span> <span class="ident">SetWindowsHookEx</span>(
-		<span class="ident">hook_id</span>: <span class="ident">co::WH</span>, <span class="ident">proc</span>: <span class="ident">HOOKPROC</span>,
-		<span class="ident">module</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HINSTANCE</span><span class="op">&gt;</span>, <span class="ident">thread_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HHOOK</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`SetWindowsHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexw)
+	/// static method.
+	</span><span class="kw">fn </span>SetWindowsHookEx(
+		hook_id: co::WH, proc: HOOKPROC,
+		module: <span class="prelude-ty">Option</span>&lt;HINSTANCE&gt;, thread_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;HHOOK&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::SetWindowsHookExW</span>(
-				<span class="ident">hook_id</span>.<span class="number">0</span>,
-				<span class="ident">proc</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">module</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-				<span class="ident">thread_id</span>.<span class="ident">unwrap_or_default</span>(),
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HHOOK</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			user::ffi::SetWindowsHookExW(
+				hook_id.<span class="number">0</span>,
+				proc <span class="kw">as _</span>,
+				module.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+				thread_id.unwrap_or_default(),
+			).as_mut()
+		}.map(|ptr| HHOOK(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`UnhookWindowsHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unhookwindowshookex)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">UnhookWindowsHookEx</span>(<span class="self">self</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">bool_to_winresult</span>(
-			<span class="kw">unsafe</span> { <span class="ident">user::ffi::UnhookWindowsHookEx</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) },
+	<span class="doccomment">/// [`UnhookWindowsHookEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unhookwindowshookex)
+	/// method.
+	</span><span class="kw">fn </span>UnhookWindowsHookEx(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{ user::ffi::UnhookWindowsHookEx(<span class="self">self</span>.as_ptr()) },
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

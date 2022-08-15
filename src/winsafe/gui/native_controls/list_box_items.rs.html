@@ -235,241 +235,241 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::ListBox</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::lb</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiWindow</span>, <span class="ident">NativeBitflag</span>, <span class="ident">user_Hwnd</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::ListBox;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::msg::lb;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, NativeBitflag, user_Hwnd};
 
-<span class="doccomment">/// Exposes item methods of a [`ListBox`](crate::gui::ListBox) control.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListBoxItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>,
+<span class="doccomment">/// Exposes item methods of a [`ListBox`](crate::gui::ListBox) control.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ListBoxItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ListBoxItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">owner</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ListBoxItems&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ owner }
 	}
 
-	<span class="doccomment">/// Adds new texts by sending [`lb::AddString`](crate::msg::lb::AddString)</span>
-	<span class="doccomment">/// messages.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let my_list: gui::ListBox; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// my_list.items().add(&amp;[&quot;John&quot;, &quot;Mary&quot;]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>]) {
-		<span class="kw">for</span> <span class="ident">text</span> <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>() {
-			<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">lb::AddString</span> {
-					<span class="ident">text</span>: <span class="ident">WString::from_str</span>(<span class="ident">text</span>.<span class="ident">as_ref</span>()),
+	<span class="doccomment">/// Adds new texts by sending [`lb::AddString`](crate::msg::lb::AddString)
+	/// messages.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let my_list: gui::ListBox; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());
+	///
+	/// my_list.items().add(&amp;[&quot;John&quot;, &quot;Mary&quot;]);
+	/// ```
+	</span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;</span><span class="self">self</span>, items: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) {
+		<span class="kw">for </span>text <span class="kw">in </span>items.iter() {
+			<span class="self">self</span>.owner.hwnd()
+				.SendMessage(lb::AddString {
+					text: WString::from_str(text.as_ref()),
 				})
-				.<span class="ident">unwrap</span>();
+				.unwrap();
 		}
 	}
 
-	<span class="doccomment">/// Retrieves the number of items by sending an</span>
-	<span class="doccomment">/// [`lb::GetCount`](crate::msg::lb::GetCount) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetCount</span> {})
-			.<span class="ident">unwrap</span>()
+	<span class="doccomment">/// Retrieves the number of items by sending an
+	/// [`lb::GetCount`](crate::msg::lb::GetCount) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetCount {})
+			.unwrap()
 	}
 
-	<span class="doccomment">/// Deletes the item at the given index by sending an</span>
-	<span class="doccomment">/// [`lb::DeleteString`](crate::msg::lb::DeleteString) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::DeleteString</span> { <span class="ident">index</span> })
-			.<span class="ident">unwrap</span>();
+	<span class="doccomment">/// Deletes the item at the given index by sending an
+	/// [`lb::DeleteString`](crate::msg::lb::DeleteString) message.
+	</span><span class="kw">pub fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::DeleteString { index })
+			.unwrap();
 	}
 
-	<span class="doccomment">/// Deletes all items by sending an</span>
-	<span class="doccomment">/// [`lb::ResetContent`](crate::msg::lb::ResetContent) message.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(<span class="ident">lb::ResetContent</span> {});
+	<span class="doccomment">/// Deletes all items by sending an
+	/// [`lb::ResetContent`](crate::msg::lb::ResetContent) message.
+	</span><span class="kw">pub fn </span>delete_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+		<span class="self">self</span>.owner.hwnd().SendMessage(lb::ResetContent {});
 	}
 
-	<span class="doccomment">/// Returns an iterator over the texts.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let my_list: gui::ListBox; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for text in my_list.items().iter() {</span>
-	<span class="doccomment">///     println!(&quot;Text {}&quot;, text);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-		<span class="ident">ListBoxItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>)
+	<span class="doccomment">/// Returns an iterator over the texts.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let my_list: gui::ListBox; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());
+	///
+	/// for text in my_list.items().iter() {
+	///     println!(&quot;Text {}&quot;, text);
+	/// }
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = String&gt; + <span class="lifetime">&#39;a </span>{
+		ListBoxItemIter::new(<span class="self">self</span>.owner)
 	}
 
-	<span class="doccomment">/// Returns an iterator over the currently selected texts.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method works for both single and multiple-selection lists.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::gui;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let my_list: gui::ListBox; // initialized somewhere</span>
-	<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-	<span class="doccomment">/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for (sel_idx, text) in my_list.items().iter_selected() {</span>
-	<span class="doccomment">///     println!(&quot;Text {}: {}&quot;, sel_idx, text);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_selected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">u32</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-		<span class="ident">ListBoxSelItemIter::new</span>(<span class="self">self</span>.<span class="ident">owner</span>)
+	<span class="doccomment">/// Returns an iterator over the currently selected texts.
+	///
+	/// This method works for both single and multiple-selection lists.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::gui;
+	///
+	/// let my_list: gui::ListBox; // initialized somewhere
+	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+	/// # let my_list = gui::ListBox::new(&amp;wnd, gui::ListBoxOpts::default());
+	///
+	/// for (sel_idx, text) in my_list.items().iter_selected() {
+	///     println!(&quot;Text {}: {}&quot;, sel_idx, text);
+	/// }
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>iter_selected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (u32, String)&gt; + <span class="lifetime">&#39;a </span>{
+		ListBoxSelItemIter::new(<span class="self">self</span>.owner)
 	}
 
-	<span class="doccomment">/// Retrieves the text at the given position, if any, by sending a</span>
-	<span class="doccomment">/// [`lb::GetText`](crate::msg::lb::GetText) message.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">String</span> {
-		<span class="kw">let</span> <span class="ident">num_chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetTextLen</span> { <span class="ident">index</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">num_chars</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetText</span> { <span class="ident">index</span>, <span class="ident">text</span>: <span class="kw-2">&amp;mut</span> <span class="ident">buf</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="ident">buf</span>.<span class="ident">to_string</span>()
+	<span class="doccomment">/// Retrieves the text at the given position, if any, by sending a
+	/// [`lb::GetText`](crate::msg::lb::GetText) message.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; String {
+		<span class="kw">let </span>num_chars = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetTextLen { index })
+			.unwrap();
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(num_chars <span class="kw">as </span>usize + <span class="number">1</span>);
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetText { index, text: <span class="kw-2">&amp;mut </span>buf })
+			.unwrap();
+		buf.to_string()
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">struct</span> <span class="ident">ListBoxItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>,
-	<span class="ident">count</span>: <span class="ident">u32</span>,
-	<span class="ident">current</span>: <span class="ident">u32</span>,
-	<span class="ident">buffer</span>: <span class="ident">WString</span>,
+</span><span class="kw">struct </span>ListBoxItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox,
+	count: u32,
+	current: u32,
+	buffer: WString,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ListBoxItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>ListBoxItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = String;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">count</span> {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">self</span>.current == <span class="self">self</span>.count {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">let</span> <span class="ident">num_chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetTextLen</span> { <span class="ident">index</span>: <span class="self">self</span>.<span class="ident">current</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">realloc_buffer</span>(<span class="ident">num_chars</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
+		<span class="kw">let </span>num_chars = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetTextLen { index: <span class="self">self</span>.current })
+			.unwrap();
+		<span class="self">self</span>.buffer.realloc_buffer(num_chars <span class="kw">as </span>usize + <span class="number">1</span>);
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetText</span> {
-				<span class="ident">index</span>: <span class="self">self</span>.<span class="ident">current</span>,
-				<span class="ident">text</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetText {
+				index: <span class="self">self</span>.current,
+				text: <span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer,
 			})
-			.<span class="ident">unwrap</span>();
-		<span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">to_string</span>())
+			.unwrap();
+		<span class="self">self</span>.current += <span class="number">1</span>;
+		<span class="prelude-val">Some</span>(<span class="self">self</span>.buffer.to_string())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ListBoxItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">owner</span>,
-			<span class="ident">count</span>: <span class="ident">owner</span>.<span class="ident">items</span>().<span class="ident">count</span>(),
-			<span class="ident">current</span>: <span class="number">0</span>,
-			<span class="ident">buffer</span>: <span class="ident">WString::new_alloc_buffer</span>(<span class="number">40</span>), <span class="comment">// arbitrary</span>
-		}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ListBoxItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			owner,
+			count: owner.items().count(),
+			current: <span class="number">0</span>,
+			buffer: WString::new_alloc_buffer(<span class="number">40</span>), <span class="comment">// arbitrary
+		</span>}
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">struct</span> <span class="ident">ListBoxSelItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>,
-	<span class="ident">indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-	<span class="ident">current</span>: <span class="ident">u32</span>,
-	<span class="ident">buffer</span>: <span class="ident">WString</span>,
+</span><span class="kw">struct </span>ListBoxSelItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox,
+	indexes: Vec&lt;u32&gt;,
+	current: u32,
+	buffer: WString,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ListBoxSelItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">u32</span>, <span class="ident">String</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>ListBoxSelItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = (u32, String);
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">self</span>.current == <span class="self">self</span>.indexes.len() <span class="kw">as </span>u32 {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">let</span> <span class="ident">cur_sel_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indexes</span>[<span class="self">self</span>.<span class="ident">current</span> <span class="kw">as</span> <span class="ident">usize</span>];
+		<span class="kw">let </span>cur_sel_index = <span class="self">self</span>.indexes[<span class="self">self</span>.current <span class="kw">as </span>usize];
 
-		<span class="kw">let</span> <span class="ident">num_chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetTextLen</span> { <span class="ident">index</span>: <span class="ident">cur_sel_index</span> })
-			.<span class="ident">unwrap</span>();
-		<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">realloc_buffer</span>(<span class="ident">num_chars</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
+		<span class="kw">let </span>num_chars = <span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetTextLen { index: cur_sel_index })
+			.unwrap();
+		<span class="self">self</span>.buffer.realloc_buffer(num_chars <span class="kw">as </span>usize + <span class="number">1</span>);
 
-		<span class="self">self</span>.<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-			.<span class="ident">SendMessage</span>(<span class="ident">lb::GetText</span> {
-				<span class="ident">index</span>: <span class="ident">cur_sel_index</span>,
-				<span class="ident">text</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buffer</span>,
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(lb::GetText {
+				index: cur_sel_index,
+				text: <span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer,
 			})
-			.<span class="ident">unwrap</span>();
-		<span class="self">self</span>.<span class="ident">current</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-		<span class="prelude-val">Some</span>((<span class="ident">cur_sel_index</span>, <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">to_string</span>()))
+			.unwrap();
+		<span class="self">self</span>.current += <span class="number">1</span>;
+		<span class="prelude-val">Some</span>((cur_sel_index, <span class="self">self</span>.buffer.to_string()))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ListBoxSelItemIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">owner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ListBox</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">co::LBS</span>(
-			<span class="ident">owner</span>.<span class="ident">hwnd</span>().<span class="ident">GetWindowLongPtr</span>(<span class="ident">co::GWLP::STYLE</span>) <span class="kw">as</span> <span class="kw">_</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ListBoxSelItemIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ListBox) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span>styles = co::LBS(
+			owner.hwnd().GetWindowLongPtr(co::GWLP::STYLE) <span class="kw">as _</span>,
 		);
 
-		<span class="kw">let</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">styles</span>.<span class="ident">has</span>(<span class="ident">co::LBS::EXTENDEDSEL</span>) { <span class="comment">// multiple selection?</span>
-			<span class="kw">let</span> <span class="ident">num_indexes</span> <span class="op">=</span> <span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">lb::GetSelCount</span> {})
-				.<span class="ident">unwrap</span>();
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">num_indexes</span> <span class="kw">as</span> <span class="kw">_</span>];
+		<span class="kw">let </span>indexes = <span class="kw">if </span>styles.has(co::LBS::EXTENDEDSEL) { <span class="comment">// multiple selection?
+			</span><span class="kw">let </span>num_indexes = owner.hwnd()
+				.SendMessage(lb::GetSelCount {})
+				.unwrap();
+			<span class="kw">let </span><span class="kw-2">mut </span>indexes = <span class="macro">vec!</span>[<span class="number">0</span>; num_indexes <span class="kw">as _</span>];
 
-			<span class="ident">owner</span>.<span class="ident">hwnd</span>()
-				.<span class="ident">SendMessage</span>(<span class="ident">lb::GetSelItems</span> { <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">indexes</span> })
-				.<span class="ident">unwrap</span>();
-			<span class="ident">indexes</span>
-		} <span class="kw">else</span> {
-			<span class="kw">match</span> <span class="ident">owner</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(<span class="ident">lb::GetCurSel</span> {}) {
-				<span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">index</span>], <span class="comment">// single selection: at max 1</span>
-				<span class="prelude-val">None</span> =&gt; <span class="ident">Vec::default</span>(),
+			owner.hwnd()
+				.SendMessage(lb::GetSelItems { buffer: <span class="kw-2">&amp;mut </span>indexes })
+				.unwrap();
+			indexes
+		} <span class="kw">else </span>{
+			<span class="kw">match </span>owner.hwnd().SendMessage(lb::GetCurSel {}) {
+				<span class="prelude-val">Some</span>(index) =&gt; <span class="macro">vec!</span>[index], <span class="comment">// single selection: at max 1
+				</span><span class="prelude-val">None </span>=&gt; Vec::default(),
 			}
 		};
 
-		<span class="self">Self</span> {
-			<span class="ident">owner</span>,
-			<span class="ident">indexes</span>,
-			<span class="ident">current</span>: <span class="number">0</span>,
-			<span class="ident">buffer</span>: <span class="ident">WString::new_alloc_buffer</span>(<span class="number">40</span>), <span class="comment">// arbitrary</span>
-		}
+		<span class="self">Self </span>{
+			owner,
+			indexes,
+			current: <span class="number">0</span>,
+			buffer: WString::new_alloc_buffer(<span class="number">40</span>), <span class="comment">// arbitrary
+		</span>}
 	}
 }</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

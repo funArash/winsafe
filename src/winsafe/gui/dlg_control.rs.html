@@ -109,116 +109,116 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::dlg_base::DlgBase</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::WindowEventsAll</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::layout_arranger</span>::{<span class="ident">Horz</span>, <span class="ident">Vert</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::privs</span>::{
-	<span class="ident">auto_ctrl_id</span>, <span class="ident">multiply_dpi_or_dtu</span>, <span class="ident">paint_control_borders</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::dlg_base::DlgBase;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::WindowEventsAll;
+<span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
+<span class="kw">use </span><span class="kw">crate</span>::gui::privs::{
+	auto_ctrl_id, multiply_dpi_or_dtu, paint_control_borders,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">GuiEvents</span>, <span class="ident">user_Hwnd</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">HwndPlace</span>, <span class="ident">POINT</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiEvents, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, HwndPlace, POINT, SIZE};
 
-<span class="kw">struct</span> <span class="ident">Obj</span> { <span class="comment">// actual fields of DlgControl</span>
-	<span class="ident">dlg_base</span>: <span class="ident">DlgBase</span>,
-	<span class="ident">ctrl_id</span>: <span class="ident">u16</span>,
-	<span class="ident">position</span>: <span class="ident">POINT</span>,
-	<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="kw">struct </span>Obj { <span class="comment">// actual fields of DlgControl
+	</span>dlg_base: DlgBase,
+	ctrl_id: u16,
+	position: POINT,
+	_pin: PhantomPinned,
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// A dialog-based custom control window.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">struct</span> <span class="ident">DlgControl</span>(<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Obj</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+</span><span class="doccomment">/// A dialog-based custom control window.
+</span><span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>DlgControl(Pin&lt;Arc&lt;Obj&gt;&gt;);
 
-<span class="kw">impl</span> <span class="ident">DlgControl</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-		<span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>,
-		<span class="ident">dialog_id</span>: <span class="ident">u16</span>,
-		<span class="ident">position</span>: <span class="ident">POINT</span>,
-		<span class="ident">resize_behavior</span>: (<span class="ident">Horz</span>, <span class="ident">Vert</span>),
-		<span class="ident">ctrl_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-	{
-		<span class="kw">let</span> <span class="ident">new_self</span> <span class="op">=</span> <span class="self">Self</span>(
-			<span class="ident">Arc::pin</span>(
-				<span class="ident">Obj</span> {
-					<span class="ident">dlg_base</span>: <span class="ident">DlgBase::new</span>(<span class="prelude-val">Some</span>(<span class="ident">parent</span>), <span class="ident">dialog_id</span>),
-					<span class="ident">position</span>,
-					<span class="ident">ctrl_id</span>: <span class="ident">ctrl_id</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">auto_ctrl_id</span>()),
-					<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="kw">impl </span>DlgControl {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(
+		parent: <span class="kw-2">&amp;</span>Base,
+		dialog_id: u16,
+		position: POINT,
+		resize_behavior: (Horz, Vert),
+		ctrl_id: <span class="prelude-ty">Option</span>&lt;u16&gt;) -&gt; <span class="self">Self
+	</span>{
+		<span class="kw">let </span>new_self = <span class="self">Self</span>(
+			Arc::pin(
+				Obj {
+					dlg_base: DlgBase::new(<span class="prelude-val">Some</span>(parent), dialog_id),
+					position,
+					ctrl_id: ctrl_id.unwrap_or_else(|| auto_ctrl_id()),
+					_pin: PhantomPinned,
 				},
 			),
 		);
-		<span class="ident">new_self</span>.<span class="ident">default_message_handlers</span>(
-			<span class="ident">parent</span>, <span class="ident">resize_behavior</span>.<span class="number">0</span>, <span class="ident">resize_behavior</span>.<span class="number">1</span>);
-		<span class="ident">new_self</span>
+		new_self.default_message_handlers(
+			parent, resize_behavior.<span class="number">0</span>, resize_behavior.<span class="number">1</span>);
+		new_self
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">std::ffi::c_void</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">as_base</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">unsafe fn </span>as_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.as_base()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">hwnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HWND</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">hwnd</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HWND {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.hwnd()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">ctrl_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">ctrl_id</span>
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+		<span class="self">self</span>.<span class="number">0</span>.ctrl_id
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEventsAll</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">on</span>()
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.on()
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">spawn_new_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>spawn_new_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">spawn_new_thread</span>(<span class="ident">func</span>);
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.spawn_new_thread(func);
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">run_ui_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">run_ui_thread</span>(<span class="ident">func</span>);
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>run_ui_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static
+	</span>{
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.run_ui_thread(func);
 	}
 
-	<span class="kw">fn</span> <span class="ident">default_message_handlers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>, <span class="ident">horz</span>: <span class="ident">Horz</span>, <span class="ident">vert</span>: <span class="ident">Vert</span>) {
-		<span class="kw">let</span> <span class="ident">self2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">privileged_on</span>().<span class="ident">wm</span>(<span class="ident">parent</span>.<span class="ident">creation_msg</span>(), <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="comment">// Create the control.</span>
-			<span class="ident">self2</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">create_dialog_param</span>();
+	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Base, horz: Horz, vert: Vert) {
+		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.parent().unwrap().privileged_on().wm(parent.creation_msg(), <span class="kw">move </span>|<span class="kw">_</span>| {
+			<span class="comment">// Create the control.
+			</span>self2.<span class="number">0</span>.dlg_base.create_dialog_param();
 
-			<span class="comment">// Set control position within parent.</span>
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dlg_pos</span> <span class="op">=</span> <span class="ident">self2</span>.<span class="number">0</span>.<span class="ident">position</span>;
-			<span class="ident">multiply_dpi_or_dtu</span>(
-				<span class="ident">self2</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dlg_pos</span>), <span class="prelude-val">None</span>);
-			<span class="ident">self2</span>.<span class="ident">hwnd</span>().<span class="ident">SetWindowPos</span>(
-				<span class="ident">HwndPlace::None</span>,
-				<span class="ident">dlg_pos</span>, <span class="ident">SIZE::default</span>(),
-				<span class="ident">co::SWP::NOZORDER</span> <span class="op">|</span> <span class="ident">co::SWP::NOSIZE</span>,
-			).<span class="ident">unwrap</span>();
+			<span class="comment">// Set control position within parent.
+			</span><span class="kw">let </span><span class="kw-2">mut </span>dlg_pos = self2.<span class="number">0</span>.position;
+			multiply_dpi_or_dtu(
+				self2.<span class="number">0</span>.dlg_base.parent().unwrap(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>dlg_pos), <span class="prelude-val">None</span>);
+			self2.hwnd().SetWindowPos(
+				HwndPlace::None,
+				dlg_pos, SIZE::default(),
+				co::SWP::NOZORDER | co::SWP::NOSIZE,
+			).unwrap();
 
-			<span class="comment">// Give the control an ID.</span>
-			<span class="ident">self2</span>.<span class="ident">hwnd</span>().<span class="ident">SetWindowLongPtr</span>(<span class="ident">co::GWLP::ID</span>, <span class="ident">self2</span>.<span class="number">0</span>.<span class="ident">ctrl_id</span> <span class="kw">as</span> <span class="kw">_</span>);
+			<span class="comment">// Give the control an ID.
+			</span>self2.hwnd().SetWindowLongPtr(co::GWLP::ID, self2.<span class="number">0</span>.ctrl_id <span class="kw">as _</span>);
 
-			<span class="ident">self2</span>.<span class="number">0</span>.<span class="ident">dlg_base</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>()
-				.<span class="ident">add_to_layout_arranger</span>(<span class="ident">self2</span>.<span class="ident">hwnd</span>(), <span class="ident">horz</span>, <span class="ident">vert</span>);
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful</span>
-		});
+			self2.<span class="number">0</span>.dlg_base.parent().unwrap()
+				.add_to_layout_arranger(self2.hwnd(), horz, vert);
+			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
+		</span>});
 
-		<span class="kw">let</span> <span class="ident">self2</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-		<span class="self">self</span>.<span class="ident">on</span>().<span class="ident">wm_nc_paint</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-			<span class="ident">paint_control_borders</span>(<span class="ident">self2</span>.<span class="ident">hwnd</span>(), <span class="ident">p</span>);
+		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
+		<span class="self">self</span>.on().wm_nc_paint(<span class="kw">move </span>|p| {
+			paint_control_borders(self2.hwnd(), p);
 			<span class="prelude-val">Ok</span>(())
 		});
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

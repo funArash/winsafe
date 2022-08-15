@@ -268,275 +268,275 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any::Any</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
+<span class="kw">use </span>std::marker::PhantomPinned;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events</span>::{<span class="ident">ComboBoxEvents</span>, <span class="ident">WindowEvents</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::layout_arranger</span>::{<span class="ident">Horz</span>, <span class="ident">Vert</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::base_native_control</span>::{
-	<span class="ident">BaseNativeControl</span>, <span class="ident">OptsId</span>,
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::{ComboBoxEvents, WindowEvents};
+<span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::{
+	BaseNativeControl, OptsId,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::native_controls::combo_box_items::ComboBoxItems</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::privs</span>::{<span class="ident">auto_ctrl_id</span>, <span class="ident">multiply_dpi_or_dtu</span>, <span class="ident">ui_font</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msg::wm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{
-	<span class="ident">GuiChild</span>, <span class="ident">GuiChildFocus</span>, <span class="ident">GuiEvents</span>, <span class="ident">GuiNativeControl</span>,
-	<span class="ident">GuiNativeControlEvents</span>, <span class="ident">GuiParent</span>, <span class="ident">GuiWindow</span>, <span class="ident">GuiWindowText</span>, <span class="ident">Handle</span>,
-	<span class="ident">user_Hwnd</span>,
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::combo_box_items::ComboBoxItems;
+<span class="kw">use </span><span class="kw">crate</span>::gui::privs::{auto_ctrl_id, multiply_dpi_or_dtu, ui_font};
+<span class="kw">use </span><span class="kw">crate</span>::msg::wm;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{
+	GuiChild, GuiChildFocus, GuiEvents, GuiNativeControl,
+	GuiNativeControlEvents, GuiParent, GuiWindow, GuiWindowText, Handle,
+	user_Hwnd,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">HWND</span>, <span class="ident">POINT</span>, <span class="ident">SIZE</span>};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, POINT, SIZE};
 
-<span class="kw">struct</span> <span class="ident">Obj</span> { <span class="comment">// actual fields of ComboBox</span>
-	<span class="ident">base</span>: <span class="ident">BaseNativeControl</span>,
-	<span class="ident">opts_id</span>: <span class="ident">OptsId</span><span class="op">&lt;</span><span class="ident">ComboBoxOpts</span><span class="op">&gt;</span>,
-	<span class="ident">events</span>: <span class="ident">ComboBoxEvents</span>,
-	<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="kw">struct </span>Obj { <span class="comment">// actual fields of ComboBox
+	</span>base: BaseNativeControl,
+	opts_id: OptsId&lt;ComboBoxOpts&gt;,
+	events: ComboBoxEvents,
+	_pin: PhantomPinned,
 }
 
-<span class="doccomment">/// Native</span>
-<span class="doccomment">/// [combo box](https://docs.microsoft.com/en-us/windows/win32/controls/about-combo-boxes)</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ComboBox</span>(<span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Obj</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Native
+/// [combo box](https://docs.microsoft.com/en-us/windows/win32/controls/about-combo-boxes)
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="attribute">#[derive(Clone)]</span>
+<span class="kw">pub struct </span>ComboBox(Pin&lt;Arc&lt;Obj&gt;&gt;);
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {}
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>ComboBox {}
 
-<span class="kw">impl</span> <span class="ident">GuiWindow</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {
-	<span class="kw">fn</span> <span class="ident">hwnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HWND</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">hwnd</span>()
+<span class="kw">impl </span>GuiWindow <span class="kw">for </span>ComboBox {
+	<span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HWND {
+		<span class="self">self</span>.<span class="number">0</span>.base.hwnd()
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Any</span> {
-		<span class="self">self</span>
-	}
+	<span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
+		<span class="self">self
+	</span>}
 }
 
-<span class="kw">impl</span> <span class="ident">GuiWindowText</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {}
+<span class="kw">impl </span>GuiWindowText <span class="kw">for </span>ComboBox {}
 
-<span class="kw">impl</span> <span class="ident">GuiChild</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {
-	<span class="kw">fn</span> <span class="ident">ctrl_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">opts_id</span> {
-			<span class="ident">OptsId::Wnd</span>(<span class="ident">opts</span>) =&gt; <span class="ident">opts</span>.<span class="ident">ctrl_id</span>,
-			<span class="ident">OptsId::Dlg</span>(<span class="ident">ctrl_id</span>) =&gt; <span class="kw-2">*</span><span class="ident">ctrl_id</span>,
+<span class="kw">impl </span>GuiChild <span class="kw">for </span>ComboBox {
+	<span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
+			OptsId::Wnd(opts) =&gt; opts.ctrl_id,
+			OptsId::Dlg(ctrl_id) =&gt; <span class="kw-2">*</span>ctrl_id,
 		}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">GuiChildFocus</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {}
+<span class="kw">impl </span>GuiChildFocus <span class="kw">for </span>ComboBox {}
 
-<span class="kw">impl</span> <span class="ident">GuiNativeControl</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {
-	<span class="kw">fn</span> <span class="ident">on_subclass</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WindowEvents</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">on_subclass</span>()
+<span class="kw">impl </span>GuiNativeControl <span class="kw">for </span>ComboBox {
+	<span class="kw">fn </span>on_subclass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEvents {
+		<span class="self">self</span>.<span class="number">0</span>.base.on_subclass()
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">GuiNativeControlEvents</span><span class="op">&lt;</span><span class="ident">ComboBoxEvents</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComboBox</span> {
-	<span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ComboBoxEvents</span> {
-		<span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">is_null</span>() {
+<span class="kw">impl </span>GuiNativeControlEvents&lt;ComboBoxEvents&gt; <span class="kw">for </span>ComboBox {
+	<span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ComboBoxEvents {
+		<span class="kw">if </span>!<span class="self">self</span>.hwnd().is_null() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot add events after the control creation.&quot;</span>);
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">parent</span>().<span class="ident">hwnd</span>().<span class="ident">is_null</span>() {
+		} <span class="kw">else if </span>!<span class="self">self</span>.<span class="number">0</span>.base.parent().hwnd().is_null() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot add events after the parent window creation.&quot;</span>);
 		}
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">events</span>
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.events
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">ComboBox</span> {
-	<span class="doccomment">/// Instantiates a new `ComboBox` object, to be created on the parent window</span>
-	<span class="doccomment">/// with</span>
-	<span class="doccomment">/// [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">GuiParent</span>, <span class="ident">opts</span>: <span class="ident">ComboBoxOpts</span>) -&gt; <span class="ident">ComboBox</span> {
-		<span class="kw">let</span> <span class="ident">parent_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Base::from_guiparent</span>(<span class="ident">parent</span>) };
-		<span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">ComboBoxOpts::define_ctrl_id</span>(<span class="ident">opts</span>);
-		<span class="kw">let</span> (<span class="ident">ctrl_id</span>, <span class="ident">horz</span>, <span class="ident">vert</span>) <span class="op">=</span> (<span class="ident">opts</span>.<span class="ident">ctrl_id</span>, <span class="ident">opts</span>.<span class="ident">horz_resize</span>, <span class="ident">opts</span>.<span class="ident">vert_resize</span>);
+<span class="kw">impl </span>ComboBox {
+	<span class="doccomment">/// Instantiates a new `ComboBox` object, to be created on the parent window
+	/// with
+	/// [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: ComboBoxOpts) -&gt; ComboBox {
+		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>opts = ComboBoxOpts::define_ctrl_id(opts);
+		<span class="kw">let </span>(ctrl_id, horz, vert) = (opts.ctrl_id, opts.horz_resize, opts.vert_resize);
 
-		<span class="kw">let</span> <span class="ident">new_self</span> <span class="op">=</span> <span class="self">Self</span>(
-			<span class="ident">Arc::pin</span>(
-				<span class="ident">Obj</span> {
-					<span class="ident">base</span>: <span class="ident">BaseNativeControl::new</span>(<span class="ident">parent_ref</span>),
-					<span class="ident">opts_id</span>: <span class="ident">OptsId::Wnd</span>(<span class="ident">opts</span>),
-					<span class="ident">events</span>: <span class="ident">ComboBoxEvents::new</span>(<span class="ident">parent_ref</span>, <span class="ident">ctrl_id</span>),
-					<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+		<span class="kw">let </span>new_self = <span class="self">Self</span>(
+			Arc::pin(
+				Obj {
+					base: BaseNativeControl::new(parent_ref),
+					opts_id: OptsId::Wnd(opts),
+					events: ComboBoxEvents::new(parent_ref, ctrl_id),
+					_pin: PhantomPinned,
 				},
 			),
 		);
 
-		<span class="kw">let</span> <span class="ident">self2</span> <span class="op">=</span> <span class="ident">new_self</span>.<span class="ident">clone</span>();
-		<span class="ident">parent_ref</span>.<span class="ident">privileged_on</span>().<span class="ident">wm</span>(<span class="ident">parent_ref</span>.<span class="ident">creation_msg</span>(), <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">self2</span>.<span class="ident">create</span>(<span class="ident">horz</span>, <span class="ident">vert</span>);
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful</span>
-		});
-		<span class="ident">new_self</span>
+		<span class="kw">let </span>self2 = new_self.clone();
+		parent_ref.privileged_on().wm(parent_ref.creation_msg(), <span class="kw">move </span>|<span class="kw">_</span>| {
+			self2.create(horz, vert);
+			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
+		</span>});
+		new_self
 	}
 
-	<span class="doccomment">/// Instantiates a new `ComboBox` object, to be loaded from a dialog</span>
-	<span class="doccomment">/// resource with</span>
-	<span class="doccomment">/// [`HWND::GetDlgItem`](crate::prelude::user_Hwnd::GetDlgItem).</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dlg</span>(
-		<span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">GuiParent</span>,
-		<span class="ident">ctrl_id</span>: <span class="ident">u16</span>,
-		<span class="ident">resize_behavior</span>: (<span class="ident">Horz</span>, <span class="ident">Vert</span>)) -&gt; <span class="ident">ComboBox</span>
+	<span class="doccomment">/// Instantiates a new `ComboBox` object, to be loaded from a dialog
+	/// resource with
+	/// [`HWND::GetDlgItem`](crate::prelude::user_Hwnd::GetDlgItem).
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub fn </span>new_dlg(
+		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent,
+		ctrl_id: u16,
+		resize_behavior: (Horz, Vert)) -&gt; ComboBox
 	{
-		<span class="kw">let</span> <span class="ident">parent_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Base::from_guiparent</span>(<span class="ident">parent</span>) };
+		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
-		<span class="kw">let</span> <span class="ident">new_self</span> <span class="op">=</span> <span class="self">Self</span>(
-			<span class="ident">Arc::pin</span>(
-				<span class="ident">Obj</span> {
-					<span class="ident">base</span>: <span class="ident">BaseNativeControl::new</span>(<span class="ident">parent_ref</span>),
-					<span class="ident">opts_id</span>: <span class="ident">OptsId::Dlg</span>(<span class="ident">ctrl_id</span>),
-					<span class="ident">events</span>: <span class="ident">ComboBoxEvents::new</span>(<span class="ident">parent_ref</span>, <span class="ident">ctrl_id</span>),
-					<span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+		<span class="kw">let </span>new_self = <span class="self">Self</span>(
+			Arc::pin(
+				Obj {
+					base: BaseNativeControl::new(parent_ref),
+					opts_id: OptsId::Dlg(ctrl_id),
+					events: ComboBoxEvents::new(parent_ref, ctrl_id),
+					_pin: PhantomPinned,
 				},
 			),
 		);
 
-		<span class="kw">let</span> <span class="ident">self2</span> <span class="op">=</span> <span class="ident">new_self</span>.<span class="ident">clone</span>();
-		<span class="ident">parent_ref</span>.<span class="ident">privileged_on</span>().<span class="ident">wm_init_dialog</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">self2</span>.<span class="ident">create</span>(<span class="ident">resize_behavior</span>.<span class="number">0</span>, <span class="ident">resize_behavior</span>.<span class="number">1</span>);
-			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful</span>
-		});
+		<span class="kw">let </span>self2 = new_self.clone();
+		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
+			self2.create(resize_behavior.<span class="number">0</span>, resize_behavior.<span class="number">1</span>);
+			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
+		</span>});
 
-		<span class="ident">new_self</span>
+		new_self
 	}
 
-	<span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">horz</span>: <span class="ident">Horz</span>, <span class="ident">vert</span>: <span class="ident">Vert</span>) {
-		<span class="kw">if</span> <span class="ident">vert</span> <span class="op">==</span> <span class="ident">Vert::Resize</span> {
+	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>, horz: Horz, vert: Vert) {
+		<span class="kw">if </span>vert == Vert::Resize {
 			<span class="macro">panic!</span>(<span class="string">&quot;ComboBox cannot be resized with Vert::Resize.&quot;</span>);
 		}
 
-		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">opts_id</span> {
-			<span class="ident">OptsId::Wnd</span>(<span class="ident">opts</span>) =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">position</span>;
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">SIZE::new</span>(<span class="ident">opts</span>.<span class="ident">width</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="number">0</span>);
-				<span class="ident">multiply_dpi_or_dtu</span>(
-					<span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">parent</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pos</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sz</span>));
+		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
+			OptsId::Wnd(opts) =&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>pos = opts.position;
+				<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::new(opts.width <span class="kw">as _</span>, <span class="number">0</span>);
+				multiply_dpi_or_dtu(
+					<span class="self">self</span>.<span class="number">0</span>.base.parent(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>pos), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>sz));
 
-				<span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">create_window</span>(
-					<span class="string">&quot;COMBOBOX&quot;</span>, <span class="prelude-val">None</span>, <span class="ident">pos</span>, <span class="ident">sz</span>,
-					<span class="ident">opts</span>.<span class="ident">ctrl_id</span>,
-					<span class="ident">opts</span>.<span class="ident">window_ex_style</span>,
-					<span class="ident">opts</span>.<span class="ident">window_style</span> <span class="op">|</span> <span class="ident">opts</span>.<span class="ident">combo_box_style</span>.<span class="ident">into</span>(),
+				<span class="self">self</span>.<span class="number">0</span>.base.create_window(
+					<span class="string">&quot;COMBOBOX&quot;</span>, <span class="prelude-val">None</span>, pos, sz,
+					opts.ctrl_id,
+					opts.window_ex_style,
+					opts.window_style | opts.combo_box_style.into(),
 				);
 
-				<span class="self">self</span>.<span class="ident">hwnd</span>().<span class="ident">SendMessage</span>(
-					<span class="ident">wm::SetFont</span> { <span class="ident">hfont</span>: <span class="ident">ui_font</span>(), <span class="ident">redraw</span>: <span class="bool-val">true</span> });
-				<span class="self">self</span>.<span class="ident">items</span>().<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">opts</span>.<span class="ident">items</span>);
-				<span class="self">self</span>.<span class="ident">items</span>().<span class="ident">select</span>(<span class="ident">opts</span>.<span class="ident">selected_item</span>);
+				<span class="self">self</span>.hwnd().SendMessage(
+					wm::SetFont { hfont: ui_font(), redraw: <span class="bool-val">true </span>});
+				<span class="self">self</span>.items().add(<span class="kw-2">&amp;</span>opts.items);
+				<span class="self">self</span>.items().select(opts.selected_item);
 			},
-			<span class="ident">OptsId::Dlg</span>(<span class="ident">ctrl_id</span>) =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">create_dlg</span>(<span class="kw-2">*</span><span class="ident">ctrl_id</span>),
+			OptsId::Dlg(ctrl_id) =&gt; <span class="self">self</span>.<span class="number">0</span>.base.create_dlg(<span class="kw-2">*</span>ctrl_id),
 		}
 
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">base</span>.<span class="ident">parent</span>().<span class="ident">add_to_layout_arranger</span>(<span class="self">self</span>.<span class="ident">hwnd</span>(), <span class="ident">horz</span>, <span class="ident">vert</span>);
+		<span class="self">self</span>.<span class="number">0</span>.base.parent().add_to_layout_arranger(<span class="self">self</span>.hwnd(), horz, vert);
 	}
 
-	<span class="doccomment">/// Item methods.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">items</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ComboBoxItems</span> {
-		<span class="ident">ComboBoxItems::new</span>(<span class="self">self</span>)
+	<span class="doccomment">/// Item methods.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">pub const fn </span>items(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ComboBoxItems {
+		ComboBoxItems::new(<span class="self">self</span>)
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="doccomment">/// Options to create a [`ComboBox`](crate::gui::ComboBox) programmatically with</span>
-<span class="doccomment">/// [`ComboBox::new`](crate::gui::ComboBox::new).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ComboBoxOpts</span> {
-	<span class="doccomment">/// Control position within parent client area, to be</span>
-	<span class="doccomment">/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the parent window is a dialog, the values are in Dialog Template</span>
-	<span class="doccomment">/// Units; otherwise in pixels, which will be multiplied to match current</span>
-	<span class="doccomment">/// system DPI.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to 0 x 0.</span>
-	<span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">POINT</span>,
-	<span class="doccomment">/// Control width, to be</span>
-	<span class="doccomment">/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the parent window is a dialog, the value is in Dialog Template Units;</span>
-	<span class="doccomment">/// otherwise in pixels, which will be multiplied to match current system</span>
-	<span class="doccomment">/// DPI.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to 120.</span>
-	<span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">u32</span>,
-	<span class="doccomment">/// Combo box styles to be</span>
-	<span class="doccomment">/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `CBS::DROPDOWNLIST`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Suggestions:</span>
-	<span class="doccomment">/// * replace with `CBS::DROPDOWN` to allow the user to type a text;</span>
-	<span class="doccomment">/// * add `CBS::SORT` to automatically sort the items.</span>
-	<span class="kw">pub</span> <span class="ident">combo_box_style</span>: <span class="ident">co::CBS</span>,
-	<span class="doccomment">/// Window styles to be</span>
-	<span class="doccomment">/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `WS::CHILD | WS::VISIBLE | WS::TABSTOP | WS::GROUP`.</span>
-	<span class="kw">pub</span> <span class="ident">window_style</span>: <span class="ident">co::WS</span>,
-	<span class="doccomment">/// Extended window styles to be</span>
-	<span class="doccomment">/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `WS_EX::LEFT`.</span>
-	<span class="kw">pub</span> <span class="ident">window_ex_style</span>: <span class="ident">co::WS_EX</span>,
+</span><span class="doccomment">/// Options to create a [`ComboBox`](crate::gui::ComboBox) programmatically with
+/// [`ComboBox::new`](crate::gui::ComboBox::new).
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>ComboBoxOpts {
+	<span class="doccomment">/// Control position within parent client area, to be
+	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
+	///
+	/// If the parent window is a dialog, the values are in Dialog Template
+	/// Units; otherwise in pixels, which will be multiplied to match current
+	/// system DPI.
+	///
+	/// Defaults to 0 x 0.
+	</span><span class="kw">pub </span>position: POINT,
+	<span class="doccomment">/// Control width, to be
+	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
+	///
+	/// If the parent window is a dialog, the value is in Dialog Template Units;
+	/// otherwise in pixels, which will be multiplied to match current system
+	/// DPI.
+	///
+	/// Defaults to 120.
+	</span><span class="kw">pub </span>width: u32,
+	<span class="doccomment">/// Combo box styles to be
+	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
+	///
+	/// Defaults to `CBS::DROPDOWNLIST`.
+	///
+	/// Suggestions:
+	/// * replace with `CBS::DROPDOWN` to allow the user to type a text;
+	/// * add `CBS::SORT` to automatically sort the items.
+	</span><span class="kw">pub </span>combo_box_style: co::CBS,
+	<span class="doccomment">/// Window styles to be
+	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
+	///
+	/// Defaults to `WS::CHILD | WS::VISIBLE | WS::TABSTOP | WS::GROUP`.
+	</span><span class="kw">pub </span>window_style: co::WS,
+	<span class="doccomment">/// Extended window styles to be
+	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
+	///
+	/// Defaults to `WS_EX::LEFT`.
+	</span><span class="kw">pub </span>window_ex_style: co::WS_EX,
 
-	<span class="doccomment">/// The control ID.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to an auto-generated ID.</span>
-	<span class="kw">pub</span> <span class="ident">ctrl_id</span>: <span class="ident">u16</span>,
-	<span class="doccomment">/// Horizontal behavior when the parent is resized.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `Horz::None`.</span>
-	<span class="kw">pub</span> <span class="ident">horz_resize</span>: <span class="ident">Horz</span>,
-	<span class="doccomment">/// Vertical behavior when the parent is resized.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `Vert::None`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** A `ComboBox` cannot be resized vertically, so it will panic if</span>
-	<span class="doccomment">/// you use `Vert::Resize`.</span>
-	<span class="kw">pub</span> <span class="ident">vert_resize</span>: <span class="ident">Vert</span>,
+	<span class="doccomment">/// The control ID.
+	///
+	/// Defaults to an auto-generated ID.
+	</span><span class="kw">pub </span>ctrl_id: u16,
+	<span class="doccomment">/// Horizontal behavior when the parent is resized.
+	///
+	/// Defaults to `Horz::None`.
+	</span><span class="kw">pub </span>horz_resize: Horz,
+	<span class="doccomment">/// Vertical behavior when the parent is resized.
+	///
+	/// Defaults to `Vert::None`.
+	///
+	/// **Note:** A `ComboBox` cannot be resized vertically, so it will panic if
+	/// you use `Vert::Resize`.
+	</span><span class="kw">pub </span>vert_resize: Vert,
 
-	<span class="doccomment">/// Items to be added right away to the control.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to none.</span>
-	<span class="kw">pub</span> <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// Index of the item initially selected. The item must exist.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Defaults to `None`.</span>
-	<span class="kw">pub</span> <span class="ident">selected_item</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Items to be added right away to the control.
+	///
+	/// Defaults to none.
+	</span><span class="kw">pub </span>items: Vec&lt;String&gt;,
+	<span class="doccomment">/// Index of the item initially selected. The item must exist.
+	///
+	/// Defaults to `None`.
+	</span><span class="kw">pub </span>selected_item: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ComboBoxOpts</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">position</span>: <span class="ident">POINT::new</span>(<span class="number">0</span>, <span class="number">0</span>),
-			<span class="ident">width</span>: <span class="number">120</span>,
-			<span class="ident">combo_box_style</span>: <span class="ident">co::CBS::DROPDOWNLIST</span>,
-			<span class="ident">window_style</span>: <span class="ident">co::WS::CHILD</span> <span class="op">|</span> <span class="ident">co::WS::VISIBLE</span> <span class="op">|</span> <span class="ident">co::WS::TABSTOP</span> <span class="op">|</span> <span class="ident">co::WS::GROUP</span>,
-			<span class="ident">window_ex_style</span>: <span class="ident">co::WS_EX::LEFT</span>,
-			<span class="ident">ctrl_id</span>: <span class="number">0</span>,
-			<span class="ident">horz_resize</span>: <span class="ident">Horz::None</span>,
-			<span class="ident">vert_resize</span>: <span class="ident">Vert::None</span>,
-			<span class="ident">items</span>: <span class="ident">Vec::default</span>(),
-			<span class="ident">selected_item</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>ComboBoxOpts {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			position: POINT::new(<span class="number">0</span>, <span class="number">0</span>),
+			width: <span class="number">120</span>,
+			combo_box_style: co::CBS::DROPDOWNLIST,
+			window_style: co::WS::CHILD | co::WS::VISIBLE | co::WS::TABSTOP | co::WS::GROUP,
+			window_ex_style: co::WS_EX::LEFT,
+			ctrl_id: <span class="number">0</span>,
+			horz_resize: Horz::None,
+			vert_resize: Vert::None,
+			items: Vec::default(),
+			selected_item: <span class="prelude-val">None</span>,
 		}
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">ComboBoxOpts</span> {
-	<span class="kw">fn</span> <span class="ident">define_ctrl_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">ctrl_id</span> <span class="op">==</span> <span class="number">0</span> {
-			<span class="self">self</span>.<span class="ident">ctrl_id</span> <span class="op">=</span> <span class="ident">auto_ctrl_id</span>();
+<span class="kw">impl </span>ComboBoxOpts {
+	<span class="kw">fn </span>define_ctrl_id(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="self">self</span>.ctrl_id == <span class="number">0 </span>{
+			<span class="self">self</span>.ctrl_id = auto_ctrl_id();
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

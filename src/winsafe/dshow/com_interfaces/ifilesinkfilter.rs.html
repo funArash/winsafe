@@ -101,108 +101,108 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl::AM_MEDIA_TYPE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PCSTR</span>, <span class="ident">PCVOID</span>, <span class="ident">PSTR</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::WString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">CoTaskMemFree</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::AM_MEDIA_TYPE;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PCSTR, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IFileSinkFilter`](crate::IFileSinkFilter) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IFileSinkFilterVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">SetFileName</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetCurFile</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">PSTR</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IFileSinkFilter`](crate::IFileSinkFilter) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IFileSinkFilterVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>SetFileName: <span class="kw">fn</span>(ComPtr, PCSTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetCurFile: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR, PVOID) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IFileSinkFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ifilesinkfilter)</span>
-<span class="doccomment">/// COM interface over [`IFileSinkFilterVT`](crate::vt::IFileSinkFilterVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IFileSinkFilter</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IFileSinkFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ifilesinkfilter)
+/// COM interface over [`IFileSinkFilterVT`](crate::vt::IFileSinkFilterVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IFileSinkFilter(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IFileSinkFilter</span>, <span class="string">&quot;a2104830-7c70-11cf-8bce-00aa00a3f1a6&quot;</span>);
-<span class="kw">impl</span> <span class="ident">dshow_IFileSinkFilter</span> <span class="kw">for</span> <span class="ident">IFileSinkFilter</span> {}
+<span class="macro">impl_iunknown!</span>(IFileSinkFilter, <span class="string">&quot;a2104830-7c70-11cf-8bce-00aa00a3f1a6&quot;</span>);
+<span class="kw">impl </span>dshow_IFileSinkFilter <span class="kw">for </span>IFileSinkFilter {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IFileSinkFilter`](crate::IFileSinkFilter).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IFileSinkFilter</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IFileSinkFilter::GetCurFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-getcurfile)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** If you pass an [`AM_MEDIA_TYPE`](crate::AM_MEDIA_TYPE)</span>
-	<span class="doccomment">/// reference to `pmt`, its `pbFormat` field may return a valid reference to</span>
-	<span class="doccomment">/// a format block. If so, you must free it with</span>
-	<span class="doccomment">/// [`CoTaskMemFree`](crate::CoTaskMemFree), or you&#39;ll have a memory leak.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{AM_MEDIA_TYPE, CoTaskMemFree, DVINFO, IFileSinkFilter};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let sinkf: IFileSinkFilter; // initialized somewhere</span>
-	<span class="doccomment">/// # let sinkf = IFileSinkFilter::from(unsafe { winsafe::ComPtr::null() });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut ammt = AM_MEDIA_TYPE::default();</span>
-	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///     sinkf.GetCurFile(Some(&amp;mut ammt))?;</span>
-	<span class="doccomment">///     if let Some(pb_format) = ammt.pbFormat::&lt;DVINFO&gt;() { // valid reference?</span>
-	<span class="doccomment">///         CoTaskMemFree(pb_format as *mut _ as _);</span>
-	<span class="doccomment">///     }</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">GetCurFile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">mt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">AM_MEDIA_TYPE</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IFileSinkFilter`](crate::IFileSinkFilter).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IFileSinkFilter: ole_IUnknown {
+	<span class="doccomment">/// [`IFileSinkFilter::GetCurFile`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-getcurfile)
+	/// method.
+	///
+	/// **Note:** If you pass an [`AM_MEDIA_TYPE`](crate::AM_MEDIA_TYPE)
+	/// reference to `pmt`, its `pbFormat` field may return a valid reference to
+	/// a format block. If so, you must free it with
+	/// [`CoTaskMemFree`](crate::CoTaskMemFree), or you&#39;ll have a memory leak.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{AM_MEDIA_TYPE, CoTaskMemFree, DVINFO, IFileSinkFilter};
+	///
+	/// let sinkf: IFileSinkFilter; // initialized somewhere
+	/// # let sinkf = IFileSinkFilter::from(unsafe { winsafe::ComPtr::null() });
+	///
+	/// let mut ammt = AM_MEDIA_TYPE::default();
+	/// unsafe {
+	///     sinkf.GetCurFile(Some(&amp;mut ammt))?;
+	///     if let Some(pb_format) = ammt.pbFormat::&lt;DVINFO&gt;() { // valid reference?
+	///         CoTaskMemFree(pb_format as *mut _ as _);
+	///     }
+	/// }
+	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">unsafe fn </span>GetCurFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;String&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pstr</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-		<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IFileSinkFilterVT</span>);
-		<span class="ident">ok_to_hrresult</span>(
-			(<span class="ident">vt</span>.<span class="ident">GetCurFile</span>)(
-				<span class="self">self</span>.<span class="ident">ptr</span>(),
-				<span class="kw-2">&amp;mut</span> <span class="ident">pstr</span>,
-				<span class="ident">mt</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
+		<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileSinkFilterVT);
+		ok_to_hrresult(
+			(vt.GetCurFile)(
+				<span class="self">self</span>.ptr(),
+				<span class="kw-2">&amp;mut </span>pstr,
+				mt.map_or(std::ptr::null_mut(), |p| p <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			),
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">WString::from_wchars_nullt</span>(<span class="ident">pstr</span>);
-			<span class="ident">CoTaskMemFree</span>(<span class="ident">pstr</span> <span class="kw">as</span> <span class="kw">_</span>);
-			<span class="ident">name</span>.<span class="ident">to_string</span>()
+		).map(|<span class="kw">_</span>| {
+			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
+			CoTaskMemFree(pstr <span class="kw">as _</span>);
+			name.to_string()
 		})
 	}
 
-	<span class="doccomment">/// [`IFileSinkFilter::SetFileName`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-setfilename)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetFileName</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">mt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AM_MEDIA_TYPE</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`IFileSinkFilter::SetFileName`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-setfilename)
+	/// method.
+	</span><span class="kw">fn </span>SetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		file_name: <span class="kw-2">&amp;</span>str, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IFileSinkFilterVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetFileName</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">file_name</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">mt</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileSinkFilterVT);
+			ok_to_hrresult(
+				(vt.SetFileName)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(file_name).as_ptr(),
+					mt.map_or(std::ptr::null(), |p| p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				),
 			)
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

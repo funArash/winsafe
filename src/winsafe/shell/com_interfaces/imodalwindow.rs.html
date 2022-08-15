@@ -55,62 +55,62 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::HANDLE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::HANDLE;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IModalWindow`](crate::IModalWindow) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IModalWindowVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">Show</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">u32</span>,
+<span class="doccomment">/// [`IModalWindow`](crate::IModalWindow) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IModalWindowVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>Show: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; u32,
 }
 
-<span class="doccomment">/// [`IModalWindow`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-imodalwindow)</span>
-<span class="doccomment">/// COM interface over [`IModalWindowVT`](crate::vt::IModalWindowVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IModalWindow</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IModalWindow`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-imodalwindow)
+/// COM interface over [`IModalWindowVT`](crate::vt::IModalWindowVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IModalWindow(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IModalWindow</span>, <span class="string">&quot;b4db1657-70d7-485e-8e3e-6fcb5a5c1802&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IModalWindow</span> <span class="kw">for</span> <span class="ident">IModalWindow</span> {}
+<span class="macro">impl_iunknown!</span>(IModalWindow, <span class="string">&quot;b4db1657-70d7-485e-8e3e-6fcb5a5c1802&quot;</span>);
+<span class="kw">impl </span>shell_IModalWindow <span class="kw">for </span>IModalWindow {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`IModalWindow`](crate::IModalWindow).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IModalWindow</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IModalWindow::Show`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-imodalwindow-show)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns false if user clicked Cancel.</span>
-	<span class="kw">fn</span> <span class="ident">Show</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd_owner</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">const</span> <span class="ident">CANCELLED</span>: <span class="ident">co::HRESULT</span> <span class="op">=</span> <span class="ident">co::ERROR::CANCELLED</span>.<span class="ident">to_hresult</span>();
-		<span class="kw">match</span> <span class="ident">co::HRESULT</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IModalWindowVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">Show</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd_owner</span>.<span class="number">0</span>)
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`IModalWindow`](crate::IModalWindow).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IModalWindow: ole_IUnknown {
+	<span class="doccomment">/// [`IModalWindow::Show`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-imodalwindow-show)
+	/// method.
+	///
+	/// Returns false if user clicked Cancel.
+	</span><span class="kw">fn </span>Show(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_owner: HWND) -&gt; HrResult&lt;bool&gt; {
+		<span class="kw">const </span>CANCELLED: co::HRESULT = co::ERROR::CANCELLED.to_hresult();
+		<span class="kw">match </span>co::HRESULT(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IModalWindowVT);
+				(vt.Show)(<span class="self">self</span>.ptr(), hwnd_owner.<span class="number">0</span>)
 			},
 		) {
-			<span class="ident">co::HRESULT::S_OK</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-			<span class="ident">CANCELLED</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-			<span class="ident">e</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+			co::HRESULT::S_OK =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+			CANCELLED =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+			e =&gt; <span class="prelude-val">Err</span>(e),
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

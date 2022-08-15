@@ -89,96 +89,96 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
 
-<span class="doccomment">/// Exposes edit control</span>
-<span class="doccomment">/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-edit-control-reference-notifications).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These event methods are just proxies to the</span>
-<span class="doccomment">/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who</span>
-<span class="doccomment">/// is the real responsible for the child event handling.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditEvents</span>(<span class="ident">BaseEventsProxy</span>);
+<span class="doccomment">/// Exposes edit control
+/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-edit-control-reference-notifications).
+///
+/// These event methods are just proxies to the
+/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who
+/// is the real responsible for the child event handling.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>EditEvents(BaseEventsProxy);
 
-<span class="kw">impl</span> <span class="ident">EditEvents</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parent_base</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>, <span class="ident">ctrl_id</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">BaseEventsProxy::new</span>(<span class="ident">parent_base</span>, <span class="ident">ctrl_id</span>))
+<span class="kw">impl </span>EditEvents {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent_base: <span class="kw-2">&amp;</span>Base, ctrl_id: u16) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(BaseEventsProxy::new(parent_base, ctrl_id))
 	}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_align_ltr_ec</span>, <span class="ident">co::EN::ALIGN_LTR_EC</span>,
-		<span class="doccomment">/// [`EN_ALIGN_LTR_EC`](https://docs.microsoft.com/en-us/windows/win32/controls/en-align-ltr-ec)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_align_ltr_ec, co::EN::ALIGN_LTR_EC,
+		<span class="doccomment">/// [`EN_ALIGN_LTR_EC`](https://docs.microsoft.com/en-us/windows/win32/controls/en-align-ltr-ec)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_align_rtl_ec</span>, <span class="ident">co::EN::ALIGN_RTL_EC</span>,
-		<span class="doccomment">/// [`EN_ALIGN_LTR_EC`](https://docs.microsoft.com/en-us/windows/win32/controls/en-align-rtl-ec)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_align_rtl_ec, co::EN::ALIGN_RTL_EC,
+		<span class="doccomment">/// [`EN_ALIGN_LTR_EC`](https://docs.microsoft.com/en-us/windows/win32/controls/en-align-rtl-ec)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_change</span>, <span class="ident">co::EN::CHANGE</span>,
-		<span class="doccomment">/// [`EN_CHANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-change)</span>
-		<span class="doccomment">/// command notification.</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// # Examples</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// ```rust,no_run</span>
-		<span class="doccomment">/// use winsafe::prelude::*;</span>
-		<span class="doccomment">/// use winsafe::{gui, AnyResult};</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// let txt: gui::Edit; // initialized somewhere</span>
-		<span class="doccomment">/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());</span>
-		<span class="doccomment">/// # let txt = gui::Edit::new(&amp;wnd, gui::EditOpts::default());</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// txt.on().en_change({</span>
-		<span class="doccomment">///     let txt = txt.clone(); // to pass into the closure</span>
-		<span class="doccomment">///     move || -&gt; AnyResult&lt;()&gt; {</span>
-		<span class="doccomment">///         println!(&quot;Text: {}&quot;, txt.hwnd().GetWindowText()?);</span>
-		<span class="doccomment">///         Ok(())</span>
-		<span class="doccomment">///     }</span>
-		<span class="doccomment">/// });</span>
-		<span class="doccomment">/// ```</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_change, co::EN::CHANGE,
+		<span class="doccomment">/// [`EN_CHANGE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-change)
+		/// command notification.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{gui, AnyResult};
+		///
+		/// let txt: gui::Edit; // initialized somewhere
+		/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
+		/// # let txt = gui::Edit::new(&amp;wnd, gui::EditOpts::default());
+		///
+		/// txt.on().en_change({
+		///     let txt = txt.clone(); // to pass into the closure
+		///     move || -&gt; AnyResult&lt;()&gt; {
+		///         println!(&quot;Text: {}&quot;, txt.hwnd().GetWindowText()?);
+		///         Ok(())
+		///     }
+		/// });
+		/// ```
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_err_space</span>, <span class="ident">co::EN::ERRSPACE</span>,
-		<span class="doccomment">/// [`EN_ERRSPACE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-errspace)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_err_space, co::EN::ERRSPACE,
+		<span class="doccomment">/// [`EN_ERRSPACE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-errspace)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_h_scroll</span>, <span class="ident">co::EN::HSCROLL</span>,
-		<span class="doccomment">/// [`EN_HSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/en-hscroll)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_h_scroll, co::EN::HSCROLL,
+		<span class="doccomment">/// [`EN_HSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/en-hscroll)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_kill_focus</span>, <span class="ident">co::EN::KILLFOCUS</span>,
-		<span class="doccomment">/// [`EN_KILLFOCUS`](https://docs.microsoft.com/en-us/windows/win32/controls/en-killfocus)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_kill_focus, co::EN::KILLFOCUS,
+		<span class="doccomment">/// [`EN_KILLFOCUS`](https://docs.microsoft.com/en-us/windows/win32/controls/en-killfocus)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_max_text</span>, <span class="ident">co::EN::MAXTEXT</span>,
-		<span class="doccomment">/// [`EN_MAXTEXT`](https://docs.microsoft.com/en-us/windows/win32/controls/en-maxtext)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_max_text, co::EN::MAXTEXT,
+		<span class="doccomment">/// [`EN_MAXTEXT`](https://docs.microsoft.com/en-us/windows/win32/controls/en-maxtext)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_set_focus</span>, <span class="ident">co::EN::SETFOCUS</span>,
-		<span class="doccomment">/// [`EN_SETFOCUS`](https://docs.microsoft.com/en-us/windows/win32/controls/en-setfocus)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_set_focus, co::EN::SETFOCUS,
+		<span class="doccomment">/// [`EN_SETFOCUS`](https://docs.microsoft.com/en-us/windows/win32/controls/en-setfocus)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_update</span>, <span class="ident">co::EN::UPDATE</span>,
-		<span class="doccomment">/// [`EN_UPDATE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-update)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_update, co::EN::UPDATE,
+		<span class="doccomment">/// [`EN_UPDATE`](https://docs.microsoft.com/en-us/windows/win32/controls/en-update)
+		/// command notification.
+	</span>}
 
-	<span class="macro">pub_fn_cmd_noparm_noret!</span> { <span class="ident">en_v_scroll</span>, <span class="ident">co::EN::VSCROLL</span>,
-		<span class="doccomment">/// [`EN_VSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/en-vscroll)</span>
-		<span class="doccomment">/// command notification.</span>
-	}
+	<span class="macro">pub_fn_cmd_noparm_noret!</span> { en_v_scroll, co::EN::VSCROLL,
+		<span class="doccomment">/// [`EN_VSCROLL`](https://docs.microsoft.com/en-us/windows/win32/controls/en-vscroll)
+		/// command notification.
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

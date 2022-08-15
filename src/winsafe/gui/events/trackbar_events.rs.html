@@ -40,47 +40,47 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comctl::decl</span>::{<span class="ident">NMCUSTOMDRAW</span>, <span class="ident">NMTRBTHUMBPOSCHANGING</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::base::Base</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl::AnyResult</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{NMCUSTOMDRAW, NMTRBTHUMBPOSCHANGING};
+<span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
+<span class="kw">use </span><span class="kw">crate</span>::gui::events::base_events_proxy::BaseEventsProxy;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
 
-<span class="doccomment">/// Exposes trackbar control</span>
-<span class="doccomment">/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-trackbar-control-reference-notifications).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These event methods are just proxies to the</span>
-<span class="doccomment">/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who</span>
-<span class="doccomment">/// is the real responsible for the child event handling.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You cannot directly instantiate this object, it is created internally by the</span>
-<span class="doccomment">/// control.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrackbarEvents</span>(<span class="ident">BaseEventsProxy</span>);
+<span class="doccomment">/// Exposes trackbar control
+/// [notifications](https://docs.microsoft.com/en-us/windows/win32/controls/bumper-trackbar-control-reference-notifications).
+///
+/// These event methods are just proxies to the
+/// [`WindowEvents`](crate::gui::events::WindowEvents) of the parent window, who
+/// is the real responsible for the child event handling.
+///
+/// You cannot directly instantiate this object, it is created internally by the
+/// control.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
+<span class="kw">pub struct </span>TrackbarEvents(BaseEventsProxy);
 
-<span class="kw">impl</span> <span class="ident">TrackbarEvents</span> {
-	<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::gui</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">parent_base</span>: <span class="kw-2">&amp;</span><span class="ident">Base</span>, <span class="ident">ctrl_id</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="ident">BaseEventsProxy::new</span>(<span class="ident">parent_base</span>, <span class="ident">ctrl_id</span>))
+<span class="kw">impl </span>TrackbarEvents {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent_base: <span class="kw-2">&amp;</span>Base, ctrl_id: u16) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(BaseEventsProxy::new(parent_base, ctrl_id))
 	}
 
-	<span class="macro">pub_fn_nfy_withparm_noret!</span> { <span class="ident">trbn_thumb_pos_changing</span>, <span class="ident">co::TRBN::THUMBPOSCHANGING</span>, <span class="ident">NMTRBTHUMBPOSCHANGING</span>,
-		<span class="doccomment">/// [`TRBN_THUMBPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/controls/trbn-thumbposchanging)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_withparm_noret!</span> { trbn_thumb_pos_changing, co::TRBN::THUMBPOSCHANGING, NMTRBTHUMBPOSCHANGING,
+		<span class="doccomment">/// [`TRBN_THUMBPOSCHANGING`](https://docs.microsoft.com/en-us/windows/win32/controls/trbn-thumbposchanging)
+		/// notification.
+	</span>}
 
-	<span class="doccomment">/// [`NM_CUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-customdraw-trackbar)</span>
-	<span class="doccomment">/// notification.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nm_custom_draw</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>)
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">NMCUSTOMDRAW</span>) -&gt; <span class="ident">AnyResult</span><span class="op">&lt;</span><span class="ident">co::CDRF</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// [`NM_CUSTOMDRAW`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-customdraw-trackbar)
+	/// notification.
+	</span><span class="kw">pub fn </span>nm_custom_draw&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
+		<span class="kw">where </span>F: Fn(<span class="kw-2">&amp;</span>NMCUSTOMDRAW) -&gt; AnyResult&lt;co::CDRF&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">wm_notify</span>(<span class="ident">co::NM::CUSTOMDRAW</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="ident">p</span>.<span class="ident">cast_nmhdr</span>::<span class="op">&lt;</span><span class="ident">NMCUSTOMDRAW</span><span class="op">&gt;</span>() })<span class="question-mark">?</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw">_</span>)));
+		<span class="self">self</span>.<span class="number">0</span>.wm_notify(co::NM::CUSTOMDRAW,
+			<span class="kw">move </span>|p| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func(<span class="kw">unsafe </span>{ p.cast_nmhdr::&lt;NMCUSTOMDRAW&gt;() })<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as _</span>)));
 	}
 
-	<span class="macro">pub_fn_nfy_noparm_noret!</span> { <span class="ident">nm_released_capture</span>, <span class="ident">co::NM::RELEASEDCAPTURE</span>,
-		<span class="doccomment">/// [`NM_RELEASEDCAPTURE`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-releasedcapture-trackbar-)</span>
-		<span class="doccomment">/// notification.</span>
-	}
+	<span class="macro">pub_fn_nfy_noparm_noret!</span> { nm_released_capture, co::NM::RELEASEDCAPTURE,
+		<span class="doccomment">/// [`NM_RELEASEDCAPTURE`](https://docs.microsoft.com/en-us/windows/win32/controls/nm-releasedcapture-trackbar-)
+		/// notification.
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -283,290 +283,290 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HANDLE</span>, <span class="ident">HRES</span>, <span class="ident">PCSTR</span>, <span class="ident">PSTR</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">WIN32_FIND_DATA</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::privs::MAX_PATH</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::privs::INFOTIPSIZE</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl::HWND</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HANDLE, HRES, PCSTR, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{WIN32_FIND_DATA, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::shell::privs::INFOTIPSIZE;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IShellLink`](crate::IShellLink) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellLinkVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">GetPath</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">i32</span>, <span class="ident">PVOID</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetIDList</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetIDList</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetDescription</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PSTR</span>, <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetDescription</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetWorkingDirectory</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PSTR</span>, <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetWorkingDirectory</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetArguments</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PSTR</span>, <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetArguments</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetHotkey</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u16</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetHotkey</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u16</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetShowCmd</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetShowCmd</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetIconLocation</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PSTR</span>, <span class="ident">i32</span>, <span class="kw-2">*mut</span> <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetIconLocation</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">i32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetRelativePath</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Resolve</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetPath</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCSTR</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IShellLink`](crate::IShellLink) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IShellLinkVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>GetPath: <span class="kw">fn</span>(ComPtr, PCSTR, i32, PVOID, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetIDList: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetIDList: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetDescription: <span class="kw">fn</span>(ComPtr, PSTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>SetDescription: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetWorkingDirectory: <span class="kw">fn</span>(ComPtr, PSTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>SetWorkingDirectory: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetArguments: <span class="kw">fn</span>(ComPtr, PSTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>SetArguments: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetHotkey: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u16) -&gt; HRES,
+	<span class="kw">pub </span>SetHotkey: <span class="kw">fn</span>(ComPtr, u16) -&gt; HRES,
+	<span class="kw">pub </span>GetShowCmd: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>SetShowCmd: <span class="kw">fn</span>(ComPtr, i32) -&gt; HRES,
+	<span class="kw">pub </span>GetIconLocation: <span class="kw">fn</span>(ComPtr, PSTR, i32, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>SetIconLocation: <span class="kw">fn</span>(ComPtr, PCSTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>SetRelativePath: <span class="kw">fn</span>(ComPtr, PCSTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>Resolve: <span class="kw">fn</span>(ComPtr, HANDLE, u32) -&gt; HRES,
+	<span class="kw">pub </span>SetPath: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IShellLink`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ishelllinkw)</span>
-<span class="doccomment">/// COM interface over [`IShellLinkVT`](crate::vt::IShellLinkVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, CoCreateInstance, IShellLink};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let obj = CoCreateInstance::&lt;IShellLink&gt;(</span>
-<span class="doccomment">///     &amp;co::CLSID::ShellLink,</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     co::CLSCTX::INPROC_SERVER,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IShellLink</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IShellLink`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ishelllinkw)
+/// COM interface over [`IShellLinkVT`](crate::vt::IShellLinkVT).
+///
+/// Automatically calls
+/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, CoCreateInstance, IShellLink};
+///
+/// let obj = CoCreateInstance::&lt;IShellLink&gt;(
+///     &amp;co::CLSID::ShellLink,
+///     None,
+///     co::CLSCTX::INPROC_SERVER,
+/// )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IShellLink(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IShellLink</span>, <span class="string">&quot;000214f9-0000-0000-c000-000000000046&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IShellLink</span> <span class="kw">for</span> <span class="ident">IShellLink</span> {}
+<span class="macro">impl_iunknown!</span>(IShellLink, <span class="string">&quot;000214f9-0000-0000-c000-000000000046&quot;</span>);
+<span class="kw">impl </span>shell_IShellLink <span class="kw">for </span>IShellLink {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`IShellLink`](crate::IShellLink).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IShellLink</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IShellLinkW::GetArguments`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getarguments)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetArguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">INFOTIPSIZE</span> <span class="op">+</span> <span class="number">1</span>); <span class="comment">// arbitrary</span>
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetArguments</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="kw">_</span>,
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`IShellLink`](crate::IShellLink).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IShellLink: ole_IUnknown {
+	<span class="doccomment">/// [`IShellLinkW::GetArguments`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getarguments)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetArguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(INFOTIPSIZE + <span class="number">1</span>); <span class="comment">// arbitrary
+		</span><span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.GetArguments)(
+					<span class="self">self</span>.ptr(),
+					buf.as_mut_ptr(),
+					buf.buffer_size() <span class="kw">as _</span>,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">to_string</span>())
+			).map(|<span class="kw">_</span>| buf.to_string())
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::GetDescription`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getdescription)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetDescription</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">INFOTIPSIZE</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetDescription</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`IShellLinkW::GetDescription`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getdescription)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetDescription(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(INFOTIPSIZE + <span class="number">1</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.GetDescription)(
+					<span class="self">self</span>.ptr(),
+					buf.as_mut_ptr(),
+					buf.buffer_size() <span class="kw">as _</span>,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">to_string</span>())
+			).map(|<span class="kw">_</span>| buf.to_string())
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::GetIconLocation`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-geticonlocation)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the path of the icon and its index within the file.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetIconLocation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">i32</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">MAX_PATH</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
+	<span class="doccomment">/// [`IShellLinkW::GetIconLocation`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-geticonlocation)
+	/// method.
+	///
+	/// Returns the path of the icon and its index within the file.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetIconLocation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(String, i32)&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>index: i32 = <span class="number">0</span>;
 
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetIconLocation</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">index</span>,
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.GetIconLocation)(
+					<span class="self">self</span>.ptr(),
+					buf.as_mut_ptr(),
+					buf.buffer_size() <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>index,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">buf</span>.<span class="ident">to_string</span>(), <span class="ident">index</span>))
+			).map(|<span class="kw">_</span>| (buf.to_string(), index))
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::GetPath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetPath</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">fd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">WIN32_FIND_DATA</span><span class="op">&gt;</span>,
-		<span class="ident">flags</span>: <span class="ident">co::SLGP</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`IShellLinkW::GetPath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getpath)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetPath(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		fd: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>WIN32_FIND_DATA&gt;,
+		flags: co::SLGP) -&gt; HrResult&lt;String&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">MAX_PATH</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetPath</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="ident">fd</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">fd</span><span class="op">|</span> <span class="ident">fd</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-					<span class="ident">flags</span>.<span class="number">0</span>,
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.GetPath)(
+					<span class="self">self</span>.ptr(),
+					buf.as_mut_ptr(),
+					buf.buffer_size() <span class="kw">as _</span>,
+					fd.map_or(std::ptr::null_mut(), |fd| fd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+					flags.<span class="number">0</span>,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">to_string</span>())
+			).map(|<span class="kw">_</span>| buf.to_string())
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::GetShowCmd`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getshowcmd)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetShowCmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">co::SW</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">show_cmd</span> <span class="op">=</span> <span class="ident">co::SW::default</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetShowCmd</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">show_cmd</span>.<span class="number">0</span>))
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">show_cmd</span>)
+	<span class="doccomment">/// [`IShellLinkW::GetShowCmd`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getshowcmd)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetShowCmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::SW&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>show_cmd = co::SW::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult((vt.GetShowCmd)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>show_cmd.<span class="number">0</span>))
+				.map(|<span class="kw">_</span>| show_cmd)
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::GetWorkingDirectory`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getworkingdirectory)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetWorkingDirectory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">WString::new_alloc_buffer</span>(<span class="ident">MAX_PATH</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetWorkingDirectory</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(),
-					<span class="ident">buf</span>.<span class="ident">buffer_size</span>() <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`IShellLinkW::GetWorkingDirectory`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getworkingdirectory)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetWorkingDirectory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.GetWorkingDirectory)(
+					<span class="self">self</span>.ptr(),
+					buf.as_mut_ptr(),
+					buf.buffer_size() <span class="kw">as _</span>,
 				),
-			).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">to_string</span>())
+			).map(|<span class="kw">_</span>| buf.to_string())
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::Resolve`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-resolve)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd</span>: <span class="ident">HWND</span>, <span class="ident">flags</span>: <span class="ident">co::SLR</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Resolve</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd</span>.<span class="number">0</span>, <span class="ident">flags</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`IShellLinkW::Resolve`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-resolve)
+	/// method.
+	</span><span class="kw">fn </span>Resolve(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: HWND, flags: co::SLR) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult((vt.Resolve)(<span class="self">self</span>.ptr(), hwnd.<span class="number">0</span>, flags.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetArguments`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setarguments)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetArguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetArguments</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">args</span>).<span class="ident">as_ptr</span>(),
-				),
-			)
-		}
-	}
-
-	<span class="doccomment">/// [`IShellLinkW::SetDescription`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setdescription)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetDescription</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetDescription</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">args</span>).<span class="ident">as_ptr</span>(),
+	<span class="doccomment">/// [`IShellLinkW::SetArguments`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setarguments)
+	/// method.
+	</span><span class="kw">fn </span>SetArguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetArguments)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(args).as_ptr(),
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetIconLocation`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-seticonlocation)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetIconLocation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">index</span>: <span class="ident">i32</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetIconLocation</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">path</span>).<span class="ident">as_ptr</span>(),
-					<span class="ident">index</span>,
+	<span class="doccomment">/// [`IShellLinkW::SetDescription`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setdescription)
+	/// method.
+	</span><span class="kw">fn </span>SetDescription(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetDescription)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(args).as_ptr(),
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetPath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setpath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetPath</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetPath</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">file</span>).<span class="ident">as_ptr</span>(),
+	<span class="doccomment">/// [`IShellLinkW::SetIconLocation`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-seticonlocation)
+	/// method.
+	</span><span class="kw">fn </span>SetIconLocation(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>str, index: i32) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetIconLocation)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(path).as_ptr(),
+					index,
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetRelativePath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setrelativepath)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetRelativePath</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetRelativePath</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">file</span>).<span class="ident">as_ptr</span>(),
+	<span class="doccomment">/// [`IShellLinkW::SetPath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setpath)
+	/// method.
+	</span><span class="kw">fn </span>SetPath(<span class="kw-2">&amp;</span><span class="self">self</span>, file: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetPath)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(file).as_ptr(),
+				),
+			)
+		}
+	}
+
+	<span class="doccomment">/// [`IShellLinkW::SetRelativePath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setrelativepath)
+	/// method.
+	</span><span class="kw">fn </span>SetRelativePath(<span class="kw-2">&amp;</span><span class="self">self</span>, file: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetRelativePath)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(file).as_ptr(),
 					<span class="number">0</span>,
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetShowCmd`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setshowcmd)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetShowCmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">show_cmd</span>: <span class="ident">co::SW</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetShowCmd</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">show_cmd</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`IShellLinkW::SetShowCmd`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setshowcmd)
+	/// method.
+	</span><span class="kw">fn </span>SetShowCmd(<span class="kw-2">&amp;</span><span class="self">self</span>, show_cmd: co::SW) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult((vt.SetShowCmd)(<span class="self">self</span>.ptr(), show_cmd.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`IShellLinkW::SetWorkingDirectory`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setworkingdirectory)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetWorkingDirectory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dir</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IShellLinkVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetWorkingDirectory</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">WString::from_str</span>(<span class="ident">dir</span>).<span class="ident">as_ptr</span>(),
+	<span class="doccomment">/// [`IShellLinkW::SetWorkingDirectory`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-setworkingdirectory)
+	/// method.
+	</span><span class="kw">fn </span>SetWorkingDirectory(<span class="kw-2">&amp;</span><span class="self">self</span>, dir: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
+			ok_to_hrresult(
+				(vt.SetWorkingDirectory)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(dir).as_ptr(),
 				),
 			)
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -100,107 +100,107 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::HRES</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">shell_IFileDialog</span>, <span class="ident">shell_IModalWindow</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IShellItemArray</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IFileDialogVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::HRES;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{shell_IFileDialog, shell_IModalWindow};
+<span class="kw">use </span><span class="kw">crate</span>::shell::decl::IShellItemArray;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IFileDialogVT;
 
-<span class="doccomment">/// [`IFileOpenDialog`](crate::IFileOpenDialog) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IFileOpenDialogVT</span> {
-	<span class="kw">pub</span> <span class="ident">IFileDialogVT</span>: <span class="ident">IFileDialogVT</span>,
-	<span class="kw">pub</span> <span class="ident">GetResults</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetSelectedItems</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IFileOpenDialog`](crate::IFileOpenDialog) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IFileOpenDialogVT {
+	<span class="kw">pub </span>IFileDialogVT: IFileDialogVT,
+	<span class="kw">pub </span>GetResults: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetSelectedItems: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IFileOpenDialog`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ifileopendialog)</span>
-<span class="doccomment">/// COM interface over [`IFileOpenDialogVT`](crate::vt::IFileOpenDialogVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, CoCreateInstance, IFileOpenDialog};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let obj = CoCreateInstance::&lt;IFileOpenDialog&gt;(</span>
-<span class="doccomment">///     &amp;co::CLSID::FileOpenDialog,</span>
-<span class="doccomment">///     None,</span>
-<span class="doccomment">///     co::CLSCTX::INPROC_SERVER,</span>
-<span class="doccomment">/// )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IFileOpenDialog</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IFileOpenDialog`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ifileopendialog)
+/// COM interface over [`IFileOpenDialogVT`](crate::vt::IFileOpenDialogVT).
+///
+/// Automatically calls
+/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, CoCreateInstance, IFileOpenDialog};
+///
+/// let obj = CoCreateInstance::&lt;IFileOpenDialog&gt;(
+///     &amp;co::CLSID::FileOpenDialog,
+///     None,
+///     co::CLSCTX::INPROC_SERVER,
+/// )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IFileOpenDialog(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IFileOpenDialog</span>, <span class="string">&quot;d57c7288-d4ad-4768-be02-9d969532d960&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IModalWindow</span> <span class="kw">for</span> <span class="ident">IFileOpenDialog</span> {}
-<span class="kw">impl</span> <span class="ident">shell_IFileDialog</span> <span class="kw">for</span> <span class="ident">IFileOpenDialog</span> {}
-<span class="kw">impl</span> <span class="ident">shell_IFileOpenDialog</span> <span class="kw">for</span> <span class="ident">IFileOpenDialog</span> {}
+<span class="macro">impl_iunknown!</span>(IFileOpenDialog, <span class="string">&quot;d57c7288-d4ad-4768-be02-9d969532d960&quot;</span>);
+<span class="kw">impl </span>shell_IModalWindow <span class="kw">for </span>IFileOpenDialog {}
+<span class="kw">impl </span>shell_IFileDialog <span class="kw">for </span>IFileOpenDialog {}
+<span class="kw">impl </span>shell_IFileOpenDialog <span class="kw">for </span>IFileOpenDialog {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`IFileOpenDialog`](crate::IFileOpenDialog).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IFileOpenDialog</span>: <span class="ident">shell_IFileDialog</span> {
-	<span class="doccomment">/// [`IFileOpenDialog::GetResults`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileopendialog-getresults)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Collecting the file paths into a</span>
-	<span class="doccomment">/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HrResult, IFileOpenDialog};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let fo: IFileOpenDialog; // initialized somewhere</span>
-	<span class="doccomment">/// # let fo = IFileOpenDialog::from(unsafe { winsafe::ComPtr::null() });</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let paths = fo.GetResults()?.iter()?</span>
-	<span class="doccomment">///     .map(|shi|</span>
-	<span class="doccomment">///         shi.and_then(|shi|</span>
-	<span class="doccomment">///             shi.GetDisplayName(co::SIGDN::FILESYSPATH)</span>
-	<span class="doccomment">///         ),</span>
-	<span class="doccomment">///     )</span>
-	<span class="doccomment">///     .collect::&lt;HrResult&lt;Vec&lt;_&gt;&gt;&gt;()?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetResults</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItemArray</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IFileOpenDialogVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetResults</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>))
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IShellItemArray::from</span>(<span class="ident">ppv_queried</span>))
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`IFileOpenDialog`](crate::IFileOpenDialog).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IFileOpenDialog: shell_IFileDialog {
+	<span class="doccomment">/// [`IFileOpenDialog::GetResults`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileopendialog-getresults)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// Collecting the file paths into a
+	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HrResult, IFileOpenDialog};
+	///
+	/// let fo: IFileOpenDialog; // initialized somewhere
+	/// # let fo = IFileOpenDialog::from(unsafe { winsafe::ComPtr::null() });
+	///
+	/// let paths = fo.GetResults()?.iter()?
+	///     .map(|shi|
+	///         shi.and_then(|shi|
+	///             shi.GetDisplayName(co::SIGDN::FILESYSPATH)
+	///         ),
+	///     )
+	///     .collect::&lt;HrResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetResults(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItemArray&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileOpenDialogVT);
+			ok_to_hrresult((vt.GetResults)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
+				.map(|<span class="kw">_</span>| IShellItemArray::from(ppv_queried))
 		}
 	}
 
-	<span class="doccomment">/// [`IFileOpenDialog::GetSelectedItems`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileopendialog-getselecteditems)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetSelectedItems</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItemArray</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IFileOpenDialogVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetSelectedItems</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>))
-				.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">IShellItemArray::from</span>(<span class="ident">ppv_queried</span>))
+	<span class="doccomment">/// [`IFileOpenDialog::GetSelectedItems`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifileopendialog-getselecteditems)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetSelectedItems(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItemArray&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileOpenDialogVT);
+			ok_to_hrresult((vt.GetSelectedItems)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
+				.map(|<span class="kw">_</span>| IShellItemArray::from(ppv_queried))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

@@ -247,254 +247,254 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dshow::decl::MFVideoNormalizedRect</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">BOOL</span>, <span class="ident">HANDLE</span>, <span class="ident">HRES</span>, <span class="ident">PCVOID</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">Handle</span>, <span class="ident">ole_IUnknown</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{<span class="ident">COLORREF</span>, <span class="ident">HWND</span>, <span class="ident">RECT</span>, <span class="ident">SIZE</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::MFVideoNormalizedRect;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{BOOL, HANDLE, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, RECT, SIZE};
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IMFVideoDisplayControl`](crate::IMFVideoDisplayControl) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IMFVideoDisplayControlVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">GetNativeVideoSize</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetIdealVideoSize</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">PVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetVideoPosition</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PCVOID</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetVideoPosition</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">PCVOID</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetAspectRatioMode</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetAspectRatioMode</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetVideoWindow</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetVideoWindow</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">HANDLE</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">RepaintVideo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetCurrentImage</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>, <span class="kw-2">*mut</span> <span class="ident">i64</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetBorderColor</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetBorderColor</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetRenderingPrefs</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetRenderingPrefs</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetFullscreen</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">BOOL</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">GetFullscreen</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">BOOL</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IMFVideoDisplayControl`](crate::IMFVideoDisplayControl) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IMFVideoDisplayControlVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>GetNativeVideoSize: <span class="kw">fn</span>(ComPtr, PVOID, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetIdealVideoSize: <span class="kw">fn</span>(ComPtr, PVOID, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetVideoPosition: <span class="kw">fn</span>(ComPtr, PCVOID, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetVideoPosition: <span class="kw">fn</span>(ComPtr, PVOID, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetAspectRatioMode: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetAspectRatioMode: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>SetVideoWindow: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>GetVideoWindow: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>RepaintVideo: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetCurrentImage: <span class="kw">fn</span>(ComPtr, PVOID, <span class="kw-2">*mut *mut </span>u8, <span class="kw-2">*mut </span>u32, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>SetBorderColor: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetBorderColor: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>SetRenderingPrefs: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetRenderingPrefs: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>SetFullscreen: <span class="kw">fn</span>(ComPtr, BOOL) -&gt; HRES,
+	<span class="kw">pub </span>GetFullscreen: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>BOOL) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IMFVideoDisplayControl`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nn-evr-imfvideodisplaycontrol)</span>
-<span class="doccomment">/// COM interface over</span>
-<span class="doccomment">/// [`IMFVideoDisplayControlVT`](crate::vt::IMFVideoDisplayControlVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, IMFGetService, IMFVideoDisplayControl};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let get_svc: IMFGetService; // initialized somewhere</span>
-<span class="doccomment">/// # let get_svc = IMFGetService::from(unsafe { winsafe::ComPtr::null() });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let controller_evr = get_svc</span>
-<span class="doccomment">///     .GetService::&lt;IMFVideoDisplayControl&gt;(</span>
-<span class="doccomment">///         &amp;co::DSHOW_SERVICE::MR_VIDEO_RENDER_SERVICE,</span>
-<span class="doccomment">///     )?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IMFVideoDisplayControl</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IMFVideoDisplayControl`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nn-evr-imfvideodisplaycontrol)
+/// COM interface over
+/// [`IMFVideoDisplayControlVT`](crate::vt::IMFVideoDisplayControlVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, IMFGetService, IMFVideoDisplayControl};
+///
+/// let get_svc: IMFGetService; // initialized somewhere
+/// # let get_svc = IMFGetService::from(unsafe { winsafe::ComPtr::null() });
+///
+/// let controller_evr = get_svc
+///     .GetService::&lt;IMFVideoDisplayControl&gt;(
+///         &amp;co::DSHOW_SERVICE::MR_VIDEO_RENDER_SERVICE,
+///     )?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IMFVideoDisplayControl(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IMFVideoDisplayControl</span>, <span class="string">&quot;a490b1e4-ab84-4d31-a1b2-181e03b1077a&quot;</span>);
-<span class="kw">impl</span> <span class="ident">dshow_IMFVideoDisplayControl</span> <span class="kw">for</span> <span class="ident">IMFVideoDisplayControl</span> {}
+<span class="macro">impl_iunknown!</span>(IMFVideoDisplayControl, <span class="string">&quot;a490b1e4-ab84-4d31-a1b2-181e03b1077a&quot;</span>);
+<span class="kw">impl </span>dshow_IMFVideoDisplayControl <span class="kw">for </span>IMFVideoDisplayControl {}
 
-<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for</span>
-<span class="doccomment">/// [`IMFVideoDisplayControl`](crate::IMFVideoDisplayControl).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">dshow_IMFVideoDisplayControl</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetAspectRatioMode`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getaspectratiomode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetAspectRatioMode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">co::MFVideoARMode</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mode</span> <span class="op">=</span> <span class="ident">co::MFVideoARMode::None</span>;
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetAspectRatioMode</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">mode</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+<span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
+/// [`IMFVideoDisplayControl`](crate::IMFVideoDisplayControl).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
+<span class="kw">pub trait </span>dshow_IMFVideoDisplayControl: ole_IUnknown {
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetAspectRatioMode`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getaspectratiomode)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetAspectRatioMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::MFVideoARMode&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>mode = co::MFVideoARMode::None;
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.GetAspectRatioMode)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>mode <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">mode</span>)
+		}.map(|<span class="kw">_</span>| mode)
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetBorderColor`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getbordercolor)</span>
-	<span class="doccomment">/// method;</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetBorderColor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">COLORREF</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">color</span> <span class="op">=</span> <span class="ident">COLORREF::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetBorderColor</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">color</span>.<span class="number">0</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">color</span>)
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetBorderColor`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getbordercolor)
+	/// method;
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetBorderColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;COLORREF&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>color = COLORREF::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.GetBorderColor)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>color.<span class="number">0</span>))
+		}.map(|<span class="kw">_</span>| color)
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetFullscreen`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getfullscreen)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetFullscreen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fulls</span> <span class="op">=</span> <span class="bool-val">false</span>;
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetFullscreen</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">fulls</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetFullscreen`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getfullscreen)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetFullscreen(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>fulls = <span class="bool-val">false</span>;
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.GetFullscreen)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>fulls <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fulls</span>)
+		}.map(|<span class="kw">_</span>| fulls)
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetIdealVideoSize`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getidealvideosize)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns minimum and maximum ideal sizes.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetIdealVideoSize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">SIZE</span>, <span class="ident">SIZE</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">min</span>, <span class="kw-2">mut</span> <span class="ident">max</span>) <span class="op">=</span> (<span class="ident">SIZE::default</span>(), <span class="ident">SIZE::default</span>());
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetIdealVideoSize</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="kw-2">&amp;mut</span> <span class="ident">min</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">max</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetIdealVideoSize`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getidealvideosize)
+	/// method.
+	///
+	/// Returns minimum and maximum ideal sizes.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetIdealVideoSize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(SIZE, SIZE)&gt; {
+		<span class="kw">let </span>(<span class="kw-2">mut </span>min, <span class="kw-2">mut </span>max) = (SIZE::default(), SIZE::default());
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.GetIdealVideoSize)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>min <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>max <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				),
 			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">min</span>, <span class="ident">max</span>))
+		}.map(|<span class="kw">_</span>| (min, max))
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetNativeVideoSize`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getnativevideosize)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns native and aspect ratio sizes.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetNativeVideoSize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">SIZE</span>, <span class="ident">SIZE</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">native</span>, <span class="kw-2">mut</span> <span class="ident">aspec</span>) <span class="op">=</span> (<span class="ident">SIZE::default</span>(), <span class="ident">SIZE::default</span>());
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetNativeVideoSize</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="kw-2">&amp;mut</span> <span class="ident">native</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">aspec</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetNativeVideoSize`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getnativevideosize)
+	/// method.
+	///
+	/// Returns native and aspect ratio sizes.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetNativeVideoSize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(SIZE, SIZE)&gt; {
+		<span class="kw">let </span>(<span class="kw-2">mut </span>native, <span class="kw-2">mut </span>aspec) = (SIZE::default(), SIZE::default());
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.GetNativeVideoSize)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>native <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>aspec <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				),
 			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">native</span>, <span class="ident">aspec</span>))
+		}.map(|<span class="kw">_</span>| (native, aspec))
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetVideoPosition`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getvideoposition)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetVideoPosition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">MFVideoNormalizedRect</span>, <span class="ident">RECT</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">norm_rc</span> <span class="op">=</span> <span class="ident">MFVideoNormalizedRect::default</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span> <span class="op">=</span> <span class="ident">RECT::default</span>();
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetVideoPosition`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getvideoposition)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetVideoPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(MFVideoNormalizedRect, RECT)&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>norm_rc = MFVideoNormalizedRect::default();
+		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
 
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">GetVideoPosition</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="kw-2">&amp;mut</span> <span class="ident">norm_rc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">rc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.GetVideoPosition)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>norm_rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				),
 			)
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">norm_rc</span>, <span class="ident">rc</span>))
+		}.map(|<span class="kw">_</span>| (norm_rc, rc))
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::GetVideoWindow`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getvideowindow)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">GetVideoWindow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hwnd</span> <span class="op">=</span> <span class="ident">HWND::NULL</span>;
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">GetVideoWindow</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">hwnd</span>.<span class="number">0</span>))
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">hwnd</span>)
+	<span class="doccomment">/// [`IMFVideoDisplayControl::GetVideoWindow`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-getvideowindow)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>GetVideoWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;HWND&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>hwnd = HWND::NULL;
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.GetVideoWindow)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>hwnd.<span class="number">0</span>))
+		}.map(|<span class="kw">_</span>| hwnd)
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::RepaintVideo`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-repaintvideo)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">RepaintVideo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">co::HRESULT</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">RepaintVideo</span>)(<span class="self">self</span>.<span class="ident">ptr</span>())
+	<span class="doccomment">/// [`IMFVideoDisplayControl::RepaintVideo`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-repaintvideo)
+	/// method.
+	</span><span class="kw">fn </span>RepaintVideo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">match </span>co::HRESULT(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+				(vt.RepaintVideo)(<span class="self">self</span>.ptr())
 			},
 		) {
-			<span class="ident">co::HRESULT::S_OK</span>
-			<span class="op">|</span> <span class="ident">co::HRESULT::MF_E_INVALIDREQUEST</span> =&gt; <span class="prelude-val">Ok</span>(()),
-			<span class="ident">hr</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">hr</span>),
+			co::HRESULT::S_OK
+			| co::HRESULT::MF_E_INVALIDREQUEST =&gt; <span class="prelude-val">Ok</span>(()),
+			hr =&gt; <span class="prelude-val">Err</span>(hr),
 		}
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::SetAspectRatioMode`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setaspectratiomode)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetAspectRatioMode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">co::MFVideoARMode</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetAspectRatioMode</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">mode</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`IMFVideoDisplayControl::SetAspectRatioMode`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setaspectratiomode)
+	/// method.
+	</span><span class="kw">fn </span>SetAspectRatioMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::MFVideoARMode) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.SetAspectRatioMode)(<span class="self">self</span>.ptr(), mode.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::SetBorderColor`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setbordercolor)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetBorderColor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">color</span>: <span class="ident">COLORREF</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetBorderColor</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">color</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`IMFVideoDisplayControl::SetBorderColor`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setbordercolor)
+	/// method.
+	</span><span class="kw">fn </span>SetBorderColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.SetBorderColor)(<span class="self">self</span>.ptr(), color.<span class="number">0</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::SetFullscreen`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setfullscreen)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetFullscreen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">full_screen</span>: <span class="ident">bool</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetFullscreen</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">full_screen</span> <span class="kw">as</span> <span class="kw">_</span>))
+	<span class="doccomment">/// [`IMFVideoDisplayControl::SetFullscreen`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setfullscreen)
+	/// method.
+	</span><span class="kw">fn </span>SetFullscreen(<span class="kw-2">&amp;</span><span class="self">self</span>, full_screen: bool) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.SetFullscreen)(<span class="self">self</span>.ptr(), full_screen <span class="kw">as _</span>))
 		}
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::SetVideoPosition`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setvideoposition)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// At least one parameter must be passed.</span>
-	<span class="kw">fn</span> <span class="ident">SetVideoPosition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">src</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MFVideoNormalizedRect</span><span class="op">&gt;</span>,
-		<span class="ident">dest</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RECT</span><span class="op">&gt;</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`IMFVideoDisplayControl::SetVideoPosition`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setvideoposition)
+	/// method.
+	///
+	/// At least one parameter must be passed.
+	</span><span class="kw">fn </span>SetVideoPosition(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		src: <span class="prelude-ty">Option</span>&lt;MFVideoNormalizedRect&gt;,
+		dest: <span class="prelude-ty">Option</span>&lt;RECT&gt;) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">SetVideoPosition</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">src</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">src</span><span class="op">|</span> <span class="ident">src</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
-					<span class="ident">dest</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="ident">std::ptr::null</span>(), <span class="op">|</span><span class="ident">dest</span><span class="op">|</span> <span class="ident">dest</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>),
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult(
+				(vt.SetVideoPosition)(
+					<span class="self">self</span>.ptr(),
+					src.as_ref().map_or(std::ptr::null(), |src| src <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+					dest.as_ref().map_or(std::ptr::null(), |dest| dest <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				),
 			)
 		}
 	}
 
-	<span class="doccomment">/// [`IMFVideoDisplayControl::SetVideoWindow`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setvideowindow)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetVideoWindow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hwnd_video</span>: <span class="ident">HWND</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IMFVideoDisplayControlVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">SetVideoWindow</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">hwnd_video</span>.<span class="number">0</span>))
+	<span class="doccomment">/// [`IMFVideoDisplayControl::SetVideoWindow`](https://docs.microsoft.com/en-us/windows/win32/api/evr/nf-evr-imfvideodisplaycontrol-setvideowindow)
+	/// method.
+	</span><span class="kw">fn </span>SetVideoWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_video: HWND) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMFVideoDisplayControlVT);
+			ok_to_hrresult((vt.SetVideoWindow)(<span class="self">self</span>.ptr(), hwnd_video.<span class="number">0</span>))
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

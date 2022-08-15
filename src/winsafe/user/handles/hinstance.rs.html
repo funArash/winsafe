@@ -235,242 +235,242 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">user</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kernel::decl</span>::{<span class="ident">GetLastError</span>, <span class="ident">HINSTANCE</span>, <span class="ident">IdStr</span>, <span class="ident">WinResult</span>, <span class="ident">WString</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::decl</span>::{
-	<span class="ident">ATOM</span>, <span class="ident">DLGPROC</span>, <span class="ident">HACCEL</span>, <span class="ident">HBITMAP</span>, <span class="ident">HCURSOR</span>, <span class="ident">HICON</span>, <span class="ident">HMENU</span>, <span class="ident">HWND</span>, <span class="ident">IdIdcStr</span>,
-	<span class="ident">IdIdiStr</span>, <span class="ident">IdObmStr</span>, <span class="ident">IdOcrStr</span>, <span class="ident">IdOicStr</span>, <span class="ident">SIZE</span>, <span class="ident">WNDCLASSEX</span>,
+<span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, IdStr, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{
+	ATOM, DLGPROC, HACCEL, HBITMAP, HCURSOR, HICON, HMENU, HWND, IdIdcStr,
+	IdIdiStr, IdObmStr, IdOcrStr, IdOicStr, SIZE, WNDCLASSEX,
 };
 
-<span class="kw">impl</span> <span class="ident">user_Hinstance</span> <span class="kw">for</span> <span class="ident">HINSTANCE</span> {}
+<span class="kw">impl </span>user_Hinstance <span class="kw">for </span>HINSTANCE {}
 
-<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for</span>
-<span class="doccomment">/// [`HINSTANCE`](crate::HINSTANCE).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;user&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">user_Hinstance</span>: <span class="ident">Handle</span> {
-	<span class="doccomment">/// [`CreateDialogParam`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdialogparamw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">CreateDialogParam</span>(
+<span class="doccomment">/// This trait is enabled with the `user` feature, and provides methods for
+/// [`HINSTANCE`](crate::HINSTANCE).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]</span>
+<span class="kw">pub trait </span>user_Hinstance: Handle {
+	<span class="doccomment">/// [`CreateDialogParam`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdialogparamw)
+	/// method.
+	</span><span class="kw">fn </span>CreateDialogParam(
 		<span class="self">self</span>,
-		<span class="ident">resource_id</span>: <span class="ident">IdStr</span>,
-		<span class="ident">hwnd_parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span>,
-		<span class="ident">dialog_proc</span>: <span class="ident">DLGPROC</span>,
-		<span class="ident">init_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span>
+		resource_id: IdStr,
+		hwnd_parent: <span class="prelude-ty">Option</span>&lt;HWND&gt;,
+		dialog_proc: DLGPROC,
+		init_param: <span class="prelude-ty">Option</span>&lt;isize&gt;) -&gt; SysResult&lt;HWND&gt;
 	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::CreateDialogParamW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">resource_id</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">hwnd_parent</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-				<span class="ident">dialog_proc</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">init_param</span>.<span class="ident">unwrap_or_default</span>(),
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HWND</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
+		<span class="kw">unsafe </span>{
+			user::ffi::CreateDialogParamW(
+				<span class="self">self</span>.as_ptr(),
+				resource_id.as_ptr(),
+				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+				dialog_proc <span class="kw">as _</span>,
+				init_param.unwrap_or_default(),
+			).as_mut()
+		}.map(|ptr| HWND(ptr))
+			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`DialogBoxParam`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dialogboxparamw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">DialogBoxParam</span>(
+	<span class="doccomment">/// [`DialogBoxParam`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dialogboxparamw)
+	/// method.
+	</span><span class="kw">fn </span>DialogBoxParam(
 		<span class="self">self</span>,
-		<span class="ident">resource_id</span>: <span class="ident">IdStr</span>,
-		<span class="ident">hwnd_parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HWND</span><span class="op">&gt;</span>,
-		<span class="ident">dialog_proc</span>: <span class="ident">DLGPROC</span>,
-		<span class="ident">init_param</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>
+		resource_id: IdStr,
+		hwnd_parent: <span class="prelude-ty">Option</span>&lt;HWND&gt;,
+		dialog_proc: DLGPROC,
+		init_param: <span class="prelude-ty">Option</span>&lt;isize&gt;) -&gt; SysResult&lt;isize&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::DialogBoxParamW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">resource_id</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">hwnd_parent</span>.<span class="ident">map_or</span>(<span class="ident">std::ptr::null_mut</span>(), <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
-				<span class="ident">dialog_proc</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="ident">init_param</span>.<span class="ident">unwrap_or_default</span>(),
+		<span class="kw">match unsafe </span>{
+			user::ffi::DialogBoxParamW(
+				<span class="self">self</span>.as_ptr(),
+				resource_id.as_ptr(),
+				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+				dialog_proc <span class="kw">as _</span>,
+				init_param.unwrap_or_default(),
 			)
 		} {
-			<span class="op">-</span><span class="number">1</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">res</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">res</span>), <span class="comment">// assumes hWndParent as valid, so no check for zero</span>
+			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			res =&gt; <span class="prelude-val">Ok</span>(res), <span class="comment">// assumes hWndParent as valid, so no check for zero
+		</span>}
+	}
+
+	<span class="doccomment">/// [`GetClassInfoEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclassinfoexw)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// Retrieving information of a window class created in our application:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{HINSTANCE, WNDCLASSEX};
+	///
+	/// let mut wcx = WNDCLASSEX::default();
+	/// HINSTANCE::GetModuleHandle(None)?
+	///     .GetClassInfoEx(&quot;SOME_CLASS_NAME&quot;, &amp;mut wcx)?;
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>GetClassInfoEx(<span class="self">self</span>,
+		class_name: <span class="kw-2">&amp;</span>str, wcx: <span class="kw-2">&amp;mut </span>WNDCLASSEX) -&gt; SysResult&lt;ATOM&gt;
+	{
+		<span class="kw">match unsafe </span>{
+			user::ffi::GetClassInfoExW(
+				<span class="self">self</span>.as_ptr(),
+				WString::from_str(class_name).as_ptr(),
+				wcx <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			)
+		} {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			atom =&gt; <span class="prelude-val">Ok</span>(ATOM(atom <span class="kw">as _</span>)),
 		}
 	}
 
-	<span class="doccomment">/// [`GetClassInfoEx`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclassinfoexw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Retrieving information of a window class created in our application:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{HINSTANCE, WNDCLASSEX};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut wcx = WNDCLASSEX::default();</span>
-	<span class="doccomment">/// HINSTANCE::GetModuleHandle(None)?</span>
-	<span class="doccomment">///     .GetClassInfoEx(&quot;SOME_CLASS_NAME&quot;, &amp;mut wcx)?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">GetClassInfoEx</span>(<span class="self">self</span>,
-		<span class="ident">class_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">wcx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">WNDCLASSEX</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">ATOM</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`LoadAccelerators`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadacceleratorsw)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadAccelerators(<span class="self">self</span>, table_name: IdStr) -&gt; SysResult&lt;HACCEL&gt; {
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadAcceleratorsW(<span class="self">self</span>.as_ptr(), table_name.as_ptr())
+				.as_mut()
+		}.map(|ptr| HACCEL(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// Loading a system cursor:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HINSTANCE, IdIdcStr};
+	///
+	/// let sys_cursor = HINSTANCE::NULL
+	///     .LoadCursor(IdIdcStr::Idc(co::IDC::ARROW))?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadCursor(<span class="self">self</span>, resource_id: IdIdcStr) -&gt; SysResult&lt;HCURSOR&gt; {
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadCursorW(<span class="self">self</span>.as_ptr(), resource_id.as_ptr()).as_mut()
+		}.map(|ptr| HCURSOR(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadIcon`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadiconw)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`HICON::DestroyIcon`](crate::prelude::user_Hicon::DestroyIcon) call.
+	///
+	/// # Examples
+	///
+	/// Loading a system icon:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, IdIdiStr, HINSTANCE};
+	///
+	/// let sys_icon = HINSTANCE::NULL
+	///     .LoadIcon(IdIdiStr::Idi(co::IDI::INFORMATION))?;
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadIcon(<span class="self">self</span>, icon_id: IdIdiStr) -&gt; SysResult&lt;HICON&gt; {
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadIconW(<span class="self">self</span>.as_ptr(), icon_id.as_ptr()).as_mut()
+		}.map(|ptr| HICON(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)
+	/// method for [`HBITMAP`](crate::HBITMAP).
+	///
+	/// **Note:** Must be paired with an
+	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadImageBitmap(<span class="self">self</span>,
+		name: IdObmStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;HBITMAP&gt;
 	{
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::GetClassInfoExW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">WString::from_str</span>(<span class="ident">class_name</span>).<span class="ident">as_ptr</span>(),
-				<span class="ident">wcx</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw">_</span>,
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadImageW(
+				<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">0</span>, sz.cx, sz.cy, load.<span class="number">0</span>,
+			).as_mut()
+		}.map(|ptr| HBITMAP(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)
+	/// method for [`HCURSOR`](crate::HCURSOR).
+	///
+	/// **Note:** Must be paired with an
+	/// [`HCURSOR::DestroyCursor`](crate::prelude::user_Hcursor::DestroyCursor)
+	/// call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadImageCursor(<span class="self">self</span>,
+		name: IdOcrStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;HCURSOR&gt;
+	{
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadImageW(
+				<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">2</span>, sz.cx, sz.cy, load.<span class="number">0</span>,
+			).as_mut()
+		}.map(|ptr| HCURSOR(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)
+	/// method for [`HICON`](crate::HICON).
+	///
+	/// **Note:** Must be paired with an
+	/// [`HICON::DestroyIcon`](crate::prelude::user_Hicon::DestroyIcon) call.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadImageIcon(<span class="self">self</span>,
+		name: IdOicStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;HICON&gt;
+	{
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadImageW(
+				<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">1</span>, sz.cx, sz.cy, load.<span class="number">0</span>,
+			).as_mut()
+		}.map(|ptr| HICON(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadMenu`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadmenuw)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadMenu(<span class="self">self</span>, resource_id: IdStr) -&gt; SysResult&lt;HMENU&gt; {
+		<span class="kw">unsafe </span>{
+			user::ffi::LoadMenuW(<span class="self">self</span>.as_ptr(), resource_id.as_ptr()).as_mut()
+		}.map(|ptr| HMENU(ptr))
+			.ok_or_else(|| GetLastError())
+	}
+
+	<span class="doccomment">/// [`LoadString`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadstringw)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>LoadString(<span class="self">self</span>, id: u16) -&gt; SysResult&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pdata: <span class="kw-2">*const </span>u16 = std::ptr::null_mut();
+		<span class="kw">match unsafe </span>{
+			user::ffi::LoadStringW(
+				<span class="self">self</span>.as_ptr(),
+				id <span class="kw">as _</span>,
+				<span class="kw-2">&amp;mut </span>pdata <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as  _</span>, <span class="number">0</span>,
 			)
 		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">atom</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ATOM</span>(<span class="ident">atom</span> <span class="kw">as</span> <span class="kw">_</span>)),
-		}
-	}
-
-	<span class="doccomment">/// [`LoadAccelerators`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadacceleratorsw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadAccelerators</span>(<span class="self">self</span>, <span class="ident">table_name</span>: <span class="ident">IdStr</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HACCEL</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadAcceleratorsW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">table_name</span>.<span class="ident">as_ptr</span>())
-				.<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HACCEL</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadCursor`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Loading a system cursor:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, HINSTANCE, IdIdcStr};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let sys_cursor = HINSTANCE::NULL</span>
-	<span class="doccomment">///     .LoadCursor(IdIdcStr::Idc(co::IDC::ARROW))?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadCursor</span>(<span class="self">self</span>, <span class="ident">resource_id</span>: <span class="ident">IdIdcStr</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HCURSOR</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadCursorW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">resource_id</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HCURSOR</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadIcon`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadiconw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HICON::DestroyIcon`](crate::prelude::user_Hicon::DestroyIcon) call.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Loading a system icon:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, IdIdiStr, HINSTANCE};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let sys_icon = HINSTANCE::NULL</span>
-	<span class="doccomment">///     .LoadIcon(IdIdiStr::Idi(co::IDI::INFORMATION))?;</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::ERROR&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadIcon</span>(<span class="self">self</span>, <span class="ident">icon_id</span>: <span class="ident">IdIdiStr</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadIconW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">icon_id</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HICON</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)</span>
-	<span class="doccomment">/// method for [`HBITMAP`](crate::HBITMAP).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadImageBitmap</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">IdObmStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HBITMAP</span><span class="op">&gt;</span>
-	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadImageW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">0</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HBITMAP</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)</span>
-	<span class="doccomment">/// method for [`HCURSOR`](crate::HCURSOR).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HCURSOR::DestroyCursor`](crate::prelude::user_Hcursor::DestroyCursor)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadImageCursor</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">IdOcrStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HCURSOR</span><span class="op">&gt;</span>
-	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadImageW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">2</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HCURSOR</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadImage`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)</span>
-	<span class="doccomment">/// method for [`HICON`](crate::HICON).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`HICON::DestroyIcon`](crate::prelude::user_Hicon::DestroyIcon) call.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadImageIcon</span>(<span class="self">self</span>,
-		<span class="ident">name</span>: <span class="ident">IdOicStr</span>, <span class="ident">sz</span>: <span class="ident">SIZE</span>, <span class="ident">load</span>: <span class="ident">co::LR</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HICON</span><span class="op">&gt;</span>
-	{
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadImageW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="number">1</span>, <span class="ident">sz</span>.<span class="ident">cx</span>, <span class="ident">sz</span>.<span class="ident">cy</span>, <span class="ident">load</span>.<span class="number">0</span>,
-			).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HICON</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadMenu`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadmenuw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadMenu</span>(<span class="self">self</span>, <span class="ident">resource_id</span>: <span class="ident">IdStr</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">HMENU</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadMenuW</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">resource_id</span>.<span class="ident">as_ptr</span>()).<span class="ident">as_mut</span>()
-		}.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">HMENU</span>(<span class="ident">ptr</span>))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">GetLastError</span>())
-	}
-
-	<span class="doccomment">/// [`LoadString`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadstringw)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">LoadString</span>(<span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u16</span>) -&gt; <span class="ident">WinResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pdata</span>: <span class="kw-2">*const</span> <span class="ident">u16</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-		<span class="kw">match</span> <span class="kw">unsafe</span> {
-			<span class="ident">user::ffi::LoadStringW</span>(
-				<span class="self">self</span>.<span class="ident">as_ptr</span>(),
-				<span class="ident">id</span> <span class="kw">as</span> <span class="kw">_</span>,
-				<span class="kw-2">&amp;mut</span> <span class="ident">pdata</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span>  <span class="kw">_</span>, <span class="number">0</span>,
-			)
-		} {
-			<span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">GetLastError</span>()),
-			<span class="ident">len</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WString::from_wchars_count</span>(<span class="ident">pdata</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">to_string</span>())
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			len =&gt; <span class="prelude-val">Ok</span>(WString::from_wchars_count(pdata, len <span class="kw">as _</span>).to_string())
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

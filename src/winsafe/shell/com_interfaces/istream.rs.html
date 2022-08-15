@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">co</span>, <span class="ident">shell</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types</span>::{<span class="ident">HRES</span>, <span class="ident">PVOID</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs::ok_to_hrresult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">ole_IUnknown</span>, <span class="ident">shell_ISequentialStream</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::ISequentialStreamVT</span>;
+<span class="kw">use crate</span>::{co, shell};
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::{HRES, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IUnknown, shell_ISequentialStream};
+<span class="kw">use </span><span class="kw">crate</span>::vt::ISequentialStreamVT;
 
-<span class="doccomment">/// [`ISequentialStream`](crate::ISequentialStream) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IStreamVT</span> {
-	<span class="kw">pub</span> <span class="ident">ISequentialStreamVT</span>: <span class="ident">ISequentialStreamVT</span>,
-	<span class="kw">pub</span> <span class="ident">Seek</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">i64</span>, <span class="ident">u32</span>, <span class="kw-2">*mut</span> <span class="ident">u64</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">SetSize</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u64</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">CopyTo</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">ComPtr</span>, <span class="ident">u64</span>, <span class="kw-2">*mut</span> <span class="ident">u64</span>, <span class="kw-2">*mut</span> <span class="ident">u64</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Commit</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>)-&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Revert</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">LockRegion</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u64</span>, <span class="ident">u64</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">UnlockRegion</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u64</span>, <span class="ident">u64</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Stat</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">PVOID</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Clone</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`ISequentialStream`](crate::ISequentialStream) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IStreamVT {
+	<span class="kw">pub </span>ISequentialStreamVT: ISequentialStreamVT,
+	<span class="kw">pub </span>Seek: <span class="kw">fn</span>(ComPtr, i64, u32, <span class="kw-2">*mut </span>u64) -&gt; HRES,
+	<span class="kw">pub </span>SetSize: <span class="kw">fn</span>(ComPtr, u64) -&gt; HRES,
+	<span class="kw">pub </span>CopyTo: <span class="kw">fn</span>(ComPtr, ComPtr, u64, <span class="kw-2">*mut </span>u64, <span class="kw-2">*mut </span>u64) -&gt; HRES,
+	<span class="kw">pub </span>Commit: <span class="kw">fn</span>(ComPtr, u32)-&gt; HRES,
+	<span class="kw">pub </span>Revert: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>LockRegion: <span class="kw">fn</span>(ComPtr, u64, u64, u32) -&gt; HRES,
+	<span class="kw">pub </span>UnlockRegion: <span class="kw">fn</span>(ComPtr, u64, u64, u32) -&gt; HRES,
+	<span class="kw">pub </span>Stat: <span class="kw">fn</span>(ComPtr, PVOID, u32) -&gt; HRES,
+	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IStream`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nn-objidl-istream)</span>
-<span class="doccomment">/// COM interface over [`IStreamVT`](crate::vt::IStreamVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IStream</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IStream`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nn-objidl-istream)
+/// COM interface over [`IStreamVT`](crate::vt::IStreamVT).
+///
+/// Automatically calls
+/// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IStream(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IStream</span>, <span class="string">&quot;0000000c-0000-0000-c000-000000000046&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_ISequentialStream</span> <span class="kw">for</span> <span class="ident">IStream</span> {}
-<span class="kw">impl</span> <span class="ident">shell_IStream</span> <span class="kw">for</span> <span class="ident">IStream</span> {}
+<span class="macro">impl_iunknown!</span>(IStream, <span class="string">&quot;0000000c-0000-0000-c000-000000000046&quot;</span>);
+<span class="kw">impl </span>shell_ISequentialStream <span class="kw">for </span>IStream {}
+<span class="kw">impl </span>shell_IStream <span class="kw">for </span>IStream {}
 
-<span class="doccomment">/// [`IStream`](crate::IStream) methods from `shell` feature.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IStream</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// Calls</span>
-	<span class="doccomment">/// [`SHCreateMemStream`](https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatememstream)</span>
-	<span class="doccomment">/// to create a new stream over a slice.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IStream</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="ident">shell::ffi::SHCreateMemStream</span>(<span class="ident">src</span>.<span class="ident">as_ptr</span>(), <span class="ident">src</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>)
-				.<span class="ident">as_ref</span>()
-		}.<span class="ident">map_or</span>(
-			<span class="prelude-val">Err</span>(<span class="ident">co::HRESULT::E_OUTOFMEMORY</span>),
-			<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">IStream::from</span>(<span class="ident">ComPtr</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="kw">_</span>))),
+<span class="doccomment">/// [`IStream`](crate::IStream) methods from `shell` feature.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IStream: ole_IUnknown {
+	<span class="doccomment">/// Calls
+	/// [`SHCreateMemStream`](https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatememstream)
+	/// to create a new stream over a slice.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>from_slice(src: <span class="kw-2">&amp;</span>[u8]) -&gt; HrResult&lt;IStream&gt; {
+		<span class="kw">unsafe </span>{
+			shell::ffi::SHCreateMemStream(src.as_ptr(), src.len() <span class="kw">as _</span>)
+				.as_ref()
+		}.map_or(
+			<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY),
+			|p| <span class="prelude-val">Ok</span>(IStream::from(ComPtr(p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut *mut </span><span class="kw">_</span>))),
 		)
 	}
 
-	<span class="doccomment">/// [`IStream::Commit`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-commit)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Commit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">co::STGC</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">Commit</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">flags</span>.<span class="number">0</span>)
+	<span class="doccomment">/// [`IStream::Commit`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-commit)
+	/// method.
+	</span><span class="kw">fn </span>Commit(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::STGC) -&gt; HrResult&lt;()&gt; {
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.Commit)(<span class="self">self</span>.ptr(), flags.<span class="number">0</span>)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`IStream::CopyTo`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-copyto)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the number of bytes read and written.</span>
-	<span class="kw">fn</span> <span class="ident">CopyTo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">IStream</span>, <span class="ident">num_bytes</span>: <span class="ident">u64</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">read</span>, <span class="kw-2">mut</span> <span class="ident">written</span>) <span class="op">=</span> (<span class="ident">u64::default</span>(), <span class="ident">u64::default</span>());
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">CopyTo</span>)(
-					<span class="self">self</span>.<span class="ident">ptr</span>(),
-					<span class="ident">dest</span>.<span class="ident">ptr</span>(),
-					<span class="ident">num_bytes</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">read</span>,
-					<span class="kw-2">&amp;mut</span> <span class="ident">written</span>,
+	<span class="doccomment">/// [`IStream::CopyTo`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-copyto)
+	/// method.
+	///
+	/// Returns the number of bytes read and written.
+	</span><span class="kw">fn </span>CopyTo(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;</span>IStream, num_bytes: u64) -&gt; HrResult&lt;(u64, u64)&gt; {
+		<span class="kw">let </span>(<span class="kw-2">mut </span>read, <span class="kw-2">mut </span>written) = (u64::default(), u64::default());
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.CopyTo)(
+					<span class="self">self</span>.ptr(),
+					dest.ptr(),
+					num_bytes,
+					<span class="kw-2">&amp;mut </span>read,
+					<span class="kw-2">&amp;mut </span>written,
 				)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">read</span>, <span class="ident">written</span>))
+		).map(|<span class="kw">_</span>| (read, written))
 	}
 
-	<span class="doccomment">/// [`IStream::LockRegion`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-lockregion)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **Note:** Must be paired with an</span>
-	<span class="doccomment">/// [`IStream::UnlockRegion`](crate::prelude::shell_IStream::UnlockRegion)</span>
-	<span class="doccomment">/// call.</span>
-	<span class="kw">fn</span> <span class="ident">LockRegion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">offset</span>: <span class="ident">u64</span>, <span class="ident">length</span>: <span class="ident">u64</span>, <span class="ident">lock_type</span>: <span class="ident">co::LOCKTYPE</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`IStream::LockRegion`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-lockregion)
+	/// method.
+	///
+	/// **Note:** Must be paired with an
+	/// [`IStream::UnlockRegion`](crate::prelude::shell_IStream::UnlockRegion)
+	/// call.
+	</span><span class="kw">fn </span>LockRegion(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		offset: u64, length: u64, lock_type: co::LOCKTYPE) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">LockRegion</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">offset</span>, <span class="ident">length</span>, <span class="ident">lock_type</span>.<span class="number">0</span>)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.LockRegion)(<span class="self">self</span>.ptr(), offset, length, lock_type.<span class="number">0</span>)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`IStream::Revert`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-revert)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Revert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">Revert</span>)(<span class="self">self</span>.<span class="ident">ptr</span>())
+	<span class="doccomment">/// [`IStream::Revert`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-revert)
+	/// method.
+	</span><span class="kw">fn </span>Revert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.Revert)(<span class="self">self</span>.ptr())
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`IStream::Seek`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-seek)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns the new absolute offset.</span>
-	<span class="kw">fn</span> <span class="ident">Seek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">displacement</span>: <span class="ident">i64</span>, <span class="ident">origin</span>: <span class="ident">co::STREAM_SEEK</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>
+	<span class="doccomment">/// [`IStream::Seek`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-seek)
+	/// method.
+	///
+	/// Returns the new absolute offset.
+	</span><span class="kw">fn </span>Seek(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		displacement: i64, origin: co::STREAM_SEEK) -&gt; HrResult&lt;u64&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_off</span> <span class="op">=</span> <span class="ident">u64::default</span>();
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">Seek</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">displacement</span>, <span class="ident">origin</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="ident">new_off</span>)
+		<span class="kw">let </span><span class="kw-2">mut </span>new_off = u64::default();
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.Seek)(<span class="self">self</span>.ptr(), displacement, origin.<span class="number">0</span>, <span class="kw-2">&amp;mut </span>new_off)
 			},
-		).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">new_off</span>)
+		).map(|<span class="kw">_</span>| new_off)
 	}
 
-	<span class="doccomment">/// [`IStream::SetSize`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-setsize)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">SetSize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_size</span>: <span class="ident">u64</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">SetSize</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">new_size</span>)
+	<span class="doccomment">/// [`IStream::SetSize`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-setsize)
+	/// method.
+	</span><span class="kw">fn </span>SetSize(<span class="kw-2">&amp;</span><span class="self">self</span>, new_size: u64) -&gt; HrResult&lt;()&gt; {
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.SetSize)(<span class="self">self</span>.ptr(), new_size)
 			},
 		)
 	}
 
-	<span class="doccomment">/// [`IStream::UnlockRegion`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-unlockregion)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">UnlockRegion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">offset</span>: <span class="ident">u64</span>, <span class="ident">length</span>: <span class="ident">u64</span>, <span class="ident">lock_type</span>: <span class="ident">co::LOCKTYPE</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+	<span class="doccomment">/// [`IStream::UnlockRegion`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-unlockregion)
+	/// method.
+	</span><span class="kw">fn </span>UnlockRegion(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		offset: u64, length: u64, lock_type: co::LOCKTYPE) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="ident">ok_to_hrresult</span>(
-			<span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IStreamVT</span>);
-				(<span class="ident">vt</span>.<span class="ident">UnlockRegion</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">offset</span>, <span class="ident">length</span>, <span class="ident">lock_type</span>.<span class="number">0</span>)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IStreamVT);
+				(vt.UnlockRegion)(<span class="self">self</span>.ptr(), offset, length, lock_type.<span class="number">0</span>)
 			},
 		)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>

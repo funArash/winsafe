@@ -152,159 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::mem::ManuallyDrop;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::co</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi_types::HRES</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::decl</span>::{<span class="ident">ComPtr</span>, <span class="ident">HrResult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ole::privs</span>::{<span class="ident">ok_to_hrresult</span>, <span class="ident">okfalse_to_hrresult</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude::ole_IUnknown</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shell::decl::IShellItem</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vt::IUnknownVT</span>;
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::ffi_types::HRES;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::shell::decl::IShellItem;
+<span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
-<span class="doccomment">/// [`IEnumShellItems`](crate::IEnumShellItems) virtual table.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IEnumShellItemsVT</span> {
-	<span class="kw">pub</span> <span class="ident">IUnknownVT</span>: <span class="ident">IUnknownVT</span>,
-	<span class="kw">pub</span> <span class="ident">Next</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Skip</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="ident">u32</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Reset</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
-	<span class="kw">pub</span> <span class="ident">Clone</span>: <span class="kw">fn</span>(<span class="ident">ComPtr</span>, <span class="kw-2">*mut</span> <span class="ident">ComPtr</span>) -&gt; <span class="ident">HRES</span>,
+<span class="doccomment">/// [`IEnumShellItems`](crate::IEnumShellItems) virtual table.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="attribute">#[repr(C)]</span>
+<span class="kw">pub struct </span>IEnumShellItemsVT {
+	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
+	<span class="kw">pub </span>Next: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Skip: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
+	<span class="kw">pub </span>Reset: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IEnumShellItems`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ienumshellitems)</span>
-<span class="doccomment">/// COM interface over [`IEnumShellItemsVT`](crate::vt::IEnumShellItemsVT).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Automatically calls</span>
-<span class="doccomment">/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)</span>
-<span class="doccomment">/// when the object goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instantiating from an [`IShellItem`](crate::IShellItem) object:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// use winsafe::{co, IEnumShellItems, IShellItem, SHCreateItemFromParsingName};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let folder = SHCreateItemFromParsingName::&lt;IShellItem&gt;(&quot;C:\\Temp&quot;, None)?;</span>
-<span class="doccomment">/// let items = folder.BindToHandler::&lt;IEnumShellItems&gt;(None, &amp;co::BHID::EnumItems)?;</span>
-<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IEnumShellItems</span>(<span class="ident">ComPtr</span>);
+<span class="doccomment">/// [`IEnumShellItems`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nn-shobjidl_core-ienumshellitems)
+/// COM interface over [`IEnumShellItemsVT`](crate::vt::IEnumShellItemsVT).
+///
+/// Automatically calls
+/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+/// when the object goes out of scope.
+///
+/// # Examples
+///
+/// Instantiating from an [`IShellItem`](crate::IShellItem) object:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{co, IEnumShellItems, IShellItem, SHCreateItemFromParsingName};
+///
+/// let folder = SHCreateItemFromParsingName::&lt;IShellItem&gt;(&quot;C:\\Temp&quot;, None)?;
+/// let items = folder.BindToHandler::&lt;IEnumShellItems&gt;(None, &amp;co::BHID::EnumItems)?;
+/// # Ok::&lt;_, co::HRESULT&gt;(())
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub struct </span>IEnumShellItems(ComPtr);
 
-<span class="macro">impl_iunknown!</span>(<span class="ident">IEnumShellItems</span>, <span class="string">&quot;70629033-e363-4a28-a567-0db78006e6d7&quot;</span>);
-<span class="kw">impl</span> <span class="ident">shell_IEnumShellItems</span> <span class="kw">for</span> <span class="ident">IEnumShellItems</span> {}
+<span class="macro">impl_iunknown!</span>(IEnumShellItems, <span class="string">&quot;70629033-e363-4a28-a567-0db78006e6d7&quot;</span>);
+<span class="kw">impl </span>shell_IEnumShellItems <span class="kw">for </span>IEnumShellItems {}
 
-<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for</span>
-<span class="doccomment">/// [`IEnumShellItems`](crate::IEnumShellItems).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer importing this trait through the prelude:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use winsafe::prelude::*;</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">shell_IEnumShellItems</span>: <span class="ident">ole_IUnknown</span> {
-	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements</span>
-	<span class="doccomment">/// which successively calls</span>
-	<span class="doccomment">/// [`IEnumShellItems::Next`](crate::prelude::shell_IEnumShellItems::Next).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Enumerating the items in a folder by iterating over the</span>
-	<span class="doccomment">/// [`IShellItem`](crate::IShellItem) objects:</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust,no_run</span>
-	<span class="doccomment">/// use winsafe::prelude::*;</span>
-	<span class="doccomment">/// use winsafe::{co, IEnumShellItems, IShellItem, SHCreateItemFromParsingName};</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let folder = SHCreateItemFromParsingName::&lt;IShellItem&gt;(&quot;C:\\Temp&quot;, None)?;</span>
-	<span class="doccomment">/// let items = folder.BindToHandler::&lt;IEnumShellItems&gt;(None, &amp;co::BHID::EnumItems)?;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// for item in items.iter() {</span>
-	<span class="doccomment">///     let item = item?;</span>
-	<span class="doccomment">///     println!(&quot;{}&quot;, item.GetDisplayName(co::SIGDN::FILESYSPATH)?);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// # Ok::&lt;_, co::HRESULT&gt;(())</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-		<span class="ident">Box::new</span>(<span class="ident">EnumShellItemsIter::new</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">ptr</span>() }))
+<span class="doccomment">/// This trait is enabled with the `shell` feature, and provides methods for
+/// [`IEnumShellItems`](crate::IEnumShellItems).
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
+<span class="kw">pub trait </span>shell_IEnumShellItems: ole_IUnknown {
+	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements
+	/// which successively calls
+	/// [`IEnumShellItems::Next`](crate::prelude::shell_IEnumShellItems::Next).
+	///
+	/// # Examples
+	///
+	/// Enumerating the items in a folder by iterating over the
+	/// [`IShellItem`](crate::IShellItem) objects:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, IEnumShellItems, IShellItem, SHCreateItemFromParsingName};
+	///
+	/// let folder = SHCreateItemFromParsingName::&lt;IShellItem&gt;(&quot;C:\\Temp&quot;, None)?;
+	/// let items = folder.BindToHandler::&lt;IEnumShellItems&gt;(None, &amp;co::BHID::EnumItems)?;
+	///
+	/// for item in items.iter() {
+	///     let item = item?;
+	///     println!(&quot;{}&quot;, item.GetDisplayName(co::SIGDN::FILESYSPATH)?);
+	/// }
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IShellItem&gt;&gt; + <span class="lifetime">&#39;a</span>&gt; {
+		Box::new(EnumShellItemsIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() }))
 	}
 
-	<span class="doccomment">/// [`IEnumShellItems::Next`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-next)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="attribute">#[<span class="ident">must_use</span>]</span>
-	<span class="kw">fn</span> <span class="ident">Next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fetched</span> <span class="op">=</span> <span class="ident">u32::default</span>();
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppv_queried</span> <span class="op">=</span> <span class="ident">ComPtr::null</span>();
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IEnumShellItemsVT</span>);
-			<span class="kw">match</span> <span class="ident">ok_to_hrresult</span>(
-				(<span class="ident">vt</span>.<span class="ident">Next</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="number">1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ppv_queried</span>, <span class="kw-2">&amp;mut</span> <span class="ident">fetched</span>),
+	<span class="doccomment">/// [`IEnumShellItems::Next`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-next)
+	/// method.
+	</span><span class="attribute">#[must_use]</span>
+	<span class="kw">fn </span>Next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="prelude-ty">Option</span>&lt;IShellItem&gt;&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>fetched = u32::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumShellItemsVT);
+			<span class="kw">match </span>ok_to_hrresult(
+				(vt.Next)(<span class="self">self</span>.ptr(), <span class="number">1</span>, <span class="kw-2">&amp;mut </span>ppv_queried, <span class="kw-2">&amp;mut </span>fetched),
 			) {
-				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">IShellItem::from</span>(<span class="ident">ppv_queried</span>))),
-				<span class="prelude-val">Err</span>(<span class="ident">hr</span>) =&gt; <span class="kw">match</span> <span class="ident">hr</span> {
-					<span class="ident">co::HRESULT::S_FALSE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no item found</span>
-				<span class="ident">hr</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">hr</span>), <span class="comment">// actual error</span>
-				},
+				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(IShellItem::from(ppv_queried))),
+				<span class="prelude-val">Err</span>(hr) =&gt; <span class="kw">match </span>hr {
+					co::HRESULT::S_FALSE =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no item found
+				</span>hr =&gt; <span class="prelude-val">Err</span>(hr), <span class="comment">// actual error
+				</span>},
 			}
 		}
 	}
 
-	<span class="doccomment">/// [`IEnumShellItems::Reset`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-reset)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IEnumShellItemsVT</span>);
-			<span class="ident">ok_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Reset</span>)(<span class="self">self</span>.<span class="ident">ptr</span>()))
+	<span class="doccomment">/// [`IEnumShellItems::Reset`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-reset)
+	/// method.
+	</span><span class="kw">fn </span>Reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumShellItemsVT);
+			ok_to_hrresult((vt.Reset)(<span class="self">self</span>.ptr()))
 		}
 	}
 
-	<span class="doccomment">/// [`IEnumShellItems::Skip`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-skip)</span>
-	<span class="doccomment">/// method.</span>
-	<span class="kw">fn</span> <span class="ident">Skip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="kw">unsafe</span> {
-			<span class="kw">let</span> <span class="ident">vt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">ptr</span>().<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">IEnumShellItemsVT</span>);
-			<span class="ident">okfalse_to_hrresult</span>((<span class="ident">vt</span>.<span class="ident">Skip</span>)(<span class="self">self</span>.<span class="ident">ptr</span>(), <span class="ident">count</span>))
+	<span class="doccomment">/// [`IEnumShellItems::Skip`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-skip)
+	/// method.
+	</span><span class="kw">fn </span>Skip(<span class="kw-2">&amp;</span><span class="self">self</span>, count: u32) -&gt; HrResult&lt;bool&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumShellItemsVT);
+			okfalse_to_hrresult((vt.Skip)(<span class="self">self</span>.ptr(), count))
 		}
 	}
 }
 
-<span class="comment">//------------------------------------------------------------------------------</span>
+<span class="comment">//------------------------------------------------------------------------------
 
-<span class="kw">struct</span> <span class="ident">EnumShellItemsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="ident">array</span>: <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">IEnumShellItems</span><span class="op">&gt;</span>,
-	<span class="ident">_owner</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+</span><span class="kw">struct </span>EnumShellItemsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	array: ManuallyDrop&lt;IEnumShellItems&gt;,
+	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">EnumShellItemsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">HrResult</span><span class="op">&lt;</span><span class="ident">IShellItem</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>EnumShellItemsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = HrResult&lt;IShellItem&gt;;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">array</span>.<span class="ident">Next</span>() {
-			<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
-			<span class="prelude-val">Ok</span>(<span class="ident">maybe_item</span>) =&gt; <span class="kw">match</span> <span class="ident">maybe_item</span> {
-				<span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-				<span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>)),
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">match </span><span class="self">self</span>.array.Next() {
+			<span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
+			<span class="prelude-val">Ok</span>(maybe_item) =&gt; <span class="kw">match </span>maybe_item {
+				<span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+				<span class="prelude-val">Some</span>(item) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item)),
 			},
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EnumShellItemsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">com_ptr</span>: <span class="ident">ComPtr</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">array</span>: <span class="ident">ManuallyDrop::new</span>(<span class="ident">IEnumShellItems</span>(<span class="ident">com_ptr</span>)),
-			<span class="ident">_owner</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumShellItemsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(com_ptr: ComPtr) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			array: ManuallyDrop::new(IEnumShellItems(com_ptr)),
+			_owner: PhantomData,
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (20ffea693 2022-08-11)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (801821d15 2022-08-14)" ></div></body></html>
