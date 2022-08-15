@@ -133,6 +133,8 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HFILE, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{HandleClose, kernel_Hfile};
@@ -145,16 +147,17 @@
 	<span class="doccomment">/// Opens the file as read-only. Fails if the file doesn&#39;t exist.
 	</span>ExistingReadOnly,
 	<span class="doccomment">/// Opens the file as read/write. Fails if the file doesn&#39;t exist.
-	</span>ExistingReadWrite,
+	</span>ExistingRW,
 	<span class="doccomment">/// Opens the file as read/write. If the file doesn&#39;t exist, it will be
 	/// created.
-	</span>OpenOrCreateReadWrite,
+	</span>OpenOrCreateRW,
 }
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="doccomment">/// Manages an [`HFILE`](crate::HFILE) handle, which is closed automatically
-/// when the object goes out of scope.
+</span><span class="doccomment">/// Manages an [`HFILE`](crate::HFILE) handle, which provides file read/write
+/// and other operations. It is closed automatically when the object goes out of
+/// scope.
 ///
 /// This is an alternative to the standard
 /// [`std::fs::File`](https://doc.rust-lang.org/std/fs/struct.File.html), with a
@@ -175,17 +178,17 @@
 	</span><span class="attribute">#[must_use]</span>
 	<span class="kw">pub fn </span>open(file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;File&gt; {
 		<span class="kw">let </span>(acc, share, disp) = <span class="kw">match </span>access {
-			FileAccess::ExistingReadOnly =&gt;  (
+			FileAccess::ExistingReadOnly =&gt; (
 				co::GENERIC::READ,
 				co::FILE_SHARE::READ,
 				co::DISPOSITION::OPEN_EXISTING,
 			),
-			FileAccess::ExistingReadWrite =&gt; (
+			FileAccess::ExistingRW =&gt; (
 				co::GENERIC::READ | co::GENERIC::WRITE,
 				co::FILE_SHARE::NoValue,
 				co::DISPOSITION::OPEN_EXISTING,
 			),
-			FileAccess::OpenOrCreateReadWrite =&gt; (
+			FileAccess::OpenOrCreateRW =&gt; (
 				co::GENERIC::READ | co::GENERIC::WRITE,
 				co::FILE_SHARE::NoValue,
 				co::DISPOSITION::OPEN_ALWAYS,
@@ -222,7 +225,8 @@
 	<span class="doccomment">/// Reads bytes from the file.
 	///
 	/// Note that the bytes will start being read from the current offset of the
-	/// internal file pointer, which is then incremented by `num_bytes`.
+	/// internal file pointer, which is then incremented by the size of
+	/// `buffer`.
 	</span><span class="kw">pub fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; SysResult&lt;usize&gt; {
 		<span class="self">self</span>.hfile.ReadFile(buffer, <span class="prelude-val">None</span>)
 			.map(|n| n <span class="kw">as _</span>)

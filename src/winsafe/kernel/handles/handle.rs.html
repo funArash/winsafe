@@ -60,6 +60,7 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
+<span id="63">63</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
 
 <span class="kw">use </span>std::fmt;
@@ -88,7 +89,7 @@
 	<span class="doccomment">/// Creates a new handle instance by wrapping a pointer.
 	</span><span class="kw">unsafe fn </span>from_ptr&lt;T&gt;(p: <span class="kw-2">*mut </span>T) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Returning the underlying raw pointer.
+	<span class="doccomment">/// Returns the underlying raw pointer.
 	</span><span class="kw">unsafe fn </span>as_ptr(<span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
 
 	<span class="doccomment">/// Tells if the handle is invalid (null).
@@ -96,7 +97,7 @@
 		<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr().is_null() }
 	}
 
-	<span class="doccomment">/// Returns `None` if the handle is null, otherwise returns `Some(&amp;Self)`.
+	<span class="doccomment">/// Returns `None` if the handle is null, otherwise returns `Some(self)`.
 	</span><span class="attribute">#[must_use]</span>
 	<span class="kw">fn </span>as_opt(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">if </span><span class="self">self</span>.is_null() {
@@ -107,7 +108,8 @@
 	}
 }
 
-<span class="doccomment">/// A [`Handle`](crate::prelude::Handle) which can be closed.
+<span class="doccomment">/// A [`Handle`](crate::prelude::Handle) which can be closed. Note that only
+/// some handles can be closed, so not all handles implement this trait.
 ///
 /// Prefer importing this trait through the prelude:
 ///

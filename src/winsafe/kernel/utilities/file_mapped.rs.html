@@ -99,14 +99,16 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, HFILEMAP, HFILEMAPVIEW, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	Handle, HandleClose, kernel_Hfile, kernel_Hfilemap, kernel_Hfilemapview,
 };
 
-<span class="doccomment">/// Manages a memory-mapped file, which can be read/written through slices. It
-/// is closed automatically when the object goes out of scope.
+<span class="doccomment">/// Manages an [`HFILEMAP`](crate::HFILEMAP) handle, which provides
+/// memory-mapped file operations, including read/write through slices. It is
+/// closed automatically when the object goes out of scope.
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
 <span class="kw">pub struct </span>FileMapped {
 	access: FileAccess,
@@ -146,8 +148,8 @@
 			<span class="prelude-val">None</span>,
 			<span class="kw">match </span><span class="self">self</span>.access {
 				FileAccess::ExistingReadOnly =&gt; co::PAGE::READONLY,
-				FileAccess::ExistingReadWrite
-					| FileAccess::OpenOrCreateReadWrite =&gt; co::PAGE::READWRITE,
+				FileAccess::ExistingRW
+					| FileAccess::OpenOrCreateRW =&gt; co::PAGE::READWRITE,
 			},
 			<span class="prelude-val">None</span>,
 			<span class="prelude-val">None</span>,
@@ -156,8 +158,8 @@
 		<span class="self">self</span>.hview = <span class="self">self</span>.hmap.MapViewOfFile(
 			<span class="kw">match </span><span class="self">self</span>.access {
 				FileAccess::ExistingReadOnly =&gt; co::FILE_MAP::READ,
-				FileAccess::ExistingReadWrite
-					| FileAccess::OpenOrCreateReadWrite =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
+				FileAccess::ExistingRW
+					| FileAccess::OpenOrCreateRW =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
 			},
 			<span class="number">0</span>,
 			<span class="prelude-val">None</span>,
