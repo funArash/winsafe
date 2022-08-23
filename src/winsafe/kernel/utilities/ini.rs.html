@@ -175,27 +175,102 @@
 <span id="175">175</span>
 <span id="176">176</span>
 <span id="177">177</span>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FileAccess, FileMapped, HFILE, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{HandleClose, kernel_Hfile};
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, FileMapped, SysResult, WString};
 
-<span class="doccomment">/// Keeps sections and key/value pairs of a `.ini` file, also doing parsing and
-/// serialization of the data.
+<span class="doccomment">/// High-level abstraction to load, manage and serialize sections and key/value
+/// pairs of a `.ini` file.
 ///
 /// # Examples
+///
+/// Printing all sections, keys and values:
 ///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::Ini;
 ///
-/// let fini = Ini::parse_from_file(&quot;C:\\Temp\\my_file.ini&quot;)?;
+/// let ini = Ini::parse_from_file(&quot;C:\\Temp\\foo.ini&quot;)?;
 ///
-/// for section in fini.sections.iter() {
+/// for section in ini.sections.iter() {
 ///     println!(&quot;Section: {}&quot;, section.name);
 ///     for entry in section.entries.iter() {
 ///         println!(&quot;Key: {}; Value: {}&quot;, entry.key, entry.val);
 ///     }
 /// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+///
+/// Reading a value:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::Ini;
+///
+/// let ini = Ini::parse_from_file(&quot;C:\\Temp\\foo.ini&quot;)?;
+///
+/// println!(&quot;{}&quot;, ini.value(&quot;the_section&quot;, &quot;the_key&quot;).unwrap());
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+///
+/// Changing an existing value:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::Ini;
+///
+/// let ini_path = &quot;C:\\Temp\\foo.ini&quot;;
+/// let mut ini = Ini::parse_from_file(ini_path)?;
+///
+/// *ini.value_mut(&quot;the_section&quot;, &quot;the_key&quot;).unwrap() = &quot;new_value&quot;.to_owned();
+///
+/// ini.serialize_to_file(ini_path)?;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
@@ -271,14 +346,19 @@
 		)
 	}
 
-	<span class="doccomment">/// Parses an `Ini` directly from a file.
+	<span class="doccomment">/// Parses an `Ini` directly from a file. The [`Encoding`](crate::Encoding)
+	/// will be guessed with
+	/// [`WString::guess_encoding`](crate::WString::guess_encoding).
+	///
+	/// The file will be [mapped in memory](crate::FileMapped) during reading
+	/// for maximum performance.
 	</span><span class="attribute">#[must_use]</span>
 	<span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Ini&gt; {
 		<span class="kw">let </span>fin = FileMapped::open(ini_path, FileAccess::ExistingReadOnly)<span class="question-mark">?</span>;
 		<span class="self">Self</span>::parse_bytes(fin.as_slice())
 	}
 
-	<span class="doccomment">/// Serializes the data to a string.
+	<span class="doccomment">/// Serializes the sections and entries to a string.
 	</span><span class="attribute">#[must_use]</span>
 	<span class="kw">pub fn </span>serialize_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
 		<span class="kw">let </span><span class="kw-2">mut </span>tot_size = <span class="number">0</span>;
@@ -312,21 +392,18 @@
 		buf
 	}
 
-	<span class="doccomment">/// Serializes the data to raw bytes with
+	<span class="doccomment">/// Serializes the sections and entries to raw bytes with
 	/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).
 	</span><span class="attribute">#[must_use]</span>
 	<span class="kw">pub fn </span>serialize_to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
 		<span class="self">self</span>.serialize_to_str().into_bytes()
 	}
 
-	<span class="doccomment">/// Serializes the data directly to a file.
+	<span class="doccomment">/// Serializes the data directly to a file with
+	/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).
 	</span><span class="kw">pub fn </span>serialize_to_file(<span class="kw-2">&amp;</span><span class="self">self</span>, ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>(fout, <span class="kw">_</span>) = HFILE::CreateFile(ini_path, co::GENERIC::WRITE,
-			co::FILE_SHARE::NoValue, <span class="prelude-val">None</span>, co::DISPOSITION::CREATE_ALWAYS,
-			co::FILE_ATTRIBUTE::NORMAL, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-
-		fout.WriteFile(<span class="kw-2">&amp;</span><span class="self">self</span>.serialize_to_bytes(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-		fout.CloseHandle()<span class="question-mark">?</span>;
+		<span class="kw">let </span>fout = File::open(ini_path, FileAccess::OpenOrCreateRW)<span class="question-mark">?</span>;
+		fout.erase_and_write(<span class="kw-2">&amp;</span><span class="self">self</span>.serialize_to_bytes())<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -335,21 +412,40 @@
 	<span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
 		<span class="self">self</span>.sections.iter()
 			.find(|s| s.name == section)
-			.and_then(|s| s.entries.iter()
-				.find(|e| e.key == key)
-				.map(|e| e.val.as_ref())
-			)
+			.and_then(|s| {
+				s.entries.iter()
+					.find(|e| e.key == key)
+					.map(|e| e.val.as_ref())
+			})
 	}
 
 	<span class="doccomment">/// Returns a mutable reference to the specified value, if any.
+	///
+	/// # Examples
+	///
+	/// Changing an existing value:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::Ini;
+	///
+	/// let ini_path = &quot;C:\\Temp\\foo.ini&quot;;
+	/// let mut ini = Ini::parse_from_file(ini_path)?;
+	///
+	/// *ini.value_mut(&quot;the_section&quot;, &quot;the_key&quot;).unwrap() = &quot;new_value&quot;.to_owned();
+	///
+	/// ini.serialize_to_file(ini_path)?;
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
 	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>str&gt; {
+	<span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt; {
 		<span class="self">self</span>.sections.iter_mut()
 			.find(|s| s.name == section)
-			.and_then(|s| s.entries.iter_mut()
-				.find(|e| e.key == key)
-				.map(|e| e.val.as_mut())
-			)
+			.and_then(|s| {
+				s.entries.iter_mut()
+					.find(|e| e.key == key)
+					.map(|e| <span class="kw-2">&amp;mut </span>e.val)
+			})
 	}
 }
 </code></pre></div>
