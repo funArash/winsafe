@@ -143,9 +143,9 @@
 
 <span class="doccomment">/// Access types for [`File::open`](crate::File::open) and
 /// [`FileMapped::open`](crate::FileMapped::open).
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Hash)]</span>
-<span class="kw">pub enum </span>FileAccess {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>FileAccess {
 	<span class="doccomment">/// Opens the file as read-only. Fails if the file doesn&#39;t exist.
 	</span>ExistingReadOnly,
 	<span class="doccomment">/// Opens the file as read/write. Fails if the file doesn&#39;t exist.
@@ -164,8 +164,8 @@
 /// This is an alternative to the standard
 /// [`std::fs::File`](https://doc.rust-lang.org/std/fs/struct.File.html), with a
 /// possibly faster implementation since it&#39;s Windows-only.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub struct </span>File {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub struct </span>File {
 	hfile: HFILE,
 }
 
@@ -177,8 +177,8 @@
 
 <span class="kw">impl </span>File {
 	<span class="doccomment">/// Opens a file with the desired access.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>open(file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;File&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>open(file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;File&gt; {
 		<span class="kw">let </span>(acc, share, disp) = <span class="kw">match </span>access {
 			FileAccess::ExistingReadOnly =&gt; (
 				co::GENERIC::READ,
@@ -212,14 +212,14 @@
 	}
 
 	<span class="doccomment">/// Returns the underlying file handle.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub const fn </span>hfile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HFILE {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub const fn </span>hfile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HFILE {
 		<span class="self">self</span>.hfile
 	}
 
 	<span class="doccomment">/// Returns the current offset of the internal pointer.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>pointer_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>pointer_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
 		<span class="self">self</span>.hfile.SetFilePointerEx(<span class="number">0</span>, co::FILE_STARTING_POINT::CURRENT) <span class="comment">// https://stackoverflow.com/a/17707021/6923555
 			</span>.map(|off| off <span class="kw">as _</span>)
 	}
@@ -237,8 +237,8 @@
 	<span class="doccomment">/// Reads all the bytes from the file into a new `Vec`.
 	///
 	/// The internal file pointer will be rewound to the beginning of the file.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>read_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>read_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
 		<span class="self">self</span>.rewind_pointer()<span class="question-mark">?</span>;
 		<span class="kw">let </span><span class="kw-2">mut </span>data: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.size()<span class="question-mark">?</span>];
 		<span class="kw">let </span>bytes_read = <span class="self">self</span>.read(<span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
@@ -264,8 +264,8 @@
 	}
 
 	<span class="doccomment">/// Returns the size of the file.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
 		<span class="self">self</span>.hfile.GetFileSizeEx()
 	}
 
@@ -277,4 +277,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

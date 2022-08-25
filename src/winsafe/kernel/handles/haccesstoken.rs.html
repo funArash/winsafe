@@ -73,14 +73,14 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { HACCESSTOKEN: <span class="string">&quot;kernel&quot;</span>;
+<span class="macro">impl_handle! </span>{ HACCESSTOKEN: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to an
 	/// [access token](https://docs.microsoft.com/en-us/windows/win32/secgloss/a-gly).
 	/// Originally just a `HANDLE`.
@@ -97,16 +97,16 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub trait </span>kernel_Haccesstoken: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub trait </span>kernel_Haccesstoken: Handle {
 	<span class="doccomment">/// [`DuplicateToken`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetoken)
 	/// method.
 	///
 	/// **Note:** Must be paired with an
 	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>DuplicateToken(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>DuplicateToken(<span class="self">self</span>,
 		level: co::SECURITY_IMPERSONATION) -&gt; SysResult&lt;HACCESSTOKEN&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
@@ -123,22 +123,22 @@
 
 	<span class="doccomment">/// [`GetCurrentProcessToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocesstoken)
 	/// static method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentProcessToken() -&gt; HACCESSTOKEN {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentProcessToken() -&gt; HACCESSTOKEN {
 		HACCESSTOKEN(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcessToken() })
 	}
 
 	<span class="doccomment">/// [`GetCurrentThreadEffectiveToken`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadeffectivetoken)
 	/// static method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentThreadEffectiveToken() -&gt; HACCESSTOKEN {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentThreadEffectiveToken() -&gt; HACCESSTOKEN {
 		HACCESSTOKEN(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThreadEffectiveToken() })
 	}
 
 	<span class="doccomment">/// [`IsTokenRestricted`](https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-istokenrestricted)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>IsTokenRestricted(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>IsTokenRestricted(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::IsTokenRestricted(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// actual false
@@ -149,4 +149,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

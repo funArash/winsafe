@@ -184,15 +184,15 @@
 /// }
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]</span>
-<span class="kw">pub struct </span>ResourceInfo {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]
+</span><span class="kw">pub struct </span>ResourceInfo {
 	res_buf: Vec&lt;u8&gt;,
 }
 
 <span class="kw">impl </span>ResourceInfo {
 	<span class="doccomment">/// Reads and stores the resource data from an executable file or a DLL.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>read_from(exe_file: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;ResourceInfo&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>read_from(exe_file: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;ResourceInfo&gt; {
 		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{ res_buf: GetFileVersionInfo(exe_file)<span class="question-mark">? </span>})
 	}
 
@@ -201,8 +201,8 @@
 	///
 	/// These blocks allow retrieval of version information strings in their
 	/// respective languages.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>blocks&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ResourceInfoBlock&gt; + <span class="lifetime">&#39;a </span>{
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>blocks&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ResourceInfoBlock&gt; + <span class="lifetime">&#39;a </span>{
 		<span class="kw">unsafe </span>{
 			VarQueryValue::&lt;(LANGID, co::CP)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\VarFileInfo\\Translation&quot;</span>)
 				.ok()
@@ -225,8 +225,8 @@
 	}
 
 	<span class="doccomment">/// Returns the version information, if any.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>version_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>VS_FIXEDFILEINFO&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>version_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>VS_FIXEDFILEINFO&gt; {
 		<span class="kw">unsafe </span>{
 			VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\&quot;</span>)
 				.ok()
@@ -237,29 +237,29 @@
 
 <span class="doccomment">/// An language block of [`ResourceInfo`](crate::ResourceInfo), composed of a
 /// language ID and a code page.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]</span>
-<span class="kw">pub struct </span>ResourceInfoBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;version&quot;</span>)))]
+</span><span class="kw">pub struct </span>ResourceInfoBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
 	res_info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ResourceInfo,
 	lang_id: LANGID,
 	code_page: co::CP,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ResourceInfoBlock&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="attribute">#[must_use]</span> <span class="kw">pub const fn </span>lang_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LANGID { <span class="self">self</span>.lang_id }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub const fn </span>code_page(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::CP { <span class="self">self</span>.code_page }
+	<span class="attribute">#[must_use] </span><span class="kw">pub const fn </span>lang_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LANGID { <span class="self">self</span>.lang_id }
+	<span class="attribute">#[must_use] </span><span class="kw">pub const fn </span>code_page(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::CP { <span class="self">self</span>.code_page }
 
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>comments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;Comments&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>company_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;CompanyName&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>file_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileDescrition&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>file_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileVersion&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>internal_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;InternalName&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>legal_copyright(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalCopyright&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>legal_trademarks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalTrademarks&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>original_filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;OriginalFilename&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>product_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductName&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>product_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductVersion&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>private_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;PrivateBuild&quot;</span>) }
-	<span class="attribute">#[must_use]</span> <span class="kw">pub fn </span>special_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;SpecialBuild&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>comments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;Comments&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>company_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;CompanyName&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>file_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileDescrition&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>file_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;FileVersion&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>internal_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;InternalName&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>legal_copyright(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalCopyright&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>legal_trademarks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;LegalTrademarks&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>original_filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;OriginalFilename&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>product_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductName&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>product_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;ProductVersion&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>private_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;PrivateBuild&quot;</span>) }
+	<span class="attribute">#[must_use] </span><span class="kw">pub fn </span>special_build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; { <span class="self">self</span>.generic_string_info(<span class="string">&quot;SpecialBuild&quot;</span>) }
 
 	<span class="kw">fn </span>generic_string_info(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
 		<span class="kw">unsafe </span>{
@@ -277,4 +277,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

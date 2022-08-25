@@ -318,9 +318,9 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	GetLastError, HRSRC, HRSRCMEM, IdStr, LANGID, RtStr, SysResult, WString,
 };
@@ -328,7 +328,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, str_to_iso88591};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="macro">impl_handle!</span> { HINSTANCE: <span class="string">&quot;kernel&quot;</span>;
+<span class="macro">impl_handle! </span>{ HINSTANCE: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to an
 	/// [instance](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hinstance),
 	/// same as `HMODULE`.
@@ -344,8 +344,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub trait </span>kernel_Hinstance: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub trait </span>kernel_Hinstance: Handle {
 	<span class="doccomment">/// [`EnumResourceLanguages`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumresourcelanguagesw)
 	/// method.
 	</span><span class="kw">fn </span>EnumResourceLanguages&lt;F&gt;(<span class="self">self</span>,
@@ -404,8 +404,8 @@
 	///
 	/// For an example, see
 	/// [`HINSTANCE::LockResource`](crate::prelude::kernel_Hinstance::LockResource).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>FindResource(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>FindResource(<span class="self">self</span>,
 		resource_id: IdStr, resource_type: RtStr) -&gt; SysResult&lt;HRSRC&gt;
 	{
 		<span class="kw">unsafe </span>{
@@ -423,8 +423,8 @@
 	///
 	/// For an example, see
 	/// [`HINSTANCE::LockResource`](crate::prelude::kernel_Hinstance::LockResource).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>FindResourceEx(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>FindResourceEx(<span class="self">self</span>,
 		resource_id: IdStr, resource_type: RtStr,
 		language: <span class="prelude-ty">Option</span>&lt;LANGID&gt;) -&gt; SysResult&lt;HRSRC&gt;
 	{
@@ -461,8 +461,8 @@
 	/// println!(&quot;EXE: {}&quot;, exe_name);
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetModuleFileName(<span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetModuleFileName(<span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; MAX_PATH];
 		<span class="kw">match unsafe </span>{
 			kernel::ffi::GetModuleFileNameW(
@@ -490,8 +490,8 @@
 	/// let hinstance = HINSTANCE::GetModuleHandle(None)?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetModuleHandle(module_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HINSTANCE&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetModuleHandle(module_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HINSTANCE&gt; {
 		<span class="kw">unsafe </span>{
 			kernel::ffi::GetModuleHandleW(
 				WString::from_opt_str(module_name).as_ptr(),
@@ -502,8 +502,8 @@
 
 	<span class="doccomment">/// [`GetProcAddress`](https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetProcAddress(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetProcAddress(<span class="self">self</span>,
 		proc_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;<span class="kw-2">*const </span>std::ffi::c_void&gt;
 	{
 		<span class="kw">unsafe </span>{
@@ -521,8 +521,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HINSTANCE::FreeLibrary`](crate::prelude::kernel_Hinstance::FreeLibrary)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HINSTANCE&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HINSTANCE&gt; {
 		<span class="kw">unsafe </span>{
 			kernel::ffi::LoadLibraryW(WString::from_str(lib_file_name).as_ptr())
 				.as_mut()
@@ -535,8 +535,8 @@
 	///
 	/// For an example, see
 	/// [`HINSTANCE::LockResource`](crate::prelude::kernel_Hinstance::LockResource).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>LoadResource(<span class="self">self</span>, res_info: HRSRC) -&gt; SysResult&lt;HRSRCMEM&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>LoadResource(<span class="self">self</span>, res_info: HRSRC) -&gt; SysResult&lt;HRSRCMEM&gt; {
 		<span class="kw">unsafe </span>{ kernel::ffi::LoadResource(<span class="self">self</span>.as_ptr(), res_info.<span class="number">0</span>).as_mut() }
 			.map(|ptr| HRSRCMEM(ptr))
 			.ok_or_else(|| GetLastError())
@@ -588,8 +588,8 @@
 	/// hExe.FreeLibrary()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>LockResource&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>LockResource&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>,
 		res_info: HRSRC, hres_loaded: HRSRCMEM) -&gt; SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;
 	{
 		<span class="kw">let </span>sz = <span class="self">self</span>.SizeofResource(res_info)<span class="question-mark">?</span>;
@@ -605,8 +605,8 @@
 	///
 	/// For an example, see
 	/// [`HINSTANCE::LockResource`](crate::prelude::kernel_Hinstance::LockResource).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>SizeofResource(<span class="self">self</span>, res_info: HRSRC) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>SizeofResource(<span class="self">self</span>, res_info: HRSRC) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::SizeofResource(<span class="self">self</span>.as_ptr(), res_info.<span class="number">0</span>) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			sz =&gt; <span class="prelude-val">Ok</span>(sz)
@@ -639,4 +639,4 @@
 	func(RtStr::from_ptr(resource_type)) <span class="kw">as _
 </span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

@@ -202,9 +202,9 @@
 ///
 /// You cannot directly instantiate this object, it is created internally by the
 /// control.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="attribute">#[derive(Clone, Copy)]</span>
-<span class="kw">pub struct </span>TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]
+#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt; {
 	owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TreeView,
 	hitem: HTREEITEM,
 }
@@ -284,15 +284,15 @@
 	}
 
 	<span class="doccomment">/// Returns the underlying handle of the item.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub const fn </span>htreeitem(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HTREEITEM {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub const fn </span>htreeitem(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HTREEITEM {
 		<span class="self">self</span>.hitem
 	}
 
 	<span class="doccomment">/// Tells if the item is expanded by sending a
 	/// [`tvm::GetItemState`](crate::msg::tvm::GetItemState) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>is_expanded(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>is_expanded(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="self">self</span>.owner.hwnd()
 			.SendMessage(tvm::GetItemState {
 				hitem: <span class="self">self</span>.hitem,
@@ -303,33 +303,33 @@
 
 	<span class="doccomment">/// Tells if the item is a root by sending a
 	/// [`tvm::GetNextItem`](crate::msg::tvm::GetNextItem) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>is_root(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>is_root(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="self">self</span>.parent().is_none()
 	}
 
 	<span class="doccomment">/// Returns an iterator over the child items.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>iter_children(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>iter_children(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
 		TreeViewChildItemIter::new(<span class="self">self</span>.owner, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>))
 	}
 
 	<span class="doccomment">/// Returns an iterator over the next sibling items.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>iter_next_siblings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>iter_next_siblings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
 		TreeViewItemIter::new(<span class="self">self</span>.owner, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>), co::TVGN::NEXT)
 	}
 
 	<span class="doccomment">/// Returns an iterator over the previous sibling items.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>iter_prev_siblings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>iter_prev_siblings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
 		TreeViewItemIter::new(<span class="self">self</span>.owner, <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>), co::TVGN::PREVIOUS)
 	}
 
 	<span class="doccomment">/// Retrieves the parent of the item by sending a
 	/// [`tvm::GetNextItem`](crate::msg::tvm::GetNextItem) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TreeViewItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
 		<span class="self">self</span>.owner.hwnd()
 			.SendMessage(tvm::GetNextItem {
 				relationship: co::TVGN::PARENT,
@@ -355,8 +355,8 @@
 
 	<span class="doccomment">/// Retrieves the text of the item by sending a
 	/// [`tvm::GetItem`](crate::msg::tvm::GetItem) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
 		<span class="kw">let </span><span class="kw-2">mut </span>tvi = TVITEMEX::default();
 		tvi.hItem = <span class="self">self</span>.hitem;
 		tvi.mask = co::TVIF::TEXT;
@@ -371,4 +371,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

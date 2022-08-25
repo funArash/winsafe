@@ -144,16 +144,16 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	FILETIME, GetLastError, HACCESSTOKEN, SECURITY_ATTRIBUTES, SysResult,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { HTHREAD: <span class="string">&quot;kernel&quot;</span>;
+<span class="macro">impl_handle! </span>{ HTHREAD: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
 	/// [thread](https://docs.microsoft.com/en-us/windows/win32/procthread/processes-and-threads).
 	/// Originally just a `HANDLE`.
@@ -170,8 +170,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub trait </span>kernel_Hthread: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub trait </span>kernel_Hthread: Handle {
 	<span class="doccomment">/// [`CreateThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread)
 	/// static method.
 	///
@@ -179,8 +179,8 @@
 	///
 	/// **Note:** Must be paired with an
 	/// [`HTHREAD::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>CreateThread(
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>CreateThread(
 		thread_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		stack_size: usize,
 		start_addr: <span class="kw-2">*mut </span>std::ffi::c_void,
@@ -209,15 +209,15 @@
 
 	<span class="doccomment">/// [`GetCurrentThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthread)
 	/// static method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentThread() -&gt; HTHREAD {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentThread() -&gt; HTHREAD {
 		HTHREAD(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThread() })
 	}
 
 	<span class="doccomment">/// [`GetExitCodeThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodethread)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetExitCodeThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetExitCodeThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -228,8 +228,8 @@
 
 	<span class="doccomment">/// [`GetProcessIdOfThread`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessidofthread)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetProcessIdOfThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetProcessIdOfThread(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessIdOfThread(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
@@ -238,8 +238,8 @@
 
 	<span class="doccomment">/// [`GetThreadId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadid)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetThreadId(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetThreadId(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetThreadId(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
@@ -273,8 +273,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>OpenThreadToken(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>OpenThreadToken(<span class="self">self</span>,
 		desired_access: co::TOKEN, open_as_self: bool) -&gt; SysResult&lt;HACCESSTOKEN&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
@@ -291,4 +291,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

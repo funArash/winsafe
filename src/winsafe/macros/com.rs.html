@@ -117,10 +117,10 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(unused_macros)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(unused_macros)]
 
-<span class="doccomment">/// Implements ole_IUnknown trait to COM object, plus all its trait bounds.
-</span><span class="macro">macro_rules!</span> impl_iunknown {
+</span><span class="doccomment">/// Implements ole_IUnknown trait to COM object, plus all its trait bounds.
+</span><span class="macro">macro_rules! </span>impl_iunknown {
 	(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$guid</span>:expr) =&gt; {
 		<span class="kw">impl </span>Drop <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
@@ -162,12 +162,12 @@
 }
 
 <span class="doccomment">/// Creates multiple `GUID`-derived pub const values.
-</span><span class="macro">macro_rules!</span> const_guid_values {
+</span><span class="macro">macro_rules! </span>const_guid_values {
 	(
 		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
 		$(<span class="macro-nonterminal">$pubname</span>:ident <span class="macro-nonterminal">$guid</span>:expr)*
 	) =&gt; {
-		$( <span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]</span> )*
+		$( <span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))] </span>)*
 		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
 			$(
 				<span class="kw">pub const </span><span class="macro-nonterminal">$pubname</span>: <span class="macro-nonterminal">$name </span>= <span class="macro-nonterminal">$name::new</span>(<span class="macro-nonterminal">$guid</span>);
@@ -177,20 +177,20 @@
 }
 
 <span class="doccomment">/// Declares the type of a GUID constant, along with public values.
-</span><span class="macro">macro_rules!</span> const_guid {
+</span><span class="macro">macro_rules! </span>const_guid {
 	(
 		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$feature</span>:literal;
-		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span> )*
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
 			<span class="macro-nonterminal">$pubname</span>:ident <span class="macro-nonterminal">$guid</span>:expr
 		)*
 	) =&gt; {
-		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span> )*
-		<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]</span>
-		<span class="attribute">#[repr(transparent)]</span>
-		<span class="attribute">#[derive(Clone, Copy, Eq, PartialEq, Hash)]</span>
-		<span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw">crate</span>::ole::decl::GUID);
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>] </span>)*
+		<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]
+		#[repr(transparent)]
+		#[derive(Clone, Copy, Eq, PartialEq, Hash)]
+		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw">crate</span>::ole::decl::GUID);
 
 		<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::ole::decl::GUID&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>from(guid: <span class="kw">crate</span>::ole::decl::GUID) -&gt; <span class="self">Self </span>{
@@ -222,13 +222,13 @@
 			///
 			/// let g = GUID::new(&quot;00000000-0000-0000-c000-000000000046&quot;);
 			/// ```
-			</span><span class="attribute">#[must_use]</span>
-			<span class="kw">pub const fn </span>new(guid_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="macro-nonterminal">$name </span>{
+			</span><span class="attribute">#[must_use]
+			</span><span class="kw">pub const fn </span>new(guid_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="macro-nonterminal">$name </span>{
 				<span class="self">Self</span>(<span class="kw">crate</span>::ole::decl::GUID::new(guid_str))
 			}
 		}
 
-		<span class="macro">const_guid_values!</span> {
+		<span class="macro">const_guid_values! </span>{
 			<span class="macro-nonterminal">$name</span>;
 			$(
 				<span class="macro-nonterminal">$pubname $guid
@@ -237,4 +237,4 @@
 	};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

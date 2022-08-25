@@ -71,9 +71,9 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::LCID;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::LCID;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -82,9 +82,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IDispatch`](crate::IDispatch) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IDispatchVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IDispatchVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>GetTypeInfoCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 	<span class="kw">pub </span>GetTypeInfo: <span class="kw">fn</span>(ComPtr, u32, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
@@ -98,8 +98,8 @@
 /// Automatically calls
 /// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 /// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IDispatch(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+</span><span class="kw">pub struct </span>IDispatch(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IDispatch, <span class="string">&quot;00020400-0000-0000-c000-000000000046&quot;</span>);
 <span class="kw">impl </span>oleaut_IDispatch <span class="kw">for </span>IDispatch {}
@@ -112,12 +112,12 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub trait </span>oleaut_IDispatch: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+</span><span class="kw">pub trait </span>oleaut_IDispatch: ole_IUnknown {
 	<span class="doccomment">/// [`IDispatch::GetTypeInfoCount`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfocount)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetTypeInfoCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetTypeInfoCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
@@ -128,8 +128,8 @@
 
 	<span class="doccomment">/// [`IDispatch::GetTypeInfo`](https://docs.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfo)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetTypeInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info_type: u32, lcid: LCID) -&gt; HrResult&lt;ITypeInfo&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetTypeInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info_type: u32, lcid: LCID) -&gt; HrResult&lt;ITypeInfo&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
@@ -145,4 +145,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

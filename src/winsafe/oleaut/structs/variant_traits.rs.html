@@ -250,9 +250,9 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types)]
 
-<span class="kw">use </span>std::mem::ManuallyDrop;
+</span><span class="kw">use </span>std::mem::ManuallyDrop;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SysResult, SYSTEMTIME};
@@ -262,40 +262,40 @@
 
 <span class="doccomment">/// Methods common to [`VARIANT`](crate::VARIANT) and
 /// [`PROPVARIANT`](crate::PROPVARIANT) structs.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub trait </span>oleaut_Variant {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+</span><span class="kw">pub trait </span>oleaut_Variant {
 	<span class="doccomment">/// Returns a reference to the raw data being held.
 	///
 	/// Used internally by the library.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">unsafe fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>];
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">unsafe fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>];
 
 	<span class="doccomment">/// Creates an object straight from raw data. Up to 16 `u8` elements will be
 	/// actually copied.
 	///
 	/// Used internally by the library.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">unsafe fn </span>from_raw(vt: co::VT, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self</span>;
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">unsafe fn </span>from_raw(vt: co::VT, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Returns the [`co::VT`](crate::co::VT) variant type currently being held.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>vt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::VT;
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>vt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::VT;
 
 	<span class="doccomment">/// Tells whether no value is being held.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="self">self</span>.vt() == co::VT::EMPTY
 	}
 
 	<span class="doccomment">/// Tells whether the object holds an SQL style null.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="self">self</span>.vt() == co::VT::NULL
 	}
 
 	<span class="doccomment">/// Crates a new object holding a `bool` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_bool(val: bool) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_bool(val: bool) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">let </span>val16: i16 = <span class="kw">if </span>val { -<span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
@@ -303,8 +303,8 @@
 	}
 
 	<span class="doccomment">/// If the object holds a `bool` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::BOOL {
 			<span class="kw">let </span>val16 = i16::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">2</span>].try_into().unwrap());
 			<span class="prelude-val">Some</span>(val16 != <span class="number">0</span>)
@@ -314,8 +314,8 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding a [`BSTR`](crate::BSTR) value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_bstr(val: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_bstr(val: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>bstr = BSTR::SysAllocString(val);
@@ -325,8 +325,8 @@
 
 	<span class="doccomment">/// If the object holds a [`BSTR`](crate::BSTR) value, returns it, otherwise
 	/// `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>bstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>bstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::BSTR {
 			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
 			<span class="kw">let </span>bstr = ManuallyDrop::new(BSTR(ptr <span class="kw">as _</span>)); <span class="comment">// won&#39;t release the stored pointer
@@ -337,16 +337,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new `VARIANT` holding an `f32` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_f32(val: f32) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_f32(val: f32) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::R4, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the `VARIANT` holds an `f32` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>f32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>f32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::R4 {
 			<span class="prelude-val">Some</span>(f32::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">4</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -355,16 +355,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `f64` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_f64(val: f64) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_f64(val: f64) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::R8, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `f64` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::R8 {
 			<span class="prelude-val">Some</span>(f64::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -373,16 +373,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `i8` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_i8(val: i8) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_i8(val: i8) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::I1, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `i8` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>i8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i8&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>i8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i8&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::I1 {
 			<span class="prelude-val">Some</span>(i8::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">1</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -391,16 +391,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `i16` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_i16(val: i16) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_i16(val: i16) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::I2, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `i16` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>i16(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i16&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>i16(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i16&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::I2 {
 			<span class="prelude-val">Some</span>(i16::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">2</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -409,16 +409,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `i32` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_i32(val: i32) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_i32(val: i32) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::I4, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `i32` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>i32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>i32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::I4 {
 			<span class="prelude-val">Some</span>(i32::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">4</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -427,8 +427,8 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding a date/time value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_time(val: <span class="kw-2">&amp;</span>SYSTEMTIME) -&gt; SysResult&lt;<span class="self">Self</span>&gt;
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_time(val: <span class="kw-2">&amp;</span>SYSTEMTIME) -&gt; SysResult&lt;<span class="self">Self</span>&gt;
 		<span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">let </span>double = SystemTimeToVariantTime(val)<span class="question-mark">?</span>;
@@ -436,8 +436,8 @@
 	}
 
 	<span class="doccomment">/// If the object holds a date/time value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SYSTEMTIME&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SYSTEMTIME&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::DATE {
 			<span class="kw">let </span>double = f64::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
 			<span class="kw">let </span><span class="kw-2">mut </span>st = SYSTEMTIME::default();
@@ -449,16 +449,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `u8` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_u8(val: u8) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_u8(val: u8) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::UI1, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `u8` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>u8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>u8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::UI1 {
 			<span class="prelude-val">Some</span>(u8::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">1</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -467,16 +467,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `u16` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_u16(val: u16) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_u16(val: u16) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::UI2, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `u16` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>u16(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u16&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>u16(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u16&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::UI2 {
 			<span class="prelude-val">Some</span>(u16::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">2</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -485,16 +485,16 @@
 	}
 
 	<span class="doccomment">/// Creates a new object holding an `u32` value.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>new_u32(val: u32) -&gt; <span class="self">Self
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>new_u32(val: u32) -&gt; <span class="self">Self
 		</span><span class="kw">where </span><span class="self">Self</span>: Sized,
 	{
 		<span class="kw">unsafe </span>{ <span class="self">Self</span>::from_raw(co::VT::UI4, <span class="kw-2">&amp;</span>val.to_ne_bytes()) }
 	}
 
 	<span class="doccomment">/// If the object holds an `u32` value, returns it, otherwise `None`.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::UI4 {
 			<span class="prelude-val">Some</span>(u32::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">4</span>].try_into().unwrap()))
 		} <span class="kw">else </span>{
@@ -503,4 +503,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

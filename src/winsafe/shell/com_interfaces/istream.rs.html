@@ -152,9 +152,10 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+<span id="155">155</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, shell};
+</span><span class="kw">use crate</span>::{co, shell};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -162,9 +163,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::ISequentialStreamVT;
 
 <span class="doccomment">/// [`ISequentialStream`](crate::ISequentialStream) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IStreamVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IStreamVT {
 	<span class="kw">pub </span>ISequentialStreamVT: ISequentialStreamVT,
 	<span class="kw">pub </span>Seek: <span class="kw">fn</span>(ComPtr, i64, u32, <span class="kw-2">*mut </span>u64) -&gt; HRES,
 	<span class="kw">pub </span>SetSize: <span class="kw">fn</span>(ComPtr, u64) -&gt; HRES,
@@ -183,28 +184,29 @@
 /// Automatically calls
 /// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 /// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IStream(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub struct </span>IStream(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IStream, <span class="string">&quot;0000000c-0000-0000-c000-000000000046&quot;</span>);
 <span class="kw">impl </span>shell_ISequentialStream <span class="kw">for </span>IStream {}
 <span class="kw">impl </span>shell_IStream <span class="kw">for </span>IStream {}
 
 <span class="doccomment">/// [`IStream`](crate::IStream) methods from `shell` feature.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub trait </span>shell_IStream: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub trait </span>shell_IStream: ole_IUnknown {
 	<span class="doccomment">/// Calls
 	/// [`SHCreateMemStream`](https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatememstream)
 	/// to create a new stream over a slice.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>from_slice(src: <span class="kw-2">&amp;</span>[u8]) -&gt; HrResult&lt;IStream&gt; {
-		<span class="kw">unsafe </span>{
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>from_slice(src: <span class="kw-2">&amp;</span>[u8]) -&gt; HrResult&lt;IStream&gt; {
+		<span class="kw">let </span>p = <span class="kw">unsafe </span>{
 			shell::ffi::SHCreateMemStream(src.as_ptr(), src.len() <span class="kw">as _</span>)
-				.as_ref()
-		}.map_or(
-			<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY),
-			|p| <span class="prelude-val">Ok</span>(IStream::from(ComPtr(p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut *mut </span><span class="kw">_</span>))),
-		)
+		};
+		<span class="kw">if </span>p.is_null() {
+			<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
+		} <span class="kw">else </span>{
+			<span class="prelude-val">Ok</span>(IStream::from(ComPtr(p <span class="kw">as _</span>)))
+		}
 	}
 
 	<span class="doccomment">/// [`IStream::Commit`](https://docs.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-commit)
@@ -307,4 +309,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

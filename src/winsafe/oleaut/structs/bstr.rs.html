@@ -118,9 +118,9 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::oleaut;
 
@@ -131,9 +131,9 @@
 /// Automatically calls
 /// [`SysFreeString`](https://docs.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysfreestring)
 /// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="attribute">#[repr(transparent)]</span>
-<span class="kw">pub struct </span>BSTR(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">*mut </span>u16);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>BSTR(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">*mut </span>u16);
 
 <span class="kw">impl </span>Default <span class="kw">for </span>BSTR {
 	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
@@ -162,8 +162,8 @@
 	/// # Panics
 	///
 	/// Panics if there is not enough memory.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>SysAllocString(s: <span class="kw-2">&amp;</span>str) -&gt; BSTR {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>SysAllocString(s: <span class="kw-2">&amp;</span>str) -&gt; BSTR {
 		<span class="kw">let </span>str_obj = WString::from_str(s);
 		<span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ oleaut::ffi::SysAllocString(str_obj.as_ptr()) };
 		<span class="kw">if </span>ptr.is_null() {
@@ -193,24 +193,24 @@
 
 	<span class="doccomment">/// [`SysStringLen`](https://docs.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysstringlen)
 	/// function.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>SysStringLen(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>SysStringLen(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
 		<span class="kw">unsafe </span>{ oleaut::ffi::SysStringLen(<span class="self">self</span>.<span class="number">0</span>) }
 	}
 
 	<span class="doccomment">/// Returns the underlying
 	/// [`LPWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
 	/// pointer.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
 		<span class="self">self</span>.<span class="number">0
 	</span>}
 
 	<span class="doccomment">/// Returns the underlying
 	/// [`LPWSTR`](https://docs.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
 	/// memory block as a null-terminated `u16` slice.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
 		<span class="kw">unsafe </span>{
 			std::slice::from_raw_parts(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.SysStringLen() <span class="kw">as </span>usize + <span class="number">1</span>)
 		}
@@ -224,8 +224,8 @@
 	///
 	/// **Note:** Be sure to free the pointer, otherwise, as the name of this
 	/// method implies, you will cause a memory leak.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub unsafe fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub unsafe fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
 		<span class="kw">let </span>ptr = <span class="self">self</span>.<span class="number">0</span>;
 		<span class="self">self</span>.<span class="number">0 </span>= std::ptr::null_mut();
 		ptr
@@ -233,10 +233,10 @@
 
 	<span class="doccomment">/// Converts into
 	/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
 		WString::from_wchars_nullt(<span class="self">self</span>.<span class="number">0</span>).to_string()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

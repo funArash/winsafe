@@ -152,9 +152,9 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span>std::marker::PhantomData;
+</span><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::mem::ManuallyDrop;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -166,9 +166,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IEnumShellItems`](crate::IEnumShellItems) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IEnumShellItemsVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IEnumShellItemsVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>Next: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 	<span class="kw">pub </span>Skip: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
@@ -195,8 +195,8 @@
 /// let items = folder.BindToHandler::&lt;IEnumShellItems&gt;(None, &amp;co::BHID::EnumItems)?;
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IEnumShellItems(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub struct </span>IEnumShellItems(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IEnumShellItems, <span class="string">&quot;70629033-e363-4a28-a567-0db78006e6d7&quot;</span>);
 <span class="kw">impl </span>shell_IEnumShellItems <span class="kw">for </span>IEnumShellItems {}
@@ -209,8 +209,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub trait </span>shell_IEnumShellItems: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub trait </span>shell_IEnumShellItems: ole_IUnknown {
 	<span class="doccomment">/// Returns an iterator over the [`IShellItem`](crate::IShellItem) elements
 	/// which successively calls
 	/// [`IEnumShellItems::Next`](crate::prelude::shell_IEnumShellItems::Next).
@@ -233,15 +233,15 @@
 	/// }
 	/// # Ok::&lt;_, co::HRESULT&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IShellItem&gt;&gt; + <span class="lifetime">&#39;a</span>&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IShellItem&gt;&gt; + <span class="lifetime">&#39;a</span>&gt; {
 		Box::new(EnumShellItemsIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() }))
 	}
 
 	<span class="doccomment">/// [`IEnumShellItems::Next`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ienumshellitems-next)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>Next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="prelude-ty">Option</span>&lt;IShellItem&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>Next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="prelude-ty">Option</span>&lt;IShellItem&gt;&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>fetched = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
@@ -307,4 +307,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

@@ -162,9 +162,9 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span>std::marker::PhantomData;
+</span><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
@@ -172,7 +172,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::shell;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::POINT;
 
-<span class="macro">impl_handle!</span> { HDROP: <span class="string">&quot;shell&quot;</span>;
+<span class="macro">impl_handle! </span>{ HDROP: <span class="string">&quot;shell&quot;</span>;
 	<span class="doccomment">/// Handle to an
 	/// [internal drop structure](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hdrop).
 </span>}
@@ -187,8 +187,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub trait </span>shell_Hdrop: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub trait </span>shell_Hdrop: Handle {
 	<span class="doccomment">/// Returns an iterator over the dropped files by calling
 	/// [`HDROP::DragQueryFile`](crate::prelude::shell_Hdrop::DragQueryFile)
 	/// consecutively, then frees the handle by calling
@@ -226,8 +226,8 @@
 	///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
 		<span class="prelude-val">Ok</span>(Box::new(DropsIter::new(HDROP(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
 	}
 
@@ -268,8 +268,8 @@
 	///
 	/// Returns the coordinates and whether the drop occurred in the client area
 	/// of the window.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>DragQueryPoint(<span class="self">self</span>) -&gt; (POINT, bool) {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>DragQueryPoint(<span class="self">self</span>) -&gt; (POINT, bool) {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		<span class="kw">let </span>client_area = <span class="kw">unsafe </span>{
 			shell::ffi::DragQueryPoint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
@@ -327,4 +327,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

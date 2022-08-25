@@ -273,15 +273,15 @@
 /// ini.serialize_to_file(ini_path)?;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub struct </span>Ini {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub struct </span>Ini {
 	<span class="doccomment">/// All the sections of the file. The values can be modified at will.
 	</span><span class="kw">pub </span>sections: Vec&lt;IniSection&gt;,
 }
 
 <span class="doccomment">/// A single section of an [`Ini`](crate::Ini).
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IniSection {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub struct </span>IniSection {
 	<span class="doccomment">/// The name of this section.
 	</span><span class="kw">pub </span>name: String,
 	<span class="doccomment">/// All key/value pairs of this section.
@@ -290,8 +290,8 @@
 
 <span class="doccomment">/// A single key/value pair of an [`IniSection`](crate::IniSection) of an
 /// [`Ini`](crate::Ini).
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IniEntry {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub struct </span>IniEntry {
 	<span class="doccomment">/// Key of this entry.
 	</span><span class="kw">pub </span>key: String,
 	<span class="doccomment">/// Value of this entry.
@@ -300,8 +300,8 @@
 
 <span class="kw">impl </span>Ini {
 	<span class="doccomment">/// Parses an `Ini` from a string.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>parse_str(contents: <span class="kw-2">&amp;</span>str) -&gt; Ini {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>parse_str(contents: <span class="kw-2">&amp;</span>str) -&gt; Ini {
 		<span class="kw">let </span><span class="kw-2">mut </span>sections = Vec::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>cur_section = IniSection {
 			name: <span class="string">&quot;&quot;</span>.to_owned(),
@@ -339,8 +339,8 @@
 	<span class="doccomment">/// Parses an `Ini` from raw bytes. The [`Encoding`](crate::Encoding) will
 	/// be guessed with
 	/// [`WString::guess_encoding`](crate::WString::guess_encoding).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;Ini&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;Ini&gt; {
 		<span class="prelude-val">Ok</span>(
 			<span class="self">Self</span>::parse_str(<span class="kw-2">&amp;</span>WString::parse_str(bytes)<span class="question-mark">?</span>.to_string()),
 		)
@@ -352,15 +352,15 @@
 	///
 	/// The file will be [mapped in memory](crate::FileMapped) during reading
 	/// for maximum performance.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Ini&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Ini&gt; {
 		<span class="kw">let </span>fin = FileMapped::open(ini_path, FileAccess::ExistingReadOnly)<span class="question-mark">?</span>;
 		<span class="self">Self</span>::parse_bytes(fin.as_slice())
 	}
 
 	<span class="doccomment">/// Serializes the sections and entries to a string.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>serialize_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>serialize_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
 		<span class="kw">let </span><span class="kw-2">mut </span>tot_size = <span class="number">0</span>;
 		<span class="kw">for </span>(idx, section) <span class="kw">in </span><span class="self">self</span>.sections.iter().enumerate() {
 			tot_size += section.name.len() + <span class="number">2 </span>+ <span class="number">2</span>;
@@ -394,8 +394,8 @@
 
 	<span class="doccomment">/// Serializes the sections and entries to raw bytes with
 	/// [`String::into_bytes`](https://doc.rust-lang.org/std/string/struct.String.html#method.into_bytes).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>serialize_to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>serialize_to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
 		<span class="self">self</span>.serialize_to_str().into_bytes()
 	}
 
@@ -408,8 +408,8 @@
 	}
 
 	<span class="doccomment">/// Returns a reference to the specified value, if any.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
 		<span class="self">self</span>.sections.iter()
 			.find(|s| s.name == section)
 			.and_then(|s| {
@@ -437,8 +437,8 @@
 	/// ini.serialize_to_file(ini_path)?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt; {
 		<span class="self">self</span>.sections.iter_mut()
 			.find(|s| s.name == section)
 			.and_then(|s| {
@@ -449,4 +449,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

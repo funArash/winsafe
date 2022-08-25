@@ -283,9 +283,9 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{WIN32_FIND_DATA, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HANDLE, HRES, PCSTR, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
@@ -297,9 +297,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IShellLink`](crate::IShellLink) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IShellLinkVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IShellLinkVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>GetPath: <span class="kw">fn</span>(ComPtr, PCSTR, i32, PVOID, u32) -&gt; HRES,
 	<span class="kw">pub </span>GetIDList: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
@@ -341,8 +341,8 @@
 /// )?;
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IShellLink(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub struct </span>IShellLink(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IShellLink, <span class="string">&quot;000214f9-0000-0000-c000-000000000046&quot;</span>);
 <span class="kw">impl </span>shell_IShellLink <span class="kw">for </span>IShellLink {}
@@ -355,12 +355,12 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub trait </span>shell_IShellLink: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub trait </span>shell_IShellLink: ole_IUnknown {
 	<span class="doccomment">/// [`IShellLinkW::GetArguments`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getarguments)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetArguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetArguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(INFOTIPSIZE + <span class="number">1</span>); <span class="comment">// arbitrary
 		</span><span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
@@ -376,8 +376,8 @@
 
 	<span class="doccomment">/// [`IShellLinkW::GetDescription`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getdescription)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetDescription(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetDescription(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(INFOTIPSIZE + <span class="number">1</span>);
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
@@ -395,8 +395,8 @@
 	/// method.
 	///
 	/// Returns the path of the icon and its index within the file.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetIconLocation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(String, i32)&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetIconLocation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(String, i32)&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
 		<span class="kw">let </span><span class="kw-2">mut </span>index: i32 = <span class="number">0</span>;
 
@@ -415,8 +415,8 @@
 
 	<span class="doccomment">/// [`IShellLinkW::GetPath`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getpath)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetPath(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetPath(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		fd: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>WIN32_FIND_DATA&gt;,
 		flags: co::SLGP) -&gt; HrResult&lt;String&gt;
 	{
@@ -437,8 +437,8 @@
 
 	<span class="doccomment">/// [`IShellLinkW::GetShowCmd`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getshowcmd)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetShowCmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::SW&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetShowCmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::SW&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>show_cmd = co::SW::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
@@ -449,8 +449,8 @@
 
 	<span class="doccomment">/// [`IShellLinkW::GetWorkingDirectory`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-getworkingdirectory)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetWorkingDirectory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetWorkingDirectory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellLinkVT);
@@ -569,4 +569,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

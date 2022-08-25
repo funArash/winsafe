@@ -137,9 +137,9 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
-<span class="kw">use crate</span>::{co, ole};
+</span><span class="kw">use crate</span>::{co, ole};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult, IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
@@ -164,9 +164,9 @@
 /// )?;
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>CoCreateInstance&lt;T&gt;(
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>CoCreateInstance&lt;T&gt;(
 	clsid: <span class="kw-2">&amp;</span>co::CLSID,
 	iunk_outer: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>IUnknown&gt;,
 	cls_context: co::CLSCTX) -&gt; HrResult&lt;T&gt;
@@ -216,8 +216,8 @@
 /// CoUninitialize();
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;co::HRESULT&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;co::HRESULT&gt; {
 	<span class="kw">let </span>code = co::HRESULT(
 		<span class="kw">unsafe </span>{ ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.<span class="number">0</span>) },
 	);
@@ -234,8 +234,8 @@
 ///
 /// **Note:** Must be paired with a [`CoTaskMemFree`](crate::CoTaskMemFree)
 /// call.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="kw">pub fn </span>CoTaskMemAlloc(cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoTaskMemAlloc(cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
 	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ole::ffi::CoTaskMemAlloc(cb) };
 	<span class="kw">if </span>p.is_null() {
 		<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
@@ -246,8 +246,8 @@
 
 <span class="doccomment">/// [`CoTaskMemFree`](https://docs.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree)
 /// function.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="kw">pub fn </span>CoTaskMemFree(pv: <span class="kw-2">*mut </span>u8) {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoTaskMemFree(pv: <span class="kw-2">*mut </span>u8) {
 	<span class="kw">unsafe </span>{ ole::ffi::CoTaskMemFree(pv <span class="kw">as _</span>) }
 }
 
@@ -256,8 +256,8 @@
 ///
 /// **Note:** Must be paired with a [`CoTaskMemFree`](crate::CoTaskMemFree)
 /// call.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="kw">pub fn </span>CoTaskMemRealloc(pv: <span class="kw-2">*mut </span>u8, cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoTaskMemRealloc(pv: <span class="kw-2">*mut </span>u8, cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
 	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ole::ffi::CoTaskMemRealloc(pv <span class="kw">as _</span>, cb) };
 	<span class="kw">if </span>p.is_null() {
 		<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
@@ -272,9 +272,9 @@
 /// **Note:** Must be called **after** all COM interfaces have been released,
 /// otherwise you&#39;ll get a segmentation fault error with
 /// `STATUS_ACCESS_VIOLATION` code.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]</span>
-<span class="kw">pub fn </span>CoUninitialize() {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoUninitialize() {
 	<span class="kw">unsafe </span>{ ole::ffi::CoUninitialize() }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

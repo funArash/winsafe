@@ -183,9 +183,9 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span>std::marker::PhantomData;
+</span><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::mem::ManuallyDrop;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -197,9 +197,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IPropertyStore`](crate::IPropertyStore) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IPropertyStoreVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IPropertyStoreVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 	<span class="kw">pub </span>GetAt: <span class="kw">fn</span>(ComPtr, u32, PVOID) -&gt; HRES,
@@ -227,8 +227,8 @@
 /// let props = file.BindToHandler::&lt;IPropertyStore&gt;(None, &amp;co::BHID::PropertyStore)?;
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IPropertyStore(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+</span><span class="kw">pub struct </span>IPropertyStore(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IPropertyStore, <span class="string">&quot;886d8eeb-8cf2-4446-8d02-cdba1dbdcf99&quot;</span>);
 <span class="kw">impl </span>oleaut_IPropertyStore <span class="kw">for </span>IPropertyStore {}
@@ -241,8 +241,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]</span>
-<span class="kw">pub trait </span>oleaut_IPropertyStore: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;oleaut&quot;</span>)))]
+</span><span class="kw">pub trait </span>oleaut_IPropertyStore: ole_IUnknown {
 	<span class="doccomment">/// Returns an iterator over the [`PROPERTYKEY`](crate::PROPERTYKEY)
 	/// elements by calling
 	/// [`IPropertyStore::GetCount`](crate::prelude::oleaut_IPropertyStore::GetCount)
@@ -265,8 +265,8 @@
 	/// }
 	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; HrResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;PROPERTYKEY&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; HrResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;PROPERTYKEY&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
 		<span class="prelude-val">Ok</span>(Box::new(PropertyStoreIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() })<span class="question-mark">?</span>))
 	}
 
@@ -281,8 +281,8 @@
 
 	<span class="doccomment">/// [`IPropertyStore::GetAt`](https://docs.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getat)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;PROPERTYKEY&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;PROPERTYKEY&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ppk = PROPERTYKEY::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPropertyStoreVT);
@@ -294,8 +294,8 @@
 
 	<span class="doccomment">/// [`IPropertyStore::GetCount`](https://docs.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getcount)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPropertyStoreVT);
@@ -305,8 +305,8 @@
 
 	<span class="doccomment">/// [`IPropertyStore::GetValue`](https://docs.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getvalue)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetValue(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>PROPERTYKEY) -&gt; HrResult&lt;PROPVARIANT&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetValue(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>PROPERTYKEY) -&gt; HrResult&lt;PROPVARIANT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>var = PROPVARIANT::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPropertyStoreVT);
@@ -369,4 +369,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

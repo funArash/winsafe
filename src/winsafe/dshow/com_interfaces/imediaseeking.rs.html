@@ -229,9 +229,9 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -239,9 +239,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IMediaSeeking`](crate::IMediaSeeking) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IMediaSeekingVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IMediaSeekingVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>GetCapabilities: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 	<span class="kw">pub </span>CheckCapabilities: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
@@ -283,8 +283,8 @@
 ///     .QueryInterface::&lt;IMediaSeeking&gt;()?;
 /// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IMediaSeeking(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+</span><span class="kw">pub struct </span>IMediaSeeking(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IMediaSeeking, <span class="string">&quot;36b73880-c2c8-11cf-8b46-00805f6cef60&quot;</span>);
 <span class="kw">impl </span>dshow_IMediaSeeking <span class="kw">for </span>IMediaSeeking {}
@@ -297,12 +297,12 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub trait </span>dshow_IMediaSeeking: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+</span><span class="kw">pub trait </span>dshow_IMediaSeeking: ole_IUnknown {
 	<span class="doccomment">/// [`IMediaSeeking::ConvertTimeFormat`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-converttimeformat)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>ConvertTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>ConvertTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		target_format: <span class="kw-2">&amp;</span>co::TIME_FORMAT,
 		source: i64, source_format: <span class="kw-2">&amp;</span>co::TIME_FORMAT) -&gt; HrResult&lt;i64&gt;
 	{
@@ -325,8 +325,8 @@
 	/// method.
 	///
 	/// Returns earliest and latest times for efficient seeking.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetAvailable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetAvailable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
 		<span class="kw">let </span>(<span class="kw-2">mut </span>early, <span class="kw-2">mut </span>late) = (i64::default(), i64::default());
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -336,8 +336,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetCurrentPosition method`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getcurrentposition)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pos = i64::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -347,8 +347,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetDuration`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getduration)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetDuration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetDuration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>duration = i64::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -360,8 +360,8 @@
 	/// method.
 	///
 	/// Returns current and stop positions.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetPositions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetPositions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
 		<span class="kw">let </span>(<span class="kw-2">mut </span>current, <span class="kw-2">mut </span>stop) = (i64::default(), i64::default());
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -371,8 +371,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetPreroll`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getpreroll)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetPreroll(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetPreroll(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>preroll = i64::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -382,8 +382,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetRate`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getrate)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetRate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;f64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetRate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;f64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rate = f64::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -393,8 +393,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetStopPosition`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getstopposition)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetStopPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetStopPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pos = i64::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -404,8 +404,8 @@
 
 	<span class="doccomment">/// [`IMediaSeeking::GetTimeFormat`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-gettimeformat)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TIME_FORMAT&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TIME_FORMAT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>time_guid = co::TIME_FORMAT::NONE;
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IMediaSeekingVT);
@@ -461,4 +461,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

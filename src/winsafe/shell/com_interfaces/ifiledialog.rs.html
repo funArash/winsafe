@@ -320,9 +320,9 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, GUID, HrResult};
@@ -332,9 +332,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IModalWindowVT;
 
 <span class="doccomment">/// [`IFileDialog`](crate::IFileDialog) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IFileDialogVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IFileDialogVT {
 	<span class="kw">pub </span>IModalWindowVT: IModalWindowVT,
 	<span class="kw">pub </span>SetFileTypes: <span class="kw">fn</span>(ComPtr, u32, PCVOID) -&gt; HRES,
 	<span class="kw">pub </span>SetFileTypeIndex: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
@@ -367,8 +367,8 @@
 /// Automatically calls
 /// [`Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 /// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IFileDialog(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub struct </span>IFileDialog(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IFileDialog, <span class="string">&quot;42f85136-db7e-439c-85f1-e4075d135fc8&quot;</span>);
 <span class="kw">impl </span>shell_IModalWindow <span class="kw">for </span>IFileDialog {}
@@ -382,8 +382,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]</span>
-<span class="kw">pub trait </span>shell_IFileDialog: shell_IModalWindow {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
+</span><span class="kw">pub trait </span>shell_IFileDialog: shell_IModalWindow {
 	<span class="doccomment">/// [`IFileDialog::AddPlace`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-addplace)
 	/// method.
 	</span><span class="kw">fn </span>AddPlace(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem, fdap: co::FDAP) -&gt; HrResult&lt;()&gt; {
@@ -413,8 +413,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetCurrentSelection`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getcurrentselection)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentSelection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentSelection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -425,8 +425,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetFileName`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getfilename)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -440,8 +440,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetFileTypeIndex`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getfiletypeindex)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>index = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -451,8 +451,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetFolder`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getfolder)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -463,8 +463,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetOptions`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getoptions)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::FOS&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::FOS&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>opts = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -474,8 +474,8 @@
 
 	<span class="doccomment">/// [`IFileDialog::GetResult`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-getresult)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetResult(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetResult(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
@@ -643,4 +643,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

@@ -108,9 +108,9 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{IBaseFilter, IEnumFilters};
+</span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{IBaseFilter, IEnumFilters};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
@@ -119,9 +119,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IFilterGraph`](crate::IFilterGraph) virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="attribute">#[repr(C)]</span>
-<span class="kw">pub struct </span>IFilterGraphVT {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>IFilterGraphVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>AddFilter: <span class="kw">fn</span>(ComPtr, ComPtr, PCSTR) -&gt; HRES,
 	<span class="kw">pub </span>RemoveFilter: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
@@ -139,8 +139,8 @@
 /// Automatically calls
 /// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 /// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub struct </span>IFilterGraph(ComPtr);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+</span><span class="kw">pub struct </span>IFilterGraph(ComPtr);
 
 <span class="macro">impl_iunknown!</span>(IFilterGraph, <span class="string">&quot;56a8689f-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
 <span class="kw">impl </span>dshow_IFilterGraph <span class="kw">for </span>IFilterGraph {}
@@ -153,8 +153,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]</span>
-<span class="kw">pub trait </span>dshow_IFilterGraph: ole_IUnknown {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
+</span><span class="kw">pub trait </span>dshow_IFilterGraph: ole_IUnknown {
 	<span class="doccomment">/// [`IFilterGraph::AddFilter`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-addfilter)
 	/// method.
 	</span><span class="kw">fn </span>AddFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span>IBaseFilter, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
@@ -172,8 +172,8 @@
 
 	<span class="doccomment">/// [`IFilterGraph::EnumFilters`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-enumfilters)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>EnumFilters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IEnumFilters&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>EnumFilters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IEnumFilters&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFilterGraphVT);
@@ -185,8 +185,8 @@
 
 	<span class="doccomment">/// [`IFilterGraph::FindFilterByName`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-findfilterbyname)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>FindFilterByName(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IBaseFilter&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>FindFilterByName(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IBaseFilter&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
 			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFilterGraphVT);
@@ -219,4 +219,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

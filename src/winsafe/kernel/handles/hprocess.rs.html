@@ -267,9 +267,9 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	FILETIME, GetLastError, HACCESSTOKEN, PROCESS_INFORMATION,
 	SECURITY_ATTRIBUTES, STARTUPINFO, SysResult, WString,
@@ -278,7 +278,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, INFINITE, MAX_PATH};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
 
-<span class="macro">impl_handle!</span> { HPROCESS: <span class="string">&quot;kernel&quot;</span>;
+<span class="macro">impl_handle! </span>{ HPROCESS: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
 	/// [process](https://docs.microsoft.com/en-us/windows/win32/procthread/processes-and-threads).
 	/// Originally just a `HANDLE`.
@@ -295,8 +295,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub trait </span>kernel_Hprocess: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub trait </span>kernel_Hprocess: Handle {
 	<span class="doccomment">/// [`CreateProcess`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)
 	/// static method.
 	///
@@ -306,8 +306,8 @@
 	/// [`HPROCESS::CloseHandle`](crate::prelude::HandleClose::CloseHandle) and
 	/// [`HTHREAD::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
 	/// calls.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>CreateProcess(
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>CreateProcess(
 		application_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		command_line: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		process_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
@@ -318,7 +318,7 @@
 		current_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;PROCESS_INFORMATION&gt;
 	{
-		<span class="kw">let </span><span class="kw-2">mut </span>buf_cmd_line = command_line.map_or(WString::default(), |lp| WString::from_str(lp));
+		<span class="kw">let </span><span class="kw-2">mut </span>buf_cmd_line = WString::from_opt_str(command_line);
 		<span class="kw">let </span><span class="kw-2">mut </span>pi = PROCESS_INFORMATION::default();
 
 		bool_to_sysresult(
@@ -368,15 +368,15 @@
 
 	<span class="doccomment">/// [`GetCurrentProcess`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess)
 	/// static method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetCurrentProcess() -&gt; HPROCESS {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentProcess() -&gt; HPROCESS {
 		HPROCESS(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcess() })
 	}
 
 	<span class="doccomment">/// [`GetExitCodeProcess`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodeprocess)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetExitCodeProcess(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetExitCodeProcess(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -387,8 +387,8 @@
 
 	<span class="doccomment">/// [`GetGuiResources`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getguiresources)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetGuiResources(<span class="self">self</span>, flags: co::GR) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetGuiResources(<span class="self">self</span>, flags: co::GR) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetGuiResources(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count),
@@ -397,8 +397,8 @@
 
 	<span class="doccomment">/// [`GetProcessId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessid)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetProcessId(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetProcessId(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessId(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
@@ -428,8 +428,8 @@
 
 	<span class="doccomment">/// [`IsProcessCritical`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-isprocesscritical)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>IsProcessCritical(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>IsProcessCritical(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>critical: BOOL = <span class="number">0</span>;
 		<span class="kw">match unsafe </span>{
 			kernel::ffi::IsProcessCritical(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>critical) }
@@ -441,8 +441,8 @@
 
 	<span class="doccomment">/// [`IsWow64Process`](https://docs.microsoft.com/en-us/windows/win32/api/wow64apiset/nf-wow64apiset-iswow64process)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>IsWow64Process(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>IsWow64Process(<span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>wow64: BOOL = <span class="number">0</span>;
 		<span class="kw">match unsafe </span>{ kernel::ffi::IsWow64Process(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>wow64) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -460,8 +460,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HPROCESS::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>OpenProcess(
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>OpenProcess(
 		desired_access: co::PROCESS,
 		inherit_handle: bool, process_id: u32) -&gt; SysResult&lt;HPROCESS&gt;
 	{
@@ -481,8 +481,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>OpenProcessToken(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>OpenProcessToken(<span class="self">self</span>,
 		desired_access: co::TOKEN) -&gt; SysResult&lt;HACCESSTOKEN&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
@@ -499,8 +499,8 @@
 
 	<span class="doccomment">/// [`QueryFullProcessImageName`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queryfullprocessimagenamew)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>QueryFullProcessImageName(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>QueryFullProcessImageName(<span class="self">self</span>,
 		flags: co::PROCESS_NAME) -&gt; SysResult&lt;String&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buffer(MAX_PATH + <span class="number">1</span>);
@@ -537,4 +537,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

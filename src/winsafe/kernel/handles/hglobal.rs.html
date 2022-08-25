@@ -106,14 +106,14 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, GMEM_INVALID_HANDLE};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="macro">impl_handle!</span> { HGLOBAL: <span class="string">&quot;kernel&quot;</span>;
+<span class="macro">impl_handle! </span>{ HGLOBAL: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
 	/// [global memory block](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc).
 	/// Originally just a `HANDLE`.
@@ -129,16 +129,16 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="kw">pub trait </span>kernel_Hglobal: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub trait </span>kernel_Hglobal: Handle {
 	<span class="doccomment">/// [`GlobalAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc)
 	/// static method.
 	///
 	/// **Note:** Must be paired with an
 	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GlobalAlloc(flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HGLOBAL&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GlobalAlloc(flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HGLOBAL&gt; {
 		<span class="kw">unsafe </span>{ kernel::ffi::GlobalAlloc(flags.<span class="number">0</span>, num_bytes).as_mut() }
 			.map(|ptr| HGLOBAL(ptr))
 			.ok_or_else(|| GetLastError())
@@ -146,8 +146,8 @@
 
 	<span class="doccomment">/// [`GlobalFlags`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalflags)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GlobalFlags(<span class="self">self</span>) -&gt; SysResult&lt;co::GMEM&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GlobalFlags(<span class="self">self</span>) -&gt; SysResult&lt;co::GMEM&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalFlags(<span class="self">self</span>.as_ptr()) } {
 			GMEM_INVALID_HANDLE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			flags =&gt; <span class="prelude-val">Ok</span>(co::GMEM(flags)),
@@ -172,8 +172,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HGLOBAL::GlobalUnlock`](crate::prelude::kernel_Hglobal::GlobalUnlock)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GlobalLock&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GlobalLock&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]&gt; {
 		<span class="kw">let </span>mem_sz = <span class="self">self</span>.GlobalSize()<span class="question-mark">?</span>;
 		<span class="kw">unsafe </span>{ kernel::ffi::GlobalLock(<span class="self">self</span>.as_ptr()).as_mut() }
 			.map(|ptr| <span class="kw">unsafe </span>{
@@ -188,8 +188,8 @@
 	/// **Note:** Must be paired with an
 	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
 	/// call.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GlobalReAlloc(<span class="self">self</span>,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GlobalReAlloc(<span class="self">self</span>,
 		num_bytes: usize, flags: co::GMEM) -&gt; SysResult&lt;HGLOBAL&gt;
 	{
 		<span class="kw">unsafe </span>{
@@ -200,8 +200,8 @@
 
 	<span class="doccomment">/// [`GlobalSize`](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize)
 	/// method.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GlobalSize(<span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GlobalSize(<span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalSize(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			sz =&gt; <span class="prelude-val">Ok</span>(sz),
@@ -215,4 +215,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

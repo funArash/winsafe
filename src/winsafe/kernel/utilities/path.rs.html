@@ -236,11 +236,6 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
 </pre><pre class="rust"><code><span class="doccomment">//! File path utilities.
 //!
 //! Some of the functions are similar to
@@ -256,10 +251,10 @@
 /// without a trailing backslash.
 ///
 /// In a debug build, the `target\debug` folders will not show up.
-</span><span class="attribute">#[cfg(debug_assertions)]</span>
-<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>exe_path() -&gt; SysResult&lt;String&gt; {
+</span><span class="attribute">#[cfg(debug_assertions)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>exe_path() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span>dbg = HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>;
 	<span class="prelude-val">Ok</span>(
 		get_path( <span class="comment">// target
@@ -275,10 +270,10 @@
 /// without a trailing backslash.
 ///
 /// In a debug build, the `target\debug` folders will not show up.
-</span><span class="attribute">#[cfg(not(debug_assertions))]</span>
-<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>exe_path() -&gt; SysResult&lt;String&gt; {
+</span><span class="attribute">#[cfg(not(debug_assertions))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>exe_path() -&gt; SysResult&lt;String&gt; {
 	<span class="prelude-val">Ok</span>(
 		get_path(<span class="kw-2">&amp;</span>HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>)
 			.unwrap().to_owned(),
@@ -286,9 +281,9 @@
 }
 
 <span class="doccomment">/// Returns an iterator over each part of the path.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>iter(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>iter(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; {
 	PathIterator { path: full_path }
 }
 
@@ -302,18 +297,17 @@
 ///
 /// let f = path::get_file_name(&quot;C:\\Temp\\foo.txt&quot;); // foo.txt
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>get_file_name(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-	full_path.rfind(<span class="string">&#39;\\&#39;</span>)
-		.map_or(
-			<span class="prelude-val">Some</span>(full_path), <span class="comment">// if no backslash, the whole string is the file name
-			</span>|idx| <span class="kw">if </span>idx == full_path.chars().count() - <span class="number">1 </span>{
-				<span class="prelude-val">None </span><span class="comment">// last char is &#39;\\&#39;, no file name
-			</span>} <span class="kw">else </span>{
-				<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>full_path[idx + <span class="number">1</span>..])
-			},
-		)
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>get_file_name(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+	<span class="kw">match </span>full_path.rfind(<span class="string">&#39;\\&#39;</span>) {
+		<span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(full_path), <span class="comment">// if no backslash, the whole string is the file name
+		</span><span class="prelude-val">Some</span>(idx) =&gt; <span class="kw">if </span>idx == full_path.chars().count() - <span class="number">1 </span>{
+			<span class="prelude-val">None </span><span class="comment">// last char is &#39;\\&#39;, no file name
+		</span>} <span class="kw">else </span>{
+			<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>full_path[idx + <span class="number">1</span>..])
+		},
+	}
 }
 
 <span class="doccomment">/// Extracts the full path, but the last part.
@@ -328,9 +322,9 @@
 /// let q = path::get_path(&quot;C:\\Temp\\xx\\&quot;);      // C:\Temp\xx
 /// let r = path::get_path(&quot;C:\\Temp\\xx&quot;);        // C:\Temp&quot;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>get_path(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>get_path(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
 	full_path.rfind(<span class="string">&#39;\\&#39;</span>) <span class="comment">// if no backslash, the whole string is the file name, so no path
 		</span>.map(|idx| <span class="kw-2">&amp;</span>full_path[<span class="number">0</span>..idx])
 }
@@ -347,9 +341,9 @@
 /// println!(&quot;{}&quot;,
 ///     path::has_extension(&quot;file.txt&quot;, &amp;[&quot;.txt&quot;, &quot;.bat&quot;]));
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>has_extension(full_path: <span class="kw-2">&amp;</span>str, extensions: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; bool {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>has_extension(full_path: <span class="kw-2">&amp;</span>str, extensions: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; bool {
 	<span class="kw">let </span>full_path_u = full_path.to_uppercase();
 	extensions.iter()
 		.find(|ext| {
@@ -370,9 +364,9 @@
 /// let p = path::replace_extension(
 ///     &quot;C:\\Temp\\something.txt&quot;, &quot;.sh&quot;); // C:\Temp\something.sh
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>replace_extension(full_path: <span class="kw-2">&amp;</span>str, new_extension: <span class="kw-2">&amp;</span>str) -&gt; String {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>replace_extension(full_path: <span class="kw-2">&amp;</span>str, new_extension: <span class="kw-2">&amp;</span>str) -&gt; String {
 	<span class="kw">if let </span><span class="prelude-val">Some</span>(last) = full_path.chars().last() {
 		<span class="kw">if </span>last == <span class="string">&#39;\\&#39; </span>{ <span class="comment">// full_path is a directory, do nothing
 			</span><span class="kw">return </span>rtrim_backslash(full_path).to_owned();
@@ -380,30 +374,28 @@
 	}
 
 	<span class="kw">let </span>new_has_dot = new_extension.chars().next() == <span class="prelude-val">Some</span>(<span class="string">&#39;.&#39;</span>);
-	full_path.rfind(<span class="string">&#39;.&#39;</span>)
-		.map_or_else(
-			|| <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>, <span class="comment">// file name without extension, just append it
-				</span>full_path,
-				<span class="kw">if </span>new_has_dot { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;.&quot; </span>},
-				new_extension,
-			),
-			|idx| <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>,
-				<span class="kw-2">&amp;</span>full_path[<span class="number">0</span>..idx],
-				<span class="kw">if </span>new_has_dot { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;.&quot; </span>},
-				new_extension,
-			),
-		)
+	<span class="kw">match </span>full_path.rfind(<span class="string">&#39;.&#39;</span>) {
+		<span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>, <span class="comment">// file name without extension, just append it
+			</span>full_path,
+			<span class="kw">if </span>new_has_dot { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;.&quot; </span>},
+			new_extension,
+		),
+		<span class="prelude-val">Some</span>(idx) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>,
+			<span class="kw-2">&amp;</span>full_path[<span class="number">0</span>..idx],
+			<span class="kw">if </span>new_has_dot { <span class="string">&quot;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;.&quot; </span>},
+			new_extension,
+		),
+	}
 }
 
 <span class="doccomment">/// Replaces the file name by the given one.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>replace_file_name(full_path: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str) -&gt; String {
-	get_path(full_path)
-		.map_or_else(
-			|| new_file.to_owned(),
-			|path| <span class="macro">format!</span>(<span class="string">&quot;{}\\{}&quot;</span>, path, new_file),
-		)
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>replace_file_name(full_path: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str) -&gt; String {
+	<span class="kw">match </span>get_path(full_path) {
+		<span class="prelude-val">None </span>=&gt; new_file.to_owned(),
+		<span class="prelude-val">Some</span>(path) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}\\{}&quot;</span>, path, new_file),
+	}
 }
 
 <span class="doccomment">/// Keeps the file name and replaces the path by the given one.
@@ -419,9 +411,9 @@
 ///     &quot;C:\\another&quot;,
 /// );
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>replace_path(full_path: <span class="kw-2">&amp;</span>str, new_path: <span class="kw-2">&amp;</span>str) -&gt; String {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>replace_path(full_path: <span class="kw-2">&amp;</span>str, new_path: <span class="kw-2">&amp;</span>str) -&gt; String {
 	<span class="kw">let </span>file_name = get_file_name(full_path);
 	<span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>,
 		rtrim_backslash(new_path),
@@ -439,21 +431,19 @@
 ///
 /// let p = path::rtrim_backslash(&quot;C:\\Temp\\&quot;); // C:\Temp
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]</span>
-<span class="attribute">#[must_use]</span>
-<span class="kw">pub fn </span>rtrim_backslash(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
-	full_path.chars()
-		.last()
-		.map_or(
-			full_path, <span class="comment">// empty string
-			</span>|last_ch| <span class="kw">if </span>last_ch == <span class="string">&#39;\\&#39; </span>{
-				<span class="kw">let </span><span class="kw-2">mut </span>chars = full_path.chars();
-				chars.next_back(); <span class="comment">// remove last char
-				</span>chars.as_str()
-			} <span class="kw">else </span>{
-				full_path <span class="comment">// no trailing backslash
-			</span>},
-		)
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>rtrim_backslash(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+	<span class="kw">match </span>full_path.chars().last() {
+		<span class="prelude-val">None </span>=&gt; full_path, <span class="comment">// empty string
+		</span><span class="prelude-val">Some</span>(last_ch) =&gt; <span class="kw">if </span>last_ch == <span class="string">&#39;\\&#39; </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>chars = full_path.chars();
+			chars.next_back(); <span class="comment">// remove last char
+			</span>chars.as_str()
+		} <span class="kw">else </span>{
+			full_path <span class="comment">// no trailing backslash
+		</span>},
+	}
 }
 
 <span class="comment">//------------------------------------------------------------------------------
@@ -485,4 +475,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

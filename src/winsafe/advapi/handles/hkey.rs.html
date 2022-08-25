@@ -622,16 +622,16 @@
 <span id="622">622</span>
 <span id="623">623</span>
 <span id="624">624</span>
-</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-<span class="kw">use </span>std::marker::PhantomData;
+</span><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use crate</span>::{advapi, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="macro">impl_handle!</span> { HKEY: <span class="string">&quot;advapi&quot;</span>;
+<span class="macro">impl_handle! </span>{ HKEY: <span class="string">&quot;advapi&quot;</span>;
 	<span class="doccomment">/// Handle to a
 	/// [registry key](https://docs.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hkey).
 	///
@@ -643,7 +643,7 @@
 
 <span class="kw">impl </span>advapi_Hkey <span class="kw">for </span>HKEY {}
 
-<span class="macro">macro_rules!</span> predef_key {
+<span class="macro">macro_rules! </span>predef_key {
 	(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$val</span>:expr) =&gt; {
 		<span class="doccomment">/// Predefined registry key, always open.
 		</span><span class="kw">const </span><span class="macro-nonterminal">$name</span>: HKEY = HKEY(<span class="macro-nonterminal">$val </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
@@ -658,8 +658,8 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]</span>
-<span class="kw">pub trait </span>advapi_Hkey: Handle {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]
+</span><span class="kw">pub trait </span>advapi_Hkey: Handle {
 	<span class="macro">predef_key!</span>(CLASSES_ROOT, <span class="number">0x8000_0000</span>);
 	<span class="macro">predef_key!</span>(CURRENT_USER, <span class="number">0x8000_0001</span>);
 	<span class="macro">predef_key!</span>(LOCAL_MACHINE, <span class="number">0x8000_0002</span>);
@@ -704,8 +704,8 @@
 	/// hkey.CloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>EnumKeyEx&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>EnumKeyEx&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
 		<span class="prelude-val">Ok</span>(Box::new(EnumKeyIter::new(HKEY(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
 	}
 
@@ -733,8 +733,8 @@
 	/// hkey.CloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>EnumValue&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>EnumValue&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
 		<span class="prelude-val">Ok</span>(Box::new(EnumValueIter::new(HKEY(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
 	}
 
@@ -770,8 +770,8 @@
 	/// }
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>GetValue(<span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetValue(<span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
 		<span class="kw">let </span>sub_key_w = WString::from_str(sub_key);
 		<span class="kw">let </span>value_w = WString::from_str(value);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type = u32::default();
@@ -854,8 +854,8 @@
 	/// hkey.CloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>OpenKeyEx(<span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str,
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>OpenKeyEx(<span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str,
 		options: co::REG_OPTION, access_rights: co::KEY) -&gt; SysResult&lt;HKEY&gt;
 	{
 		<span class="kw">let </span>hKey = HKEY::NULL;
@@ -980,8 +980,8 @@
 	/// hkey.CloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">fn </span>QueryValueEx(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>QueryValueEx(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
 		<span class="kw">let </span>value_w = WString::from_str(value);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len = u32::default();
@@ -1247,4 +1247,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>

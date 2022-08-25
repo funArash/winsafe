@@ -457,9 +457,9 @@
 /// [list view](https://docs.microsoft.com/en-us/windows/win32/controls/list-view-controls-overview)
 /// control. Not to be confused with the simpler [list box](crate::gui::ListBox)
 /// control.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="attribute">#[derive(Clone)]</span>
-<span class="kw">pub struct </span>ListView(Pin&lt;Arc&lt;Obj&gt;&gt;);
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>ListView(Pin&lt;Arc&lt;Obj&gt;&gt;);
 
 <span class="kw">unsafe impl </span>Send <span class="kw">for </span>ListView {}
 
@@ -505,8 +505,8 @@
 	<span class="doccomment">/// Instantiates a new `ListView` object, to be created on the parent window
 	/// with
 	/// [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: ListViewOpts) -&gt; ListView {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: ListViewOpts) -&gt; ListView {
 		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 		<span class="kw">let </span>opts = ListViewOpts::define_ctrl_id(opts);
 		<span class="kw">let </span>(ctrl_id, horz, vert) = (opts.ctrl_id, opts.horz_resize, opts.vert_resize);
@@ -541,8 +541,8 @@
 	/// **Note:** The optional `context_menu` is shared: it must be destroyed
 	/// manually after the control is destroyed. But note that menus loaded from
 	/// resources don&#39;t need to be destroyed.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>new_dlg(
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>new_dlg(
 		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent,
 		ctrl_id: u16,
 		resize_behavior: (Horz, Vert),
@@ -626,8 +626,8 @@
 	}
 
 	<span class="doccomment">/// Exposes the column methods.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub const fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ListViewColumns {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub const fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ListViewColumns {
 		ListViewColumns::new(<span class="self">self</span>)
 	}
 
@@ -636,28 +636,28 @@
 	/// The context menu is attached when the list view is created, either by
 	/// calling [`ListView::new`](crate::gui::ListView::new) or
 	/// [`ListView::new_dlg`](crate::gui::ListView::new_dlg).
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>context_menu(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>context_menu(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
 		<span class="self">self</span>.<span class="number">0</span>.context_menu
 	}
 
 	<span class="doccomment">/// Retrieves one of the associated image lists by sending an
 	/// [`lvm::GetImageList`](crate::msg::lvm::GetImageList) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>image_list(<span class="kw-2">&amp;</span><span class="self">self</span>, kind: co::LVSIL) -&gt; <span class="prelude-ty">Option</span>&lt;HIMAGELIST&gt; {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>image_list(<span class="kw-2">&amp;</span><span class="self">self</span>, kind: co::LVSIL) -&gt; <span class="prelude-ty">Option</span>&lt;HIMAGELIST&gt; {
 		<span class="self">self</span>.hwnd().SendMessage(lvm::GetImageList { kind })
 	}
 
 	<span class="doccomment">/// Exposes the item methods.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub const fn </span>items(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ListViewItems {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub const fn </span>items(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ListViewItems {
 		ListViewItems::new(<span class="self">self</span>)
 	}
 
 	<span class="doccomment">/// Retrieves the current view by sending an
 	/// [`lvm::GetView`](crate::msg::lvm::GetView) message.
-	</span><span class="attribute">#[must_use]</span>
-	<span class="kw">pub fn </span>current_view(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::LV_VIEW {
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">pub fn </span>current_view(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::LV_VIEW {
 		<span class="self">self</span>.hwnd().SendMessage(lvm::GetView {})
 	}
 
@@ -741,8 +741,8 @@
 
 </span><span class="doccomment">/// Options to create a [`ListView`](crate::gui::ListView) programmatically with
 /// [`ListView::new`](crate::gui::ListView::new).
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]</span>
-<span class="kw">pub struct </span>ListViewOpts {
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;gui&quot;</span>)))]
+</span><span class="kw">pub struct </span>ListViewOpts {
 	<span class="doccomment">/// Control position within parent client area, to be
 	/// [created](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
 	///
@@ -837,4 +837,4 @@
 	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (86c6ebee8 2022-08-16)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>
