@@ -275,6 +275,13 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{WindowEvents, WindowEventsAll};
@@ -384,7 +391,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{gui, AnyResult, GetCurrentThreadId};
+	/// use winsafe::{gui, AnyResult, HTHREAD};
 	///
 	/// let wnd: gui::WindowMain; // initialized somewhere
 	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
@@ -394,12 +401,14 @@
 	/// btn.on().bn_clicked({
 	///     let wnd = wnd.clone();
 	///     move || -&gt; AnyResult&lt;()&gt; {
-	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
+	///         println!(&quot;Click event at {:#x}&quot;,
+	///             HTHREAD::GetCurrentThreadId());
 	///
 	///         wnd.spawn_new_thread({
 	///             let wnd = wnd.clone();
 	///             move || {
-	///                 println!(&quot;This is another thread: {:#x}&quot;, GetCurrentThreadId());
+	///                 println!(&quot;This is another thread: {:#x}&quot;,
+	///                     HTHREAD::GetCurrentThreadId());
 	///                 if 1 != 2 {
 	///                     Err(&quot;Unexpected condition, goodbye.&quot;.into())
 	///                 } else {
@@ -447,7 +456,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{gui, AnyResult, GetCurrentThreadId, Sleep};
+	/// use winsafe::{gui, AnyResult, HTHREAD, Sleep};
 	///
 	/// let wnd: gui::WindowMain; // initialized somewhere
 	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
@@ -457,30 +466,35 @@
 	/// btn.on().bn_clicked({
 	///     let wnd = wnd.clone();
 	///     move || -&gt; AnyResult&lt;()&gt; {
-	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
+	///         println!(&quot;Click event at {:#x}&quot;,
+	///             HTHREAD::GetCurrentThreadId());
 	///
 	///         std::thread::spawn({
 	///             let wnd = wnd.clone();
 	///             move || {
-	///                 println!(&quot;Parallel task starts at {:#x}&quot;, GetCurrentThreadId());
+	///                 println!(&quot;Parallel task starts at {:#x}&quot;,
+	///                     HTHREAD::GetCurrentThreadId());
 	///                 Sleep(2000);
 	///
 	///                 wnd.run_ui_thread({
 	///                     let wnd = wnd.clone();
 	///                     move || -&gt; AnyResult&lt;()&gt; {
-	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
+	///                         println!(&quot;Updating UI at {:#x}&quot;,
+	///                             HTHREAD::GetCurrentThreadId());
 	///                         wnd.hwnd().SetWindowText(&quot;Status... 50%&quot;)?;
 	///                         Ok(())
 	///                     }
 	///                 });
 	///
-	///                 println!(&quot;Parallel task keeps going at {:#x}&quot;, GetCurrentThreadId());
+	///                 println!(&quot;Parallel task keeps going at {:#x}&quot;,
+	///                     HTHREAD::GetCurrentThreadId());
 	///                 Sleep(2000);
 	///
 	///                 wnd.run_ui_thread({
 	///                     let wnd = wnd.clone();
 	///                     move || -&gt; AnyResult&lt;()&gt; {
-	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
+	///                         println!(&quot;Updating UI at {:#x}&quot;,
+	///                             HTHREAD::GetCurrentThreadId());
 	///                         wnd.hwnd().SetWindowText(&quot;Status... 100%&quot;)?;
 	///                         Ok(())
 	///                     }
@@ -553,4 +567,4 @@
 	</span><span class="kw">fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>E;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (02654a084 2022-08-30)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (9243168fa 2022-08-31)" ></div></body></html>

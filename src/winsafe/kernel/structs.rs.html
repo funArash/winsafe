@@ -394,13 +394,57 @@
 <span id="394">394</span>
 <span id="395">395</span>
 <span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HEVENT, HPIPE, HPROCESS, HTHREAD, MAKEQWORD};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	HEVENT, HINSTANCE, HPIPE, HPROCESS, HTHREAD, MAKEQWORD,
+};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{MAX_MODULE_NAME32, MAX_PATH};
 
 <span class="doccomment">/// [`ACL`](https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-acl)
 /// struct.
@@ -533,6 +577,30 @@
 	</span><span class="kw">pub const fn </span>sort_id(<span class="self">self</span>) -&gt; co::SORT {
 		co::SORT(((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xf</span>) <span class="kw">as _</span>)
 	}
+}
+
+<span class="doccomment">/// [`MODULEENTRY32`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-moduleentry32w)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>MODULEENTRY32 {
+	dwSize: u32,
+	th32ModuleID: u32,
+	<span class="kw">pub </span>th32ProcessID: u32,
+	<span class="kw">pub </span>GlblcntUsage: u32,
+	<span class="kw">pub </span>ProccntUsage: u32,
+	<span class="kw">pub </span>modBaseAddr: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>modBaseSize: u32,
+	<span class="kw">pub </span>hModule: HINSTANCE,
+	szModule: [u16; MAX_MODULE_NAME32 + <span class="number">1</span>],
+	szExePath: [u16; MAX_PATH],
+}
+
+<span class="macro">impl_default_with_size!</span>(MODULEENTRY32, dwSize);
+
+<span class="kw">impl </span>MODULEENTRY32 {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szModule, set_szModule);
+	<span class="macro">pub_fn_string_arr_get_set!</span>(szExePath, set_szExePath);
 }
 
 <span class="doccomment">/// [`MEMORYSTATUSEX`](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-memorystatusex)
@@ -741,6 +809,22 @@
 	<span class="kw">pub </span>wMilliseconds: u16,
 }
 
+<span class="doccomment">/// [`THREADENTRY32`](https://docs.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-threadentry32)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>THREADENTRY32 {
+	dwSize: u32,
+	cntUsage: u32,
+	<span class="kw">pub </span>th32ThreadID: u32,
+	<span class="kw">pub </span>th32OwnerProcessID: u32,
+	<span class="kw">pub </span>tpBasePri: i32,
+	tpDeltaPri: i32,
+	dwFlags: u32,
+}
+
+<span class="macro">impl_default_with_size!</span>(THREADENTRY32, dwSize);
+
 <span class="doccomment">/// [`TIME_ZONE_INFORMATION`](https://docs.microsoft.com/en-us/windows/win32/api/timezoneapi/ns-timezoneapi-time_zone_information)
 /// struct.
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
@@ -791,4 +875,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (02654a084 2022-08-30)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (9243168fa 2022-08-31)" ></div></body></html>

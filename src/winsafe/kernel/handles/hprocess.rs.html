@@ -267,6 +267,33 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -373,6 +400,13 @@
 		HPROCESS(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcess() })
 	}
 
+	<span class="doccomment">/// [`GetCurrentProcessId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessid)
+	/// static method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetCurrentProcessId() -&gt; u32 {
+		<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcessId() }
+	}
+
 	<span class="doccomment">/// [`GetExitCodeProcess`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodeprocess)
 	/// method.
 	</span><span class="attribute">#[must_use]
@@ -393,6 +427,18 @@
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count),
 		}
+	}
+
+	<span class="doccomment">/// [`GetProcessHandleCount`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocesshandlecount)
+	/// method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>GetProcessHandleCount(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::GetProcessHandleCount(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>count)
+			},
+		).map(|<span class="kw">_</span>| count)
 	}
 
 	<span class="doccomment">/// [`GetProcessId`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessid)
@@ -424,6 +470,13 @@
 				)
 			},
 		)
+	}
+
+	<span class="doccomment">/// [`IsDebuggerPresent`](https://docs.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-isdebuggerpresent)
+	/// static method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>IsDebuggerPresent() -&gt; bool {
+		<span class="kw">unsafe </span>{ kernel::ffi::IsDebuggerPresent() != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsProcessCritical`](https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-isprocesscritical)
@@ -463,7 +516,8 @@
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">fn </span>OpenProcess(
 		desired_access: co::PROCESS,
-		inherit_handle: bool, process_id: u32) -&gt; SysResult&lt;HPROCESS&gt;
+		inherit_handle: bool,
+		process_id: u32) -&gt; SysResult&lt;HPROCESS&gt;
 	{
 		<span class="kw">unsafe </span>{
 			kernel::ffi::OpenProcess(
@@ -537,4 +591,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (02654a084 2022-08-30)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (9243168fa 2022-08-31)" ></div></body></html>
