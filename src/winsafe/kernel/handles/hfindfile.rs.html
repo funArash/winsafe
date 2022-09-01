@@ -184,6 +184,13 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -224,23 +231,30 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::HFINDFILE;
+	/// use winsafe::{AnyResult, HFINDFILE};
 	///
 	/// for file_path in HFINDFILE::iter(&quot;C:\\Temp\\*.txt&quot;) {
 	///     let file_path = file_path?;
 	///     println!(&quot;File: {}&quot;, file_path);
 	/// }
-	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	///
+	/// HFINDFILE::iter(&quot;C:\\Temp\\*.txt&quot;)
+	///     .try_for_each(|file_path| -&gt; AnyResult&lt;()&gt; {
+	///         let file_path = file_path?;
+	///         println!(&quot;File: {}&quot;, file_path);
+	///         Ok(())
+	///     })?;
+	/// # Ok::&lt;_, Box&lt;dyn std::error::Error + Send + Sync&gt;&gt;(())
 	/// ```
 	///
-	/// Collecting the strings into a
+	/// Collecting the TXTs into a
 	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html):
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::{HFINDFILE, SysResult};
 	///
-	/// let file_paths = HFINDFILE::iter(&quot;&quot;)
+	/// let file_paths = HFINDFILE::iter(&quot;C:\\Temp\\*.txt&quot;)
 	///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
@@ -248,7 +262,7 @@
 	</span><span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;a</span>&gt;(
 		path_and_pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;
 	{
-		Box::new(HfindfileIter::new(path_and_pattern))
+		Box::new(FindFileIter::new(path_and_pattern))
 	}
 
 	<span class="doccomment">/// [`FindClose`](https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findclose)
@@ -305,21 +319,21 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>HfindfileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">struct </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	hfind: HFINDFILE,
-	first_pass: bool,
 	wfd: WIN32_FIND_DATA,
 	path_and_pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+	first_pass: bool,
 	no_more: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>HfindfileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 		<span class="self">self</span>.hfind.FindClose().ok(); <span class="comment">// ignore error
 	</span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>HfindfileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">type </span>Item = SysResult&lt;String&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -359,13 +373,13 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; HfindfileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>new(path_and_pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			hfind: HFINDFILE::NULL,
-			first_pass: <span class="bool-val">true</span>,
 			wfd: WIN32_FIND_DATA::default(),
 			path_and_pattern,
+			first_pass: <span class="bool-val">true</span>,
 			no_more: <span class="bool-val">false</span>,
 		}
 	}
