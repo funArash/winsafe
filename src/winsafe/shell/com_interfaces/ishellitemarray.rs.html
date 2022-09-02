@@ -270,7 +270,7 @@
 	</span><span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellItemArrayVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IShellItemArrayVT&gt;();
 			ok_to_hrresult((vt.GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
 		}.map(|<span class="kw">_</span>| count)
 	}
@@ -284,7 +284,7 @@
 	</span><span class="kw">fn </span>GetItemAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IShellItemArrayVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IShellItemArrayVT&gt;();
 			ok_to_hrresult((vt.GetItemAt)(<span class="self">self</span>.ptr(), index, <span class="kw-2">&amp;mut </span>ppv_queried))
 				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
 		}

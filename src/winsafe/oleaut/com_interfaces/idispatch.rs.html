@@ -120,7 +120,7 @@
 	</span><span class="kw">fn </span>GetTypeInfoCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
 			ok_to_hrresult((vt.GetTypeInfoCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
 		}.map(|<span class="kw">_</span>| count)
 
@@ -132,7 +132,7 @@
 	</span><span class="kw">fn </span>GetTypeInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info_type: u32, lcid: LCID) -&gt; HrResult&lt;ITypeInfo&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IDispatchVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
 			ok_to_hrresult(
 				(vt.GetTypeInfo)(
 					<span class="self">self</span>.ptr(),

@@ -388,7 +388,7 @@
 	/// method.
 	</span><span class="kw">fn </span>AddPlace(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem, fdap: co::FDAP) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.AddPlace)(<span class="self">self</span>.ptr(), si.ptr(), fdap.<span class="number">0</span>))
 		}
 	}
@@ -397,7 +397,7 @@
 	/// method.
 	</span><span class="kw">fn </span>ClearClientData(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.ClearClientData)(<span class="self">self</span>.ptr()))
 		}
 	}
@@ -406,7 +406,7 @@
 	/// method.
 	</span><span class="kw">fn </span>Close(<span class="kw-2">&amp;</span><span class="self">self</span>, hr: co::ERROR) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.Close)(<span class="self">self</span>.ptr(), hr.<span class="number">0 </span><span class="kw">as _</span>))
 		}
 	}
@@ -417,7 +417,7 @@
 	</span><span class="kw">fn </span>GetCurrentSelection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetCurrentSelection)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
 				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
 		}
@@ -429,7 +429,7 @@
 	</span><span class="kw">fn </span>GetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetFileName)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
 		}.map(|<span class="kw">_</span>| {
 			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
@@ -444,7 +444,7 @@
 	</span><span class="kw">fn </span>GetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>index = u32::default();
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetFileTypeIndex)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>index))
 		}.map(|<span class="kw">_</span>| index)
 	}
@@ -455,7 +455,7 @@
 	</span><span class="kw">fn </span>GetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetFolder)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
 				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
 		}
@@ -467,7 +467,7 @@
 	</span><span class="kw">fn </span>GetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::FOS&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>opts = u32::default();
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetOptions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>opts))
 		}.map(|<span class="kw">_</span>| co::FOS(opts))
 	}
@@ -478,7 +478,7 @@
 	</span><span class="kw">fn </span>GetResult(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetResult)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
 				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
 		}
@@ -488,7 +488,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetClientGuid(<span class="kw-2">&amp;</span><span class="self">self</span>, guid: <span class="kw-2">&amp;</span>GUID) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetClientGuid)(<span class="self">self</span>.ptr(), guid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
 		}
 	}
@@ -497,7 +497,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetDefaultExtension(<span class="kw-2">&amp;</span><span class="self">self</span>, default_extension: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetDefaultExtension)(
 					<span class="self">self</span>.ptr(),
@@ -511,7 +511,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetDefaultFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetDefaultFolder)(<span class="self">self</span>.ptr(), si.ptr()))
 		}
 	}
@@ -520,7 +520,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetFileName)(<span class="self">self</span>.ptr(), WString::from_str(name).as_ptr()),
 			)
@@ -531,7 +531,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetFileNameLabel(<span class="kw-2">&amp;</span><span class="self">self</span>, label: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetFileNameLabel)(
 					<span class="self">self</span>.ptr(),
@@ -547,7 +547,7 @@
 	/// **Note:** The index is one-based.
 	</span><span class="kw">fn </span>SetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetFileTypeIndex)(<span class="self">self</span>.ptr(), index))
 		}
 	}
@@ -591,7 +591,7 @@
 			.for_each(|(i, el)| com_dlgs[i].set_pszSpec(<span class="prelude-val">Some</span>(el)));
 
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetFileTypes)(
 					<span class="self">self</span>.ptr(),
@@ -606,7 +606,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetFolder)(<span class="self">self</span>.ptr(), si.ptr()))
 		}
 	}
@@ -615,7 +615,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetOkButtonLabel(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetOkButtonLabel)(<span class="self">self</span>.ptr(), WString::from_str(text).as_ptr()),
 			)
@@ -626,7 +626,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>, opts: co::FOS) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetOptions)(<span class="self">self</span>.ptr(), opts.<span class="number">0</span>))
 		}
 	}
@@ -635,7 +635,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetTitle(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IFileDialogVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult(
 				(vt.SetTitle)(<span class="self">self</span>.ptr(), WString::from_str(text).as_ptr()),
 			)

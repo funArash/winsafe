@@ -138,6 +138,7 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
+<span id="141">141</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -212,15 +213,19 @@
 
 	<span class="doccomment">/// [`IEnumFilters::Next`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ienumfilters-next)
 	/// method.
+	///
+	/// Prefer using
+	/// [`IEnumFilters::iter`](crate::prelude::dshow_IEnumFilters::iter), which
+	/// is simpler.
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">fn </span>Next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="prelude-ty">Option</span>&lt;IBaseFilter&gt;&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>fetched = u32::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumFiltersVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
 			<span class="kw">match </span>ok_to_hrresult(
-				(vt.Next)(<span class="self">self</span>.ptr(), <span class="number">1</span>, <span class="kw-2">&amp;mut </span>ppv_queried, <span class="kw-2">&amp;mut </span>fetched),
-			) {
+				(vt.Next)(<span class="self">self</span>.ptr(), <span class="number">1</span>, <span class="kw-2">&amp;mut </span>ppv_queried, <span class="kw-2">&amp;mut </span>fetched), <span class="comment">// retrieve only 1
+			</span>) {
 				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(IBaseFilter::from(ppv_queried))),
 				<span class="prelude-val">Err</span>(hr) =&gt; <span class="kw">match </span>hr {
 					co::HRESULT::S_FALSE =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no filter found
@@ -234,7 +239,7 @@
 	/// method.
 	</span><span class="kw">fn </span>Reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumFiltersVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
 			ok_to_hrresult((vt.Reset)(<span class="self">self</span>.ptr()))
 		}
 	}
@@ -243,7 +248,7 @@
 	/// method.
 	</span><span class="kw">fn </span>Skip(<span class="kw-2">&amp;</span><span class="self">self</span>, count: u32) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IEnumFiltersVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
 			okfalse_to_hrresult((vt.Skip)(<span class="self">self</span>.ptr(), count))
 		}
 	}
@@ -262,10 +267,7 @@
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
 		<span class="kw">match </span><span class="self">self</span>.array.Next() {
 			<span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
-			<span class="prelude-val">Ok</span>(maybe_item) =&gt; <span class="kw">match </span>maybe_item {
-				<span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
-				<span class="prelude-val">Some</span>(item) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item)),
-			},
+			<span class="prelude-val">Ok</span>(maybe_item) =&gt; maybe_item.map(|item| <span class="prelude-val">Ok</span>(item)),
 		}
 	}
 }

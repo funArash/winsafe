@@ -116,6 +116,13 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -215,6 +222,13 @@
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">unsafe fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ComPtr;
 
+	<span class="doccomment">/// Returns a reference to the underlying COM virtual table.
+	///
+	/// **Note:** Be sure the pointer has the correct virtual table type (or
+	/// inherits from it), and it is not null.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">unsafe fn </span>vt_ref&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T;
+
 	<span class="doccomment">/// [`IUnknown::QueryInterface`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-queryinterface(refiid_void))
 	/// method.
 	</span><span class="attribute">#[must_use]
@@ -223,7 +237,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IUnknownVT);
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IUnknownVT&gt;();
 			ok_to_hrresult(
 				(vt.QueryInterface)(
 					<span class="self">self</span>.ptr(),
