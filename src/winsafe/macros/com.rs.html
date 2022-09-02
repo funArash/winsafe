@@ -117,11 +117,29 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(unused_macros)]
 
-</span><span class="doccomment">/// Implements ole_IUnknown trait to COM object, plus all its trait bounds.
-</span><span class="macro">macro_rules! </span>impl_iunknown {
-	(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$guid</span>:expr) =&gt; {
+</span><span class="doccomment">/// Declares an ordinary COM interface, and implements ole_IUnknown trait.
+</span><span class="macro">macro_rules! </span>com_interface {
+	(
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$feature</span>:literal;
+		<span class="macro-nonterminal">$guid</span>:expr;
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
+	) =&gt; {
+		$( <span class="attribute">#[<span class="macro-nonterminal">$doc</span>] </span>)*
+		<span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]
+		#[repr(transparent)]
+		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(ComPtr);
+
 		<span class="kw">impl </span>Drop <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 				<span class="kw">if </span>!<span class="self">self</span>.<span class="number">0</span>.is_null() {
@@ -158,7 +176,7 @@
 				<span class="self">self</span>.<span class="number">0
 			</span>}
 		}
-	};
+	}
 }
 
 <span class="doccomment">/// Creates multiple `GUID`-derived pub const values.

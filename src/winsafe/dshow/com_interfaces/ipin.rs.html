@@ -109,12 +109,132 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, PIN_INFO};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -123,7 +243,7 @@
 #[repr(C)]
 </span><span class="kw">pub struct </span>IPinVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(ComPtr, ComPtr, PCVOID) -&gt; HRES,
 	<span class="kw">pub </span>ReceiveConnection: <span class="kw">fn</span>(ComPtr, ComPtr, PCVOID) -&gt; HRES,
 	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
 	<span class="kw">pub </span>ConnectedTo: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
@@ -140,16 +260,16 @@
 	<span class="kw">pub </span>NewSegment: <span class="kw">fn</span>(ComPtr, i64, i64, f64) -&gt; HRES,
 }
 
-<span class="doccomment">/// [`IPin`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ipin)
-/// COM interface over [`IPinVT`](crate::vt::IPinVT).
-///
-/// Automatically calls
-/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
-/// when the object goes out of scope.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dshow&quot;</span>)))]
-</span><span class="kw">pub struct </span>IPin(ComPtr);
+<span class="macro">com_interface! </span>{ IPin: <span class="string">&quot;dshow&quot;</span>;
+	<span class="string">&quot;56a86891-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
+	<span class="doccomment">/// [`IPin`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nn-strmif-ipin)
+	/// COM interface over [`IPinVT`](crate::vt::IPinVT).
+	///
+	/// Automatically calls
+	/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
+	/// when the object goes out of scope.
+</span>}
 
-<span class="macro">impl_iunknown!</span>(IPin, <span class="string">&quot;56a86891-0ad4-11ce-b03a-0020af0ba770&quot;</span>);
 <span class="kw">impl </span>dshow_IPin <span class="kw">for </span>IPin {}
 
 <span class="doccomment">/// This trait is enabled with the `dshow` feature, and provides methods for
@@ -165,6 +285,23 @@
 		}
 	}
 
+	<span class="doccomment">/// [`IPin::Connect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connect)
+	/// method.
+	</span><span class="kw">fn </span>Connect(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		receive_pin: <span class="kw-2">&amp;</span>IPin, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
+	{
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult(
+				(vt.Connect)(
+					<span class="self">self</span>.ptr(),
+					receive_pin.ptr(),
+					mt.map_or(std::ptr::null(), |p| p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+				),
+			)
+		}
+	}
+
 	<span class="doccomment">/// [`IPin::ConnectedTo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectedto)
 	/// method.
 	</span><span class="attribute">#[must_use]
@@ -175,6 +312,15 @@
 			ok_to_hrresult(
 				(vt.ConnectedTo)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried),
 			).map(|<span class="kw">_</span>| IPin::from(ppv_queried))
+		}
+	}
+
+	<span class="doccomment">/// [`IPin::ConnectionMediaType`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectionmediatype)
+	/// method.
+	</span><span class="kw">fn </span>ConnectionMediaType(<span class="kw-2">&amp;</span><span class="self">self</span>, mt: <span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.ConnectionMediaType)(<span class="self">self</span>.ptr(), mt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
 		}
 	}
 
@@ -205,6 +351,38 @@
 		}
 	}
 
+	<span class="doccomment">/// [`IPin::NewSegment`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-newsegment)
+	/// method.
+	</span><span class="kw">fn </span>NewSegment(<span class="kw-2">&amp;</span><span class="self">self</span>, start: i64, stop: i64, rate: f64) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.NewSegment)(<span class="self">self</span>.ptr(), start, stop, rate))
+		}
+	}
+
+	<span class="doccomment">/// [`IPin::QueryAccept`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryaccept)
+	/// method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>QueryAccept(<span class="kw-2">&amp;</span><span class="self">self</span>, mt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;bool&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			okfalse_to_hrresult((vt.QueryAccept)(<span class="self">self</span>.ptr(), mt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
+		}
+	}
+
+	<span class="doccomment">/// [`IPin::QueryDirection`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-querydirection)
+	/// method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>QueryDirection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::PIN_DIRECTION&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>pin_dir = co::PIN_DIRECTION::INPUT;
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult(
+				(vt.QueryDirection)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pin_dir <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			).map(|<span class="kw">_</span>| pin_dir)
+		}
+	}
+
 	<span class="doccomment">/// [`IPin::QueryId`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryid)
 	/// method.
 	</span><span class="attribute">#[must_use]
@@ -218,6 +396,64 @@
 			CoTaskMemFree(pstr <span class="kw">as _</span>);
 			name.to_string()
 		})
+	}
+
+	<span class="doccomment">/// [`IPin::QueryInternalConnections`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryinternalconnections)
+	/// method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>QueryInternalConnections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;Vec&lt;IPin&gt;&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			<span class="kw">if let </span><span class="prelude-val">Err</span>(e) = ok_to_hrresult(
+				(vt.QueryInternalConnections)(
+					<span class="self">self</span>.ptr(),
+					std::ptr::null_mut(),
+					<span class="kw-2">&amp;mut </span>count <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				),
+			) {
+				<span class="kw">return </span><span class="prelude-val">Err</span>(e);
+			}
+
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = <span class="macro">vec!</span>[ComPtr::null(); count <span class="kw">as _</span>];
+			ok_to_hrresult(
+				(vt.QueryInternalConnections)(
+					<span class="self">self</span>.ptr(),
+					ppv_queried.as_mut_ptr(),
+					<span class="kw-2">&amp;mut </span>count <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				),
+			).map(|<span class="kw">_</span>| {
+				ppv_queried.into_iter()
+					.map(|ppv| IPin::from(ppv))
+					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+			})
+		}
+	}
+
+	<span class="doccomment">/// [`IPin::QueryPinInfo`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-querypininfo)
+	/// method.
+	</span><span class="kw">fn </span>QueryPinInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;mut </span>PIN_INFO) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult((vt.QueryPinInfo)(<span class="self">self</span>.ptr(), info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
+		}
+	}
+
+	<span class="doccomment">/// [`IPin::ReceiveConnection`]`(https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-receiveconnection)
+	/// method.
+	</span><span class="kw">fn </span>ReceiveConnection(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		connector: <span class="kw-2">&amp;</span>IPin, mt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt;
+	{
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="kw-2">&amp;**</span>(<span class="self">self</span>.ptr().<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut *mut </span>IPinVT);
+			ok_to_hrresult(
+				(vt.ReceiveConnection)(
+					<span class="self">self</span>.ptr(),
+					connector.ptr(),
+					mt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				),
+			)
+		}
 	}
 }
 </code></pre></div>
