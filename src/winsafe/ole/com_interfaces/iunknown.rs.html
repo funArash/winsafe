@@ -93,74 +93,14 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 
-<span class="doccomment">/// A pointer to a COM virtual table.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
-#[repr(transparent)]
-#[derive(Clone, Copy)]
-</span><span class="kw">pub struct </span>ComPtr(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">*mut *mut </span>IUnknownVT);
-
-<span class="kw">impl </span>From&lt;ComPtr&gt; <span class="kw">for </span>usize {
-	<span class="kw">fn </span>from(com_ptr: ComPtr) -&gt; <span class="self">Self </span>{
-		com_ptr.<span class="number">0 </span><span class="kw">as _
-	</span>}
-}
-
-<span class="kw">impl </span>ComPtr {
-	<span class="doccomment">/// Creates a null pointer to a COM virtual table.
-	///
-	/// Used internally by the library.
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub const unsafe fn </span>null() -&gt; <span class="self">Self </span>{
-		<span class="self">Self</span>(std::ptr::null_mut())
-	}
-
-	<span class="doccomment">/// Returns `true` if the pointer is null.
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub fn </span>is_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="self">self</span>.<span class="number">0</span>.is_null()
-	}
-}
-
-<span class="comment">//------------------------------------------------------------------------------
-
-</span><span class="doccomment">/// [`IUnknown`](crate::IUnknown) virtual table, base to all COM virtual tables.
+<span class="doccomment">/// [`IUnknown`](crate::IUnknown) virtual table, base to all COM virtual tables.
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 #[repr(C)]
 </span><span class="kw">pub struct </span>IUnknownVT {
