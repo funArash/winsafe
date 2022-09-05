@@ -227,10 +227,24 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, PIN_INFO};
+<span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, IEnumMediaTypes, PIN_INFO};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
@@ -288,7 +302,7 @@
 	<span class="doccomment">/// [`IPin::Connect`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connect)
 	/// method.
 	</span><span class="kw">fn </span>Connect(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		receive_pin: <span class="kw-2">&amp;</span>IPin, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
+		receive_pin: <span class="kw-2">&amp;</span>IPin, amt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
@@ -296,7 +310,7 @@
 				(vt.Connect)(
 					<span class="self">self</span>.ptr(),
 					receive_pin.ptr(),
-					mt.map_or(std::ptr::null(), |p| p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+					amt.map_or(std::ptr::null(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				),
 			)
 		}
@@ -317,10 +331,12 @@
 
 	<span class="doccomment">/// [`IPin::ConnectionMediaType`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectionmediatype)
 	/// method.
-	</span><span class="kw">fn </span>ConnectionMediaType(<span class="kw-2">&amp;</span><span class="self">self</span>, mt: <span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>ConnectionMediaType(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: <span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.ConnectionMediaType)(<span class="self">self</span>.ptr(), mt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
+			ok_to_hrresult(
+				(vt.ConnectionMediaType)(<span class="self">self</span>.ptr(), amt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			)
 		}
 	}
 
@@ -351,6 +367,18 @@
 		}
 	}
 
+	<span class="doccomment">/// [`IPin::EnumMediaTypes`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-enummediatypes)
+	/// method.
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>EnumMediaTypes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IEnumMediaTypes&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
+			ok_to_hrresult((vt.EnumMediaTypes)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
+				.map(|<span class="kw">_</span>| IEnumMediaTypes::from(ppv_queried))
+		}
+	}
+
 	<span class="doccomment">/// [`IPin::NewSegment`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-newsegment)
 	/// method.
 	</span><span class="kw">fn </span>NewSegment(<span class="kw-2">&amp;</span><span class="self">self</span>, start: i64, stop: i64, rate: f64) -&gt; HrResult&lt;()&gt; {
@@ -363,10 +391,10 @@
 	<span class="doccomment">/// [`IPin::QueryAccept`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryaccept)
 	/// method.
 	</span><span class="attribute">#[must_use]
-	</span><span class="kw">fn </span>QueryAccept(<span class="kw-2">&amp;</span><span class="self">self</span>, mt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;bool&gt; {
+	</span><span class="kw">fn </span>QueryAccept(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			okfalse_to_hrresult((vt.QueryAccept)(<span class="self">self</span>.ptr(), mt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
+			okfalse_to_hrresult((vt.QueryAccept)(<span class="self">self</span>.ptr(), amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
 		}
 	}
 
@@ -442,7 +470,7 @@
 	<span class="doccomment">/// [`IPin::ReceiveConnection`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-receiveconnection)
 	/// method.
 	</span><span class="kw">fn </span>ReceiveConnection(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		connector: <span class="kw-2">&amp;</span>IPin, mt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt;
+		connector: <span class="kw-2">&amp;</span>IPin, amt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt;
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
@@ -450,11 +478,11 @@
 				(vt.ReceiveConnection)(
 					<span class="self">self</span>.ptr(),
 					connector.ptr(),
-					mt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				),
 			)
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (9243168fa 2022-08-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (289279de1 2022-09-04)" ></div></body></html>

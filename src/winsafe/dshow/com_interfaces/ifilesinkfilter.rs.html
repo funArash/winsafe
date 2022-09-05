@@ -170,7 +170,7 @@
 	/// ```
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">unsafe fn </span>GetCurFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;String&gt;
+		amt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;String&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr: <span class="kw-2">*mut </span>u16 = std::ptr::null_mut();
 		<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileSinkFilterVT&gt;();
@@ -178,7 +178,7 @@
 			(vt.GetCurFile)(
 				<span class="self">self</span>.ptr(),
 				<span class="kw-2">&amp;mut </span>pstr,
-				mt.map_or(std::ptr::null_mut(), |p| p <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				amt.map_or(std::ptr::null_mut(), |amt| amt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			),
 		).map(|<span class="kw">_</span>| {
 			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
@@ -190,7 +190,7 @@
 	<span class="doccomment">/// [`IFileSinkFilter::SetFileName`](https://docs.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-setfilename)
 	/// method.
 	</span><span class="kw">fn </span>SetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		file_name: <span class="kw-2">&amp;</span>str, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
+		file_name: <span class="kw-2">&amp;</span>str, amt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileSinkFilterVT&gt;();
@@ -198,11 +198,11 @@
 				(vt.SetFileName)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(file_name).as_ptr(),
-					mt.map_or(std::ptr::null(), |p| p <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+					amt.map_or(std::ptr::null(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				),
 			)
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (9243168fa 2022-08-31)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (289279de1 2022-09-04)" ></div></body></html>
