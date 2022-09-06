@@ -1173,6 +1173,43 @@
 <span id="1173">1173</span>
 <span id="1174">1174</span>
 <span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1741,6 +1778,43 @@
 
 <span class="macro">impl_default_with_size!</span>(MCHITTESTINFO, cbSize);
 
+<span class="doccomment">/// [`MONTHDAYSTATE`](https://docs.microsoft.com/en-us/windows/win32/controls/monthdaystate)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
+#[repr(transparent)]
+#[derive(Default, Clone, Copy)]
+</span><span class="kw">pub struct </span>MONTHDAYSTATE(u32);
+
+<span class="kw">impl </span>MONTHDAYSTATE {
+	<span class="doccomment">/// Returns the state of the bit corresponding to the given day index.
+	///
+	/// # Panics
+	///
+	/// Panics if `index` is greater than 31.
+	</span><span class="kw">pub fn </span>get_day(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u8) -&gt; bool {
+		<span class="kw">if </span>index &gt; <span class="number">31 </span>{
+			<span class="macro">panic!</span>(<span class="string">&quot;MONTHDAYSTATE max index is 31, tried to get {}.&quot;</span>, index)
+		} <span class="kw">else </span>{
+			((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; index) &amp; <span class="number">1</span>) != <span class="number">0
+		</span>}
+	}
+
+	<span class="doccomment">/// Sets the state of the bit corresponding to the given day index.
+	///
+	/// # Panics
+	///
+	/// Panics if `index` is greater than 31.
+	</span><span class="kw">pub fn </span>set_day(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: u8, state: bool) {
+		<span class="kw">if </span>index &gt; <span class="number">31 </span>{
+			<span class="macro">panic!</span>(<span class="string">&quot;MONTHDAYSTATE max index is 31, tried to set {}.&quot;</span>, index)
+		} <span class="kw">else if </span>state {
+			<span class="self">self</span>.<span class="number">0 </span>|= <span class="number">1 </span>&lt;&lt; index;
+		} <span class="kw">else </span>{
+			<span class="self">self</span>.<span class="number">0 </span>&amp;= !(<span class="number">1 </span>&lt;&lt; index);
+		}
+	}
+}
+
 <span class="doccomment">/// [`NMBCDROPDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbcdropdown)
 /// struct.
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
@@ -1889,15 +1963,15 @@
 	<span class="kw">pub </span>nmhdr: NMHDR,
 	<span class="kw">pub </span>stStart: SYSTEMTIME,
 	cDayState: i32,
-	prgDayState: <span class="kw-2">*mut </span>u32,
+	prgDayState: <span class="kw-2">*mut </span>MONTHDAYSTATE,
 
-	_prgDayState: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u32&gt;,
+	_prgDayState: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>MONTHDAYSTATE&gt;,
 }
 
 <span class="macro">impl_default!</span>(NMDAYSTATE, <span class="lifetime">&#39;a</span>);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMDAYSTATE&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, prgDayState, set_prgDayState, cDayState, u32);
+	<span class="macro">pub_fn_array_buf_get_set!</span>(<span class="lifetime">&#39;a</span>, prgDayState, set_prgDayState, cDayState, MONTHDAYSTATE);
 }
 
 <span class="doccomment">/// [`NMHDR`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-nmhdr)
