@@ -1128,6 +1128,34 @@
 <span id="1128">1128</span>
 <span id="1129">1129</span>
 <span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1138,6 +1166,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::{HINST_COMMCTRL, L_MAX_URL_LENGTH, MAX_LINKID_TEXT};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, IdStr, SYSTEMTIME, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::IS_INTRESOURCE;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
@@ -1650,6 +1679,33 @@
 }
 
 <span class="macro">impl_default_with_size!</span>(LVTILEVIEWINFO, cbSize);
+
+<span class="doccomment">/// [`MCGRIDINFO`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-mcgridinfo)
+/// struct.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
+#[repr(C)]
+</span><span class="kw">pub struct </span>MCGRIDINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	cbSize: u32,
+	<span class="kw">pub </span>dwPart: co::MCGIP,
+	<span class="kw">pub </span>dwFlags: co::MCGIF,
+	<span class="kw">pub </span>iCalendar: i32,
+	<span class="kw">pub </span>iRow: i32,
+	<span class="kw">pub </span>iCol: i32,
+	bSelected: BOOL,
+	<span class="kw">pub </span>stStart: SYSTEMTIME,
+	<span class="kw">pub </span>stEnd: SYSTEMTIME,
+	<span class="kw">pub </span>rc: RECT,
+	pszName: <span class="kw-2">*mut </span>u16,
+	cchName: usize,
+
+	_pszName: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>u16&gt;,
+}
+
+<span class="macro">impl_default_with_size!</span>(MCGRIDINFO, cbSize, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MCGRIDINFO&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_bool_get_set!</span>(bSelected, set_bSelected); <span class="comment">// ignore cchName
+</span>}
 
 <span class="doccomment">/// [`NMBCDROPDOWN`](https://docs.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmbcdropdown)
 /// struct.
