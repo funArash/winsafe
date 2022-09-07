@@ -125,11 +125,60 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HTREEITEM;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, IdStr, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, POINT};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, HCURSOR, HDC, HICON, POINT};
+
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`stm::GetImage`](crate::msg::stm::GetImage) `image`;
+/// * [`stm::SetImage`](crate::msg::stm::SetImage) `image`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
+#[derive(Clone, Copy)]
+</span><span class="kw">pub enum </span>BmpIconCurMeta {
+	Bmp(HBITMAP),
+	Icon(HICON),
+	Cur(HCURSOR),
+	Meta(HDC),
+}
+
+<span class="kw">impl </span>From&lt;BmpIconCurMeta&gt; <span class="kw">for </span>isize {
+	<span class="kw">fn </span>from(v: BmpIconCurMeta) -&gt; <span class="self">Self </span>{
+		(<span class="kw">match </span>v {
+			BmpIconCurMeta::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
+			BmpIconCurMeta::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
+			BmpIconCurMeta::Cur(hcur) =&gt; hcur.<span class="number">0</span>,
+			BmpIconCurMeta::Meta(hdc) =&gt; hdc.<span class="number">0</span>,
+		}) <span class="kw">as _
+	</span>}
+}
 
 <span class="doccomment">/// Variant parameter for:
 ///
@@ -232,6 +281,15 @@
 	</span>Tvi(co::TVI),
 }
 
+<span class="kw">impl </span>From&lt;TreeitemTvi&gt; <span class="kw">for </span>isize {
+	<span class="kw">fn </span>from(v: TreeitemTvi) -&gt; <span class="self">Self </span>{
+		<span class="kw">match </span>v {
+			TreeitemTvi::Treeitem(htreeitem) =&gt; htreeitem.<span class="number">0 </span><span class="kw">as _</span>,
+			TreeitemTvi::Tvi(tvi) =&gt; tvi.<span class="number">0</span>,
+		}
+	}
+}
+
 <span class="kw">impl </span>TreeitemTvi {
 	<span class="attribute">#[must_use]
 	</span><span class="kw">pub fn </span>from_isize(val: isize) -&gt; TreeitemTvi {
@@ -241,14 +299,6 @@
 			co::TVI::ROOT =&gt; <span class="self">Self</span>::Tvi(co::TVI::ROOT),
 			co::TVI::SORT =&gt; <span class="self">Self</span>::Tvi(co::TVI::SORT),
 			val =&gt; <span class="self">Self</span>::Treeitem(HTREEITEM(val.<span class="number">0 </span><span class="kw">as _</span>)),
-		}
-	}
-
-	<span class="attribute">#[must_use]
-	</span><span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-		<span class="kw">match </span><span class="self">self </span>{
-			<span class="self">Self</span>::Treeitem(htreeitem) =&gt; htreeitem.<span class="number">0 </span><span class="kw">as _</span>,
-			<span class="self">Self</span>::Tvi(tvi) =&gt; tvi.<span class="number">0 </span><span class="kw">as _</span>,
 		}
 	}
 }

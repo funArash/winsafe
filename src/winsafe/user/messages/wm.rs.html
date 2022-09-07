@@ -2248,7 +2248,7 @@
 		WndMsg {
 			msg_id: co::WM::CONTEXTMENU,
 			wparam: <span class="self">self</span>.hwnd.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.cursor_pos.into_u32() <span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.cursor_pos) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -2257,7 +2257,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			hwnd: HWND(p.wparam <span class="kw">as _</span>),
-			cursor_pos: POINT::from_u32(p.lparam <span class="kw">as _</span>),
+			cursor_pos: POINT::from(p.lparam <span class="kw">as </span>u32),
 		}
 	}
 }
@@ -2423,7 +2423,7 @@
 		WndMsg {
 			msg_id: co::WM::ENTERIDLE,
 			wparam: <span class="self">self</span>.reason.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.handle.as_isize(),
+			lparam: <span class="self">self</span>.handle.into(),
 		}
 	}
 }
@@ -3112,7 +3112,7 @@
 		WndMsg {
 			msg_id: co::WM::MOVE,
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.coords.into_u32() <span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.coords) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3120,7 +3120,7 @@
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>Move {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			coords: POINT::from_u32(p.lparam <span class="kw">as _</span>),
+			coords: POINT::from(p.lparam <span class="kw">as </span>u32),
 		}
 	}
 }
@@ -3257,7 +3257,7 @@
 		WndMsg {
 			msg_id: co::WM::NCHITTEST,
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.cursor_pos.into_u32() <span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.cursor_pos) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3265,7 +3265,7 @@
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>NcHitTest {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			cursor_pos: POINT::from_u32(p.lparam <span class="kw">as _</span>),
+			cursor_pos: POINT::from(p.lparam <span class="kw">as </span>u32),
 		}
 	}
 }
@@ -3338,7 +3338,7 @@
 		WndMsg {
 			msg_id: co::WM::PARENTNOTIFY,
 			wparam: MAKEDWORD(<span class="self">self</span>.event.<span class="number">0</span>, <span class="self">self</span>.child_id) <span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.data.as_isize(),
+			lparam: <span class="self">self</span>.data.into(),
 		}
 	}
 }
@@ -3352,7 +3352,7 @@
 			data: <span class="kw">match </span>event {
 				co::WMPN::CREATE | co::WMPN::DESTROY =&gt; HwndPointId::Hwnd(HWND(p.lparam <span class="kw">as _</span>)),
 				co::WMPN::POINTERDOWN =&gt; HwndPointId::Id(p.lparam <span class="kw">as _</span>),
-				<span class="kw">_ </span>=&gt; HwndPointId::Point(POINT::from_u32(p.lparam <span class="kw">as _</span>)),
+				<span class="kw">_ </span>=&gt; HwndPointId::Point(POINT::from(p.lparam <span class="kw">as </span>u32)),
 			},
 		}
 	}
@@ -3612,7 +3612,7 @@
 		WndMsg {
 			msg_id: co::WM::SIZE,
 			wparam: <span class="self">self</span>.request.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.client_area.into_u32() <span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.client_area) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3761,7 +3761,7 @@
 		WndMsg {
 			msg_id: co::WM::SYSCOMMAND,
 			wparam: <span class="self">self</span>.request.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.position.into_u32() <span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.position) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3770,7 +3770,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			request: co::SC(p.wparam <span class="kw">as _</span>),
-			position: POINT::from_u32(p.lparam <span class="kw">as _</span>),
+			position: POINT::from(p.lparam <span class="kw">as </span>u32),
 		}
 	}
 }

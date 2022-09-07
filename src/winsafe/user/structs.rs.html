@@ -950,8 +950,6 @@
 <span id="950">950</span>
 <span id="951">951</span>
 <span id="952">952</span>
-<span id="953">953</span>
-<span id="954">954</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1630,6 +1628,18 @@
 	}
 }
 
+<span class="kw">impl </span>From&lt;POINT&gt; <span class="kw">for </span>u32 {
+	<span class="kw">fn </span>from(v: POINT) -&gt; <span class="self">Self </span>{
+		MAKEDWORD(v.x <span class="kw">as _</span>, v.y <span class="kw">as _</span>)
+	}
+}
+
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>POINT {
+	<span class="kw">fn </span>from(v: u32) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new(LOWORD(v) <span class="kw">as _</span>, HIWORD(v) <span class="kw">as _</span>)
+	}
+}
+
 <span class="kw">impl </span>POINT {
 	<span class="doccomment">/// Creates a new `POINT`.
 	</span><span class="attribute">#[must_use]
@@ -1637,23 +1647,10 @@
 		<span class="self">Self </span>{ x, y }
 	}
 
-	<span class="doccomment">/// Creates a new `POINT` by splitting `val` into two `u16` values, with
-	/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub const fn </span>from_u32(val: u32) -&gt; POINT {
-		<span class="self">Self</span>::new(LOWORD(val) <span class="kw">as _</span>, HIWORD(val) <span class="kw">as _</span>)
-	}
-
 	<span class="doccomment">/// Tells whether the struct contains exactly the given values.
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">pub const fn </span>is(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; bool {
 		<span class="self">self</span>.x == x &amp;&amp; <span class="self">self</span>.y == y
-	}
-
-	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `x` and `y`.
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub const fn </span>into_u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-		MAKEDWORD(<span class="self">self</span>.x <span class="kw">as _</span>, <span class="self">self</span>.y <span class="kw">as _</span>)
 	}
 }
 
@@ -1717,6 +1714,18 @@
 	}
 }
 
+<span class="kw">impl </span>From&lt;SIZE&gt; <span class="kw">for </span>u32 {
+	<span class="kw">fn </span>from(v: SIZE) -&gt; <span class="self">Self </span>{
+		MAKEDWORD(v.cx <span class="kw">as _</span>, v.cy <span class="kw">as _</span>)
+	}
+}
+
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>SIZE {
+	<span class="kw">fn </span>from(v: u32) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new(LOWORD(v) <span class="kw">as _</span>, HIWORD(v) <span class="kw">as _</span>)
+	}
+}
+
 <span class="kw">impl </span>SIZE {
 	<span class="doccomment">/// Creates a new `SIZE`.
 	</span><span class="attribute">#[must_use]
@@ -1724,23 +1733,10 @@
 		<span class="self">Self </span>{ cx, cy }
 	}
 
-	<span class="doccomment">/// Creates a new `SIZE` by splitting `val` into two `u16` values, with
-	/// [`LOWORD`](crate::LOWORD) and [`HIWORD`](crate::HIWORD).
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub const fn </span>from_u32(val: u32) -&gt; SIZE {
-		<span class="self">Self</span>::new(LOWORD(val) <span class="kw">as _</span>, HIWORD(val) <span class="kw">as _</span>)
-	}
-
 	<span class="doccomment">/// Tells whether the struct contains exactly the given values.
 	</span><span class="attribute">#[must_use]
 	</span><span class="kw">pub const fn </span>is(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: i32, cy: i32) -&gt; bool {
 		<span class="self">self</span>.cx == cx &amp;&amp; <span class="self">self</span>.cy == cy
-	}
-
-	<span class="doccomment">/// Calls [`MAKEDWORD`](crate::MAKEDWORD) with `cx` and `cy`.
-	</span><span class="attribute">#[must_use]
-	</span><span class="kw">pub const fn </span>into_u32(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-		MAKEDWORD(<span class="self">self</span>.cx <span class="kw">as _</span>, <span class="self">self</span>.cy <span class="kw">as _</span>)
 	}
 }
 

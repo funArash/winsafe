@@ -52,11 +52,83 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::BmpIconCurMeta;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::HICON;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, HCURSOR, HDC, HICON};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_err;
 
 <span class="doccomment">/// [`STM_GETICON`](https://docs.microsoft.com/en-us/windows/win32/controls/stm-geticon)
@@ -77,6 +149,37 @@
 		WndMsg {
 			msg_id: co::STM::GETICON.into(),
 			wparam: <span class="number">0</span>,
+			lparam: <span class="number">0</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`STM_GETIMAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/stm-getimage)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;BmpIconCurMeta&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
+</span><span class="kw">pub struct </span>GetImage {
+	<span class="kw">pub </span>img_type: co::IMAGE_TYPE,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>GetImage {
+	<span class="kw">type </span>RetType = SysResult&lt;BmpIconCurMeta&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">match </span><span class="self">self</span>.img_type {
+			co::IMAGE_TYPE::BITMAP =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Bmp(HBITMAP(v <span class="kw">as _</span>))),
+			co::IMAGE_TYPE::ICON =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Icon(HICON(v <span class="kw">as _</span>))),
+			co::IMAGE_TYPE::CURSOR =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Cur(HCURSOR(v <span class="kw">as _</span>))),
+			co::IMAGE_TYPE::ENHMETAFILE =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Meta(HDC(v <span class="kw">as _</span>))),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::STM::GETIMAGE.into(),
+			wparam: <span class="self">self</span>.img_type.<span class="number">0 </span><span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
 		}
 	}
@@ -103,6 +206,45 @@
 			msg_id: co::STM::SETICON.into(),
 			wparam: <span class="self">self</span>.icon.<span class="number">0 </span><span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`STM_SETIMAGE`](https://docs.microsoft.com/en-us/windows/win32/controls/stm-setimage)
+/// message parameters.
+///
+/// Return type: `SysResult&lt;BmpIconCurMeta&gt;`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
+</span><span class="kw">pub struct </span>SetImage {
+	<span class="kw">pub </span>image: BmpIconCurMeta,
+}
+
+<span class="kw">unsafe impl </span>MsgSend <span class="kw">for </span>SetImage {
+	<span class="kw">type </span>RetType = SysResult&lt;BmpIconCurMeta&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		<span class="kw">if </span>v == <span class="number">0 </span>{
+			<span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS)
+		} <span class="kw">else </span>{
+			<span class="kw">match </span><span class="self">self</span>.image {
+				BmpIconCurMeta::Bmp(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Bmp(HBITMAP(v <span class="kw">as _</span>))),
+				BmpIconCurMeta::Icon(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Icon(HICON(v <span class="kw">as _</span>))),
+				BmpIconCurMeta::Cur(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Cur(HCURSOR(v <span class="kw">as _</span>))),
+				BmpIconCurMeta::Meta(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(BmpIconCurMeta::Meta(HDC(v <span class="kw">as _</span>))),
+			}
+		}
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::STM::SETIMAGE.into(),
+			wparam: <span class="kw">match </span><span class="self">self</span>.image {
+				BmpIconCurMeta::Bmp(<span class="kw">_</span>) =&gt; co::IMAGE_TYPE::BITMAP.<span class="number">0</span>,
+				BmpIconCurMeta::Icon(<span class="kw">_</span>) =&gt; co::IMAGE_TYPE::ICON.<span class="number">0</span>,
+				BmpIconCurMeta::Cur(<span class="kw">_</span>) =&gt; co::IMAGE_TYPE::CURSOR.<span class="number">0</span>,
+				BmpIconCurMeta::Meta(<span class="kw">_</span>) =&gt; co::IMAGE_TYPE::ENHMETAFILE.<span class="number">0</span>,
+			} <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.image.into(),
 		}
 	}
 }
