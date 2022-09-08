@@ -313,12 +313,6 @@
 <span id="313">313</span>
 <span id="314">314</span>
 <span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::DATETIMEPICKERINFO;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::GDT_ERROR;
@@ -326,7 +320,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, SIZE};
-<span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_err;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::{minus1_as_err, zero_as_err};
 
 <span class="macro">pub_struct_msg_empty! </span>{ CloseMonthCal: co::DTM::CLOSEMONTHCAL.into(); <span class="string">&quot;comctl&quot;</span>;
 	<span class="doccomment">/// [`DTM_CLOSEMONTHCAL`](https://docs.microsoft.com/en-us/windows/win32/controls/dtm-closemonthcal)
@@ -395,10 +389,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;COLORREF&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		<span class="kw">match </span>v {
-			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
-			rgb =&gt; <span class="prelude-val">Ok</span>(COLORREF(rgb <span class="kw">as _</span>)),
-		}
+		minus1_as_err(v).map(|v| COLORREF(v <span class="kw">as _</span>))
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -550,10 +541,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;COLORREF&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		<span class="kw">match </span>v {
-			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
-			rgb =&gt; <span class="prelude-val">Ok</span>(COLORREF(rgb <span class="kw">as _</span>)),
-		}
+		minus1_as_err(v).map(|v| COLORREF(v <span class="kw">as _</span>))
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
