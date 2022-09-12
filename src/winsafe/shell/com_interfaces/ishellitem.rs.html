@@ -181,15 +181,30 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use crate</span>::{co, shell};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IBindCtx};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
-<span class="kw">use </span><span class="kw">crate</span>::shell::decl::IBindCtx;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IShellItem`](crate::IShellItem) virtual table.
@@ -212,23 +227,6 @@
 	/// Automatically calls
 	/// [`IUnknown::Release`](https://docs.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 	/// when the object goes out of scope.
-	///
-	/// # Examples
-	///
-	/// Creating an object with
-	/// [`SHCreateItemFromParsingName`](crate::SHCreateItemFromParsingName):
-	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{IShellItem, SHCreateItemFromParsingName};
-	///
-	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
-	///     &quot;C:\\Temp\\test.txt&quot;,
-	///     None,
-	/// )?;
-	///
-	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
-	/// ```
 </span>}
 
 <span class="kw">impl </span>shell_IShellItem <span class="kw">for </span>IShellItem {}
@@ -243,6 +241,40 @@
 /// ```
 </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;shell&quot;</span>)))]
 </span><span class="kw">pub trait </span>shell_IShellItem: ole_IUnknown {
+	<span class="doccomment">/// [`SHCreateItemFromParsingName`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromparsingname)
+	/// static method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::IShellItem;
+	///
+	/// let shi = IShellItem::SHCreateItemFromParsingName(
+	///     &quot;C:\\Temp\\foo.txt&quot;,
+	///     None,
+	/// )?;
+	///
+	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attribute">#[must_use]
+	</span><span class="kw">fn </span>SHCreateItemFromParsingName(
+		file_or_folder_path: <span class="kw-2">&amp;</span>str,
+		bind_ctx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;) -&gt; HrResult&lt;IShellItem&gt;
+	{
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+			ok_to_hrresult(
+				shell::ffi::SHCreateItemFromParsingName(
+					WString::from_str(file_or_folder_path).as_ptr(),
+					bind_ctx.map_or(std::ptr::null_mut(), |i| i.ptr().<span class="number">0 </span><span class="kw">as _</span>),
+					<span class="kw-2">&amp;</span>IShellItem::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>ppv_queried <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				),
+			).map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
+		}
+	}
+
 	<span class="doccomment">/// [`IShellItem::BindToHandler`](https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-bindtohandler)
 	/// method.
 	///
@@ -307,10 +339,10 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, IShellItem, SHCreateItemFromParsingName};
+	/// use winsafe::{co, IShellItem};
 	///
-	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
-	///     &quot;C:\\Temp\\test.txt&quot;,
+	/// let shi = IShellItem::SHCreateItemFromParsingName(
+	///     &quot;C:\\Temp\\foo.txt&quot;,
 	///     None,
 	/// )?;
 	///
@@ -341,10 +373,10 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, IShellItem, SHCreateItemFromParsingName};
+	/// use winsafe::{co, IShellItem};
 	///
-	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
-	///     &quot;C:\\Temp\\test.txt&quot;,
+	/// let shi = IShellItem::SHCreateItemFromParsingName(
+	///     &quot;C:\\Temp\\foo.txt&quot;,
 	///     None,
 	/// )?;
 	///
