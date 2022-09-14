@@ -137,6 +137,28 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, ole};
@@ -227,6 +249,28 @@
 		| co::HRESULT::RPC_E_CHANGED_MODE =&gt; <span class="prelude-val">Ok</span>(code),
 		hr =&gt; <span class="prelude-val">Err</span>(hr),
 	}
+}
+
+<span class="doccomment">/// [`CoLockObjectExternal`](https://docs.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-colockobjectexternal)
+/// function.
+///
+/// **Note:** If you lock a COM pointer, `CoLockObjectExternal` must be called
+/// again to unlock it, or you&#39;ll have a resource leak.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
+</span><span class="kw">pub fn </span>CoLockObjectExternal(
+	obj: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown,
+	lock: bool,
+	last_unlock_releases: bool) -&gt; HrResult&lt;()&gt;
+{
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
+			ole::ffi::CoLockObjectExternal(
+				obj.ptr().<span class="number">0 </span><span class="kw">as _</span>,
+				lock <span class="kw">as _</span>,
+				last_unlock_releases <span class="kw">as _</span>,
+			)
+		},
+	)
 }
 
 <span class="doccomment">/// [`CoTaskMemAlloc`](https://docs.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemalloc)
