@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\utilities\w_string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>w_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\utilities\w_string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>w_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -389,7 +389,7 @@
 ///
 /// This is struct is mostly used internally by the library, as a bridge between
 /// Windows and Rust strings.
-</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>WString {
 	vec_u16: Vec&lt;u16&gt;,
@@ -415,7 +415,7 @@
 	///
 	/// If `s` is `None`, the internal buffer is not allocated – it simply calls
 	/// `WString::default`.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; WString {
 		<span class="kw">match </span>s {
 			<span class="prelude-val">Some</span>(s) =&gt; <span class="self">Self</span>::from_str(s),
@@ -427,7 +427,7 @@
 	/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).
 	///
 	/// The string will be stored with a terminating null.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; WString {
 		<span class="self">Self </span>{
 			vec_u16: s.encode_utf16()
@@ -444,7 +444,7 @@
 	///
 	/// This method is intended to pass multi-strings to native APIs, not to
 	/// retrieve them.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; WString {
 		<span class="kw">let </span>tot_chars = v.iter() <span class="comment">// number of chars of all strings, including terminating nulls
 			</span>.fold(<span class="number">0</span>, |tot, s| tot + s.as_ref().chars().count() + <span class="number">1</span>) <span class="comment">// including terminating null
@@ -466,7 +466,7 @@
 	/// number of existing chars, not counting a terminating null.
 	///
 	/// The string will be stored with a terminating null.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; WString {
 		<span class="kw">if </span>src.is_null() || num_chars == <span class="number">0 </span>{
 			<span class="self">Self</span>::default()
@@ -485,7 +485,7 @@
 	<span class="doccomment">/// Creates a new UTF-16 string by copying from a null-terminated buffer.
 	///
 	/// The string will be stored with a terminating null.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; WString {
 		<span class="kw">if </span>src.is_null() {
 			<span class="self">Self</span>::default()
@@ -498,14 +498,14 @@
 	<span class="doccomment">/// Creates a new UTF-16 string by copying from a slice.
 	///
 	/// The string will be stored with a terminating null.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; WString {
 		<span class="self">Self</span>::from_wchars_count(src.as_ptr(), src.len())
 	}
 
 	<span class="doccomment">/// Creates a new UTF-16 buffer allocated with an specific length. All
 	/// UTF-16 chars will be set to zero.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new_alloc_buf(num_chars: usize) -&gt; WString {
 		<span class="self">Self </span>{ vec_u16: <span class="macro">vec!</span>[<span class="number">0x0000</span>; num_chars] }
 	}
@@ -519,7 +519,7 @@
 	///
 	/// Panics if the buffer wasn&#39;t previously allocated. Be sure to alloc
 	/// enough room, otherwise a buffer overrun may occur.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub unsafe fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
 		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>)
@@ -536,7 +536,7 @@
 	/// **Note:** Returns a null pointer if the buffer wasn&#39;t previously
 	/// allocated. Make sure the `WString` object outlives the function call,
 	/// otherwise it will point to an invalid memory location.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub unsafe fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
 			std::ptr::null()
@@ -548,19 +548,19 @@
 	<span class="doccomment">/// Returns a slice to the internal
 	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) buffer. This
 	/// is useful to receive strings.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
 		<span class="self">self</span>.vec_u16.as_mut_slice()
 	}
 
 	<span class="doccomment">/// Returns a slice to the internal UTF-16 string buffer.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
 		<span class="self">self</span>.vec_u16.as_slice()
 	}
 
 	<span class="doccomment">/// Tells whether the internal bufer has not been allocated.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>buf_is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="self">self</span>.vec_u16.is_empty()
 	}
@@ -568,7 +568,7 @@
 	<span class="doccomment">/// Returns the size of the allocated internal buffer.
 	///
 	/// If the buffer was not allocated yet, returns zero.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>buf_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
 		<span class="self">self</span>.vec_u16.len()
 	}
@@ -635,7 +635,7 @@
 	/// Returns the number of
 	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) characters
 	/// stored in the internal buffer, not counting the terminating null.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>str_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
 		<span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}
 	}
@@ -650,7 +650,7 @@
 	///
 	/// If you&#39;re parsing raw data which may contain errors, prefer using
  	/// [`to_string_checked`](crate::WString::to_string_checked) instead.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
 		<span class="self">self</span>.to_string_checked().unwrap()
 	}
@@ -664,7 +664,7 @@
 	/// This method is useful if you&#39;re parsing raw data which may contain
 	/// invalid characters. If you&#39;re dealing with a string known to be valid,
 	/// [`to_string`](crate::WString::to_string) is more practical.
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>to_string_checked(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::string::FromUtf16Error&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
 			<span class="prelude-val">Ok</span>(String::default())
@@ -696,7 +696,7 @@
 	/// let str_contents = WString::parse(file_in.as_slice())?.to_string();
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="attribute">#[must_use]
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>parse(data: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;WString&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>data = data;
 		<span class="kw">if </span>data.is_empty() { <span class="comment">// nothing to parse
@@ -723,7 +723,7 @@
 		<span class="prelude-val">Ok</span>(wstr)
 	}
 
-	<span class="attribute">#[must_use]
+	<span class="attr">#[must_use]
 	</span><span class="kw">fn </span>parse_ansi(data: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u16&gt; {
 		<span class="kw">let </span>the_len = data.iter()
 			.position(|ch| <span class="kw-2">*</span>ch == <span class="number">0x00</span>) <span class="comment">// a terminating null means end of the string
@@ -735,7 +735,7 @@
 		</span>str16
 	}
 
-	<span class="attribute">#[must_use]
+	<span class="attr">#[must_use]
 	</span><span class="kw">fn </span>parse_utf16(data: <span class="kw-2">&amp;</span>[u8], is_big_endian: bool) -&gt; Vec&lt;u16&gt; {
 		<span class="kw">let </span>data = <span class="kw">if </span>data.len() % <span class="number">2 </span>== <span class="number">1 </span>{
 			<span class="kw-2">&amp;</span>data[..data.len() - <span class="number">1</span>] <span class="comment">// if odd number of bytes, discard last one
@@ -763,4 +763,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (1898c34e9 2022-10-26)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="winsafe" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (11ebe6512 2022-11-01)" ></div></body></html>
