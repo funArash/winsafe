@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\gdi\handles\hdc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hdc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-71d02aebf3a9cedb.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-c11f492748536797.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-a78f946771c40031.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-70b683d68cb31790.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\gdi\handles\hdc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hdc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-83be770da8fbb54b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-860cb8b69b437763.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-ca7398001115f6db.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-2916eb07452214a6.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c2d2a5dbaed13e6b.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -896,13 +896,22 @@
 <span id="896">896</span>
 <span id="897">897</span>
 <span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{BITMAPINFO, HFONT, HPEN, TEXTMETRIC};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::privs::{CLR_INVALID, GDI_ERROR, LF_FACESIZE};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, invalidate_handle};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	COLORREF, HBITMAP, HBRUSH, HDC, HRGN, POINT, RECT, SIZE,
@@ -922,13 +931,13 @@
 </span><span class="kw">pub trait </span>gdi_Hdc: Handle {
 	<span class="doccomment">/// [`AborthPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-abortpath)
 	/// method.
-	</span><span class="kw">fn </span>AbortPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>AbortPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::AbortPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`AngleArc`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-anglearc)
 	/// method.
-	</span><span class="kw">fn </span>AngleArc(<span class="self">self</span>,
+	</span><span class="kw">fn </span>AngleArc(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		center: POINT, radius: u32,
 		start_angle: f32, sweep_angle: f32) -&gt; SysResult&lt;()&gt;
 	{
@@ -945,7 +954,7 @@
 
 	<span class="doccomment">/// [`Arc`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arc)
 	/// method.
-	</span><span class="kw">fn </span>Arc(<span class="self">self</span>,
+	</span><span class="kw">fn </span>Arc(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
@@ -963,7 +972,7 @@
 
 	<span class="doccomment">/// [`ArcTo`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arcto)
 	/// method.
-	</span><span class="kw">fn </span>ArcTo(<span class="self">self</span>,
+	</span><span class="kw">fn </span>ArcTo(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
@@ -981,15 +990,15 @@
 
 	<span class="doccomment">/// [`BeginPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-beginpath)
 	/// method.
-	</span><span class="kw">fn </span>BeginPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>BeginPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::BeginPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`BitBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-bitblt)
 	/// method.
-	</span><span class="kw">fn </span>BitBlt(<span class="self">self</span>,
+	</span><span class="kw">fn </span>BitBlt(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		dest_pos: POINT, sz: SIZE,
-		hdc_src: HDC, src_src: POINT, rop: co::ROP) -&gt; SysResult&lt;()&gt;
+		hdc_src: <span class="kw-2">&amp;</span>HDC, src_src: POINT, rop: co::ROP) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1007,13 +1016,13 @@
 
 	<span class="doccomment">/// [`CancelDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-canceldc)
 	/// method.
-	</span><span class="kw">fn </span>CancelDC(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>CancelDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::CancelDC(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`Chord`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-chord)
 	/// method.
-	</span><span class="kw">fn </span>Chord(<span class="self">self</span>,
+	</span><span class="kw">fn </span>Chord(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		bounds: RECT, start_radial: POINT, end_radial: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
@@ -1030,7 +1039,7 @@
 
 	<span class="doccomment">/// [`CloseFigure`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-closefigure)
 	/// method.
-	</span><span class="kw">fn </span>CloseFigure(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>CloseFigure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::CloseFigure(<span class="self">self</span>.as_ptr()) })
 	}
 
@@ -1041,7 +1050,7 @@
 	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
 	/// call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateCompatibleBitmap(<span class="self">self</span>, cx: i32, cy: i32) -&gt; SysResult&lt;HBITMAP&gt; {
+	</span><span class="kw">fn </span>CreateCompatibleBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: i32, cy: i32) -&gt; SysResult&lt;HBITMAP&gt; {
 		<span class="kw">unsafe </span>{
 			gdi::ffi::CreateCompatibleBitmap(<span class="self">self</span>.as_ptr(), cx, cy).as_mut()
 		}.map(|ptr| HBITMAP(ptr))
@@ -1054,7 +1063,7 @@
 	/// **Note:** Must be paired with an
 	/// [`HDC::DeleteDC`](crate::prelude::gdi_Hdc::DeleteDC) call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateCompatibleDC(<span class="self">self</span>) -&gt; SysResult&lt;HDC&gt; {
+	</span><span class="kw">fn </span>CreateCompatibleDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HDC&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::CreateCompatibleDC(<span class="self">self</span>.as_ptr()).as_mut() }
 			.map(|ptr| HDC(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1062,13 +1071,19 @@
 
 	<span class="doccomment">/// [`DeleteDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deletedc)
 	/// method.
-	</span><span class="kw">fn </span>DeleteDC(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::DeleteDC(<span class="self">self</span>.as_ptr()) })
+	///
+	/// After calling this method, the handle will be invalidated and further
+	/// operations will fail with
+	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
+	</span><span class="kw">fn </span>DeleteDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span>ret = bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::DeleteDC(<span class="self">self</span>.as_ptr()) });
+		invalidate_handle(<span class="self">self</span>);
+		ret
 	}
 
 	<span class="doccomment">/// [`Ellipse`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ellipse)
 	/// method.
-	</span><span class="kw">fn </span>Ellipse(<span class="self">self</span>, bound: RECT) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>Ellipse(<span class="kw-2">&amp;</span><span class="self">self</span>, bound: RECT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::Ellipse(
@@ -1082,19 +1097,19 @@
 
 	<span class="doccomment">/// [`EndPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-endpath)
 	/// method.
-	</span><span class="kw">fn </span>EndPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>EndPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::EndPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`FillPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillpath)
 	/// method.
-	</span><span class="kw">fn </span>FillPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>FillPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::FillPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`FillRect`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-fillrect)
 	/// method.
-	</span><span class="kw">fn </span>FillRect(<span class="self">self</span>, rc: RECT, hbr: HBRUSH) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>FillRect(<span class="kw-2">&amp;</span><span class="self">self</span>, rc: RECT, hbr: <span class="kw-2">&amp;</span>HBRUSH) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">match unsafe </span>{
 			gdi::ffi::FillRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, hbr.<span class="number">0</span>)
 		} {
@@ -1105,7 +1120,7 @@
 
 	<span class="doccomment">/// [`FillRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-fillrgn)
 	/// method.
-	</span><span class="kw">fn </span>FillRgn(<span class="self">self</span>, rgn: HRGN, brush: HBRUSH) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>FillRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, rgn: <span class="kw-2">&amp;</span>HRGN, brush: <span class="kw-2">&amp;</span>HBRUSH) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::FillRgn(<span class="self">self</span>.as_ptr(), rgn.as_ptr(), brush.as_ptr())
@@ -1115,14 +1130,14 @@
 
 	<span class="doccomment">/// [`FlattenPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-flattenpath)
 	/// method.
-	</span><span class="kw">fn </span>FlattenPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>FlattenPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::FlattenPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`FrameRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-framergn)
 	/// method.
-	</span><span class="kw">fn </span>FrameRgn(<span class="self">self</span>,
-		rgn: HRGN, brush: HBRUSH, w: i32, h: i32) -&gt; SysResult&lt;()&gt;
+	</span><span class="kw">fn </span>FrameRgn(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		rgn: <span class="kw-2">&amp;</span>HRGN, brush: <span class="kw-2">&amp;</span>HBRUSH, w: i32, h: i32) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1139,7 +1154,7 @@
 	<span class="doccomment">/// [`GetBkMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getbkmode)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetBkMode(<span class="self">self</span>) -&gt; SysResult&lt;co::BKMODE&gt; {
+	</span><span class="kw">fn </span>GetBkMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::BKMODE&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetBkMode(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
@@ -1149,7 +1164,7 @@
 	<span class="doccomment">/// [`GetDCBrushColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcbrushcolor)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetDCBrushColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>GetDCBrushColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCBrushColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
@@ -1159,7 +1174,7 @@
 	<span class="doccomment">/// [`GetDCPenColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdcpencolor)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetDCPenColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>GetDCPenColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCPenColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
@@ -1185,10 +1200,10 @@
 	/// let hdc_screen = w::HWND::DESKTOP.GetDC()?;
 	/// let hbmp = hdc_screen.CreateCompatibleBitmap(cx_screen, cy_screen)?;
 	/// let hdc_mem = hdc_screen.CreateCompatibleDC()?;
-	/// let hbmp_old = hdc_mem.SelectObjectBitmap(hbmp)?;
+	/// let hbmp_old = hdc_mem.SelectObjectBitmap(&amp;hbmp)?;
 	///
 	/// hdc_mem.BitBlt(w::POINT::new(0, 0), w::SIZE::new(cx_screen, cy_screen),
-	///     hdc_screen, w::POINT::new(0, 0), co::ROP::SRCCOPY)?;
+	///     &amp;hdc_screen, w::POINT::new(0, 0), co::ROP::SRCCOPY)?;
 	///
 	/// let mut bmp_obj = w::BITMAP::default();
 	/// hbmp.GetObject(&amp;mut bmp_obj)?;
@@ -1205,7 +1220,7 @@
 	/// let mut data_buf = vec![0u8; bmp_size as _];
 	///
 	/// unsafe {
-	///     hdc_screen.GetDIBits(hbmp, 0, cy_screen as _,
+	///     hdc_screen.GetDIBits(&amp;hbmp, 0, cy_screen as _,
 	///         Some(&amp;mut data_buf), &amp;mut bi, co::DIB::RGB_COLORS)?;
 	/// }
 	///
@@ -1219,15 +1234,18 @@
 	/// fo.write(bi.bmiHeader.serialize())?;
 	/// fo.write(&amp;data_buf)?;
 	///
-	/// hdc_mem.SelectObjectBitmap(hbmp_old)?;
+	/// hdc_mem.SelectObjectBitmap(&amp;hbmp_old)?;
 	/// hdc_mem.DeleteDC()?;
 	/// hbmp.DeleteObject()?;
-	/// w::HWND::DESKTOP.ReleaseDC(hdc_screen)?;
+	/// w::HWND::DESKTOP.ReleaseDC(&amp;hdc_screen)?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">unsafe fn </span>GetDIBits(<span class="self">self</span>,
-		hbm: HBITMAP, firstScanLine: u32, numScanLines: u32,
-		bmpDataBuf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt;, bmi: <span class="kw-2">&amp;mut </span>BITMAPINFO,
+	</span><span class="kw">unsafe fn </span>GetDIBits(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		hbm: <span class="kw-2">&amp;</span>HBITMAP,
+		firstScanLine: u32,
+		numScanLines: u32,
+		bmpDataBuf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt;,
+		bmi: <span class="kw-2">&amp;mut </span>BITMAPINFO,
 		usage: co::DIB) -&gt; SysResult&lt;i32&gt;
 	{
 		<span class="kw">let </span>ret = gdi::ffi::GetDIBits(
@@ -1251,14 +1269,14 @@
 	<span class="doccomment">/// [`GetDeviceCaps`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getdevicecaps)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetDeviceCaps(<span class="self">self</span>, index: co::GDC) -&gt; i32 {
+	</span><span class="kw">fn </span>GetDeviceCaps(<span class="kw-2">&amp;</span><span class="self">self</span>, index: co::GDC) -&gt; i32 {
 		<span class="kw">unsafe </span>{ gdi::ffi::GetDeviceCaps(<span class="self">self</span>.as_ptr(), index.<span class="number">0</span>) }
 	}
 
 	<span class="doccomment">/// [`GetStretchBltMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstretchbltmode)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetStretchBltMode(<span class="self">self</span>) -&gt; SysResult&lt;co::STRETCH_MODE&gt; {
+	</span><span class="kw">fn </span>GetStretchBltMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::STRETCH_MODE&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetStretchBltMode(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			sm =&gt; <span class="prelude-val">Ok</span>(co::STRETCH_MODE(sm)),
@@ -1268,7 +1286,7 @@
 	<span class="doccomment">/// [`GetTextColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextcolor)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetTextColor(<span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>GetTextColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetTextColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
@@ -1278,7 +1296,7 @@
 	<span class="doccomment">/// [`GetTextExtentPoint32`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextextentpoint32w)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetTextExtentPoint32(<span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;SIZE&gt; {
+	</span><span class="kw">fn </span>GetTextExtentPoint32(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;SIZE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1295,7 +1313,7 @@
 	<span class="doccomment">/// [`GetTextFace`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextfacew)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetTextFace(<span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
+	</span><span class="kw">fn </span>GetTextFace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(LF_FACESIZE + <span class="number">1</span>);
 		<span class="kw">match unsafe </span>{
 			gdi::ffi::GetTextFaceW(
@@ -1311,7 +1329,7 @@
 
 	<span class="doccomment">/// [`GetTextMetrics`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-gettextmetricsw)
 	/// method.
-	</span><span class="kw">fn </span>GetTextMetrics(<span class="self">self</span>, tm: <span class="kw-2">&amp;mut </span>TEXTMETRIC) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>GetTextMetrics(<span class="kw-2">&amp;</span><span class="self">self</span>, tm: <span class="kw-2">&amp;mut </span>TEXTMETRIC) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::GetTextMetricsW(<span class="self">self</span>.as_ptr(), tm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
@@ -1320,7 +1338,7 @@
 	<span class="doccomment">/// [`GetViewportExtEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportextex)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetViewportExtEx(<span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
+	</span><span class="kw">fn </span>GetViewportExtEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1332,7 +1350,7 @@
 	<span class="doccomment">/// [`GetViewportOrgEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getviewportorgex)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetViewportOrgEx(<span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
+	</span><span class="kw">fn </span>GetViewportOrgEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1344,7 +1362,7 @@
 	<span class="doccomment">/// [`GetWindowExtEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindowextex)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetWindowExtEx(<span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
+	</span><span class="kw">fn </span>GetWindowExtEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;SIZE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1356,7 +1374,7 @@
 	<span class="doccomment">/// [`GetWindowOrgEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getwindoworgex)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetWindowOrgEx(<span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
+	</span><span class="kw">fn </span>GetWindowOrgEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;POINT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1367,13 +1385,13 @@
 
 	<span class="doccomment">/// [`LineTo`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-lineto)
 	/// method.
-	</span><span class="kw">fn </span>LineTo(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>LineTo(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::LineTo(<span class="self">self</span>.as_ptr(), x, y) })
 	}
 
 	<span class="doccomment">/// [`MoveToEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-movetoex)
 	/// method.
-	</span><span class="kw">fn </span>MoveToEx(<span class="self">self</span>, x: i32, y: i32, pt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>POINT&gt;) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>MoveToEx(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32, pt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>POINT&gt;) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::MoveToEx(
@@ -1387,7 +1405,7 @@
 
 	<span class="doccomment">/// [`PatBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-patblt)
 	/// method.
-	</span><span class="kw">fn </span>PatBlt(<span class="self">self</span>, top_left: POINT, sz: SIZE, rop: co::ROP) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>PatBlt(<span class="kw-2">&amp;</span><span class="self">self</span>, top_left: POINT, sz: SIZE, rop: co::ROP) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::PatBlt(
@@ -1403,7 +1421,7 @@
 	/// **Note:** Must be paired with an
 	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>PathToRegion(<span class="self">self</span>) -&gt; SysResult&lt;HRGN&gt; {
+	</span><span class="kw">fn </span>PathToRegion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HRGN&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::PathToRegion(<span class="self">self</span>.as_ptr()).as_mut() }
 			.map(|ptr| HRGN(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1411,7 +1429,7 @@
 
 	<span class="doccomment">/// [`Pie`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pie)
 	/// method.
-	</span><span class="kw">fn </span>Pie(<span class="self">self</span>,
+	</span><span class="kw">fn </span>Pie(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		bounds: RECT, radial_1: POINT, radial_2: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
@@ -1428,7 +1446,7 @@
 
 	<span class="doccomment">/// [`PolyBezier`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezier)
 	/// method.
-	</span><span class="kw">fn </span>PolyBezier(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>PolyBezier(<span class="kw-2">&amp;</span><span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::PolyBezier(
@@ -1440,7 +1458,7 @@
 
 	<span class="doccomment">/// [`PolyBezierTo`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polybezierto)
 	/// method.
-	</span><span class="kw">fn </span>PolyBezierTo(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>PolyBezierTo(<span class="kw-2">&amp;</span><span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::PolyBezierTo(
@@ -1452,7 +1470,7 @@
 
 	<span class="doccomment">/// [`Polyline`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polyline)
 	/// method.
-	</span><span class="kw">fn </span>Polyline(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>Polyline(<span class="kw-2">&amp;</span><span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::Polyline(<span class="self">self</span>.as_ptr(), pts.as_ptr() <span class="kw">as _</span>, pts.len() <span class="kw">as _</span>)
@@ -1462,7 +1480,7 @@
 
 	<span class="doccomment">/// [`PolylineTo`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-polylineto)
 	/// method.
-	</span><span class="kw">fn </span>PolylineTo(<span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>PolylineTo(<span class="kw-2">&amp;</span><span class="self">self</span>, pts: <span class="kw-2">&amp;</span>[POINT]) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::PolylineTo(
@@ -1475,7 +1493,7 @@
 	<span class="doccomment">/// [`PtVisible`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-ptvisible)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>PtVisible(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;bool&gt; {
+	</span><span class="kw">fn </span>PtVisible(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::PtVisible(<span class="self">self</span>.as_ptr(), x, y) } {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
@@ -1485,7 +1503,7 @@
 
 	<span class="doccomment">/// [`RealizePalette`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-realizepalette)
 	/// method.
-	</span><span class="kw">fn </span>RealizePalette(<span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
+	</span><span class="kw">fn </span>RealizePalette(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::RealizePalette(<span class="self">self</span>.as_ptr()) } {
 			GDI_ERROR =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			num =&gt; <span class="prelude-val">Ok</span>(num),
@@ -1494,7 +1512,7 @@
 
 	<span class="doccomment">/// [`Rectangle`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-rectangle)
 	/// method.
-	</span><span class="kw">fn </span>Rectangle(<span class="self">self</span>, bounds: RECT) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>Rectangle(<span class="kw-2">&amp;</span><span class="self">self</span>, bounds: RECT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::Rectangle(<span class="self">self</span>.as_ptr(),
@@ -1505,13 +1523,13 @@
 
 	<span class="doccomment">/// [`RestoreDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-restoredc)
 	/// method.
-	</span><span class="kw">fn </span>RestoreDC(<span class="self">self</span>, saved_dc: i32) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>RestoreDC(<span class="kw-2">&amp;</span><span class="self">self</span>, saved_dc: i32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::RestoreDC(<span class="self">self</span>.as_ptr(), saved_dc) })
 	}
 
 	<span class="doccomment">/// [`RoundRect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-roundrect)
 	/// method.
-	</span><span class="kw">fn </span>RoundRect(<span class="self">self</span>, bounds: RECT, sz: SIZE) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>RoundRect(<span class="kw-2">&amp;</span><span class="self">self</span>, bounds: RECT, sz: SIZE) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::RoundRect(
@@ -1525,7 +1543,7 @@
 
 	<span class="doccomment">/// [`SaveDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-savedc)
 	/// method.
-	</span><span class="kw">fn </span>SaveDC(<span class="self">self</span>) -&gt; SysResult&lt;i32&gt; {
+	</span><span class="kw">fn </span>SaveDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;i32&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SaveDC(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			v =&gt; <span class="prelude-val">Ok</span>(v),
@@ -1534,7 +1552,7 @@
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
 	/// method for [`HBITMAP`](crate::HBITMAP).
-	</span><span class="kw">fn </span>SelectObjectBitmap(<span class="self">self</span>, hbmp: HBITMAP) -&gt; SysResult&lt;HBITMAP&gt; {
+	</span><span class="kw">fn </span>SelectObjectBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>, hbmp: <span class="kw-2">&amp;</span>HBITMAP) -&gt; SysResult&lt;HBITMAP&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbmp.<span class="number">0</span>).as_mut() }
 			.map(|ptr| HBITMAP(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1542,7 +1560,7 @@
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
 	/// method for [`HBRUSH`](crate::HBRUSH).
-	</span><span class="kw">fn </span>SelectObjectBrush(<span class="self">self</span>, hbr: HBRUSH) -&gt; SysResult&lt;HBRUSH&gt; {
+	</span><span class="kw">fn </span>SelectObjectBrush(<span class="kw-2">&amp;</span><span class="self">self</span>, hbr: <span class="kw-2">&amp;</span>HBRUSH) -&gt; SysResult&lt;HBRUSH&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbr.<span class="number">0</span>).as_mut() }
 			.map(|ptr| HBRUSH(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1550,7 +1568,7 @@
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
 	/// method for [`HFONT`](crate::HFONT).
-	</span><span class="kw">fn </span>SelectObjectFont(<span class="self">self</span>, hfont: HFONT) -&gt; SysResult&lt;HFONT&gt; {
+	</span><span class="kw">fn </span>SelectObjectFont(<span class="kw-2">&amp;</span><span class="self">self</span>, hfont: <span class="kw-2">&amp;</span>HFONT) -&gt; SysResult&lt;HFONT&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hfont.<span class="number">0</span>).as_mut() }
 			.map(|ptr| HFONT(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1558,7 +1576,7 @@
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
 	/// method for [`HPEN`](crate::HPEN).
-	</span><span class="kw">fn </span>SelectObjectPen(<span class="self">self</span>, hpen: HPEN) -&gt; SysResult&lt;HPEN&gt; {
+	</span><span class="kw">fn </span>SelectObjectPen(<span class="kw-2">&amp;</span><span class="self">self</span>, hpen: <span class="kw-2">&amp;</span>HPEN) -&gt; SysResult&lt;HPEN&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hpen.<span class="number">0</span>).as_mut() }
 			.map(|ptr| HPEN(ptr))
 			.ok_or_else(|| GetLastError())
@@ -1566,7 +1584,7 @@
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
 	/// method for [`HRGN`](crate::HRGN).
-	</span><span class="kw">fn </span>SelectObjectRgn(<span class="self">self</span>, hrgn: HRGN) -&gt; SysResult&lt;co::REGION&gt; {
+	</span><span class="kw">fn </span>SelectObjectRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN) -&gt; SysResult&lt;co::REGION&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hrgn.<span class="number">0</span>).as_mut() }
 			.map(|ptr| co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
 			.ok_or_else(|| GetLastError())
@@ -1574,7 +1592,7 @@
 
 	<span class="doccomment">/// [`SetArcDirection`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setarcdirection)
 	/// method.
-	</span><span class="kw">fn </span>SetArcDirection(<span class="self">self</span>, dir: co::AD) -&gt; SysResult&lt;co::AD&gt; {
+	</span><span class="kw">fn </span>SetArcDirection(<span class="kw-2">&amp;</span><span class="self">self</span>, dir: co::AD) -&gt; SysResult&lt;co::AD&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetArcDirection(<span class="self">self</span>.as_ptr(), dir.<span class="number">0</span>) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			v =&gt; <span class="prelude-val">Ok</span>(co::AD(v)),
@@ -1583,7 +1601,7 @@
 
 	<span class="doccomment">/// [`SetBkColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkcolor)
 	/// method.
-	</span><span class="kw">fn </span>SetBkColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>SetBkColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
@@ -1592,7 +1610,7 @@
 
 	<span class="doccomment">/// [`SetBkMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkmode)
 	/// method.
-	</span><span class="kw">fn </span>SetBkMode(<span class="self">self</span>, mode: co::BKMODE) -&gt; SysResult&lt;co::BKMODE&gt; {
+	</span><span class="kw">fn </span>SetBkMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::BKMODE) -&gt; SysResult&lt;co::BKMODE&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
@@ -1601,7 +1619,7 @@
 
 	<span class="doccomment">/// [`SetBrushOrgEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbrushorgex)
 	/// method.
-	</span><span class="kw">fn </span>SetBrushOrgEx(<span class="self">self</span>, new_origin: POINT) -&gt; SysResult&lt;POINT&gt; {
+	</span><span class="kw">fn </span>SetBrushOrgEx(<span class="kw-2">&amp;</span><span class="self">self</span>, new_origin: POINT) -&gt; SysResult&lt;POINT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>old_origin = POINT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1616,7 +1634,7 @@
 
 	<span class="doccomment">/// [`SetDCBrushColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcbrushcolor)
 	/// method.
-	</span><span class="kw">fn </span>SetDCBrushColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>SetDCBrushColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCBrushColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
@@ -1625,7 +1643,7 @@
 
 	<span class="doccomment">/// [`SetDCPenColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcpencolor)
 	/// method.
-	</span><span class="kw">fn </span>SetDCPenColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>SetDCPenColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCPenColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
@@ -1634,7 +1652,7 @@
 
 	<span class="doccomment">/// [`SetGraphicsMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setgraphicsmode)
 	/// method.
-	</span><span class="kw">fn </span>SetGraphicsMode(<span class="self">self</span>, mode: co::GM) -&gt; SysResult&lt;co::GM&gt; {
+	</span><span class="kw">fn </span>SetGraphicsMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::GM) -&gt; SysResult&lt;co::GM&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetGraphicsMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			v =&gt; <span class="prelude-val">Ok</span>(co::GM(v))
@@ -1643,7 +1661,7 @@
 
 	<span class="doccomment">/// [`SetStretchBltMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setstretchbltmode)
 	/// method.
-	</span><span class="kw">fn </span>SetStretchBltMode(<span class="self">self</span>,
+	</span><span class="kw">fn </span>SetStretchBltMode(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		mode: co::STRETCH_MODE) -&gt; SysResult&lt;co::STRETCH_MODE&gt;
 	{
 		<span class="kw">match </span>co::ERROR(
@@ -1656,7 +1674,7 @@
 
 	<span class="doccomment">/// [`SetTextAlign`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextalign)
 	/// method.
-	</span><span class="kw">fn </span>SetTextAlign(<span class="self">self</span>, align: co::TA) -&gt; SysResult&lt;co::TA&gt; {
+	</span><span class="kw">fn </span>SetTextAlign(<span class="kw-2">&amp;</span><span class="self">self</span>, align: co::TA) -&gt; SysResult&lt;co::TA&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextAlign(<span class="self">self</span>.as_ptr(), align.<span class="number">0</span>) } {
 			GDI_ERROR =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			ta =&gt; <span class="prelude-val">Ok</span>(co::TA(ta)),
@@ -1665,7 +1683,7 @@
 
 	<span class="doccomment">/// [`SetTextColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextcolor)
 	/// method.
-	</span><span class="kw">fn </span>SetTextColor(<span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
+	</span><span class="kw">fn </span>SetTextColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
@@ -1674,7 +1692,7 @@
 
 	<span class="doccomment">/// [`SetTextJustification`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextjustification)
 	/// method.
-	</span><span class="kw">fn </span>SetTextJustification(<span class="self">self</span>, extra: i32, count: i32) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>SetTextJustification(<span class="kw-2">&amp;</span><span class="self">self</span>, extra: i32, count: i32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::SetTextJustification(<span class="self">self</span>.as_ptr(), extra, count) },
 		)
@@ -1682,7 +1700,7 @@
 
 	<span class="doccomment">/// [`SetViewportExtEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportextex)
 	/// method.
-	</span><span class="kw">fn </span>SetViewportExtEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
+	</span><span class="kw">fn </span>SetViewportExtEx(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1695,7 +1713,7 @@
 
 	<span class="doccomment">/// [`SetViewportOrgEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setviewportorgex)
 	/// method.
-	</span><span class="kw">fn </span>SetViewportOrgEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
+	</span><span class="kw">fn </span>SetViewportOrgEx(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1708,7 +1726,7 @@
 
 	<span class="doccomment">/// [`SetWindowExtEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindowextex)
 	/// method.
-	</span><span class="kw">fn </span>SetWindowExtEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
+	</span><span class="kw">fn </span>SetWindowExtEx(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;SIZE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1721,7 +1739,7 @@
 
 	<span class="doccomment">/// [`SetWindowOrgEx`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setwindoworgex)
 	/// method.
-	</span><span class="kw">fn </span>SetWindowOrgEx(<span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
+	</span><span class="kw">fn </span>SetWindowOrgEx(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;POINT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1734,9 +1752,9 @@
 
 	<span class="doccomment">/// [`StretchBlt`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-stretchblt)
 	/// method.
-	</span><span class="kw">fn </span>StretchBlt(<span class="self">self</span>,
+	</span><span class="kw">fn </span>StretchBlt(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		pos_dest: POINT, sz_dest: SIZE,
-		hdc_src: HDC,
+		hdc_src: <span class="kw-2">&amp;</span>HDC,
 		pt_src: POINT, sz_src: SIZE,
 		rop: co::ROP) -&gt; SysResult&lt;()&gt;
 	{
@@ -1757,19 +1775,19 @@
 
 	<span class="doccomment">/// [`StrokeAndFillPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokeandfillpath)
 	/// method.
-	</span><span class="kw">fn </span>StrokeAndFillPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>StrokeAndFillPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::StrokeAndFillPath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`StrokePath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-strokepath)
 	/// method.
-	</span><span class="kw">fn </span>StrokePath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>StrokePath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::StrokePath(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`TextOut`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-textoutw)
 	/// method.
-	</span><span class="kw">fn </span>TextOut(<span class="self">self</span>, x: i32, y: i32, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>TextOut(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::TextOutW(
@@ -1784,15 +1802,15 @@
 
 	<span class="doccomment">/// [`UpdateColors`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-updatecolors)
 	/// method.
-	</span><span class="kw">fn </span>UpdateColors(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>UpdateColors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::UpdateColors(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`WidenPath`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-widenpath)
 	/// method.
-	</span><span class="kw">fn </span>WidenPath(<span class="self">self</span>) -&gt; SysResult&lt;()&gt;  {
+	</span><span class="kw">fn </span>WidenPath(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt;  {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ gdi::ffi::WidenPath(<span class="self">self</span>.as_ptr()) })
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e75aab045 2022-11-09)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (6284998a2 2022-11-12)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

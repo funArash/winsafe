@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\advapi\handles\hkey.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-71d02aebf3a9cedb.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-c11f492748536797.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-a78f946771c40031.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-70b683d68cb31790.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-0dede64717b247ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-201a7e04dc4c6fce.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\advapi\handles\hkey.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-83be770da8fbb54b.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-860cb8b69b437763.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-ca7398001115f6db.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-2916eb07452214a6.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-74087aa2e88f4475.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-c2d2a5dbaed13e6b.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -627,13 +627,30 @@
 <span id="627">627</span>
 <span id="628">628</span>
 <span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span>std::marker::PhantomData;
-
-<span class="kw">use crate</span>::{advapi, co};
+</span><span class="kw">use crate</span>::{advapi, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::invalidate_handle;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HKEY: <span class="string">&quot;advapi&quot;</span>;
@@ -678,11 +695,17 @@
 
 	<span class="doccomment">/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
 	/// method.
-	</span><span class="kw">fn </span>RegCloseKey(<span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(<span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}) {
+	///
+	/// After calling this method, the handle will be invalidated and further
+	/// operations will fail with
+	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
+	</span><span class="kw">fn </span>RegCloseKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span>ret = <span class="kw">match </span>co::ERROR(<span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}) {
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
 			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+		};
+		invalidate_handle(<span class="self">self</span>);
+		ret
 	}
 
 	<span class="doccomment">/// Returns an iterator over the names of the keys, which calls
@@ -710,8 +733,8 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegEnumKeyEx&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
-		<span class="prelude-val">Ok</span>(Box::new(EnumKeyIter::new(HKEY(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
+	</span><span class="kw">fn </span>RegEnumKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt; {
+		<span class="prelude-val">Ok</span>(Box::new(EnumKeyIter::new(<span class="self">self</span>)<span class="question-mark">?</span>))
 	}
 
 	<span class="doccomment">/// Returns an iterator of the names and types of the values, which calls
@@ -736,15 +759,16 @@
 	/// }
 	///
 	/// // Collecting into a Vec
-	/// let values_and_types = hkey.RegEnumValue()?
-	///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+	/// let values_and_types: Vec&lt;(String, co::REG)&gt; =
+	///     hkey.RegEnumValue()?
+	///         .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 	///
 	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegEnumValue&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;a</span>&gt;&gt; {
-		<span class="prelude-val">Ok</span>(Box::new(EnumValueIter::new(HKEY(<span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() }))<span class="question-mark">?</span>))
+	</span><span class="kw">fn </span>RegEnumValue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt; {
+		<span class="prelude-val">Ok</span>(Box::new(EnumValueIter::new(<span class="self">self</span>)<span class="question-mark">?</span>))
 	}
 
 	<span class="doccomment">/// [`RegGetValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew)
@@ -780,7 +804,7 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegGetValue(<span class="self">self</span>,
+	</span><span class="kw">fn </span>RegGetValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, value: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt;
 	{
 		<span class="kw">let </span>sub_key_w = WString::from_opt_str(sub_key);
@@ -866,7 +890,7 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str,
+	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str,
 		options: co::REG_OPTION, access_rights: co::KEY) -&gt; SysResult&lt;HKEY&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hKey = HKEY::NULL;
@@ -888,7 +912,7 @@
 
 	<span class="doccomment">/// [`RegQueryInfoKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryinfokeyw)
 	/// method.
-	</span><span class="kw">fn </span>RegQueryInfoKey(<span class="self">self</span>,
+	</span><span class="kw">fn </span>RegQueryInfoKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="kw-2">mut </span>class: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>WString&gt;,
 		num_sub_keys: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
 		max_sub_key_name_len: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
@@ -991,7 +1015,7 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegQueryValueEx(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
+	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
 		<span class="kw">let </span>value_w = WString::from_str(value);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len = u32::default();
@@ -1069,7 +1093,7 @@
 	/// )?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>RegSetKeyValue(<span class="self">self</span>,
+	</span><span class="kw">fn </span>RegSetKeyValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">match </span>co::ERROR(
@@ -1115,7 +1139,7 @@
 	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>RegSetValueEx(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>RegSetValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegSetValueExW(
@@ -1134,15 +1158,20 @@
 	}
 }
 
-<span class="kw">struct </span>EnumKeyIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	hkey: HKEY,
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="kw">struct </span>EnumKeyIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
+	hkey: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
 	count: u32,
 	current: u32,
 	name_buffer: WString,
-	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>EnumKeyIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Iterator <span class="kw">for </span>EnumKeyIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
 	<span class="kw">type </span>Item = SysResult&lt;String&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -1154,7 +1183,7 @@
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegEnumKeyExW(
-					<span class="self">self</span>.hkey.<span class="number">0</span>,
+					<span class="self">self</span>.hkey.as_ptr(),
 					<span class="self">self</span>.current,
 					<span class="self">self</span>.name_buffer.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>len_buffer,
@@ -1177,8 +1206,10 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumKeyIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(hkey: HKEY) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; EnumKeyIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
+	<span class="kw">fn </span>new(hkey: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>num_keys = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>max_key_name_len = u32::default();
 		hkey.RegQueryInfoKey(
@@ -1190,20 +1221,24 @@
 			count: num_keys,
 			current: <span class="number">0</span>,
 			name_buffer: WString::new_alloc_buf(max_key_name_len <span class="kw">as </span>usize + <span class="number">1</span>),
-			_owner: PhantomData,
 		})
 	}
 }
 
-<span class="kw">struct </span>EnumValueIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	hkey: HKEY,
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="kw">struct </span>EnumValueIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
+	hkey: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
 	count: u32,
 	current: u32,
 	name_buffer: WString,
-	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>EnumValueIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Iterator <span class="kw">for </span>EnumValueIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
 	<span class="kw">type </span>Item = SysResult&lt;(String, co::REG)&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -1216,7 +1251,7 @@
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegEnumValueW(
-					<span class="self">self</span>.hkey.<span class="number">0</span>,
+					<span class="self">self</span>.hkey.as_ptr(),
 					<span class="self">self</span>.current,
 					<span class="self">self</span>.name_buffer.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>len_buffer,
@@ -1239,8 +1274,10 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumValueIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(hkey: HKEY) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; EnumValueIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: advapi_Hkey,
+{
+	<span class="kw">fn </span>new(hkey: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>num_vals = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>max_val_name_len = u32::default();
 		hkey.RegQueryInfoKey(
@@ -1252,9 +1289,8 @@
 			count: num_vals,
 			current: <span class="number">0</span>,
 			name_buffer: WString::new_alloc_buf(max_val_name_len <span class="kw">as </span>usize + <span class="number">1</span>),
-			_owner: PhantomData,
 		})
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (e75aab045 2022-11-09)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-3a0b9947ba1bd99a.js" data-settings-css="settings-a66f7524084a489a.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (6284998a2 2022-11-12)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
