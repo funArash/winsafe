@@ -629,28 +629,11 @@
 <span id="629">629</span>
 <span id="630">630</span>
 <span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::invalidate_handle;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HKEY: <span class="string">&quot;advapi&quot;</span>;
@@ -661,9 +644,22 @@
 	/// [predefined registry keys](https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys),
 	/// like `HKEY::CURRENT_USER`, which are always open and ready to be used.
 	/// Usually, they are the starting point to open a registry key.
+	///
+	/// Automatically calls
+	/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
+	/// when the object goes out of scope.
 </span>}
 
 <span class="kw">impl </span>advapi_Hkey <span class="kw">for </span>HKEY {}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>HKEY {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">let </span>raw_val = <span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() } <span class="kw">as </span>usize;
+		<span class="kw">if </span>raw_val &lt; <span class="number">0x8000_0000 </span>|| raw_val &gt; <span class="number">0x8000_0060 </span>{ <span class="comment">// guard predefined keys
+			</span><span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(<span class="self">self</span>.as_ptr()); } <span class="comment">// ignore errors
+		</span>}
+	}
+}
 
 <span class="macro">macro_rules! </span>predef_key {
 	(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$val</span>:expr) =&gt; {
@@ -687,26 +683,11 @@
 	<span class="macro">predef_key!</span>(LOCAL_MACHINE, <span class="number">0x8000_0002</span>);
 	<span class="macro">predef_key!</span>(USERS, <span class="number">0x8000_0003</span>);
 	<span class="macro">predef_key!</span>(PERFORMANCE_DATA, <span class="number">0x8000_0004</span>);
-	<span class="macro">predef_key!</span>(PERFORMANCE_TEXT, <span class="number">0x8000_0050</span>);
-	<span class="macro">predef_key!</span>(PERFORMANCE_NLSTEXT, <span class="number">0x8000_0060</span>);
 	<span class="macro">predef_key!</span>(CURRENT_CONFIG, <span class="number">0x8000_0005</span>);
 	<span class="macro">predef_key!</span>(DYN_DATA, <span class="number">0x8000_0006</span>);
 	<span class="macro">predef_key!</span>(CURRENT_USER_LOCAL_SETTINGS, <span class="number">0x8000_0007</span>);
-
-	<span class="doccomment">/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
-	/// method.
-	///
-	/// After calling this method, the handle will be invalidated and further
-	/// operations will fail with
-	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
-	</span><span class="kw">fn </span>RegCloseKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>ret = <span class="kw">match </span>co::ERROR(<span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		};
-		invalidate_handle(<span class="self">self</span>);
-		ret
-	}
+	<span class="macro">predef_key!</span>(PERFORMANCE_TEXT, <span class="number">0x8000_0050</span>);
+	<span class="macro">predef_key!</span>(PERFORMANCE_NLSTEXT, <span class="number">0x8000_0060</span>);
 
 	<span class="doccomment">/// Returns an iterator over the names of the keys, which calls
 	/// [`RegEnumKeyEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenumkeyexw)
@@ -728,8 +709,6 @@
 	///     let key_name = key_name?;
 	///     println!(&quot;{}&quot;, key_name);
 	/// }
-	///
-	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -762,8 +741,6 @@
 	/// let values_and_types: Vec&lt;(String, co::REG)&gt; =
 	///     hkey.RegEnumValue()?
 	///         .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
-	///
-	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -871,9 +848,6 @@
 	<span class="doccomment">/// [`RegOpenKeyEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexw)
 	/// method.
 	///
-	/// **Note:** Must be paired with an
-	/// [`HKEY::RegCloseKey`](crate::prelude::advapi_Hkey::RegCloseKey) call.
-	///
 	/// # Examples
 	///
 	/// ```rust,no_run
@@ -885,8 +859,6 @@
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
-	///
-	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -1010,8 +982,6 @@
 	///     },
 	///     RegistryValue::None =&gt; println!(&quot;No value&quot;),
 	/// }
-	///
-	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -1135,8 +1105,6 @@
 	///     &quot;Color&quot;,
 	///     RegistryValue::Sz(WString::from_str(&quot;blue&quot;)),
 	/// )?;
-	///
-	/// hkey.RegCloseKey()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt; {
