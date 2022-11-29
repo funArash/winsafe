@@ -135,14 +135,10 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HFILE, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{HandleClose, kernel_Hfile};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::kernel_Hfile;
 
 <span class="doccomment">/// Access types for [`File::open`](crate::File::open) and
 /// [`FileMapped::open`](crate::FileMapped::open).
@@ -172,13 +168,7 @@
 /// [`FileMapped`](crate::FileMapped), which tends to be faster.
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
 </span><span class="kw">pub struct </span>File {
-	hfile: HFILE,
-}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>File {
-	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="self">self</span>.hfile.CloseHandle().ok(); <span class="comment">// ignore errors
-	</span>}
+	hfile: HandleGuard&lt;HFILE&gt;,
 }
 
 <span class="kw">impl </span>File {
@@ -220,7 +210,7 @@
 	<span class="doccomment">/// Returns the underlying file handle.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>hfile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HFILE {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.hfile
+		<span class="kw-2">&amp;</span><span class="self">self</span>.hfile.handle
 	}
 
 	<span class="doccomment">/// Returns the current offset of the internal pointer.

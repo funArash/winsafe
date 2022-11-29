@@ -45,15 +45,12 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HFILEMAPVIEW, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HfilemapviewGuard;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle};
 
 <span class="macro">impl_handle! </span>{ HFILEMAP: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
@@ -64,7 +61,6 @@
 	/// [`FileMapped`](crate::FileMapped) high-level abstraction.
 </span>}
 
-<span class="kw">impl </span>HandleClose <span class="kw">for </span>HFILEMAP {}
 <span class="kw">impl </span>kernel_Hfilemap <span class="kw">for </span>HFILEMAP {}
 
 <span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
@@ -79,15 +75,11 @@
 </span><span class="kw">pub trait </span>kernel_Hfilemap: Handle {
 	<span class="doccomment">/// [`MapViewOfFile`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-mapviewoffile)
 	/// method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HFILEMAPVIEW::UnmapViewOfFile`](crate::prelude::kernel_Hfilemapview::UnmapViewOfFile)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>MapViewOfFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		desired_access: co::FILE_MAP,
 		offset: u64,
-		number_of_bytes_to_map: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; SysResult&lt;HFILEMAPVIEW&gt;
+		number_of_bytes_to_map: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; SysResult&lt;HfilemapviewGuard&gt;
 	{
 		<span class="kw">unsafe </span>{
 			kernel::ffi::MapViewOfFileFromApp(
@@ -96,7 +88,7 @@
 				offset,
 				number_of_bytes_to_map.unwrap_or_default(),
 			).as_mut()
-		}.map(|ptr| HFILEMAPVIEW(ptr))
+		}.map(|ptr| HfilemapviewGuard { handle: HFILEMAPVIEW(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 }

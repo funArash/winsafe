@@ -106,28 +106,11 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, GMEM_INVALID_HANDLE, invalidate_handle,
-};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, GMEM_INVALID_HANDLE};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HGLOBAL: <span class="string">&quot;kernel&quot;</span>;
@@ -150,14 +133,12 @@
 </span><span class="kw">pub trait </span>kernel_Hglobal: Handle {
 	<span class="doccomment">/// [`GlobalAlloc`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalalloc)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
-	/// call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GlobalAlloc(flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HGLOBAL&gt; {
+	</span><span class="kw">fn </span>GlobalAlloc(
+		flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HglobalGuard&gt;
+	{
 		<span class="kw">unsafe </span>{ kernel::ffi::GlobalAlloc(flags.<span class="number">0</span>, num_bytes).as_mut() }
-			.map(|ptr| HGLOBAL(ptr))
+			.map(|ptr| HglobalGuard { handle: HGLOBAL(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
@@ -169,23 +150,6 @@
 			GMEM_INVALID_HANDLE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			flags =&gt; <span class="prelude-val">Ok</span>(co::GMEM(flags)),
 		}
-	}
-
-	<span class="doccomment">/// [`GlobalFree`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfree)
-	/// method.
-	///
-	/// After calling this method, the handle will be invalidated and further
-	/// operations will fail with
-	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
-	</span><span class="kw">fn </span>GlobalFree(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>ret = <span class="kw">match unsafe </span>{
-			kernel::ffi::GlobalFree(<span class="self">self</span>.as_ptr()).as_mut()
-		} {
-			<span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(()),
-			<span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		};
-		invalidate_handle(<span class="self">self</span>);
-		ret
 	}
 
 	<span class="doccomment">/// [`GlobalLock`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globallock)
@@ -212,10 +176,6 @@
 	///
 	/// Originally this method returns the handle to the reallocated memory
 	/// object; here the original handle is automatically updated.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HGLOBAL::GlobalFree`](crate::prelude::kernel_Hglobal::GlobalFree)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GlobalReAlloc(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		num_bytes: usize, flags: co::GMEM) -&gt; SysResult&lt;()&gt;
@@ -244,5 +204,15 @@
 		bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::GlobalUnlock(<span class="self">self</span>.as_ptr()) })
 	}
 }
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="macro">handle_guard! </span>{ HglobalGuard, HGLOBAL, <span class="string">&quot;kernel&quot;</span>;
+	kernel::ffi::GlobalFree;
+	<span class="doccomment">/// RAII implementation for [`HGLOBAL`](crate::HGLOBAL) which automatically
+	/// calls
+	/// [`GlobalFree`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalfree)
+	/// when the object goes out of scope.
+</span>}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (6284998a2 2022-11-12)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

@@ -113,13 +113,18 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::{fmt, hash};
+<span class="kw">use </span>std::ops::Deref;
 
 <span class="kw">use </span><span class="kw">crate</span>::kernel;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, invalidate_handle};
 
 <span class="doccomment">/// A native
 /// [handle](https://learn.microsoft.com/en-us/windows/win32/sysinfo/handles-and-objects),
@@ -203,29 +208,36 @@
 	}
 }
 
-<span class="doccomment">/// A [`Handle`](crate::prelude::Handle) which can be closed. Note that only
-/// some handles can be directly closed, so not all handles implement this
-/// trait.
-///
-/// Prefer importing this trait through the prelude:
-///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// ```
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// RAII implementation for a [`Handle`](crate::prelude::Handle) which
+/// automatically calls
+/// [`CloseHandle`](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
+/// when the object goes out of scope.
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
-</span><span class="kw">pub trait </span>HandleClose: Handle {
-	<span class="doccomment">/// [`CloseHandle`](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
-	/// method.
-	///
-	/// After calling this method, the handle will be invalidated and further
-	/// operations will fail with
-	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
-	</span><span class="kw">fn </span>CloseHandle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(<span class="self">self</span>.as_ptr()) },
-		);
-		invalidate_handle(<span class="self">self</span>);
-		ret
+</span><span class="kw">pub struct </span>HandleGuard&lt;T&gt;
+	<span class="kw">where </span>T: Handle,
+{
+	<span class="kw">pub</span>(<span class="kw">crate</span>) handle: T,
+}
+
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>HandleGuard&lt;T&gt;
+	<span class="kw">where </span>T: Handle,
+{
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.handle.as_opt() {
+			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(h.as_ptr()); } <span class="comment">// ignore errors
+		</span>}
+	}
+}
+
+<span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>HandleGuard&lt;T&gt;
+	<span class="kw">where </span>T: Handle,
+{
+	<span class="kw">type </span>Target = T;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.handle
 	}
 }
 </code></pre></div>

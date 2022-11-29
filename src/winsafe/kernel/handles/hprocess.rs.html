@@ -294,16 +294,36 @@
 <span id="294">294</span>
 <span id="295">295</span>
 <span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{co, kernel};
+</span><span class="kw">use </span>std::ops::Deref;
+
+<span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	FILETIME, GetLastError, HACCESSTOKEN, PROCESS_INFORMATION,
 	SECURITY_ATTRIBUTES, STARTUPINFO, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, INFINITE, MAX_PATH};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HPROCESS: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
@@ -311,7 +331,6 @@
 	/// Originally just a `HANDLE`.
 </span>}
 
-<span class="kw">impl </span>HandleClose <span class="kw">for </span>HPROCESS {}
 <span class="kw">impl </span>kernel_Hprocess <span class="kw">for </span>HPROCESS {}
 
 <span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
@@ -326,13 +345,6 @@
 </span><span class="kw">pub trait </span>kernel_Hprocess: Handle {
 	<span class="doccomment">/// [`CreateProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)
 	/// static method.
-	///
-	/// **Note:** Process and thread handles are returned in the
-	/// [`PROCESS_INFORMATION`](crate::PROCESS_INFORMATION) struct, and they
-	/// must be paired with their respective
-	/// [`HPROCESS::CloseHandle`](crate::prelude::HandleClose::CloseHandle) and
-	/// [`HTHREAD::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
-	/// calls.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateProcess(
 		application_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
@@ -343,7 +355,7 @@
 		creation_flags: co::CREATE,
 		environment: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 		current_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;PROCESS_INFORMATION&gt;
+		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;ProcessInformationGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>buf_cmd_line = WString::from_opt_str(command_line);
 		<span class="kw">let </span><span class="kw-2">mut </span>pi = PROCESS_INFORMATION::default();
@@ -364,7 +376,7 @@
 					<span class="kw-2">&amp;mut </span>pi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| pi)
+		).map(|<span class="kw">_</span>| ProcessInformationGuard { pi })
 	}
 
 	<span class="doccomment">/// [`ExitProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitprocess)
@@ -509,15 +521,11 @@
 	/// This method will return
 	/// [`ERROR::INVALID_PARAMETER`](crate::co::ERROR::INVALID_PARAMETER) if you
 	/// try to open a system process.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HPROCESS::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenProcess(
 		desired_access: co::PROCESS,
 		inherit_handle: bool,
-		process_id: u32) -&gt; SysResult&lt;HPROCESS&gt;
+		process_id: u32) -&gt; SysResult&lt;HandleGuard&lt;HPROCESS&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
 			kernel::ffi::OpenProcess(
@@ -525,19 +533,15 @@
 				inherit_handle <span class="kw">as _</span>,
 				process_id,
 			).as_mut()
-		}.map(|ptr| HPROCESS(ptr))
+		}.map(|ptr| HandleGuard { handle: HPROCESS(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`OpenProcessToken`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocesstoken)
 	/// method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HACCESSTOKEN::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenProcessToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		desired_access: co::TOKEN) -&gt; SysResult&lt;HACCESSTOKEN&gt;
+		desired_access: co::TOKEN) -&gt; SysResult&lt;HandleGuard&lt;HACCESSTOKEN&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
 		bool_to_sysresult(
@@ -548,7 +552,7 @@
 					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| handle)
+		).map(|<span class="kw">_</span>| HandleGuard { handle })
 	}
 
 	<span class="doccomment">/// [`QueryFullProcessImageName`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queryfullprocessimagenamew)
@@ -588,6 +592,36 @@
 			co::WAIT::FAILED =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			wait =&gt; <span class="prelude-val">Ok</span>(wait),
 		}
+	}
+}
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// RAII implementation for [`PROCESS_INFORMATION`](crate::PROCESS_INFORMATION)
+/// which automatically calls
+/// [`CloseHandle`](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
+/// on `hProcess` and `hThread` fields.
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+</span><span class="kw">pub struct </span>ProcessInformationGuard {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) pi: PROCESS_INFORMATION,
+}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>ProcessInformationGuard {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.pi.hProcess.as_opt() {
+			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(h.as_ptr()); } <span class="comment">// ignore errors
+		</span>}
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.pi.hThread.as_opt() {
+			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(h.as_ptr()); }
+		}
+	}
+}
+
+<span class="kw">impl </span>Deref <span class="kw">for </span>ProcessInformationGuard {
+	<span class="kw">type </span>Target = PROCESS_INFORMATION;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.pi
 	}
 }
 </code></pre></div>

@@ -618,18 +618,6 @@
 <span id="618">618</span>
 <span id="619">619</span>
 <span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -637,8 +625,9 @@
 	GetLastError, HEAPLIST32, MODULEENTRY32, PROCESSENTRY32, SysResult,
 	THREADENTRY32,
 };
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::invalidate_handle;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HPROCESSLIST: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a process list
@@ -646,7 +635,6 @@
 	/// Originally just a `HANDLE`.
 </span>}
 
-<span class="kw">impl </span>HandleClose <span class="kw">for </span>HPROCESSLIST {}
 <span class="kw">impl </span>kernel_Hprocesslist <span class="kw">for </span>HPROCESSLIST {}
 
 <span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
@@ -681,8 +669,6 @@
 	///     println!(&quot;{} {}&quot;,
 	///         heap_entry.th32HeapID, heap_entry.th32ProcessID);
 	/// }
-	///
-	/// hpl.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -713,8 +699,6 @@
 	///     println!(&quot;{} {}&quot;,
 	///         mod_entry.szModule(), mod_entry.th32ProcessID);
 	/// }
-	///
-	/// hpl.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -745,8 +729,6 @@
 	///     println!(&quot;{} {} {}&quot;,
 	///         proc_entry.szExeFile(), proc_entry.th32ProcessID, proc_entry.cntThreads);
 	/// }
-	///
-	/// hpl.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -779,8 +761,6 @@
 	///     println!(&quot;{} {}&quot;,
 	///         thread_entry.th32ThreadID, thread_entry.th32OwnerProcessID);
 	/// }
-	///
-	/// hpl.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -792,21 +772,17 @@
 
 	<span class="doccomment">/// [`CreateToolhelp32Snapshot`](https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HPROCESSLIST::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateToolhelp32Snapshot(
 		flags: co::TH32CS,
-		th32_process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;HPROCESSLIST&gt;
+		th32_process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;HandleGuard&lt;HPROCESSLIST&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
 			kernel::ffi::CreateToolhelp32Snapshot(
 				flags.<span class="number">0</span>,
 				th32_process_id.unwrap_or_default(),
 			).as_mut()
-		}.map(|ptr| HPROCESSLIST(ptr))
+		}.map(|ptr| HandleGuard { handle: HPROCESSLIST(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
@@ -1261,5 +1237,6 @@
 			has_more: <span class="bool-val">true</span>,
 		}
 	}
-}</code></pre></div>
+}
+</code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (6284998a2 2022-11-12)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

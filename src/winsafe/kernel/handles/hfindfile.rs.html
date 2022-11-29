@@ -190,26 +190,12 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	GetLastError, path, SysResult, WIN32_FIND_DATA, WString,
 };
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, invalidate_handle};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HFINDFILE: <span class="string">&quot;kernel&quot;</span>;
@@ -277,43 +263,32 @@
 		Box::new(FindFileIter::new(path_and_pattern))
 	}
 
-	<span class="doccomment">/// [`FindClose`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findclose)
-	/// method.
-	///
-	/// After calling this method, the handle will be invalidated and further
-	/// operations will fail with
-	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
-	</span><span class="kw">fn </span>FindClose(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::FindClose(<span class="self">self</span>.as_ptr()) },
-		);
-		invalidate_handle(<span class="self">self</span>);
-		ret
-	}
-
 	<span class="doccomment">/// [`FindFirstFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew)
 	/// static method.
-	///
-	/// # Safety
-	///
-	/// This handle allocates memory, which must be freed with
-	/// [`HFINDFILE::FindClose`](crate::prelude::kernel_Hfindfile::FindClose).
 	///
 	/// This method is rather tricky, consider using
 	/// [`HFINDFILE::iter`](crate::prelude::kernel_Hfindfile::iter).
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">unsafe fn </span>FindFirstFile(
+	</span><span class="kw">fn </span>FindFirstFile(
 		file_name: <span class="kw-2">&amp;</span>str,
-		wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;(HFINDFILE, bool)&gt;
+		wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;(HfindfileGuard, bool)&gt;
 	{
-		<span class="kw">match </span>kernel::ffi::FindFirstFileW(
-			WString::from_str(file_name).as_ptr(),
-			wfd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-		).as_mut() {
-			<span class="prelude-val">Some</span>(ptr) =&gt; <span class="prelude-val">Ok</span>((HFINDFILE(ptr), <span class="bool-val">true</span>)), <span class="comment">// first file found
-			</span><span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
-				co::ERROR::FILE_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>((HFINDFILE::NULL, <span class="bool-val">false</span>)), <span class="comment">// not an error, first file not found
-				</span>err =&gt; <span class="prelude-val">Err</span>(err),
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::FindFirstFileW(
+				WString::from_str(file_name).as_ptr(),
+				wfd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			).as_mut()
+		} {
+			<span class="prelude-val">Some</span>(ptr) =&gt; <span class="prelude-val">Ok</span>((
+				HfindfileGuard { handle: HFINDFILE(ptr) }, <span class="comment">// first file found
+				</span><span class="bool-val">true</span>,
+			)),
+			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::FILE_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>((
+					HfindfileGuard { handle: HFINDFILE::NULL }, <span class="comment">// not an error, first file not found
+					</span><span class="bool-val">false</span>,
+				)),
+				err =&gt; <span class="prelude-val">Err</span>(err),
 			},
 		}
 	}
@@ -321,15 +296,12 @@
 	<span class="doccomment">/// [`FindNextFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findnextfilew)
 	/// method.
 	///
-	/// # Safety
-	///
-	/// This handle allocates memory, which must be freed with
-	/// [`HFINDFILE::FindClose`](crate::prelude::kernel_Hfindfile::FindClose).
-	///
 	/// This method is rather tricky, consider using
 	/// [`HFINDFILE::iter`](crate::prelude::kernel_Hfindfile::iter).
-	</span><span class="kw">unsafe fn </span>FindNextFile(<span class="kw-2">&amp;</span><span class="self">self</span>, wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;bool&gt; {
-		<span class="kw">match </span>kernel::ffi::FindNextFileW(<span class="self">self</span>.as_ptr(), wfd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) {
+	</span><span class="kw">fn </span>FindNextFile(<span class="kw-2">&amp;</span><span class="self">self</span>, wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;bool&gt; {
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::FindNextFileW(<span class="self">self</span>.as_ptr(), wfd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::NO_MORE_FILES =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>), <span class="comment">// not an error, no further files found
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -341,18 +313,22 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
+</span><span class="macro">handle_guard! </span>{ HfindfileGuard, HFINDFILE, <span class="string">&quot;kernel&quot;</span>;
+	kernel::ffi::FindClose;
+	<span class="doccomment">/// RAII implementation for [`HFINDFILE`](crate::HFINDFILE) which
+	/// automatically calls
+	/// [`FindClose`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findclose)
+	/// when the object goes out of scope.
+</span>}
+
+<span class="comment">//------------------------------------------------------------------------------
+
 </span><span class="kw">struct </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	hfind: HFINDFILE,
+	hfind: HfindfileGuard,
 	wfd: WIN32_FIND_DATA,
 	path_and_pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 	first_pass: bool,
 	no_more: bool,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="self">self</span>.hfind.FindClose().ok(); <span class="comment">// ignore error
-	</span>}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -366,9 +342,7 @@
 		<span class="kw">let </span>found = <span class="kw">if </span><span class="self">self</span>.first_pass {
 			<span class="self">self</span>.first_pass = <span class="bool-val">false</span>;
 			<span class="kw">let </span>(hfind, found) =
-				<span class="kw">match unsafe </span>{
-					HFINDFILE::FindFirstFile(<span class="self">self</span>.path_and_pattern, <span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd)
-				} {
+				<span class="kw">match </span>HFINDFILE::FindFirstFile(<span class="self">self</span>.path_and_pattern, <span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd) {
 					<span class="prelude-val">Err</span>(e) =&gt; {
 						<span class="self">self</span>.no_more = <span class="bool-val">true</span>; <span class="comment">// prevent further iterations
 						</span><span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
@@ -378,7 +352,7 @@
 			<span class="self">self</span>.hfind = hfind;
 			found
 		} <span class="kw">else </span>{
-			<span class="kw">match unsafe </span>{ <span class="self">self</span>.hfind.FindNextFile(<span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd) } {
+			<span class="kw">match </span><span class="self">self</span>.hfind.FindNextFile(<span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd) {
 				<span class="prelude-val">Err</span>(e) =&gt; {
 					<span class="self">self</span>.no_more = <span class="bool-val">true</span>; <span class="comment">// prevent further iterations
 					</span><span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
@@ -400,7 +374,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FindFileIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>new(path_and_pattern: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			hfind: HFINDFILE::NULL,
+			hfind: HfindfileGuard { handle: HFINDFILE::NULL },
 			wfd: WIN32_FIND_DATA::default(),
 			path_and_pattern,
 			first_pass: <span class="bool-val">true</span>,

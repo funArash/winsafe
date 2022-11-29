@@ -108,16 +108,11 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, HFILEMAP, HFILEMAPVIEW, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{HandleGuard, HfilemapviewGuard};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
-	Handle, HandleClose, kernel_Hfile, kernel_Hfilemap, kernel_Hfilemapview,
+	Handle, kernel_Hfile, kernel_Hfilemap, kernel_Hfilemapview,
 };
 
 <span class="doccomment">/// Manages an [`HFILEMAP`](crate::HFILEMAP) handle, which provides
@@ -141,16 +136,9 @@
 </span><span class="kw">pub struct </span>FileMapped {
 	access: FileAccess,
 	file: File,
-	hmap: HFILEMAP,
-	hview: HFILEMAPVIEW,
+	hmap: HandleGuard&lt;HFILEMAP&gt;,
+	hview: HfilemapviewGuard,
 	size: usize,
-}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>FileMapped {
-	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">if </span><span class="self">self</span>.hview != HFILEMAPVIEW::NULL { <span class="self">self</span>.hview.UnmapViewOfFile().ok(); } <span class="comment">// ignore errors
-		</span><span class="kw">if </span><span class="self">self</span>.hmap != HFILEMAP::NULL { <span class="self">self</span>.hmap.CloseHandle().ok(); }
-	}
 }
 
 <span class="kw">impl </span>FileMapped {
@@ -159,22 +147,19 @@
 	</span><span class="kw">pub fn </span>open(
 		file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;FileMapped&gt;
 	{
-		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{
-			access,
-			file: File::open(file_path, access)<span class="question-mark">?</span>,
-			hmap: HFILEMAP::NULL,
-			hview: HFILEMAPVIEW::NULL,
-			size: <span class="number">0</span>,
-		};
-
-		new_self.map_in_memory()<span class="question-mark">?</span>;
-		<span class="prelude-val">Ok</span>(new_self)
+		<span class="kw">let </span>file = File::open(file_path, access)<span class="question-mark">?</span>;
+		<span class="kw">let </span>(hmap, hview) = <span class="self">Self</span>::map_in_memory(<span class="kw-2">&amp;</span>file, access)<span class="question-mark">?</span>;
+		<span class="kw">let </span>size = file.hfile().GetFileSizeEx()<span class="question-mark">?</span>; <span class="comment">// cache
+		</span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{ access, file, hmap, hview, size })
 	}
 
-	<span class="kw">fn </span>map_in_memory(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="self">self</span>.hmap = <span class="self">self</span>.file.hfile().CreateFileMapping(
+	<span class="attr">#[must_use]
+	</span><span class="kw">fn </span>map_in_memory(file: <span class="kw-2">&amp;</span>File, access: FileAccess)
+		-&gt; SysResult&lt;(HandleGuard&lt;HFILEMAP&gt;, HfilemapviewGuard)&gt;
+	{
+		<span class="kw">let </span>hmap = file.hfile().CreateFileMapping(
 			<span class="prelude-val">None</span>,
-			<span class="kw">match </span><span class="self">self</span>.access {
+			<span class="kw">match </span>access {
 				FileAccess::ExistingReadOnly =&gt; co::PAGE::READONLY,
 				FileAccess::ExistingRW
 					| FileAccess::OpenOrCreateRW =&gt; co::PAGE::READWRITE,
@@ -183,8 +168,8 @@
 			<span class="prelude-val">None</span>,
 		)<span class="question-mark">?</span>;
 
-		<span class="self">self</span>.hview = <span class="self">self</span>.hmap.MapViewOfFile(
-			<span class="kw">match </span><span class="self">self</span>.access {
+		<span class="kw">let </span>hview = hmap.MapViewOfFile(
+			<span class="kw">match </span>access {
 				FileAccess::ExistingReadOnly =&gt; co::FILE_MAP::READ,
 				FileAccess::ExistingRW
 					| FileAccess::OpenOrCreateRW =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
@@ -193,8 +178,7 @@
 			<span class="prelude-val">None</span>,
 		)<span class="question-mark">?</span>;
 
-		<span class="self">self</span>.size = <span class="self">self</span>.file.hfile().GetFileSizeEx()<span class="question-mark">?</span>; <span class="comment">// cache
-		</span><span class="prelude-val">Ok</span>(())
+		<span class="prelude-val">Ok</span>((hmap, hview))
 	}
 
 	<span class="doccomment">/// Returns a mutable slice to the mapped memory.
@@ -204,6 +188,7 @@
 	}
 
 	<span class="doccomment">/// Returns a slice to the mapped memory.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
 		<span class="self">self</span>.hview.as_slice(<span class="self">self</span>.size)
 	}
@@ -215,12 +200,15 @@
 	/// * [`as_mut_slice`](crate::FileMapped::as_mut_slice);
 	/// * [`as_slice`](crate::FileMapped::as_slice).
 	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: usize) -&gt; SysResult&lt;()&gt; {
-		<span class="self">self</span>.hview.UnmapViewOfFile()<span class="question-mark">?</span>;
-		<span class="self">self</span>.hmap.CloseHandle()<span class="question-mark">?</span>;
+		<span class="self">self</span>.hview = HfilemapviewGuard { handle: HFILEMAPVIEW::NULL }; <span class="comment">// close mapping handles
+		</span><span class="self">self</span>.hmap = HandleGuard { handle: HFILEMAP::NULL };
 
 		<span class="self">self</span>.file.resize(num_bytes)<span class="question-mark">?</span>;
+		<span class="kw">let </span>(hmap, hview) = <span class="self">Self</span>::map_in_memory(<span class="kw-2">&amp;</span><span class="self">self</span>.file, <span class="self">self</span>.access)<span class="question-mark">?</span>;
 
-		<span class="self">self</span>.map_in_memory()<span class="question-mark">?</span>;
+		<span class="self">self</span>.hmap = hmap;
+		<span class="self">self</span>.hview = hview;
+		<span class="self">self</span>.size = num_bytes;
 		<span class="prelude-val">Ok</span>(())
 	}
 

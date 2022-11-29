@@ -316,20 +316,6 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -337,9 +323,7 @@
 	GetLastError, HRSRC, HRSRCMEM, IdStr, LANGID, RtStr, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, invalidate_handle, MAX_PATH, str_to_iso88591,
-};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, str_to_iso88591};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HINSTANCE: <span class="string">&quot;kernel&quot;</span>;
@@ -453,20 +437,6 @@
 			.ok_or_else(|| GetLastError())
 	}
 
-	<span class="doccomment">/// [`FreeLibrary`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-freelibrary)
-	/// method.
-	///
-	/// After calling this method, the handle will be invalidated and further
-	/// operations will fail with
-	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
-	</span><span class="kw">fn </span>FreeLibrary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::FreeLibrary(<span class="self">self</span>.as_ptr()) },
-		);
-		invalidate_handle(<span class="self">self</span>);
-		ret
-	}
-
 	<span class="doccomment">/// [`GetModuleFileName`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulefilenamew)
 	/// method.
 	///
@@ -539,16 +509,12 @@
 
 	<span class="doccomment">/// [`LoadLibrary`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HINSTANCE::FreeLibrary`](crate::prelude::kernel_Hinstance::FreeLibrary)
-	/// call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HINSTANCE&gt; {
+	</span><span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HinstanceGuard&gt; {
 		<span class="kw">unsafe </span>{
 			kernel::ffi::LoadLibraryW(WString::from_str(lib_file_name).as_ptr())
 				.as_mut()
-		}.map(|ptr| HINSTANCE(ptr))
+		}.map(|ptr| HinstanceGuard { handle: HINSTANCE(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
@@ -604,10 +570,6 @@
 	///     LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
 	///     lpResLock,
 	/// )?;
-	///
-	/// hUpdateRes.EndUpdateResource(false)?;
-	///
-	/// hExe.FreeLibrary()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -635,6 +597,16 @@
 		}
 	}
 }
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="macro">handle_guard! </span>{ HinstanceGuard, HINSTANCE, <span class="string">&quot;kernel&quot;</span>;
+	kernel::ffi::FreeLibrary;
+	<span class="doccomment">/// RAII implementation for [`HINSTANCE`](crate::HINSTANCE) which
+	/// automatically calls
+	/// [`FreeLibrary`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-freelibrary)
+	/// when the object goes out of scope.
+</span>}
 
 <span class="comment">//------------------------------------------------------------------------------
 

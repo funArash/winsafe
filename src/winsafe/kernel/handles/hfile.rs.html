@@ -265,14 +265,6 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -280,8 +272,9 @@
 	BY_HANDLE_FILE_INFORMATION, GetLastError, HFILEMAP, HIDWORD, LODWORD,
 	OVERLAPPED, SECURITY_ATTRIBUTES, SysResult, WString,
 };
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, HandleClose};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HFILE: <span class="string">&quot;kernel&quot;</span>;
 	<span class="doccomment">/// Handle to a
@@ -292,7 +285,6 @@
 	/// [`File`](crate::File) high-level abstraction.
 </span>}
 
-<span class="kw">impl </span>HandleClose <span class="kw">for </span>HFILE {}
 <span class="kw">impl </span>kernel_Hfile <span class="kw">for </span>HFILE {}
 
 <span class="doccomment">/// This trait is enabled with the `kernel` feature, and provides methods for
@@ -308,8 +300,8 @@
 	<span class="doccomment">/// [`CreateFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew)
 	/// static method.
 	///
-	/// **Note:** Must be paired with an
-	/// [`HFILE::CloseHandle`](crate::prelude::HandleClose::CloseHandle) call.
+	/// The error code is also returned because it can carry information even if
+	/// the file is successfully open.
 	///
 	/// # Examples
 	///
@@ -328,8 +320,6 @@
 	///     co::FILE_ATTRIBUTE::NORMAL,
 	///     None,
 	/// )?;
-	///
-	/// hfile.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	///
@@ -348,8 +338,6 @@
 	///     co::FILE_ATTRIBUTE::NORMAL,
 	///     None,
 	/// )?;
-	///
-	/// hfile.CloseHandle()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -360,7 +348,7 @@
 		security_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		creation_disposition: co::DISPOSITION,
 		flags_and_attrs: co::FILE_ATTRIBUTE,
-		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;) -&gt; SysResult&lt;(HFILE, co::ERROR)&gt;
+		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;) -&gt; SysResult&lt;(HandleGuard&lt;HFILE&gt;, co::ERROR)&gt;
 	{
 		<span class="kw">match </span>HFILE(<span class="kw">unsafe </span>{
 			kernel::ffi::CreateFileW(
@@ -374,22 +362,18 @@
 			) <span class="kw">as _
 		</span>}) {
 			HFILE::NULL =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			h =&gt; <span class="prelude-val">Ok</span>((h, GetLastError())),
+			handle =&gt; <span class="prelude-val">Ok</span>((HandleGuard { handle }, GetLastError())),
 		}
 	}
 
 	<span class="doccomment">/// [`CreateFileMapping`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-createfilemappingw)
 	/// method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HFILEMAP::CloseHandle`](crate::prelude::HandleClose::CloseHandle)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateFileMapping(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		mapping_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		protect: co::PAGE,
 		max_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HFILEMAP&gt;
+		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HandleGuard&lt;HFILEMAP&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
 			kernel::ffi::CreateFileMappingFromApp(
@@ -399,7 +383,7 @@
 				max_size.unwrap_or_default(),
 				WString::from_opt_str(mapping_name).as_ptr(),
 			).as_mut()
-		}.map(|ptr| HFILEMAP(ptr))
+		}.map(|ptr| HandleGuard { handle: HFILEMAP(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 

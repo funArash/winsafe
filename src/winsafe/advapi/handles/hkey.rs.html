@@ -638,9 +638,28 @@
 <span id="638">638</span>
 <span id="639">639</span>
 <span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{advapi, co};
+</span><span class="kw">use </span>std::ops::Deref;
+
+<span class="kw">use crate</span>::{advapi, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
@@ -653,22 +672,9 @@
 	/// [predefined registry keys](https://learn.microsoft.com/en-us/windows/win32/sysinfo/predefined-keys),
 	/// like `HKEY::CURRENT_USER`, which are always open and ready to be used.
 	/// Usually, they are the starting point to open a registry key.
-	///
-	/// Automatically calls
-	/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
-	/// when the object goes out of scope.
 </span>}
 
 <span class="kw">impl </span>advapi_Hkey <span class="kw">for </span>HKEY {}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>HKEY {
-	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">let </span>raw_val = <span class="kw">unsafe </span>{ <span class="self">self</span>.as_ptr() } <span class="kw">as </span>usize;
-		<span class="kw">if </span>raw_val &lt; <span class="number">0x8000_0000 </span>|| raw_val &gt; <span class="number">0x8000_0060 </span>{ <span class="comment">// guard predefined keys
-			</span><span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(<span class="self">self</span>.as_ptr()); } <span class="comment">// ignore errors
-		</span>}
-	}
-}
 
 <span class="macro">macro_rules! </span>predef_key {
 	(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$val</span>:expr) =&gt; {
@@ -881,9 +887,9 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str,
-		options: co::REG_OPTION, access_rights: co::KEY) -&gt; SysResult&lt;HKEY&gt;
+		options: co::REG_OPTION, access_rights: co::KEY) -&gt; SysResult&lt;HkeyGuard&gt;
 	{
-		<span class="kw">let </span><span class="kw-2">mut </span>hKey = HKEY::NULL;
+		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegOpenKeyExW(
@@ -891,11 +897,11 @@
 					WString::from_str(sub_key).as_ptr(),
 					options.<span class="number">0</span>,
 					access_rights.<span class="number">0</span>,
-					<span class="kw-2">&amp;mut </span>hKey.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>hkey.<span class="number">0</span>,
 				)
 			} <span class="kw">as _</span>,
 		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(hKey),
+			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(HkeyGuard { hkey }),
 			err =&gt; <span class="prelude-val">Err</span>(err),
 		}
 	}
@@ -1141,6 +1147,34 @@
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
 			err =&gt; <span class="prelude-val">Err</span>(err),
 		}
+	}
+}
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// RAII implementation for [`HKEY`](crate::HKEY) which automatically calls
+/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
+/// when the object goes out of scope.
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;advapi&quot;</span>)))]
+</span><span class="kw">pub struct </span>HkeyGuard {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) hkey: HKEY,
+}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>HkeyGuard {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hkey.as_opt() {
+			<span class="kw">if </span>h.<span class="number">0 </span>&lt; HKEY::CLASSES_ROOT.<span class="number">0 </span>|| h.<span class="number">0 </span>&gt; HKEY::PERFORMANCE_NLSTEXT.<span class="number">0 </span>{ <span class="comment">// guard predefined keys
+				</span><span class="kw">unsafe </span>{ advapi::ffi::RegCloseKey(h.as_ptr()); } <span class="comment">// ignore errors
+			</span>}
+		}
+	}
+}
+
+<span class="kw">impl </span>Deref <span class="kw">for </span>HkeyGuard {
+	<span class="kw">type </span>Target = HKEY;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.hkey
 	}
 }
 
