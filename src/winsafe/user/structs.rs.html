@@ -949,6 +949,10 @@
 <span id="949">949</span>
 <span id="950">950</span>
 <span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1601,14 +1605,18 @@
 #[repr(C)]
 </span><span class="kw">pub struct </span>PAINTSTRUCT {
 	<span class="kw">pub </span>hdc: HDC,
-	<span class="kw">pub </span>fErase: u32,
+	fErase: BOOL,
 	<span class="kw">pub </span>rcPaint: RECT,
-	fRestore: u32,
-	fIncUpdate: u32,
+	fRestore: BOOL,
+	fIncUpdate: BOOL,
 	rgbReserved: [u8; <span class="number">32</span>],
 }
 
 <span class="macro">impl_default!</span>(PAINTSTRUCT);
+
+<span class="kw">impl </span>PAINTSTRUCT {
+	<span class="macro">pub_fn_bool_get_set!</span>(fErase, set_fErase);
+}
 
 <span class="doccomment">/// [`POINT`](https://learn.microsoft.com/en-us/windows/win32/api/windef/ns-windef-point)
 /// struct.

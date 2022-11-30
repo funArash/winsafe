@@ -1454,9 +1454,75 @@
 <span id="1454">1454</span>
 <span id="1455">1455</span>
 <span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{co, user};
+</span><span class="kw">use </span>std::ops::Deref;
+
+<span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	GetLastError, HINSTANCE, SetLastError, SysResult, WString,
 };
@@ -1514,31 +1580,50 @@
 	<span class="doccomment">/// [`BeginPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-beginpaint)
 	/// method.
 	///
-	/// **Note:** Must be paired with an
-	/// [`HWND::EndPaint`](crate::prelude::user_Hwnd::EndPaint) call.
-	///
 	/// # Examples
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{HWND, PAINTSTRUCT};
+	/// use winsafe::HWND;
 	///
 	/// let hwnd: HWND; // initialized somewhere
 	/// # let hwnd = HWND::NULL;
 	///
-	/// let mut ps = PAINTSTRUCT::default();
-	/// let hdc = hwnd.BeginPaint(&amp;mut ps)?;
+	/// let hdc = hwnd.BeginPaint()?;
+	///
+	/// println!(&quot;Erase background? {}&quot;, hdc.paintstruct().fErase());
+	/// println!(&quot;Painting area: {}&quot;, hdc.paintstruct().rcPaint);
 	///
 	/// // hdc painting...
-	///
-	/// hwnd.EndPaint(&amp;ps);
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>BeginPaint(<span class="kw-2">&amp;</span><span class="self">self</span>, ps: <span class="kw-2">&amp;mut </span>PAINTSTRUCT) -&gt; SysResult&lt;HDC&gt; {
+	///
+	/// Note that the [`HDC`](crate::HDC) guard returned by this method must be
+	/// kept alive while the painting is made, even if you won&#39;t use it
+	/// directly. This is necessary because, when the guard goes out of scope,
+	/// it will automatically call
+	/// [`EndPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint).
+	///
+	/// In the example below, the `HDC` is not used, but the returned guard is
+	/// kept alive:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::HWND;
+	///
+	/// let hwnd: HWND; // initialized somewhere
+	/// # let hwnd = HWND::NULL;
+	///
+	/// let _ = hwnd.BeginPaint()?; // keep the returned guard alive
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>BeginPaint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HdcPaintGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>ps = PAINTSTRUCT::default();
 		<span class="kw">unsafe </span>{
-			user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>).as_mut()
-		}.map(|ptr| HDC(ptr))
-			.ok_or_else(|| GetLastError())
+			user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>).as_mut()
+		}.map(|ptr| {
+			HdcPaintGuard { hwnd: <span class="self">self</span>, hdc: HDC(ptr), ps }
+		}).ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`BringWindowToTop`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-bringwindowtotop)
@@ -1677,12 +1762,6 @@
 	/// method.
 	</span><span class="kw">fn </span>EndDialog(<span class="kw-2">&amp;</span><span class="self">self</span>, result: isize) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EndDialog(<span class="self">self</span>.as_ptr(), result) })
-	}
-
-	<span class="doccomment">/// [`EndPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint)
-	/// method.
-	</span><span class="kw">fn </span>EndPaint(<span class="kw-2">&amp;</span><span class="self">self</span>, ps: <span class="kw-2">&amp;</span>PAINTSTRUCT) {
-		<span class="kw">unsafe </span>{ user::ffi::EndPaint(<span class="self">self</span>.as_ptr(), ps <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>); }
 	}
 
 	<span class="doccomment">/// [`EnumChildWindows`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumchildwindows)
@@ -2910,5 +2989,54 @@
 	<span class="kw">let </span>func = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(lparam <span class="kw">as </span><span class="kw-2">*const </span>F) };
 	func(hwnd) <span class="kw">as _
 </span>}
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// RAII implementation for [`HDC`](crate::HDC) which automatically calls
+/// [`EndPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint)
+/// when the object goes out of scope.
+///
+/// The [`PAINTSTRUCT`](crate::PAINTSTRUCT) object is stored internally, and can
+/// be accessed through the
+/// [`paintstruct`](crate::guard::HdcPaintGuard::paintstruct) method.
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
+</span><span class="kw">pub struct </span>HdcPaintGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+	<span class="kw">where </span>T: user_Hwnd,
+{
+	<span class="kw">pub</span>(<span class="kw">crate</span>) hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T,
+	<span class="kw">pub</span>(<span class="kw">crate</span>) hdc: HDC,
+	<span class="kw">pub</span>(<span class="kw">crate</span>) ps: PAINTSTRUCT,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Drop <span class="kw">for </span>HdcPaintGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+	<span class="kw">where </span>T: user_Hwnd,
+{
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">unsafe </span>{
+			user::ffi::EndPaint(<span class="self">self</span>.hwnd.as_ptr(), <span class="kw-2">&amp;</span><span class="self">self</span>.ps <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>);
+		}
+	}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Deref <span class="kw">for </span>HdcPaintGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+	<span class="kw">where </span>T: user_Hwnd,
+{
+	<span class="kw">type </span>Target = HDC;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.hdc
+	}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; HdcPaintGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+	<span class="kw">where </span>T: user_Hwnd,
+{
+	<span class="doccomment">/// Returns a reference to the internal [`PAINTSTRUCT`](crate::PAINTSTRUCT)
+	/// object.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>paintstruct(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>PAINTSTRUCT {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.ps
+	}
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (6284998a2 2022-11-12)" data-search-js="search-39ee4160c7dc16c9.js" data-settings-js="settings-7873449fa8c00e11.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
