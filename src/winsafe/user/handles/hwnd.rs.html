@@ -1541,9 +1541,44 @@
 <a href="#1541" id="1541">1541</a>
 <a href="#1542" id="1542">1542</a>
 <a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span>std::ops::Deref;
+</span><span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::ops::Deref;
 
 <span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
@@ -2535,10 +2570,27 @@
 	<span class="doccomment">/// [`OpenClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-openclipboard)
 	/// method.
 	///
-	/// **Note:** Must be paired with a
-	/// [`CloseClipboard`](crate::CloseClipboard) call.
-	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+	/// Note that the guard returned by this method must be kept alive while you
+	/// work upon the clipboard. This is necessary because, when the guard goes
+	/// out of scope, it will automatically call
+	/// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard).
+	///
+	/// In the example below, the returned guard is kept alive:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::HWND;
+	///
+	/// let hwnd: HWND; // initialized somewhere
+	/// # let hwnd = HWND::NULL;
+	///
+	/// let _ = hwnd.OpenClipboard()?; // keep the returned guard alive
+	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+	/// ```
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ClipboardGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::OpenClipboard(<span class="self">self</span>.as_ptr()) })
+			.map(|<span class="kw">_</span>| ClipboardGuard { _hwnd: PhantomData })
 	}
 
 	<span class="doccomment">/// [`PostMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postmessagew)
@@ -3004,6 +3056,22 @@
 	<span class="kw">let </span>func = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(lparam <span class="kw">as </span><span class="kw-2">*const </span>F) };
 	func(hwnd) <span class="kw">as _
 </span>}
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// RAII implementation for clipboard which automatically calls
+/// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)
+/// when the object goes out of scope.
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
+</span><span class="kw">pub struct </span>ClipboardGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+	_hwnd: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>ClipboardGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">unsafe </span>{ user::ffi::CloseClipboard(); } <span class="comment">// ignore errors
+	</span>}
+}
 
 <span class="comment">//------------------------------------------------------------------------------
 
