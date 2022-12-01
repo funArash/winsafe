@@ -114,11 +114,6 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::{fmt, hash};
@@ -177,20 +172,15 @@
 	///
 	/// # Safety
 	///
-	/// When a handle is closed (with methods like
-	/// [`CloseHandle`](crate::prelude::HandleClose::CloseHandle)), its internal
-	/// pointer is invalidated, so no further operations can be done. This
-	/// safety measure is necessary because Windows can reuse handle values, so
-	/// invalidating the pointer prevents this.
+	/// As the name implies, `raw_copy` returns a raw copy of the handle, so
+	/// closing one of the copies won&#39;t close the others. This means a handle
+	/// can be used after it has been closed, what can lead to errors and
+	/// undefined behavior. Even worse: sometimes Windows reuses handle values,
+	/// so you can call a method on a completely different handle type, what can
+	/// be catastrophic.
 	///
-	/// As the name implies, `raw_copy` returns a raw copy of the pointer value,
-	/// so closing one handle will **not** invalidate the other copies – if the
-	/// underlying handle value is reused by Windows, you can execute an
-	/// operation on a completely different handle, what can be catastrophic.
-	/// So after closing a handle, be sure to not use its copies anymore.
-	///
-	/// This method is necessary because in some cases the Windows API *demands*
-	/// a copy of a handle – `raw_copy` is an escape hatch to fill this gap.
+	/// However, in some cases the Windows API *demands* a copy of the handle –
+	/// `raw_copy` is an escape hatch to fill this gap.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">unsafe fn </span>raw_copy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
 		<span class="self">Self</span>::from_ptr(<span class="self">self</span>.as_ptr())
