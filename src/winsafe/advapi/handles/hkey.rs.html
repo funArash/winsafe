@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\advapi\handles\hkey.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-59deea3733ac6c09.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-3bcdcab5f4113412.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-091ecdca18d5df85.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-45445754dcd01ab2.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\advapi\handles\hkey.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e963ab4a0d0c903e.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../winsafe/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -696,6 +696,23 @@
 <a href="#696" id="696">696</a>
 <a href="#697" id="697">697</a>
 <a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::mem::transmute;
@@ -1113,13 +1130,16 @@
 	/// HKEY::CURRENT_USER.RegSetKeyValue(
 	///     &quot;Software\\My Company&quot;,
 	///     &quot;Color&quot;,
-	///     RegistryValue::Sz(WString::from_str(&quot;blue&quot;)),
+	///     RegistryValue::Sz(&quot;blue&quot;.to_owned()),
 	/// )?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetKeyValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt;
 	{
+		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
+		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
+
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegSetKeyValueW(
@@ -1127,8 +1147,8 @@
 					WString::from_str(sub_key).as_ptr(),
 					WString::from_str(value).as_ptr(),
 					data.reg_type().<span class="number">0</span>,
-					data.as_ptr(),
-					data.len() <span class="kw">as _</span>,
+					data_ptr,
+					data_len,
 				)
 			} <span class="kw">as _</span>,
 		) {
@@ -1157,11 +1177,14 @@
 	///
 	/// hkey.RegSetValueEx(
 	///     &quot;Color&quot;,
-	///     RegistryValue::Sz(WString::from_str(&quot;blue&quot;)),
+	///     RegistryValue::Sz(&quot;blue&quot;.to_owned()),
 	/// )?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
+		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
+
 		<span class="kw">match </span>co::ERROR(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegSetValueExW(
@@ -1169,8 +1192,8 @@
 					WString::from_str(value).as_ptr(),
 					<span class="number">0</span>,
 					data.reg_type().<span class="number">0</span>,
-					data.as_ptr() <span class="kw">as _</span>,
-					data.len() <span class="kw">as _</span>,
+					data_ptr <span class="kw">as _</span>,
+					data_len,
 				)
 			} <span class="kw">as _</span>,
 		) {
@@ -1210,6 +1233,17 @@
 		</span><span class="kw">return </span><span class="prelude-val">Err</span>(co::ERROR::INVALID_DATA);
 	}
 
+	<span class="kw">if </span>co::REG(raw_data_type1) == co::REG::SZ {
+		<span class="kw">if </span>data_len1 == <span class="number">0 </span><span class="comment">// empty data
+			</span>|| data_len1 % <span class="number">2 </span>!= <span class="number">0 </span><span class="comment">// odd number of bytes
+			</span>|| buf[data_len1 <span class="kw">as </span>usize - <span class="number">2</span>] != <span class="number">0 </span><span class="comment">// terminating null
+			</span>|| buf[data_len1 <span class="kw">as </span>usize - <span class="number">1</span>] != <span class="number">0
+		</span>{
+			<span class="comment">// Bad string.
+			</span><span class="kw">return </span><span class="prelude-val">Err</span>(co::ERROR::INVALID_DATA);
+		}
+	}
+
 	<span class="comment">// Return the value according to type.
 	</span><span class="prelude-val">Ok</span>(<span class="kw">match </span>co::REG(raw_data_type1) {
 		co::REG::NONE =&gt; RegistryValue::None,
@@ -1225,7 +1259,7 @@
 		),
 		co::REG::SZ =&gt; {
 			<span class="kw">let </span>(<span class="kw">_</span>, vec16, <span class="kw">_</span>) = <span class="kw">unsafe </span>{ buf.align_to::&lt;u16&gt;() };
-			RegistryValue::Sz(WString::from_wchars_slice(<span class="kw-2">&amp;</span>vec16))
+			RegistryValue::Sz(WString::from_wchars_slice(<span class="kw-2">&amp;</span>vec16).to_string())
 		},
 		co::REG::BINARY =&gt; RegistryValue::Binary(buf),
 		<span class="kw">_ </span>=&gt; RegistryValue::None, <span class="comment">// other types not implemented yet
@@ -1395,4 +1429,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (c97b539e4 2022-11-30)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (53e4b9dd7 2022-12-04)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
