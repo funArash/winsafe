@@ -71,6 +71,19 @@
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{IS_INTRESOURCE, MAKEINTRESOURCE};
@@ -92,7 +105,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Constructs the enum from a raw pointer.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; IdStr {
 		<span class="kw">if </span>IS_INTRESOURCE(ptr) {
 			<span class="self">Self</span>::Id(ptr <span class="kw">as _</span>)
@@ -101,7 +115,8 @@
 		}
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -111,6 +126,15 @@
 }
 
 <span class="doccomment">/// A predefined resource identifier.
+///
+/// Variant parameter for:
+///
+/// * [`HINSTANCE::EnumResourceLanguages`](crate::prelude::kernel_Hinstance::EnumResourceLanguages);
+/// * [`HINSTANCE::EnumResourceNames`](crate::prelude::kernel_Hinstance::EnumResourceNames);
+/// * [`HINSTANCE::EnumResourceTypes`](crate::prelude::kernel_Hinstance::EnumResourceTypes);
+/// * [`HINSTANCE::FindResource`](crate::prelude::kernel_Hinstance::FindResource);
+/// * [`HINSTANCE::FindResourceEx`](crate::prelude::kernel_Hinstance::FindResourceEx);
+/// * [`HUPDATERSRC`](crate::prelude::kernel_Hupdatersrc::UpdateResource).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>RtStr {
@@ -127,7 +151,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Constructs the enum from a pointer to raw data.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; RtStr {
 		<span class="kw">if </span>IS_INTRESOURCE(ptr) {
 			<span class="self">Self</span>::Rt(co::RT(ptr <span class="kw">as _</span>))
@@ -136,7 +161,8 @@
 		}
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Rt(id) =&gt; MAKEINTRESOURCE(id.<span class="number">0 </span><span class="kw">as _</span>),

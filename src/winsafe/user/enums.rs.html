@@ -516,6 +516,21 @@
 <a href="#516" id="516">516</a>
 <a href="#517" id="517">517</a>
 <a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -525,7 +540,9 @@
 	ATOM, HBITMAP, HICON, HMENU, HWND, NCCALCSIZE_PARAMS, POINT, RECT,
 };
 
-<span class="doccomment">/// Variant parameters of a [`wm::Command`](crate::msg::wm::Command) message.
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`wm::Command`](crate::msg::wm::Command).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>AccelMenuCtrl {
 	<span class="doccomment">/// Accelerator event. Contains the accelerator command ID.
@@ -549,7 +566,9 @@
 	}
 }
 
-<span class="doccomment">/// The data of the [`AccelMenuCtrl`](crate::AccelMenuCtrl) `Ctrl` option.
+<span class="doccomment">/// Variant parameter for:
+///
+/// * [`AccelMenuCtrl`](crate::AccelMenuCtrl).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub struct </span>AccelMenuCtrlData {
 	<span class="kw">pub </span>notif_code: co::CMD,
@@ -561,9 +580,9 @@
 /// [window class](https://learn.microsoft.com/en-us/windows/win32/winmsg/window-classes)
 /// functions:
 ///
-/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `lpClassName`;
-/// * [`HWND::FindWindowEx`](crate::prelude::user_Hwnd::FindWindowEx) `lpszClass`;
-/// * [`UnregisterClass`](crate::UnregisterClass) `lpClassName`.
+/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx);
+/// * [`HWND::FindWindowEx`](crate::prelude::user_Hwnd::FindWindowEx);
+/// * [`UnregisterClass`](crate::UnregisterClass).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>AtomStr {
@@ -581,7 +600,7 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="doccomment">/// Converts the contents into a `*const u16` pointer.
+	<span class="doccomment">/// Returns a pointer to the raw data content.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
@@ -593,8 +612,8 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`bm::GetImage`](crate::msg::bm::GetImage) `image`;
-/// * [`bm::SetImage`](crate::msg::bm::SetImage) `image`.
+/// * [`bm::GetImage`](crate::msg::bm::GetImage);
+/// * [`bm::SetImage`](crate::msg::bm::SetImage).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>BmpIcon {
 	<span class="doccomment">/// A bitmap.
@@ -606,17 +625,19 @@
 <span class="kw">impl </span>BmpIcon {
 	<span class="doccomment">/// Converts the contents into an `isize`.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-		(<span class="kw">match </span><span class="self">self </span>{
-			BmpIcon::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
-			BmpIcon::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
-		}) <span class="kw">as _
-	</span>}
+	</span><span class="kw">pub const fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">unsafe </span>{
+			std::mem::transmute(<span class="kw">match </span><span class="self">self </span>{
+				BmpIcon::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
+				BmpIcon::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
+			})
+		}
+	}
 }
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `lpNewItem`.
+/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>BmpPtrStr {
 	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).
@@ -636,7 +657,7 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="doccomment">/// Converts the contents into a `*const u16` pointer.
+	<span class="doccomment">/// Returns a pointer to the raw data content.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
@@ -650,8 +671,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`DEVMODE`](crate::DEVMODE) `dmDisplayFlags`;
-/// * [`DEVMODE`](crate::DEVMODE) `dmNup`.
+/// * [`DEVMODE`](crate::DEVMODE).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone, Copy)]
 </span><span class="kw">pub enum </span>DispfNup {
@@ -663,7 +683,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`EnumDisplaySettings`](crate::EnumDisplaySettings) `mode_num`.
+/// * [`EnumDisplaySettings`](crate::EnumDisplaySettings).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone, Copy)]
 </span><span class="kw">pub enum </span>GmidxEnum {
@@ -684,7 +704,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) `hwnd_focus`.
+/// * [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>HwndFocus {
 	<span class="doccomment">/// Handle to the control to receive the focus.
@@ -696,8 +716,8 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`wm::EnterIdle`](crate::msg::wm::EnterIdle) `reason`;
-/// * [`HELPINFO`](crate::HELPINFO) `hItemHandle`.
+/// * [`wm::EnterIdle`](crate::msg::wm::EnterIdle);
+/// * [`HELPINFO`](crate::HELPINFO).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>HwndHmenu {
 	<span class="doccomment">/// A window.
@@ -709,19 +729,21 @@
 <span class="kw">impl </span>HwndHmenu {
 	<span class="doccomment">/// Converts the contents into an `isize`.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-		(<span class="kw">match </span><span class="self">self </span>{
-			HwndHmenu::Hwnd(hwnd) =&gt; hwnd.<span class="number">0</span>,
-			HwndHmenu::Hmenu(hmenu) =&gt; hmenu.<span class="number">0</span>,
-		}) <span class="kw">as _
-	</span>}
+	</span><span class="kw">pub const fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">unsafe </span>{
+			std::mem::transmute(<span class="kw">match </span><span class="self">self </span>{
+				HwndHmenu::Hwnd(hwnd) =&gt; hwnd.<span class="number">0</span>,
+				HwndHmenu::Hmenu(hmenu) =&gt; hmenu.<span class="number">0</span>,
+			})
+		}
+	}
 }
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HWND::SetWindowPos`](crate::prelude::user_Hwnd::SetWindowPos) `hwnd_insert_after`;
-/// * [`WINDOWPOS`](crate::WINDOWPOS) `hwndInsertAfter`;
-/// * [`WINDOWPOS`](crate::WINDOWPOS) `set_hwndInsertAfter`.
+/// * [`HWND::SetWindowPos`](crate::prelude::user_Hwnd::SetWindowPos);
+/// * [`WINDOWPOS`](crate::WINDOWPOS);
+/// * [`WINDOWPOS`](crate::WINDOWPOS).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>HwndPlace {
 	<span class="doccomment">/// A handle to the window to precede the positioned window in the Z order.
@@ -733,7 +755,8 @@
 }
 
 <span class="kw">impl </span>HwndPlace {
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Hwnd(hwnd) =&gt; hwnd.<span class="number">0</span>,
@@ -745,7 +768,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`wm::ParentNotify`](crate::msg::wm::ParentNotify) `data32`.
+/// * [`wm::ParentNotify`](crate::msg::wm::ParentNotify).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>HwndPointId {
 	<span class="doccomment">/// Handle to the child window.
@@ -770,7 +793,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HINSTANCE::LoadCursor`](crate::prelude::user_Hinstance::LoadCursor) `resource_id`.
+/// * [`HINSTANCE::LoadCursor`](crate::prelude::user_Hinstance::LoadCursor).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdIdcStr {
@@ -789,7 +812,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -801,7 +825,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HINSTANCE::LoadIcon`](crate::prelude::user_Hinstance::LoadIcon) `icon_id`.
+/// * [`HINSTANCE::LoadIcon`](crate::prelude::user_Hinstance::LoadIcon).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdIdiStr {
@@ -820,7 +844,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -832,8 +857,8 @@
 
 <span class="doccomment">/// Variant parameter used in [menu](crate::HMENU) methods:
 ///
-/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu) `uIDNewItem`;
-/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx) `hMenu`.
+/// * [`HMENU::AppendMenu`](crate::prelude::user_Hmenu::AppendMenu);
+/// * [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>IdMenu&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="doccomment">/// A command ID.
@@ -845,7 +870,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IdMenu&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; <span class="kw-2">*</span>id <span class="kw">as _</span>,
@@ -854,11 +880,12 @@
 		}
 	}
 
-	<span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+	<span class="doccomment">/// Converts the raw data into an `usize`.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
 		<span class="kw">match </span><span class="self">self </span>{
 			IdMenu::Id(id) =&gt; <span class="kw-2">*</span>id <span class="kw">as _</span>,
-			IdMenu::Menu(hMenu) =&gt; hMenu.<span class="number">0 </span><span class="kw">as _</span>,
+			IdMenu::Menu(hMenu) =&gt; <span class="kw">unsafe </span>{ std::mem::transmute(hMenu.<span class="number">0</span>) },
 			IdMenu::None =&gt; <span class="number">0</span>,
 		}
 	}
@@ -866,7 +893,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HINSTANCE::LoadImageBitmap`](crate::prelude::user_Hinstance::LoadImageBitmap) `name`.
+/// * [`HINSTANCE::LoadImageBitmap`](crate::prelude::user_Hinstance::LoadImageBitmap).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdObmStr {
@@ -885,7 +912,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -897,7 +925,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HINSTANCE::LoadImageCursor`](crate::prelude::user_Hinstance::LoadImageCursor) `name`.
+/// * [`HINSTANCE::LoadImageCursor`](crate::prelude::user_Hinstance::LoadImageCursor).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdOcrStr {
@@ -916,7 +944,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -928,7 +957,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HINSTANCE::LoadImageIcon`](crate::prelude::user_Hinstance::LoadImageIcon) `name`.
+/// * [`HINSTANCE::LoadImageIcon`](crate::prelude::user_Hinstance::LoadImageIcon).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdOicStr {
@@ -947,7 +976,8 @@
 		<span class="self">Self</span>::Str(WString::from_str(v))
 	}
 
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Returns a pointer to the raw data content.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
@@ -959,19 +989,19 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HMENU::CheckMenuItem`](crate::prelude::user_Hmenu::CheckMenuItem) `uIDCheckItem`;
-/// * [`HMENU::CheckMenuRadioItem`](crate::prelude::user_Hmenu::CheckMenuRadioItem) `first`, `last`, `check`;
-/// * [`HMENU::DeleteMenu`](crate::prelude::user_Hmenu::DeleteMenu) `uPosition`;
-/// * [`HMENU::EnableMenuItem`](crate::prelude::user_Hmenu::EnableMenuItem) `uIDEnableItem`;
-/// * [`HMENU::GetMenuDefaultItem`](crate::prelude::user_Hmenu::GetMenuDefaultItem) return value;
-/// * [`HMENU::GetMenuItemInfo`](crate::prelude::user_Hmenu::GetMenuItemInfo) `item`;
-/// * [`HMENU::GetMenuState`](crate::prelude::user_Hmenu::GetMenuState) `uId`;
-/// * [`HMENU::GetMenuString`](crate::prelude::user_Hmenu::GetMenuString) `uIDItem`;
-/// * [`HMENU::InsertMenuItem`](crate::prelude::user_Hmenu::InsertMenuItem) `item`;
-/// * [`HMENU::RemoveMenu`](crate::prelude::user_Hmenu::RemoveMenu) `uPosition`;
-/// * [`HMENU::SetMenuItemBitmaps`](crate::prelude::user_Hmenu::SetMenuItemBitmaps) `uPosition`;
-/// * [`HMENU::SetMenuItemInfo`](crate::prelude::user_Hmenu::SetMenuItemInfo) `item`;
-/// * [`HWND::HiliteMenuItem`](crate::prelude::user_Hwnd::HiliteMenuItem) `uIDHiliteItem`.
+/// * [`HMENU::CheckMenuItem`](crate::prelude::user_Hmenu::CheckMenuItem);
+/// * [`HMENU::CheckMenuRadioItem`](crate::prelude::user_Hmenu::CheckMenuRadioItem);
+/// * [`HMENU::DeleteMenu`](crate::prelude::user_Hmenu::DeleteMenu);
+/// * [`HMENU::EnableMenuItem`](crate::prelude::user_Hmenu::EnableMenuItem);
+/// * [`HMENU::GetMenuDefaultItem`](crate::prelude::user_Hmenu::GetMenuDefaultItem);
+/// * [`HMENU::GetMenuItemInfo`](crate::prelude::user_Hmenu::GetMenuItemInfo);
+/// * [`HMENU::GetMenuState`](crate::prelude::user_Hmenu::GetMenuState);
+/// * [`HMENU::GetMenuString`](crate::prelude::user_Hmenu::GetMenuString);
+/// * [`HMENU::InsertMenuItem`](crate::prelude::user_Hmenu::InsertMenuItem);
+/// * [`HMENU::RemoveMenu`](crate::prelude::user_Hmenu::RemoveMenu);
+/// * [`HMENU::SetMenuItemBitmaps`](crate::prelude::user_Hmenu::SetMenuItemBitmaps);
+/// * [`HMENU::SetMenuItemInfo`](crate::prelude::user_Hmenu::SetMenuItemInfo);
+/// * [`HWND::HiliteMenuItem`](crate::prelude::user_Hwnd::HiliteMenuItem).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 #[derive(Clone, Copy)]
 </span><span class="kw">pub enum </span>IdPos {
@@ -1013,7 +1043,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`HMENU::AppendMenuEnum`](crate::prelude::user_Hmenu::AppendMenuEnum) `entry`.
+/// * [`HMENU::AppendMenuEnum`](crate::prelude::user_Hmenu::AppendMenuEnum).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>MenuEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="doccomment">/// A selectable entry item, with command ID and text.
@@ -1026,7 +1056,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`wm::NcCalcSize`](crate::msg::wm::NcCalcSize) `data`.
+/// * [`wm::NcCalcSize`](crate::msg::wm::NcCalcSize).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;user&quot;</span>)))]
 </span><span class="kw">pub enum </span>NccspRect&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
 	<span class="doccomment">/// Mutable reference to [`NCCALCSIZE_PARAMS`](crate::NCCALCSIZE_PARAMS).

@@ -160,48 +160,16 @@
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HTREEITEM;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::{I_IMAGECALLBACK, I_IMAGENONE};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, IdStr, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAKEINTRESOURCE;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, HCURSOR, HDC, HICON, POINT};
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`stm::GetImage`](crate::msg::stm::GetImage) `image`;
-/// * [`stm::SetImage`](crate::msg::stm::SetImage) `image`.
+/// * [`stm::GetImage`](crate::msg::stm::GetImage);
+/// * [`stm::SetImage`](crate::msg::stm::SetImage).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 </span><span class="kw">pub enum </span>BmpIconCurMeta {
 	<span class="doccomment">/// Bitmap.
@@ -217,19 +185,21 @@
 <span class="kw">impl </span>BmpIconCurMeta {
 	<span class="doccomment">/// Converts the contents into an `isize`.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-		(<span class="kw">match </span><span class="self">self </span>{
-			BmpIconCurMeta::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
-			BmpIconCurMeta::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
-			BmpIconCurMeta::Cur(hcur) =&gt; hcur.<span class="number">0</span>,
-			BmpIconCurMeta::Meta(hdc) =&gt; hdc.<span class="number">0</span>,
-		}) <span class="kw">as _
-	</span>}
+	</span><span class="kw">pub const fn </span>as_isize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
+		<span class="kw">unsafe </span>{
+			std::mem::transmute(<span class="kw">match </span><span class="self">self </span>{
+				BmpIconCurMeta::Bmp(hbmp) =&gt; hbmp.<span class="number">0</span>,
+				BmpIconCurMeta::Icon(hicon) =&gt; hicon.<span class="number">0</span>,
+				BmpIconCurMeta::Cur(hcur) =&gt; hcur.<span class="number">0</span>,
+				BmpIconCurMeta::Meta(hdc) =&gt; hdc.<span class="number">0</span>,
+			})
+		}
+	}
 }
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`TBADDBITMAP`](crate::TBADDBITMAP) `nID`.
+/// * [`TBADDBITMAP`](crate::TBADDBITMAP).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 </span><span class="kw">pub enum </span>BmpIdbRes {
 	<span class="doccomment">/// An [`HBITMAP`](crate::HBITMAP).
@@ -251,43 +221,9 @@
 	</span>InstId((HINSTANCE, u16)),
 }
 
-<span class="doccomment">/// Variant parameter for:
-///
-/// * [`HWND::TaskDialog`](crate::prelude::comctl_ole_Hwnd::TaskDialog) `pszIcon`.
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
-#[derive(Clone)]
-</span><span class="kw">pub enum </span>IdTdiconStr {
-	<span class="doccomment">/// No icon.
-	</span><span class="prelude-val">None</span>,
-	<span class="doccomment">/// A resource ID.
-	</span>Id(u16),
-	<span class="doccomment">/// A predefined icon.
-	</span>Tdicon(co::TD_ICON),
-	<span class="doccomment">/// A resource string identifier.
-	</span>Str(WString),
-}
-
-<span class="kw">impl </span>IdTdiconStr {
-	<span class="doccomment">/// Constructs the enum directly from a string.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_str(v: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-		<span class="self">Self</span>::Str(WString::from_str(v))
-	}
-
-	<span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
-		<span class="kw">match </span><span class="self">self </span>{
-			<span class="self">Self</span>::None =&gt; std::ptr::null(),
-			<span class="self">Self</span>::Id(id) =&gt; MAKEINTRESOURCE(<span class="kw-2">*</span>id <span class="kw">as _</span>),
-			<span class="self">Self</span>::Tdicon(tdi) =&gt; MAKEINTRESOURCE(tdi.<span class="number">0 </span><span class="kw">as _</span>),
-			<span class="self">Self</span>::Str(ws) =&gt; <span class="kw">unsafe </span>{ ws.as_ptr() },
-		}
-	}
-}
-
 <span class="doccomment">/// Variant type for:
 ///
-/// * [`tbm::ChangeBitmap`](crate::msg::tbm::ChangeBitmap) `image`.
+/// * [`tbm::ChangeBitmap`](crate::msg::tbm::ChangeBitmap).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 #[derive(Clone, Copy)]
 </span><span class="kw">pub enum </span>IdxCbNone {
@@ -311,7 +247,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`TBBUTTON`](crate::TBBUTTON) `iString`.
+/// * [`TBBUTTON`](crate::TBBUTTON).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>IdxStr {
@@ -323,7 +259,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`hdm::SetHotDivider`](crate::msg::hdm::SetHotDivider) `value`.
+/// * [`hdm::SetHotDivider`](crate::msg::hdm::SetHotDivider).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 </span><span class="kw">pub enum </span>PtIdx {
 	<span class="doccomment">/// X and Y coordinates of the pointer
@@ -334,7 +270,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`tbm::AddString`](crate::msg::tbm::AddString) `texts`.
+/// * [`tbm::AddString`](crate::msg::tbm::AddString).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 </span><span class="kw">pub enum </span>ResStrs {
 	<span class="doccomment">/// A resource string resource.
@@ -346,7 +282,8 @@
 }
 
 <span class="kw">impl </span>ResStrs {
-	<span class="attr">#[must_use]
+	<span class="doccomment">/// Constructs the enum from a list of strings.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_strs(texts: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; ResStrs {
 		<span class="self">Self</span>::Strs(WString::from_str_vec(texts))
 	}
@@ -354,7 +291,7 @@
 
 <span class="doccomment">/// Variant parameter for:
 ///
-/// * [`TVINSERTSTRUCT`](crate::TVINSERTSTRUCT) `hInsertAfter`.
+/// * [`TVINSERTSTRUCT`](crate::TVINSERTSTRUCT).
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
 </span><span class="kw">pub enum </span>TreeitemTvi {
 	<span class="doccomment">/// Handle to a tree view item.
@@ -373,8 +310,9 @@
 }
 
 <span class="kw">impl </span>TreeitemTvi {
-	<span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_isize(val: isize) -&gt; TreeitemTvi {
+	<span class="doccomment">/// Constructs the enum from an `isize`.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>from_isize(val: isize) -&gt; TreeitemTvi {
 		<span class="kw">match </span>co::TVI(val) {
 			co::TVI::FIRST =&gt; <span class="self">Self</span>::Tvi(co::TVI::FIRST),
 			co::TVI::LAST =&gt; <span class="self">Self</span>::Tvi(co::TVI::LAST),
