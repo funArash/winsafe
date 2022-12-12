@@ -268,9 +268,6 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
 </pre><pre class="rust"><code><span class="doccomment">//! File path utilities.
 //!
 //! Some of the functions are similar to
@@ -413,16 +410,6 @@
 	flags.has(co::FILE_ATTRIBUTE::HIDDEN)
 }
 
-<span class="doccomment">/// Returns an iterator over each part of the path.
-///
-/// To iterate over files within a directory, see
-/// [`HFINDFILE::iter`](crate::prelude::kernel_Hfindfile::iter).
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
-#[must_use]
-</span><span class="kw">pub fn </span>iter_parts(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; {
-	PartsIterator { path: full_path }
-}
-
 <span class="doccomment">/// Replaces the extension by the given one.
 ///
 /// # Examples
@@ -514,6 +501,13 @@
 			full_path <span class="comment">// no trailing backslash
 		</span>},
 	}
+}
+
+<span class="doccomment">/// Returns a `Vec` with each part of the full path.
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>split_parts(full_path: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+	full_path.split(<span class="string">&#39;\\&#39;</span>).collect()
 }
 
 <span class="comment">//------------------------------------------------------------------------------
