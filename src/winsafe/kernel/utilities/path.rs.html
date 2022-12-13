@@ -268,6 +268,75 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
 </pre><pre class="rust"><code><span class="doccomment">//! File path utilities.
 //!
 //! Some of the functions are similar to
@@ -277,8 +346,37 @@
 //! [`&amp;OsStr`](https://doc.rust-lang.org/std/ffi/struct.OsStr.html).
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetFileAttributes, HINSTANCE, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hinstance, NativeBitflag};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	GetFileAttributes, HFINDFILE, HINSTANCE, SysResult, WIN32_FIND_DATA,
+};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HfindfileGuard;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hfindfile, kernel_Hinstance, NativeBitflag};
+
+<span class="doccomment">/// Returns an iterator over the files and folders within a directory.
+/// Optionally, a wildcard can be specified to filter files by name.
+///
+/// # Examples
+///
+/// Listing all text files in a directory:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::path;
+///
+/// for file_path in path::dir_list(&quot;C:\\temp&quot;, Some(&quot;*.txt&quot;)) {
+///     let file_path = file_path?;
+///     println!(&quot;{}&quot;, file_path);
+/// }
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
+#[must_use]
+</span><span class="kw">pub fn </span>dir_list&lt;<span class="lifetime">&#39;a</span>&gt;(
+	dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+	filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a
+</span>{
+	DirListIter::new(dir_path, filter)
+}
 
 <span class="doccomment">/// Returns the path of the current EXE file, without the EXE filename, and
 /// without a trailing backslash.
@@ -507,35 +605,75 @@
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;kernel&quot;</span>)))]
 #[must_use]
 </span><span class="kw">pub fn </span>split_parts(full_path: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
-	full_path.split(<span class="string">&#39;\\&#39;</span>).collect()
+	<span class="kw">let </span>no_bs = rtrim_backslash(full_path);
+	no_bs.split(<span class="string">&#39;\\&#39;</span>).collect()
 }
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>PartsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
-	path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+</span><span class="kw">struct </span>DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+	filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+	hfind: <span class="prelude-ty">Option</span>&lt;HfindfileGuard&gt;,
+	wfd: WIN32_FIND_DATA,
+	no_more: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>PartsIterator&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">type </span>Item = SysResult&lt;String&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-		<span class="kw">if </span><span class="self">self</span>.path.is_empty() {
+		<span class="kw">if </span><span class="self">self</span>.no_more {
 			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="prelude-val">Some</span>(<span class="kw">match </span><span class="self">self</span>.path.find(<span class="string">&#39;\\&#39;</span>) {
-			<span class="prelude-val">Some</span>(idx) =&gt; {
-				<span class="kw">let </span>cur_part = <span class="kw-2">&amp;</span><span class="self">self</span>.path[..idx];
-				<span class="self">self</span>.path = <span class="kw-2">&amp;</span><span class="self">self</span>.path[idx + <span class="number">1</span>..];
-				cur_part
+		<span class="kw">let </span>found = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.hfind {
+			<span class="prelude-val">None </span>=&gt; { <span class="comment">// first pass
+				</span><span class="kw">let </span>dir_final = <span class="kw">match </span><span class="self">self</span>.filter {
+					<span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}\\*&quot;</span>, <span class="self">self</span>.dir_path),
+					<span class="prelude-val">Some</span>(filter) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}\\{}&quot;</span>, <span class="self">self</span>.dir_path, filter),
+				};
+
+				<span class="kw">let </span>found = <span class="kw">match </span>HFINDFILE::FindFirstFile(<span class="kw-2">&amp;</span>dir_final, <span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd) {
+					<span class="prelude-val">Err</span>(e) =&gt; {
+						<span class="self">self</span>.no_more = <span class="bool-val">true</span>; <span class="comment">// prevent further iterations
+						</span><span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e));
+					},
+					<span class="prelude-val">Ok</span>((hfind, found)) =&gt; {
+						<span class="self">self</span>.hfind = <span class="prelude-val">Some</span>(hfind); <span class="comment">// store our find handle
+						</span>found
+					},
+				};
+				found
 			},
-			<span class="prelude-val">None </span>=&gt; {
-				<span class="kw">let </span>cur_part = <span class="self">self</span>.path; <span class="comment">// until the end
-				</span><span class="self">self</span>.path = <span class="kw-2">&amp;</span><span class="self">self</span>.path[<span class="self">self</span>.path.len()..]; <span class="comment">// empty
-				</span>cur_part
+			<span class="prelude-val">Some</span>(hfind) =&gt; { <span class="comment">// subsequent passes
+				</span><span class="kw">match </span>hfind.FindNextFile(<span class="kw-2">&amp;mut </span><span class="self">self</span>.wfd) {
+					<span class="prelude-val">Err</span>(e) =&gt; {
+						<span class="self">self</span>.no_more = <span class="bool-val">true</span>; <span class="comment">// prevent further iterations
+						</span><span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e));
+					},
+					<span class="prelude-val">Ok</span>(found) =&gt; found,
+				}
 			},
-		})
+		};
+
+		<span class="kw">if </span>found {
+			<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;{}\\{}&quot;</span>, <span class="self">self</span>.dir_path, <span class="self">self</span>.wfd.cFileName())))
+		} <span class="kw">else </span>{
+			<span class="prelude-val">None
+		</span>}
+	}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>new(dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			dir_path: rtrim_backslash(dir_path),
+			filter,
+			hfind: <span class="prelude-val">None</span>,
+			wfd: WIN32_FIND_DATA::default(),
+			no_more: <span class="bool-val">false</span>,
+		}
 	}
 }
 </code></pre></div>
