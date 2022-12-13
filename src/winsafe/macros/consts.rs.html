@@ -434,14 +434,12 @@
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(unused_macros)]
 
 </span><span class="doccomment">/// Writes pub(crate) and pub values of the given constant type.
 </span><span class="macro">macro_rules! </span>const_values {
 	(
-		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident;
 		$(
 			$( <span class="attr">#[<span class="macro-nonterminal">$privvaldoc</span>:meta] </span>)*
 			<span class="macro-nonterminal">$privvalname</span>:ident <span class="macro-nonterminal">$privval</span>:expr
@@ -452,7 +450,6 @@
 			<span class="macro-nonterminal">$pubvalname</span>:ident <span class="macro-nonterminal">$pubval</span>:expr
 		)*
 	) =&gt; {
-		$( <span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))] </span>)*
 		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
 			$(
 				$( <span class="attr">#[<span class="macro-nonterminal">$privvaldoc</span>] </span>)*
@@ -470,12 +467,11 @@
 /// include `Debug` and `Display` impls.
 </span><span class="macro">macro_rules! </span>const_no_debug_display {
 	(
-		<span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ntype</span>:ty: <span class="macro-nonterminal">$feature</span>:literal;
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ntype</span>:ty;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 	) =&gt; {
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
-		<span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="macro-nonterminal">$feature</span>)))]
-		#[repr(transparent)]
+		<span class="attr">#[repr(transparent)]
 		#[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="macro-nonterminal">$ntype</span>);
 
@@ -525,7 +521,7 @@
 /// values.
 </span><span class="macro">macro_rules! </span>const_ordinary {
 	(
-		<span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ntype</span>:ty: <span class="macro-nonterminal">$feature</span>:literal;
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ntype</span>:ty;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -539,7 +535,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_no_debug_display! </span>{
-			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype </span>: <span class="macro-nonterminal">$feature</span>;
+			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype</span>;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		}
 
@@ -579,7 +575,7 @@
 /// public values.
 </span><span class="macro">macro_rules! </span>const_bitflag {
 	(
-		<span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ntype</span>:ty: <span class="macro-nonterminal">$feature</span>:literal;
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ntype</span>:ty;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -593,7 +589,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_ordinary! </span>{
-			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype </span>: <span class="macro-nonterminal">$feature</span>;
+			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype</span>;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is a bitflag constant, which implements the
@@ -663,7 +659,7 @@
 /// [`WM`](crate::co::WM) constant type, along with private and public values.
 </span><span class="macro">macro_rules! </span>const_wm {
 	(
-		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -677,7 +673,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_ordinary! </span>{
-			<span class="macro-nonterminal">$name</span>: u32 $(: <span class="macro-nonterminal">$feature </span>)<span class="kw-2">*</span>;
+			<span class="macro-nonterminal">$name</span>: u32;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is a window message, convertible to [`WM`](crate::co::WM).
@@ -706,7 +702,7 @@
 /// public values.
 </span><span class="macro">macro_rules! </span>const_cmd {
 	(
-		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -720,7 +716,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_ordinary! </span>{
-			<span class="macro-nonterminal">$name</span>: u16 $(: <span class="macro-nonterminal">$feature </span>)<span class="kw-2">*</span>;
+			<span class="macro-nonterminal">$name</span>: u16;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is a [`wm::Command`](crate::msg::wm::Command) notification
@@ -750,7 +746,7 @@
 /// public values.
 </span><span class="macro">macro_rules! </span>const_nm {
 	(
-		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -764,7 +760,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_ordinary! </span>{
-			<span class="macro-nonterminal">$name</span>: i32 $(: <span class="macro-nonterminal">$feature </span>)<span class="kw-2">*</span>;
+			<span class="macro-nonterminal">$name</span>: i32;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is a [`wm::Notify`](crate::msg::wm::Notify) notification
@@ -793,7 +789,7 @@
 /// [`WS`](crate::co::WS) constant type, along with private and public values.
 </span><span class="macro">macro_rules! </span>const_ws {
 	(
-		<span class="macro-nonterminal">$name</span>:ident: <span class="macro-nonterminal">$ntype</span>:ty $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident : <span class="macro-nonterminal">$ntype</span>:ty;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -807,7 +803,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_bitflag! </span>{
-			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype </span>$(: <span class="macro-nonterminal">$feature </span>)<span class="kw-2">*</span>;
+			<span class="macro-nonterminal">$name</span>: <span class="macro-nonterminal">$ntype</span>;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is a window style, convertible to [`WS`](crate::co::WS).
@@ -836,7 +832,7 @@
 /// values.
 </span><span class="macro">macro_rules! </span>const_wsex {
 	(
-		<span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$feature</span>:literal)<span class="kw-2">*</span>;
+		<span class="macro-nonterminal">$name</span>:ident;
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>:meta] </span>)*
 		=&gt;
 		$(
@@ -850,7 +846,7 @@
 		)*
 	) =&gt; {
 		<span class="macro">const_bitflag! </span>{
-			<span class="macro-nonterminal">$name</span>: u32 $(: <span class="macro-nonterminal">$feature </span>)<span class="kw-2">*</span>;
+			<span class="macro-nonterminal">$name</span>: u32;
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 			<span class="doccomment">///
 			/// This is an extended windoow style, convertible to

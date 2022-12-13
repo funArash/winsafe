@@ -156,13 +156,6 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, ole};
@@ -190,8 +183,7 @@
 /// )?;
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
-#[must_use]
+</span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CoCreateInstance&lt;T&gt;(
 	clsid: <span class="kw-2">&amp;</span>co::CLSID,
 	iunk_outer: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>IUnknown&gt;,
@@ -242,7 +234,6 @@
 /// CoUninitialize();
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;co::HRESULT&gt; {
 	<span class="kw">let </span>code = co::HRESULT(
 		<span class="kw">unsafe </span>{ ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.<span class="number">0</span>) },
@@ -260,7 +251,6 @@
 ///
 /// **Note:** If you lock a COM pointer, `CoLockObjectExternal` must be called
 /// again to unlock it, or you&#39;ll have a resource leak.
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub fn </span>CoLockObjectExternal(
 	obj: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown,
 	lock: bool,
@@ -284,7 +274,6 @@
 ///
 /// This function manually allocates a memory block, which must be freed with
 /// [`CoTaskMemFree`](crate::CoTaskMemFree).
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub unsafe fn </span>CoTaskMemAlloc(cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
 	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ole::ffi::CoTaskMemAlloc(cb) };
 	<span class="kw">if </span>p.is_null() {
@@ -296,7 +285,6 @@
 
 <span class="doccomment">/// [`CoTaskMemFree`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree)
 /// function.
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub fn </span>CoTaskMemFree(pv: <span class="kw-2">*mut </span>u8) {
 	<span class="kw">unsafe </span>{ ole::ffi::CoTaskMemFree(pv <span class="kw">as _</span>) }
 }
@@ -308,7 +296,6 @@
 ///
 /// This function manually allocates a memory block, which must be freed with
 /// [`CoTaskMemFree`](crate::CoTaskMemFree).
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub unsafe fn </span>CoTaskMemRealloc(pv: <span class="kw-2">*mut </span>u8, cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
 	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ole::ffi::CoTaskMemRealloc(pv <span class="kw">as _</span>, cb) };
 	<span class="kw">if </span>p.is_null() {
@@ -324,7 +311,6 @@
 /// **Note:** Must be called **after** all COM interfaces have been released,
 /// otherwise you&#39;ll get a segmentation fault error with
 /// `STATUS_ACCESS_VIOLATION` code.
-</span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ole&quot;</span>)))]
 </span><span class="kw">pub fn </span>CoUninitialize() {
 	<span class="kw">unsafe </span>{ ole::ffi::CoUninitialize() }
 }
