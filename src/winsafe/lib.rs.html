@@ -554,6 +554,10 @@
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Windows API and GUI in safe, idiomatic Rust.
 //!
 //! [Crate](https://crates.io/crates/winsafe) •
@@ -590,19 +594,20 @@
 //!
 //! | Feature | Description |
 //! | - | - |
-//! | `advapi` | Advapi32.dll, for Windows Registry |
+//! | `advapi` | Advapi32.dll, for [Windows Registry](https://learn.microsoft.com/en-us/windows/win32/sysinfo/registry) |
 //! | `comctl` | ComCtl32.dll, for [Common Controls](https://learn.microsoft.com/en-us/windows/win32/api/_controls/) |
 //! | `comdlg` | ComDlg32.dll, for the old [Common Dialogs](https://learn.microsoft.com/en-us/windows/win32/uxguide/win-common-dlg) |
 //! | `dshow` | [DirectShow](https://learn.microsoft.com/en-us/windows/win32/directshow/directshow) |
 //! | `gdi` | Gdi32.dll, the [Windows GDI](https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi) |
-//! | **[`gui`](crate::gui)** | **The WinSafe high-level GUI structs** |
-//! | `kernel` | Kernel32.dll, required by all others |
+//! | **`gui`** | **The WinSafe high-level GUI abstractions** |
+//! | `kernel` | Kernel32.dll, all others will include it |
+//! | `ktm` | Ktmw32.dll, the [Kernel Transaction Manager](https://learn.microsoft.com/en-us/windows/win32/ktm/ktm-security-and-access-rights) |
 //! | `msimg` | Msimg32.dll |
 //! | `ole` | OLE and basic COM support |
 //! | `oleaut` | [OLE Automation](https://learn.microsoft.com/en-us/windows/win32/api/_automat/) |
 //! | `shell` | Shell32.dll and Shlwapi.dll, the COM-based [Windows Shell](https://learn.microsoft.com/en-us/windows/win32/shell/shell-entry) |
-//! | `user` | User32.dll, the basic Windows UI support |
-//! | `uxtheme` | UxTheme.dll, extended UI theming |
+//! | `user` | User32.dll, the basic Windows GUI support |
+//! | `uxtheme` | UxTheme.dll, extended window theming |
 //! | `version` | Version.dll, to manipulate *.exe version info |
 //!
 //! Note that a Cargo feature may depend on other features, which will be
@@ -827,6 +832,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)] </span><span class="kw">mod </span>dshow;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)] </span><span class="kw">mod </span>gdi;
 <span class="attr">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)] </span><span class="kw">mod </span>kernel;
+<span class="attr">#[cfg(feature = <span class="string">&quot;ktm&quot;</span>)] </span><span class="kw">mod </span>ktm;
 <span class="attr">#[cfg(feature = <span class="string">&quot;msimg&quot;</span>)] </span><span class="kw">mod </span>msimg;
 <span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">mod </span>ole;
 <span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">mod </span>oleaut;
@@ -849,6 +855,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)] </span><span class="kw">pub use </span>dshow::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)] </span><span class="kw">pub use </span>gdi::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)] </span><span class="kw">pub use </span>kernel::decl::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(feature = <span class="string">&quot;ktm&quot;</span>)] </span><span class="kw">pub use </span>ktm::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span>ole::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span>oleaut::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span>shell::decl::<span class="kw-2">*</span>;
@@ -1094,6 +1101,7 @@
 	<span class="attr">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::gdi::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;gui&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::gui::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::kernel::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(feature = <span class="string">&quot;ktm&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::ktm::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;msimg&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::msimg::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::ole::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::oleaut::traits::<span class="kw-2">*</span>;

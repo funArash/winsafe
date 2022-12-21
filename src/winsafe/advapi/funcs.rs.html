@@ -50,11 +50,47 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::advapi;
-<span class="kw">use </span><span class="kw">crate</span>::advapi::privs::UNLEN;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::advapi::privs::{SECURITY_DESCRIPTOR_REVISION, UNLEN};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
+	GetLastError, SECURITY_DESCRIPTOR, SysResult, WString,
+};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 
 <span class="doccomment">/// [`DecryptFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-decryptfilew)
@@ -101,6 +137,38 @@
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
 	}
+}
+
+<span class="doccomment">/// [`InitializeSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-initializesecuritydescriptor)
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::InitializeSecurityDescriptor;
+///
+/// let security_descriptor = InitializeSecurityDescriptor()?;
+/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
+/// ```
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>InitializeSecurityDescriptor() -&gt; SysResult&lt;SECURITY_DESCRIPTOR&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>sd = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;SECURITY_DESCRIPTOR&gt;() };
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			advapi::ffi::InitializeSecurityDescriptor(
+				<span class="kw-2">&amp;mut </span>sd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				SECURITY_DESCRIPTOR_REVISION,
+			)
+		},
+	).map(|<span class="kw">_</span>| sd)
+}
+
+<span class="doccomment">/// [`IsValidSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-isvalidsecuritydescriptor)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>IsValidSecurityDescriptor(sd: <span class="kw-2">&amp;</span>SECURITY_DESCRIPTOR) -&gt; bool {
+	<span class="kw">unsafe </span>{ advapi::ffi::IsValidSecurityDescriptor(sd <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) != <span class="number">0 </span>}
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0-nightly (d0dc9efff 2022-12-18)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-58836c674e2f7bd2.css" ></div></body></html>
