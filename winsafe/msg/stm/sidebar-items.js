@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["GetIcon","`STM_GETICON` message, which has no parameters."],["GetImage","`STM_GETIMAGE` message parameters."],["SetIcon","`STM_SETICON` message parameters."],["SetImage","`STM_SETIMAGE` message parameters."]]};
