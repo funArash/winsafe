@@ -561,6 +561,9 @@
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
 <a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Windows API and GUI in safe, idiomatic Rust.
 //!
 //! [Crate](https://crates.io/crates/winsafe) •
@@ -838,6 +841,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">mod </span>user;
 <span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">mod </span>uxtheme;
 <span class="attr">#[cfg(feature = <span class="string">&quot;version&quot;</span>)] </span><span class="kw">mod </span>version;
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;advapi&quot;</span>, feature = <span class="string">&quot;comctl&quot;</span>))] </span><span class="kw">mod </span>advapi_comctl;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;advapi&quot;</span>, feature = <span class="string">&quot;ktm&quot;</span>))] </span><span class="kw">mod </span>advapi_ktm;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))] </span><span class="kw">mod </span>comctl_gdi;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">mod </span>comctl_ole;
@@ -851,9 +855,7 @@
 
 <span class="comment">// Declarations inside decl are public, placed at the root of the crate.
 
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))] </span><span class="kw">pub use </span>comctl_gdi::decl::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span>comctl_ole::decl::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)] </span><span class="kw">pub use </span>advapi::decl::<span class="kw-2">*</span>;
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)] </span><span class="kw">pub use </span>advapi::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)] </span><span class="kw">pub use </span>comctl::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;comdlg&quot;</span>)] </span><span class="kw">pub use </span>comdlg::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)] </span><span class="kw">pub use </span>dshow::decl::<span class="kw-2">*</span>;
@@ -866,6 +868,9 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">pub use </span>user::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">pub use </span>uxtheme::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;version&quot;</span>)] </span><span class="kw">pub use </span>version::decl::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;advapi&quot;</span>, feature = <span class="string">&quot;comctl&quot;</span>))] </span><span class="kw">pub use </span>advapi_comctl::decl::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))] </span><span class="kw">pub use </span>comctl_gdi::decl::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span>comctl_ole::decl::<span class="kw-2">*</span>;
 
 <span class="kw">pub mod </span>co {
 	<span class="doccomment">//! Native constants.
@@ -1052,6 +1057,7 @@
 		//! [messages](https://learn.microsoft.com/en-us/windows/win32/controls/bumper-toolbar-control-reference-messages),
 		//! whose constants have [`TBM`](crate::co::TBM) prefix.
 		</span><span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl::messages::tbm::<span class="kw-2">*</span>;
+		<span class="attr">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::advapi_comctl::messages::tbm::<span class="kw-2">*</span>;
 		<span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::<span class="kw">super</span>::comctl_ole::messages::tbm::<span class="kw-2">*</span>;
 	}
 
@@ -1096,12 +1102,7 @@
 	//! ```rust,no_run
 	//! use winsafe::prelude::*;
 	//! ```
-	</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;advapi&quot;</span>, feature = <span class="string">&quot;ktm&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::advapi_ktm::traits::<span class="kw-2">*</span>;
-	<span class="attr">#[cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::gdi_ole::traits::<span class="kw-2">*</span>;
-	<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::comctl_ole::traits::<span class="kw-2">*</span>;
-	<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::comctl_shell::traits::<span class="kw-2">*</span>;
-	<span class="attr">#[cfg(all(feature = <span class="string">&quot;dshow&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::dshow_gdi::traits::<span class="kw-2">*</span>;
-	<span class="attr">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::advapi::traits::<span class="kw-2">*</span>;
+	</span><span class="attr">#[cfg(feature = <span class="string">&quot;advapi&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::advapi::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;comctl&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::comctl::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;dshow&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::dshow::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;gdi&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::gdi::traits::<span class="kw-2">*</span>;
@@ -1114,6 +1115,11 @@
 	<span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::shell::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::user::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::uxtheme::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(all(feature = <span class="string">&quot;advapi&quot;</span>, feature = <span class="string">&quot;ktm&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::advapi_ktm::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::gdi_ole::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::comctl_ole::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(all(feature = <span class="string">&quot;comctl&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::comctl_shell::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(all(feature = <span class="string">&quot;dshow&quot;</span>, feature = <span class="string">&quot;gdi&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::dshow_gdi::traits::<span class="kw-2">*</span>;
 }
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;dshow&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>, feature = <span class="string">&quot;oleaut&quot;</span>, feature = <span class="string">&quot;shell&quot;</span>))]
