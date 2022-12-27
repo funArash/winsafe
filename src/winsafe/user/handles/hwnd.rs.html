@@ -1573,6 +1573,23 @@
 <a href="#1573" id="1573">1573</a>
 <a href="#1574" id="1574">1574</a>
 <a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1590,6 +1607,7 @@
 	IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, RECT, SCROLLINFO, SIZE,
 	TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
 };
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_none;
 
 <span class="macro">impl_handle! </span>{ HWND;
 	<span class="doccomment">/// Handle to a
@@ -2176,6 +2194,22 @@
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
 		}
+	}
+
+	<span class="doccomment">/// [`GetUpdateRect`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getupdaterect)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetUpdateRect(<span class="kw-2">&amp;</span><span class="self">self</span>, erase: bool) -&gt; <span class="prelude-ty">Option</span>&lt;RECT&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
+		zero_as_none(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetUpdateRect(
+					<span class="self">self</span>.as_ptr(),
+					<span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					erase <span class="kw">as _</span>,
+				)
+			} <span class="kw">as _</span>,
+		).map(|<span class="kw">_</span>| rc)
 	}
 
 	<span class="doccomment">/// [`GetUpdateRgn`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getupdatergn)

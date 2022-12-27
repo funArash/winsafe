@@ -71,14 +71,44 @@
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+</span><span class="kw">use crate</span>::{co, user};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
-<span class="kw">use </span><span class="kw">crate</span>::user;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HMONITOR, RECT};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HMONITOR, HWND, RECT};
 
 <span class="macro">impl_handle! </span>{ HDC;
 	<span class="doccomment">/// Handle to a
@@ -96,6 +126,26 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>user_Hdc: Handle {
+	<span class="doccomment">/// [`DrawText`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawtext)
+	/// method.
+	</span><span class="kw">fn </span>DrawText(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		text: <span class="kw-2">&amp;</span>str, bounds: <span class="kw-2">&amp;</span>RECT, format: co::DT) -&gt; SysResult&lt;i32&gt;
+	{
+		<span class="kw">let </span>wtext = WString::from_str(text);
+		<span class="kw">match unsafe </span>{
+			user::ffi::DrawText(
+				<span class="self">self</span>.as_ptr(),
+				wtext.as_ptr(),
+				wtext.str_len() <span class="kw">as _</span>,
+				bounds <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				format.<span class="number">0</span>,
+			)
+		} {
+			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+			i =&gt; <span class="prelude-val">Ok</span>(i),
+		}
+	}
+
 	<span class="doccomment">/// [`EnumDisplayMonitors`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors)
 	/// method.
 	///
@@ -132,6 +182,16 @@
 				)
 			},
 		)
+	}
+
+	<span class="doccomment">/// [`WindowFromDC`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-windowfromdc)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>WindowFromDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
+		<span class="kw">match </span>HWND(<span class="kw">unsafe </span>{ user::ffi::WindowFromDC(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}) {
+			HWND::NULL =&gt; <span class="prelude-val">None</span>,
+			handle =&gt; <span class="prelude-val">Some</span>(handle),
+		}
 	}
 }
 

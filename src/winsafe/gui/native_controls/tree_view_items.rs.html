@@ -188,9 +188,6 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{HTREEITEM, TreeitemTvi, TVINSERTSTRUCT, TVITEMEX};
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::tree_view_item::TreeViewItem;
@@ -308,8 +305,7 @@
 		<span class="self">self</span>.current = <span class="self">self</span>.owner.hwnd()
 			.SendMessage(tvm::GetNextItem {
 				relationship: <span class="self">self</span>.relationship,
-				hitem: <span class="self">self</span>.current.as_ref()
-					.map(|tvi| <span class="kw">unsafe </span>{ tvi.htreeitem().raw_copy() }),
+				hitem: <span class="self">self</span>.current.as_ref().map(|tvi| tvi.htreeitem()),
 			})
 			.map(|hitem| <span class="self">self</span>.owner.items().get(hitem));
 
@@ -347,8 +343,7 @@
 			</span><span class="self">self</span>.current = <span class="self">self</span>.owner.hwnd()
 				.SendMessage(tvm::GetNextItem {
 					relationship: co::TVGN::CHILD,
-					hitem: <span class="self">self</span>.current.as_ref()
-						.map(|tvi| <span class="kw">unsafe </span>{ tvi.htreeitem().raw_copy() }),
+					hitem: <span class="self">self</span>.current.as_ref().map(|tvi| tvi.htreeitem()),
 				})
 				.map(|hitem| <span class="self">self</span>.owner.items().get(hitem));
 
@@ -358,8 +353,7 @@
 			</span><span class="self">self</span>.current = <span class="self">self</span>.owner.hwnd()
 				.SendMessage(tvm::GetNextItem {
 					relationship: co::TVGN::NEXT,
-					hitem: <span class="self">self</span>.current.as_ref()
-						.map(|tvi| <span class="kw">unsafe </span>{ tvi.htreeitem().raw_copy() }),
+					hitem: <span class="self">self</span>.current.as_ref().map(|tvi| tvi.htreeitem()),
 				})
 				.map(|hitem| <span class="self">self</span>.owner.items().get(hitem));
 		}
