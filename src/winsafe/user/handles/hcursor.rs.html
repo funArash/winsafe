@@ -60,7 +60,7 @@
 
 </span><span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, invalidate_handle};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, replace_handle_value};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HCURSOR;
@@ -102,7 +102,7 @@
 		<span class="kw">let </span>ret = bool_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::DestroyCursor(<span class="self">self</span>.as_ptr()) },
 		);
-		invalidate_handle(<span class="self">self</span>);
+		replace_handle_value(<span class="self">self</span>, <span class="self">Self</span>::INVALID);
 		ret
 	}
 
