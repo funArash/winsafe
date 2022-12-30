@@ -816,7 +816,6 @@
 <a href="#816" id="816">816</a>
 <a href="#817" id="817">817</a>
 <a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::HFONT;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::func_store::FuncStore;
@@ -1175,7 +1174,7 @@
 		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;HFONT&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
 		<span class="self">self</span>.wm(co::WM::GETFONT,
-			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default())));
+			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map_or(<span class="number">0</span>, |h| h.<span class="number">0 </span><span class="kw">as _</span>))));
 	}
 
 	<span class="doccomment">/// [`WM_GETHMENU`](https://learn.microsoft.com/en-us/windows/win32/winmsg/mn-gethmenu)
@@ -1184,7 +1183,7 @@
 		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;HMENU&gt;&gt; + <span class="lifetime">&#39;static
 	</span>{
 		<span class="self">self</span>.wm(co::WM::MN_GETHMENU,
-			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default())));
+			<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(func()<span class="question-mark">?</span>.map_or(<span class="number">0</span>, |h| h.<span class="number">0 </span><span class="kw">as _</span>))));
 	}
 
 	<span class="macro">fn_wm_withparm_noret! </span>{ wm_get_min_max_info, co::WM::GETMINMAXINFO, wm::GetMinMaxInfo,
@@ -1498,8 +1497,7 @@
 	{
 		<span class="self">self</span>.wm(co::WM::SETICON, <span class="kw">move </span>|p|
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-				func(wm::SetIcon::from_generic_wm(p))<span class="question-mark">?
-					</span>.map(|h| h.<span class="number">0 </span><span class="kw">as _</span>).unwrap_or_default(),
+				func(wm::SetIcon::from_generic_wm(p))<span class="question-mark">?</span>.map_or(<span class="number">0</span>, |h| h.<span class="number">0 </span><span class="kw">as _</span>),
 			))
 		);
 	}
