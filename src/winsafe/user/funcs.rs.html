@@ -683,6 +683,45 @@
 <a href="#683" id="683">683</a>
 <a href="#684" id="684">684</a>
 <a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
@@ -743,6 +782,32 @@
 			user::ffi::AttachThreadInput(attach_id, attach_to_id, do_attach <span class="kw">as _</span>)
 		},
 	)
+}
+
+<span class="doccomment">/// [`BroadcastSystemMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-broadcastsystemmessage)
+/// function.
+</span><span class="kw">pub fn </span>BroadcastSystemMessage&lt;M&gt;(
+	flags: co::BSF, info: co::BSM, msg: M) -&gt; SysResult&lt;co::BSM&gt;
+	<span class="kw">where </span>M: MsgSend,
+{
+	<span class="kw">let </span><span class="kw-2">mut </span>msg = msg;
+	<span class="kw">let </span>wm_any = msg.as_generic_wm();
+
+	<span class="kw">let </span><span class="kw-2">mut </span>info_ret = info;
+
+	<span class="kw">if unsafe </span>{
+		user::ffi::BroadcastSystemMessageW(
+			flags.<span class="number">0</span>,
+			<span class="kw-2">&amp;mut </span>info_ret.<span class="number">0 </span><span class="kw">as _</span>,
+			wm_any.msg_id.<span class="number">0</span>,
+			wm_any.wparam,
+			wm_any.lparam,
+		)
+	} &gt; <span class="number">0 </span>{
+		<span class="prelude-val">Ok</span>(info_ret)
+	} <span class="kw">else </span>{
+		<span class="prelude-val">Err</span>(GetLastError())
+	}
 }
 
 <span class="doccomment">/// [`ChangeDisplaySettings`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-changedisplaysettingsw)
@@ -1013,6 +1078,21 @@
 	<span class="kw">unsafe </span>{ user::ffi::GetAsyncKeyState(virt_key.<span class="number">0 </span><span class="kw">as _</span>) != <span class="number">0 </span>}
 }
 
+<span class="doccomment">/// [`GetClipboardData`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboarddata)
+/// function.
+///
+/// # Safety
+///
+/// The returned pointer must be correctly cast to the memory block specified by
+/// `format`.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub unsafe fn </span>GetClipboardData(format: co::CF) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt; {
+	user::ffi::GetClipboardData(format.<span class="number">0</span>)
+		.as_mut()
+		.map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+		.ok_or_else(|| GetLastError())
+}
+
 <span class="doccomment">/// [`GetClipboardSequenceNumber`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboardsequencenumber)
 /// function.
 </span><span class="attr">#[must_use]
@@ -1239,6 +1319,18 @@
 	}
 }
 
+<span class="doccomment">/// [`RegisterWindowMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerwindowmessagew)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>RegisterWindowMessage(s: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;u32&gt; {
+	<span class="kw">match unsafe </span>{
+			user::ffi::RegisterWindowMessageW(WString::from_str(s).as_ptr())
+	} {
+		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
+		id =&gt; <span class="prelude-val">Ok</span>(id),
+	}
+}
+
 <span class="doccomment">/// [`ReleaseCapture`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-releasecapture)
 /// function.
 </span><span class="kw">pub fn </span>ReleaseCapture() -&gt; SysResult&lt;()&gt; {
@@ -1257,20 +1349,6 @@
 /// function.
 </span><span class="kw">pub fn </span>SetCaretPos(x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::SetCaretPos(x, y) })
-}
-
-<span class="doccomment">/// [`GetClipboardData`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboarddata)
-/// function.
-///
-/// # Safety
-///
-/// The returned pointer must be correctly cast to the memory block specified by
-/// `format`.
-</span><span class="kw">pub unsafe fn </span>GetClipboardData(format: co::CF) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt; {
-	user::ffi::GetClipboardData(format.<span class="number">0</span>)
-		.as_mut()
-		.map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-		.ok_or_else(|| GetLastError())
 }
 
 <span class="doccomment">/// [`SetClipboardData`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setclipboarddata)
