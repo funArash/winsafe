@@ -94,14 +94,28 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::gdi_Hgdiobj;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HRGN, RECT, SIZE};
 
-<span class="kw">impl </span>gdi_Hgdiobj <span class="kw">for </span>HRGN {}
+<span class="kw">impl </span>GdiObject <span class="kw">for </span>HRGN {
+	<span class="kw">type </span>SelectRet = co::REGION;
+
+	<span class="kw">unsafe fn </span>convert_sel_ret(v: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>::SelectRet {
+		co::REGION(v <span class="kw">as _</span>)
+	}
+}
+
 <span class="kw">impl </span>gdi_Hrgn <span class="kw">for </span>HRGN {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -112,12 +126,12 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="kw">pub trait </span>gdi_Hrgn: gdi_Hgdiobj {
+</span><span class="kw">pub trait </span>gdi_Hrgn: GdiObject {
 	<span class="doccomment">/// [`CreateRectRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgn)
 	/// static method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateRectRgn(bounds: RECT) -&gt; SysResult&lt;HRGN&gt; {
 		<span class="kw">unsafe </span>{
@@ -132,7 +146,7 @@
 	/// static method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateRectRgnIndirect(rc: RECT) -&gt; SysResult&lt;HRGN&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::CreateRectRgnIndirect(<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>).as_mut() }
@@ -144,7 +158,7 @@
 	/// static method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateRoundRectRgn(
 		bounds: RECT, size: SIZE) -&gt; SysResult&lt;HRGN&gt;

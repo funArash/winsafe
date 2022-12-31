@@ -53,12 +53,19 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGPEN;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::gdi_Hgdiobj;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::COLORREF;
 
 <span class="macro">impl_handle! </span>{ HPEN;
@@ -67,7 +74,14 @@
 	/// GDI object.
 </span>}
 
-<span class="kw">impl </span>gdi_Hgdiobj <span class="kw">for </span>HPEN {}
+<span class="kw">impl </span>GdiObject <span class="kw">for </span>HPEN {
+	<span class="kw">type </span>SelectRet = HPEN;
+
+	<span class="kw">unsafe fn </span>convert_sel_ret(v: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>::SelectRet {
+		HPEN(v)
+	}
+}
+
 <span class="kw">impl </span>gdi_Hpen <span class="kw">for </span>HPEN {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -78,7 +92,7 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="kw">pub trait </span>gdi_Hpen: gdi_Hgdiobj {
+</span><span class="kw">pub trait </span>gdi_Hpen: GdiObject {
 	<span class="doccomment">/// [`CreatePen`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createpen)
 	/// static method.
 	</span><span class="attr">#[must_use]

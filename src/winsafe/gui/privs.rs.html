@@ -242,7 +242,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::MulDiv;
 <span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
-	gdi_Hdc, gdi_Hfont, gdi_Hgdiobj, Handle, NativeBitflag, user_Hwnd,
+	gdi_Hdc, gdi_Hfont, GdiObject, Handle, NativeBitflag, user_Hwnd,
 	uxtheme_Htheme, uxtheme_Hwnd,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
@@ -379,7 +379,7 @@
 	<span class="kw">let </span>desktop_hwnd = HWND::GetDesktopWindow();
 	<span class="kw">let </span>desktop_hdc = desktop_hwnd.GetDC().unwrap();
 	<span class="kw">let </span>clone_dc = desktop_hdc.CreateCompatibleDC().unwrap();
-	<span class="kw">let </span>prev_hfont = clone_dc.SelectObjectFont(ui_font()).unwrap();
+	<span class="kw">let </span>prev_hfont = clone_dc.SelectObject(ui_font()).unwrap();
 
 	<span class="kw">let </span><span class="kw-2">mut </span>bounds = <span class="kw">if </span>text.is_empty() {
 		clone_dc.GetTextExtentPoint32(<span class="string">&quot;Pj&quot;</span>).unwrap() <span class="comment">// just a placeholder to get the text height
@@ -391,7 +391,7 @@
 		bounds.cx = <span class="number">0</span>; <span class="comment">// if no text was given, return just the height
 	</span>}
 
-	clone_dc.SelectObjectFont(<span class="kw-2">&amp;</span>prev_hfont).unwrap();
+	clone_dc.SelectObject(<span class="kw-2">&amp;</span>prev_hfont).unwrap();
 	bounds
 }
 

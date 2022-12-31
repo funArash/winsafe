@@ -52,15 +52,28 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::gdi;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::BITMAP;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::gdi_Hgdiobj;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, SIZE};
 
-<span class="kw">impl </span>gdi_Hgdiobj <span class="kw">for </span>HBITMAP {}
+<span class="kw">impl </span>GdiObject <span class="kw">for </span>HBITMAP {
+	<span class="kw">type </span>SelectRet = HBITMAP;
+
+	<span class="kw">unsafe fn </span>convert_sel_ret(v: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>::SelectRet {
+		HBITMAP(v)
+	}
+}
+
 <span class="kw">impl </span>gdi_Hbitmap <span class="kw">for </span>HBITMAP {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -71,13 +84,12 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="kw">pub trait </span>gdi_Hbitmap: gdi_Hgdiobj {
+</span><span class="kw">pub trait </span>gdi_Hbitmap: GdiObject {
 	<span class="doccomment">/// [`CreateBitmap`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap)
 	/// static method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
-	/// call.
+	/// [`HBITMAP::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateBitmap(
 		sz: SIZE, num_planes: u32,

@@ -878,43 +878,14 @@
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
-<a href="#899" id="899">899</a>
-<a href="#900" id="900">900</a>
-<a href="#901" id="901">901</a>
-<a href="#902" id="902">902</a>
-<a href="#903" id="903">903</a>
-<a href="#904" id="904">904</a>
-<a href="#905" id="905">905</a>
-<a href="#906" id="906">906</a>
-<a href="#907" id="907">907</a>
-<a href="#908" id="908">908</a>
-<a href="#909" id="909">909</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
-<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{BITMAPINFO, HFONT, HPEN, TEXTMETRIC};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{BITMAPINFO, TEXTMETRIC};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::privs::{CLR_INVALID, GDI_ERROR, LF_FACESIZE};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObject, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	COLORREF, HBITMAP, HBRUSH, HDC, HRGN, POINT, RECT, SIZE,
 };
@@ -1048,8 +1019,7 @@
 	/// method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HBITMAP::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject)
-	/// call.
+	/// [`HBITMAP::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateCompatibleBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: i32, cy: i32) -&gt; SysResult&lt;HBITMAP&gt; {
 		<span class="kw">unsafe </span>{
@@ -1197,7 +1167,7 @@
 	/// let hdc_screen = w::HWND::DESKTOP.GetDC()?;
 	/// let hbmp = hdc_screen.CreateCompatibleBitmap(cx_screen, cy_screen)?;
 	/// let hdc_mem = hdc_screen.CreateCompatibleDC()?;
-	/// let hbmp_old = hdc_mem.SelectObjectBitmap(&amp;hbmp)?;
+	/// let hbmp_old = hdc_mem.SelectObject(&amp;hbmp)?;
 	///
 	/// hdc_mem.BitBlt(w::POINT::new(0, 0), w::SIZE::new(cx_screen, cy_screen),
 	///     &amp;hdc_screen, w::POINT::new(0, 0), co::ROP::SRCCOPY)?;
@@ -1231,7 +1201,7 @@
 	/// fo.write(bi.bmiHeader.serialize())?;
 	/// fo.write(&amp;data_buf)?;
 	///
-	/// hdc_mem.SelectObjectBitmap(&amp;hbmp_old)?;
+	/// hdc_mem.SelectObject(&amp;hbmp_old)?;
 	/// hbmp.DeleteObject()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
@@ -1414,7 +1384,7 @@
 	/// method.
 	///
 	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::gdi_Hgdiobj::DeleteObject) call.
+	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>PathToRegion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HRGN&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::PathToRegion(<span class="self">self</span>.as_ptr()).as_mut() }
@@ -1546,43 +1516,15 @@
 	}
 
 	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
-	/// method for [`HBITMAP`](crate::HBITMAP).
-	</span><span class="kw">fn </span>SelectObjectBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>, hbmp: <span class="kw-2">&amp;</span>HBITMAP) -&gt; SysResult&lt;HBITMAP&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbmp.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HBITMAP(ptr))
-			.ok_or_else(|| GetLastError())
-	}
-
-	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
-	/// method for [`HBRUSH`](crate::HBRUSH).
-	</span><span class="kw">fn </span>SelectObjectBrush(<span class="kw-2">&amp;</span><span class="self">self</span>, hbr: <span class="kw-2">&amp;</span>HBRUSH) -&gt; SysResult&lt;HBRUSH&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hbr.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HBRUSH(ptr))
-			.ok_or_else(|| GetLastError())
-	}
-
-	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
-	/// method for [`HFONT`](crate::HFONT).
-	</span><span class="kw">fn </span>SelectObjectFont(<span class="kw-2">&amp;</span><span class="self">self</span>, hfont: <span class="kw-2">&amp;</span>HFONT) -&gt; SysResult&lt;HFONT&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hfont.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HFONT(ptr))
-			.ok_or_else(|| GetLastError())
-	}
-
-	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
-	/// method for [`HPEN`](crate::HPEN).
-	</span><span class="kw">fn </span>SelectObjectPen(<span class="kw-2">&amp;</span><span class="self">self</span>, hpen: <span class="kw-2">&amp;</span>HPEN) -&gt; SysResult&lt;HPEN&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hpen.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HPEN(ptr))
-			.ok_or_else(|| GetLastError())
-	}
-
-	<span class="doccomment">/// [`SelectObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject)
-	/// method for [`HRGN`](crate::HRGN).
-	</span><span class="kw">fn </span>SelectObjectRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN) -&gt; SysResult&lt;co::REGION&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hrgn.<span class="number">0</span>).as_mut() }
-			.map(|ptr| co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
-			.ok_or_else(|| GetLastError())
+	/// method.
+	</span><span class="kw">fn </span>SelectObject&lt;G&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, hgdiobj: <span class="kw-2">&amp;</span>G) -&gt; SysResult&lt;G::SelectRet&gt;
+		<span class="kw">where </span>G: GdiObject,
+	{
+		<span class="kw">unsafe </span>{
+			gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hgdiobj.as_ptr())
+				.as_mut()
+				.map(|ptr| G::convert_sel_ret(ptr))
+		}.ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`SetArcDirection`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setarcdirection)
