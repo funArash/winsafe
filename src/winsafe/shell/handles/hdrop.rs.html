@@ -174,6 +174,10 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
@@ -259,9 +263,13 @@
 	<span class="doccomment">/// [`DragQueryFile`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew)
 	/// method.
 	///
+	/// # Safety
+	///
+	/// The `buf` must be allocated with the correct length.
+	///
 	/// This method is rather tricky, consider using
 	/// [`HDROP::iter`](crate::prelude::shell_Hdrop::iter).
-	</span><span class="kw">fn </span>DragQueryFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	</span><span class="kw">unsafe fn </span>DragQueryFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		ifile: <span class="prelude-ty">Option</span>&lt;u32&gt;, buf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>WString&gt;) -&gt; SysResult&lt;u32&gt;
 	{
 		<span class="kw">let </span>cch = buf.as_ref().map_or(<span class="number">0</span>, |buf| buf.buf_len());
@@ -323,9 +331,9 @@
 			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match </span><span class="self">self</span>.hdrop
-			.DragQueryFile(<span class="prelude-val">Some</span>(<span class="self">self</span>.current), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer))
-		{
+		<span class="kw">match unsafe </span>{
+			<span class="self">self</span>.hdrop.DragQueryFile(<span class="prelude-val">Some</span>(<span class="self">self</span>.current), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer))
+		} {
 			<span class="prelude-val">Err</span>(e) =&gt; {
 				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made
 				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
@@ -345,7 +353,7 @@
 		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{
 			hdrop,
 			buffer: WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>), <span class="comment">// so we alloc just once
-			</span>count: hdrop.DragQueryFile(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>,
+			</span>count: <span class="kw">unsafe </span>{ hdrop.DragQueryFile(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">? </span>},
 			current: <span class="number">0</span>,
 		})
 	}
