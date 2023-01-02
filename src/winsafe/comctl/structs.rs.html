@@ -1331,6 +1331,10 @@
 <a href="#1331" id="1331">1331</a>
 <a href="#1332" id="1332">1332</a>
 <a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1465,15 +1469,8 @@
 <span class="macro">impl_default!</span>(HDLAYOUT, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; HDLAYOUT&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-	<span class="doccomment">/// Sets the field.
-	</span><span class="kw">pub fn </span>set_prc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>RECT&gt;) {
-		<span class="self">self</span>.prc = rc.map(|rc| rc <span class="kw">as _</span>).unwrap_or(std::ptr::null_mut());
-	}
-
-	<span class="doccomment">/// Sets the field.
-	</span><span class="kw">pub fn </span>set_pwpos(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>WINDOWPOS&gt;) {
-		<span class="self">self</span>.pwpos = pos.map(|pos| pos <span class="kw">as _</span>).unwrap_or(std::ptr::null_mut());
-	}
+	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, prc, set_prc, RECT);
+	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;b</span>, pwpos, set_pwpos, WINDOWPOS);
 }
 
 <span class="doccomment">/// [`INITCOMMONCONTROLSEX`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-initcommoncontrolsex)
@@ -2302,6 +2299,17 @@
 	<span class="kw">pub </span>stSelStart: SYSTEMTIME,
 	<span class="kw">pub </span>stSelEnd: SYSTEMTIME,
 }
+
+<span class="doccomment">/// [`NMTCKEYDOWN`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtckeydown)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>NMTCKEYDOWN {
+	<span class="kw">pub </span>hdr: NMHDR,
+	<span class="kw">pub </span>wVKey: co::VK,
+	<span class="kw">pub </span>flags: u32,
+}
+
+<span class="macro">impl_default!</span>(NMTCKEYDOWN);
 
 <span class="doccomment">/// [`NMTREEVIEW`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmtreevieww)
 /// struct.
