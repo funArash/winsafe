@@ -62,13 +62,15 @@
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
 <a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::{MONITORINFO, POINT, RECT};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{MONITORINFOEX, POINT, RECT};
 
 <span class="macro">impl_handle! </span>{ HMONITOR;
 	<span class="doccomment">/// Handle to a
@@ -93,16 +95,18 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{HMONITOR, MONITORINFO};
+	/// use winsafe::{HMONITOR, MONITORINFOEX};
 	///
 	/// let hmon: HMONITOR; // initialized somewhere
 	/// # let hmon = HMONITOR::NULL;
 	///
-	/// let mut mi = MONITORINFO::default();
+	/// let mut mi = MONITORINFOEX::default();
 	/// hmon.GetMonitorInfo(&amp;mut mi)?;
+	///
+	/// println!(&quot;{}&quot;, mi.szDevice());
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>GetMonitorInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, mi: <span class="kw-2">&amp;mut </span>MONITORINFO) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>GetMonitorInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, mi: <span class="kw-2">&amp;mut </span>MONITORINFOEX) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetMonitorInfoW(<span class="self">self</span>.as_ptr(), mi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
