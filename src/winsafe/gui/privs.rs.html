@@ -235,25 +235,20 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Global objects used within `gui` module.
 
 </span><span class="kw">use </span>std::error::Error;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{HFONT, NONCLIENTMETRICS};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::msg_error::MsgError;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, MulDiv, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
-	gdi_Hdc, gdi_Hfont, GdiObject, Handle, NativeBitflag, user_Hwnd,
-	uxtheme_Htheme, uxtheme_Hwnd,
+	gdi_Hdc, gdi_Hfont, Handle, NativeBitflag, user_Hwnd, uxtheme_Htheme,
+	uxtheme_Hwnd,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	GetSystemMetrics, HWND, POINT, PostQuitMessage, RECT, SIZE,
@@ -276,7 +271,7 @@
 <span class="comment">//------------------------------------------------------------------------------
 
 </span><span class="doccomment">/// Global UI font object.
-</span><span class="kw">static </span><span class="kw-2">mut </span>UI_HFONT: <span class="prelude-ty">Option</span>&lt;HFONT&gt; = <span class="prelude-val">None</span>;
+</span><span class="kw">static </span><span class="kw-2">mut </span>UI_HFONT: <span class="prelude-ty">Option</span>&lt;GdiObjectGuard&lt;HFONT&gt;&gt; = <span class="prelude-val">None</span>;
 
 <span class="doccomment">/// Creates the global UI font object.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create_ui_font() -&gt; SysResult&lt;()&gt; {
@@ -285,7 +280,8 @@
 		SystemParametersInfo(
 			co::SPI::GETNONCLIENTMETRICS,
 			std::mem::size_of::&lt;NONCLIENTMETRICS&gt;() <span class="kw">as _</span>,
-			<span class="kw-2">&amp;mut </span>ncm, co::SPIF::NoValue,
+			<span class="kw-2">&amp;mut </span>ncm,
+			co::SPIF::NoValue,
 		)<span class="question-mark">?</span>;
 		UI_HFONT = <span class="prelude-val">Some</span>(HFONT::CreateFontIndirect(<span class="kw-2">&amp;</span>ncm.lfMenuFont)<span class="question-mark">?</span>);
 	}
@@ -293,15 +289,9 @@
 }
 
 <span class="doccomment">/// Frees the global UI font object.
-</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>delete_ui_font() -&gt; SysResult&lt;()&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">if let </span><span class="prelude-val">Some</span>(hfont) = <span class="kw-2">&amp;</span>UI_HFONT {
-			hfont.DeleteObject()<span class="question-mark">?</span>;
-			UI_HFONT = <span class="prelude-val">None</span>;
-		}
-	}
-	<span class="prelude-val">Ok</span>(())
-}
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>delete_ui_font() {
+	<span class="kw">unsafe </span>{ UI_HFONT = <span class="prelude-val">None</span>; } <span class="comment">// https://users.rust-lang.org/t/why-drop-trait-not-called-when-use-global-static
+</span>}
 
 <span class="doccomment">/// Retrieves the global UI font object, or panics if not created yet.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>ui_font() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>HFONT {
@@ -395,7 +385,7 @@
 	<span class="kw">let </span>desktop_hwnd = HWND::GetDesktopWindow();
 	<span class="kw">let </span>desktop_hdc = desktop_hwnd.GetDC()<span class="question-mark">?</span>;
 	<span class="kw">let </span>clone_dc = desktop_hdc.CreateCompatibleDC()<span class="question-mark">?</span>;
-	<span class="kw">let </span>prev_hfont = clone_dc.SelectObject(ui_font())<span class="question-mark">?</span>;
+	<span class="kw">let </span>_prev_font = clone_dc.SelectObject(ui_font())<span class="question-mark">?</span>;
 
 	<span class="kw">let </span><span class="kw-2">mut </span>bounds = <span class="kw">if </span>text.is_empty() {
 		clone_dc.GetTextExtentPoint32(<span class="string">&quot;Pj&quot;</span>)<span class="question-mark">? </span><span class="comment">// just a placeholder to get the text height
@@ -406,8 +396,6 @@
 	<span class="kw">if </span>text.is_empty() {
 		bounds.cx = <span class="number">0</span>; <span class="comment">// if no text was given, return just the height
 	</span>}
-
-	clone_dc.SelectObject(<span class="kw-2">&amp;</span>prev_hfont)<span class="question-mark">?</span>;
 	<span class="prelude-val">Ok</span>(bounds)
 }
 

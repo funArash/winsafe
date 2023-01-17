@@ -299,6 +299,9 @@
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -461,12 +464,15 @@
 	<span class="doccomment">/// [`LockFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)
 	/// method.
 	///
-	/// Note that the guard returned by this method must be kept alive while the
-	/// lock is used. This is necessary because, when the guard goes out of
-	/// scope, it will automatically call
-	/// [`UnlockFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile).
+	/// In the original C implementation, you must call
+	/// [`UnlockFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-unlockfile)
+	/// as a cleanup operation.
 	///
-	/// In the example below, the guard is kept alive:
+	/// Here, the cleanup is performed automatically, because `LockFile` returns
+	/// an [`HfileLockGuard`](crate::guard::HfileLockGuard), which automatically
+	/// calls `UnlockFile` when the guard goes out of scope. You must, however,
+	/// keep the guard alive, otherwise the cleanup will be performed right
+	/// away.
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -477,7 +483,7 @@
 	///
 	/// let total_size = hfile.GetFileSizeEx()?;
 	///
-	/// let _lock = hfile.LockFile(0, total_size as _)?; // keep the returned guard alive
+	/// let _lock = hfile.LockFile(0, total_size as _)?; // keep guard alive
 	///
 	/// // file read/write operations...
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())

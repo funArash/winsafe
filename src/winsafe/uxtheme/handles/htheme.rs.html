@@ -166,13 +166,10 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, uxtheme};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
@@ -267,15 +264,11 @@
 
 	<span class="doccomment">/// [`GetThemeBackgroundRegion`](https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemebackgroundregion)
 	/// method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetThemeBackgroundRegion(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		hdc: <span class="kw-2">&amp;</span>HDC, part_state: co::VS, rc: RECT) -&gt; HrResult&lt;HRGN&gt;
+		hdc: <span class="kw-2">&amp;</span>HDC, part_state: co::VS, rc: RECT) -&gt; HrResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt;
 	{
-		<span class="kw">let </span><span class="kw-2">mut </span>hrgn = HRGN::NULL;
-
+		<span class="kw">let </span><span class="kw-2">mut </span>handle = HRGN::NULL;
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
 				uxtheme::ffi::GetThemeBackgroundRegion(
@@ -284,10 +277,10 @@
 					part_state.part,
 					part_state.state,
 					<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>hrgn <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>handle <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| hrgn)
+		).map(|<span class="kw">_</span>| GdiObjectGuard { handle })
 	}
 
 	<span class="doccomment">/// [`GetThemeColor`](https://learn.microsoft.com/en-us/windows/win32/api/uxtheme/nf-uxtheme-getthemecolor)
@@ -297,7 +290,6 @@
 		part_state: co::VS, prop: co::TMT) -&gt; HrResult&lt;COLORREF&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>color = COLORREF(<span class="number">0</span>);
-
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
 				uxtheme::ffi::GetThemeColor(

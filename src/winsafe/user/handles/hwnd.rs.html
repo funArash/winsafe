@@ -1684,6 +1684,12 @@
 <a href="#1684" id="1684">1684</a>
 <a href="#1685" id="1685">1685</a>
 <a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1747,6 +1753,18 @@
 	<span class="doccomment">/// [`BeginPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-beginpaint)
 	/// method.
 	///
+	/// In the original C implementation, `BeginPaint` returns a handle which
+	/// must be passed to
+	/// [`EndPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint),
+	/// as a cleanup operation. Also, you must allocate and pass a
+	/// [`PAINTSTRUCT`](crate::PAINTSTRUCT) object.
+	///
+	/// Here, the cleanup is performed automatically, because `BeginPaint`
+	/// returns an [`HdcPaintGuard`](crate::guard::HdcPaintGuard), which stores
+	/// the `PAINTSTRUCT` and automatically calls `EndPaint` when the guard goes
+	/// out of scope. You must, however, keep the guard alive, otherwise the
+	/// cleanup will be performed right away.
+	///
 	/// # Examples
 	///
 	/// ```rust,no_run
@@ -1758,21 +1776,12 @@
 	///
 	/// let hdc = hwnd.BeginPaint()?;
 	///
-	/// println!(&quot;Erase background? {}&quot;, hdc.paintstruct().fErase());
-	/// println!(&quot;Painting area: {}&quot;, hdc.paintstruct().rcPaint);
-	///
 	/// // hdc painting...
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	///
-	/// Note that the [`HDC`](crate::HDC) guard returned by this method must be
-	/// kept alive while the painting is made, even if you won&#39;t use it
-	/// directly. This is necessary because, when the guard goes out of scope,
-	/// it will automatically call
-	/// [`EndPaint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-endpaint).
-	///
-	/// In the example below, the `HDC` is not used, but the returned guard is
-	/// kept alive:
+	/// If you don&#39;t use the returned device context handle, you must still keep
+	/// the guard alive:
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -1781,7 +1790,7 @@
 	/// let hwnd: HWND; // initialized somewhere
 	/// # let hwnd = HWND::NULL;
 	///
-	/// let _hdc = hwnd.BeginPaint()?; // keep the returned guard alive
+	/// let _hdc = hwnd.BeginPaint()?; // keep guard alive
 	///
 	/// // hdc painting...
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
@@ -2769,12 +2778,15 @@
 	<span class="doccomment">/// [`OpenClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-openclipboard)
 	/// method.
 	///
-	/// Note that the guard returned by this method must be kept alive while you
-	/// work upon the clipboard. This is necessary because, when the guard goes
-	/// out of scope, it will automatically call
-	/// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard).
+	/// In the original C implementation, you must call
+	/// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)
+	/// as a cleanup operation.
 	///
-	/// In the example below, the returned guard is kept alive:
+	/// Here, the cleanup is performed automatically, because `OpenClipboard`
+	/// returns a [`ClipboardGuard`](crate::guard::ClipboardGuard), which
+	/// automatically calls `CloseClipboard` when the guard goes out of scope.
+	/// You must, however, keep the guard alive, otherwise the cleanup will be
+	/// performed right away.
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -2783,7 +2795,7 @@
 	/// let hwnd: HWND; // initialized somewhere
 	/// # let hwnd = HWND::NULL;
 	///
-	/// let _hdc = hwnd.OpenClipboard()?; // keep the returned guard alive
+	/// let _hdc = hwnd.OpenClipboard()?; // keep guard alive
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]

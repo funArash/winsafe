@@ -86,36 +86,15 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HRGN, RECT, SIZE};
 
-<span class="kw">impl </span>GdiObject <span class="kw">for </span>HRGN {
-	<span class="kw">type </span>SelectRet = co::REGION;
-
-	<span class="kw">unsafe fn </span>convert_sel_ret(v: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>::SelectRet {
-		co::REGION(v <span class="kw">as _</span>)
-	}
-}
-
+<span class="kw">impl </span>GdiObject <span class="kw">for </span>HRGN {}
 <span class="kw">impl </span>gdi_Hrgn <span class="kw">for </span>HRGN {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -129,46 +108,37 @@
 </span><span class="kw">pub trait </span>gdi_Hrgn: GdiObject {
 	<span class="doccomment">/// [`CreateRectRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgn)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateRectRgn(bounds: RECT) -&gt; SysResult&lt;HRGN&gt; {
+	</span><span class="kw">fn </span>CreateRectRgn(bounds: RECT) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt; {
 		<span class="kw">unsafe </span>{
 			gdi::ffi::CreateRectRgn(
 				bounds.left, bounds.top, bounds.right, bounds.bottom,
 			).as_mut()
-		}.map(|ptr| HRGN(ptr))
+		}.map(|ptr| GdiObjectGuard { handle: HRGN(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`CreateRectRgnIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgnindirect)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateRectRgnIndirect(rc: RECT) -&gt; SysResult&lt;HRGN&gt; {
+	</span><span class="kw">fn </span>CreateRectRgnIndirect(rc: RECT) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::CreateRectRgnIndirect(<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>).as_mut() }
-			.map(|ptr| HRGN(ptr))
+			.map(|ptr| GdiObjectGuard { handle: HRGN(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`CreateRoundRectRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createroundrectrgn)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HRGN::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateRoundRectRgn(
-		bounds: RECT, size: SIZE) -&gt; SysResult&lt;HRGN&gt;
+		bounds: RECT, size: SIZE) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
 			gdi::ffi::CreateRoundRectRgn(
 				bounds.left, bounds.top, bounds.right, bounds.top,
 				size.cx, size.cy,
 			).as_mut()
-		}.map(|ptr| HRGN(ptr))
+		}.map(|ptr| GdiObjectGuard { handle: HRGN(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 

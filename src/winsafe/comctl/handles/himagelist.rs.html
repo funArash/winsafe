@@ -249,6 +249,9 @@
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -278,8 +281,8 @@
 	<span class="doccomment">/// [`ImageList_Add`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_add)
 	/// method.
 	///
-	/// **Note:** A copy of the bitmap is made, and this copy is then stored.
-	/// You&#39;re still responsible for freeing the original bitmap.
+	/// A copy of the bitmap is made and stored in the image list, so you&#39;re
+	/// free to release the original bitmap.
 	</span><span class="kw">fn </span>Add(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hbmp_image: <span class="kw-2">&amp;</span>HBITMAP, hbmp_mask: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HBITMAP&gt;) -&gt; SysResult&lt;u32&gt;
 	{
@@ -298,8 +301,8 @@
 	<span class="doccomment">/// [`ImageList_AddIcon`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addicon)
 	/// method.
 	///
-	/// **Note:** A copy of the bitmap is made, and this copy is then stored.
-	/// You&#39;re still responsible for freeing the original bitmap.
+	/// A copy of the icon is made and stored in the image list, so you&#39;re free
+	/// to release the original icon.
 	</span><span class="kw">fn </span>AddIcon(<span class="kw-2">&amp;</span><span class="self">self</span>, hicon: <span class="kw-2">&amp;</span>HICON) -&gt; SysResult&lt;u32&gt; {
 		<span class="self">self</span>.ReplaceIcon(<span class="prelude-val">None</span>, hicon)
 	}
@@ -307,8 +310,8 @@
 	<span class="doccomment">/// [`ImageList_AddMasked`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_addmasked)
 	/// method.
 	///
-	/// **Note:** A copy of the bitmap is made, and this copy is then stored.
-	/// You&#39;re still responsible for freeing the original bitmap.
+	/// A copy of the bitmap is made and stored in the image list, so you&#39;re
+	/// free to release the original bitmap.
 	</span><span class="kw">fn </span>AddMasked(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hbmp_image: <span class="kw-2">&amp;</span>HBITMAP, color_mask: COLORREF) -&gt; SysResult&lt;u32&gt;
 	{
@@ -325,12 +328,15 @@
 	<span class="doccomment">/// [`ImageList_BeginDrag`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_begindrag)
 	/// method.
 	///
-	/// Note that the guard returned by this method must be kept alive while you
-	/// work on the drag. This is necessary because, when the guard goes out of
-	/// scope, it will automatically call
-	/// [`ImageList_EndDrag`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_enddrag).
+	/// In the original C implementation, you must call
+	/// [`ImageList_EndDrag`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_enddrag)
+	/// as a cleanup operation.
 	///
-	/// In the example below, the returned guard is kept alive:
+	/// Here, the cleanup is performed automatically, because `BeginDrag`
+	/// returns an [`HimagelistDragGuard`](crate::guard::HimagelistDragGuard),
+	/// which automatically calls `ImageList_EndDrag` when the guard goes out of
+	/// scope. You must, however, keep the guard alive, otherwise the
+	/// cleanup will be performed right away.
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -339,7 +345,7 @@
 	/// let himgl: HIMAGELIST; // initialized somewhere
 	/// # let himgl = HIMAGELIST::NULL;
 	///
-	/// let _drag = himgl.BeginDrag(0, POINT::new(0, 0))?; // keep the returned guard alive
+	/// let _drag = himgl.BeginDrag(0, POINT::new(0, 0))?; // keep guard alive
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>BeginDrag(<span class="kw-2">&amp;</span><span class="self">self</span>,

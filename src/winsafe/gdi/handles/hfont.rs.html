@@ -82,22 +82,11 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGFONT;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::SIZE;
@@ -107,14 +96,7 @@
 	/// [font](https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types#hfont).
 </span>}
 
-<span class="kw">impl </span>GdiObject <span class="kw">for </span>HFONT {
-	<span class="kw">type </span>SelectRet = HFONT;
-
-	<span class="kw">unsafe fn </span>convert_sel_ret(v: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>::SelectRet {
-		HFONT(v)
-	}
-}
-
+<span class="kw">impl </span>GdiObject <span class="kw">for </span>HFONT {}
 <span class="kw">impl </span>gdi_Hfont <span class="kw">for </span>HFONT {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -128,9 +110,6 @@
 </span><span class="kw">pub trait </span>gdi_Hfont: GdiObject {
 	<span class="doccomment">/// [`CreateFont`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createfontw)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HFONT::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateFont(
 		sz: SIZE, escapement: i32, orientation: i32,
@@ -138,7 +117,7 @@
 		char_set: co::CHARSET,
 		out_precision: co::OUT_PRECIS, clip_precision: co::CLIP,
 		quality: co::QUALITY, pitch_and_family: co::PITCH,
-		face_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HFONT&gt;
+		face_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
 			gdi::ffi::CreateFontW(
@@ -150,19 +129,16 @@
 				quality.<span class="number">0 </span><span class="kw">as _</span>, pitch_and_family.<span class="number">0 </span><span class="kw">as _</span>,
 				WString::from_str(face_name).as_ptr(),
 			).as_mut()
-		}.map(|ptr| HFONT(ptr))
+		}.map(|ptr| GdiObjectGuard { handle: HFONT(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
 	<span class="doccomment">/// [`CreateFontIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createfontindirectw)
 	/// static method.
-	///
-	/// **Note:** Must be paired with an
-	/// [`HFONT::DeleteObject`](crate::prelude::GdiObject::DeleteObject) call.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateFontIndirect(lf: <span class="kw-2">&amp;</span>LOGFONT) -&gt; SysResult&lt;HFONT&gt; {
+	</span><span class="kw">fn </span>CreateFontIndirect(lf: <span class="kw-2">&amp;</span>LOGFONT) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt; {
 		<span class="kw">unsafe </span>{ gdi::ffi::CreateFontIndirectW(lf <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>).as_mut() }
-			.map(|ptr| HFONT(ptr))
+			.map(|ptr| GdiObjectGuard { handle: HFONT(ptr) })
 			.ok_or_else(|| GetLastError())
 	}
 
