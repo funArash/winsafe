@@ -153,13 +153,11 @@
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, ole};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult, IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::ole::guard::ComLibraryGuard;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 
@@ -214,34 +212,40 @@
 <span class="doccomment">/// [`CoInitializeEx`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-coinitializeex)
 /// function, which
 /// [initializes](https://learn.microsoft.com/en-us/windows/win32/learnwin32/initializing-the-com-library)
-/// the COM library. Returns some error codes as success status.
+/// the COM library. When succeeding, returns an informational error code.
 ///
-/// **Note:** Must be paired with a [`CoUninitialize`](crate::CoUninitialize)
-/// call.
+/// In the original C implementation, you must call
+/// [`CoUninitialize`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-couninitialize)
+/// as a cleanup operation.
+///
+/// Here, the cleanup is performed automatically, because `CoInitializeEx`
+/// returns a [`ComLibraryGuard`](crate::guard::ComLibraryGuard), which
+/// automatically calls `CoUninitialize` when the guard goes out of scope. You
+/// must, however, keep the guard alive, otherwise the cleanup will be performed
+/// right away.
 ///
 /// # Examples
 ///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
-/// use winsafe::{co, CoInitializeEx, CoUninitialize};
+/// use winsafe::{co, CoInitializeEx};
 ///
-/// CoInitializeEx(
+/// let _com_lib = CoInitializeEx( // keep guard alive
 ///     co::COINIT::APARTMENTTHREADED
-///     | co::COINIT::DISABLE_OLE1DDE)?;
+///     | co::COINIT::DISABLE_OLE1DDE,
+/// )?;
 ///
 /// // program runs...
-///
-/// CoUninitialize();
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;co::HRESULT&gt; {
-	<span class="kw">let </span>code = co::HRESULT(
+</span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;ComLibraryGuard&gt; {
+	<span class="kw">let </span>hr = co::HRESULT(
 		<span class="kw">unsafe </span>{ ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.<span class="number">0</span>) },
 	);
-	<span class="kw">match </span>code {
+	<span class="kw">match </span>hr {
 		co::HRESULT::S_OK
 		| co::HRESULT::S_FALSE
-		| co::HRESULT::RPC_E_CHANGED_MODE =&gt; <span class="prelude-val">Ok</span>(code),
+		| co::HRESULT::RPC_E_CHANGED_MODE =&gt; <span class="prelude-val">Ok</span>(ComLibraryGuard { hr }),
 		hr =&gt; <span class="prelude-val">Err</span>(hr),
 	}
 }
@@ -303,16 +307,6 @@
 	} <span class="kw">else </span>{
 		<span class="prelude-val">Ok</span>(p <span class="kw">as _</span>)
 	}
-}
-
-<span class="doccomment">/// [`CoUninitialize`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-couninitialize)
-/// function.
-///
-/// **Note:** Must be called **after** all COM interfaces have been released,
-/// otherwise you&#39;ll get a segmentation fault error with
-/// `STATUS_ACCESS_VIOLATION` code.
-</span><span class="kw">pub fn </span>CoUninitialize() {
-	<span class="kw">unsafe </span>{ ole::ffi::CoUninitialize() }
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0-nightly (9e75dddf6 2023-01-15)" data-search-js="search-181581080540673f.js" data-settings-js="settings-a2afdefbb7c817f1.js" data-settings-css="settings-84508a86fe805444.css" ></div></body></html>
