@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\gdi\handles\hfont.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hfont.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-52c5db6f6f352e54.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../..\../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../..\../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../..\../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../..\../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../..\../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../..\../source-files.js"></script><script defer src="../../..\../static.files/main-d2686a620d99aad7.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\gdi\handles\hfont.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hfont.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-52c5db6f6f352e54.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../..\../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../..\../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../..\../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../..\../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../..\../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../..\../source-files.js"></script><script defer src="../../..\../static.files/main-ccceecc34bb68766.js"></script><noscript><link rel="stylesheet" href="../../..\../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -82,12 +82,18 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGFONT;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::SIZE;
 
@@ -119,27 +125,30 @@
 		quality: co::QUALITY, pitch_and_family: co::PITCH,
 		face_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt;
 	{
-		<span class="kw">unsafe </span>{
-			gdi::ffi::CreateFontW(
-				sz.cy, sz.cx, escapement, orientation,
-				weight.<span class="number">0 </span><span class="kw">as _</span>,
-				italic <span class="kw">as _</span>, underline <span class="kw">as _</span>, strike_out <span class="kw">as _</span>,
-				char_set.<span class="number">0 </span><span class="kw">as _</span>,
-				out_precision.<span class="number">0 </span><span class="kw">as _</span>, clip_precision.<span class="number">0 </span><span class="kw">as _</span>,
-				quality.<span class="number">0 </span><span class="kw">as _</span>, pitch_and_family.<span class="number">0 </span><span class="kw">as _</span>,
-				WString::from_str(face_name).as_ptr(),
-			).as_mut()
-		}.map(|ptr| GdiObjectGuard { handle: HFONT(ptr) })
-			.ok_or_else(|| GetLastError())
+		ptr_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::CreateFontW(
+					sz.cy, sz.cx, escapement, orientation,
+					weight.<span class="number">0 </span><span class="kw">as _</span>,
+					italic <span class="kw">as _</span>, underline <span class="kw">as _</span>, strike_out <span class="kw">as _</span>,
+					char_set.<span class="number">0 </span><span class="kw">as _</span>,
+					out_precision.<span class="number">0 </span><span class="kw">as _</span>, clip_precision.<span class="number">0 </span><span class="kw">as _</span>,
+					quality.<span class="number">0 </span><span class="kw">as _</span>, pitch_and_family.<span class="number">0 </span><span class="kw">as _</span>,
+					WString::from_str(face_name).as_ptr(),
+				)
+			},
+			|ptr| GdiObjectGuard { handle: HFONT(ptr) },
+		)
 	}
 
 	<span class="doccomment">/// [`CreateFontIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createfontindirectw)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateFontIndirect(lf: <span class="kw-2">&amp;</span>LOGFONT) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::CreateFontIndirectW(lf <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>).as_mut() }
-			.map(|ptr| GdiObjectGuard { handle: HFONT(ptr) })
-			.ok_or_else(|| GetLastError())
+		ptr_to_sysresult(
+			<span class="kw">unsafe </span>{ gdi::ffi::CreateFontIndirectW(lf <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
+			|ptr| GdiObjectGuard { handle: HFONT(ptr) },
+		)
 	}
 
 	<span class="doccomment">/// [`GetObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw)
@@ -161,10 +170,11 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetStockObject(sf: co::STOCK_FONT) -&gt; SysResult&lt;HFONT&gt; {
-		<span class="kw">unsafe </span>{ gdi::ffi::GetStockObject(sf.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HFONT(ptr))
-			.ok_or_else(|| GetLastError())
+		ptr_to_sysresult(
+			<span class="kw">unsafe </span>{ gdi::ffi::GetStockObject(sf.<span class="number">0</span>) },
+			|ptr| HFONT(ptr),
+		)
 	}
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0-nightly (9e75dddf6 2023-01-15)" data-search-js="search-181581080540673f.js" data-settings-js="settings-a2afdefbb7c817f1.js" data-settings-css="settings-84508a86fe805444.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0-nightly (333ee6c46 2023-01-18)" data-search-js="search-181581080540673f.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-cd1be5fcaa86d99b.css" ></div></body></html>
