@@ -229,7 +229,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, LayoutArranger, Vert};
-<span class="kw">use </span><span class="kw">crate</span>::gui::msg_error::MsgResult;
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{post_quit_error, QUIT_ERROR};
 <span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, HINSTANCE, SysResult};
@@ -413,19 +412,20 @@
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>run_main_loop(
-		haccel: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HACCEL&gt;) -&gt; MsgResult&lt;i32&gt;
+		haccel: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HACCEL&gt;) -&gt; AnyResult&lt;i32&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>msg = MSG::default();
 
 		<span class="kw">loop </span>{
-			<span class="kw">if </span>!GetMessage(<span class="kw-2">&amp;mut </span>msg, <span class="prelude-val">None</span>, <span class="number">0</span>, <span class="number">0</span>).unwrap() {
+			<span class="kw">if </span>!GetMessage(<span class="kw-2">&amp;mut </span>msg, <span class="prelude-val">None</span>, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">? </span>{
 				<span class="comment">// WM_QUIT was sent, gracefully terminate the program.
 				// wParam has the program exit code.
 				// https://learn.microsoft.com/en-us/windows/win32/winmsg/using-messages-and-message-queues
+				// PostQuitMessage() may have been called internally, so check QUIT_ERROR.
 				</span><span class="kw">return match unsafe </span>{ QUIT_ERROR.take() } {
-					<span class="prelude-val">Some</span>(rt_err) =&gt; <span class="prelude-val">Err</span>(rt_err),
-					<span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(msg.wParam <span class="kw">as _</span>),
-				};
+					<span class="prelude-val">Some</span>(msg_err) =&gt; <span class="prelude-val">Err</span>(msg_err.into()), <span class="comment">// MsgError wrapped into AnyResult
+					</span><span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(msg.wParam <span class="kw">as _</span>), <span class="comment">// successfull exit with ret code
+				</span>};
 			}
 
 			<span class="comment">// If a child window, will retrieve its top-level parent.
