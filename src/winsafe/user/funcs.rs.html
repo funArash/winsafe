@@ -790,6 +790,19 @@
 <a href="#790" id="790">790</a>
 <a href="#791" id="791">791</a>
 <a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
@@ -1282,6 +1295,19 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSystemMetrics(index: co::SM) -&gt; i32 {
 	<span class="kw">unsafe </span>{ user::ffi::GetSystemMetrics(index.<span class="number">0</span>) }
+}
+
+<span class="doccomment">/// [`GetSystemMetricsForDpi`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetricsfordpi)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetSystemMetricsForDpi(index: co::SM, dpi: u32) -&gt; SysResult&lt;i32&gt; {
+	<span class="kw">match unsafe </span>{ user::ffi::GetSystemMetricsForDpi(index.<span class="number">0</span>, dpi) } {
+		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual value is zero
+			</span>err =&gt; <span class="prelude-val">Err</span>(err),
+		},
+		val =&gt; <span class="prelude-val">Ok</span>(val),
+	}
 }
 
 <span class="doccomment">/// [`InSendMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessage)
