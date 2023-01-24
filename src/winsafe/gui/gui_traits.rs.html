@@ -290,14 +290,25 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 
+<span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{WindowEvents, WindowEventsAll};
 <span class="kw">use </span><span class="kw">crate</span>::gui::window_control::WindowControl;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
 <span class="kw">use </span><span class="kw">crate</span>::msg::wm;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, HwndFocus};
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::WC_DIALOG;
 
 <span class="doccomment">/// Any window. Exposes the underlying window handle.
 </span><span class="kw">pub trait </span>GuiWindow {
@@ -532,17 +543,24 @@
 
 <span class="doccomment">/// Any child window which can be focused.
 </span><span class="kw">pub trait </span>GuiChildFocus: GuiChild {
-	<span class="doccomment">/// Focus the control by sending a
+	<span class="doccomment">/// In a raw, ordinary window, simply calls
+	/// [`HWND:SetFocus`](crate::prelude::user_Hwnd::SetFocus).
+	///
+	/// In a dialog window,sends a
 	/// [`wm::NextDlgCtl`](crate::msg::wm::NextDlgCtl) message. This is
-	/// preferable to the
-	/// [`HWND::SetFocus`](crate::prelude::user_Hwnd::SetFocus) method, because
-	/// it takes care of border highlighting, like the native
-	/// [`Button`](crate::gui::Button) control needs.
+	/// preferable to the `HWND::SetFocus` because it takes care of border
+	/// highlighting, like the native [`Button`](crate::gui::Button) control
+	/// needs.
 	</span><span class="kw">fn </span>focus(<span class="kw-2">&amp;</span><span class="self">self</span>) {
 		<span class="kw">let </span>hparent = <span class="self">self</span>.hwnd().GetParent().unwrap();
-		hparent.SendMessage(wm::NextDlgCtl {
-			hwnd_focus: HwndFocus::Hwnd(<span class="kw">unsafe </span>{ <span class="self">self</span>.hwnd().raw_copy() }),
-		});
+		<span class="kw">let </span>atom = hparent.GetClassLongPtr(co::GCLP::ATOM) <span class="kw">as </span>u16;
+		<span class="kw">if </span>atom == WC_DIALOG { <span class="comment">// https://stackoverflow.com/a/64437627/6923555
+			</span>hparent.SendMessage(wm::NextDlgCtl {
+				hwnd_focus: HwndFocus::Hwnd(<span class="kw">unsafe </span>{ <span class="self">self</span>.hwnd().raw_copy() }),
+			});
+		} <span class="kw">else </span>{
+			<span class="self">self</span>.hwnd().SetFocus();
+		}
 	}
 }
 
