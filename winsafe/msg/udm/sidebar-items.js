@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["GetAccel","`UDM_GETACCEL` message parameter."],["GetBase","`UDM_GETBASE` message, which has no parameters."]]};
