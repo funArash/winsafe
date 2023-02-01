@@ -65,12 +65,6 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
@@ -80,6 +74,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, HCURSOR, HICON, SIZE};
+<span class="kw">use </span><span class="kw">crate</span>::user::guard::{DestroyCursorGuard, DestroyIconGuard};
 
 <span class="kw">impl </span>gdi_Hinstance <span class="kw">for </span>HINSTANCE {}
 
@@ -109,38 +104,31 @@
 
 	<span class="doccomment">/// [`LoadImage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)
 	/// method for [`HCURSOR`](crate::HCURSOR).
-	///
-	/// **Note:** Must be paired with an
-	/// [`HCURSOR::DestroyCursor`](crate::prelude::user_Hcursor::DestroyCursor)
-	/// call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LoadImageCursor(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		name: IdOcrStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;HCURSOR&gt;
+		name: IdOcrStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;DestroyCursorGuard&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::LoadImageW(
 					<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">2</span>, sz.cx, sz.cy, load.<span class="number">0</span>)
 			},
-			|ptr| HCURSOR(ptr),
+			|ptr| DestroyCursorGuard::new(HCURSOR(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`LoadImage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew)
 	/// method for [`HICON`](crate::HICON).
-	///
-	/// **Note:** Must be paired with an
-	/// [`HICON::DestroyIcon`](crate::prelude::user_Hicon::DestroyIcon) call.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LoadImageIcon(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		name: IdOicStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;HICON&gt;
+		name: IdOicStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;DestroyIconGuard&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::LoadImageW(
 					<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">1</span>, sz.cx, sz.cy, load.<span class="number">0</span>)
 			},
-			|ptr| HICON(ptr),
+			|ptr| DestroyIconGuard::new(HICON(ptr)),
 		)
 	}
 }

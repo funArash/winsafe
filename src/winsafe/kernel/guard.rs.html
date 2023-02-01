@@ -271,7 +271,7 @@
 {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(handle: T) -&gt; CloseHandleGuard&lt;T&gt; {
+	</span><span class="kw">pub const fn </span>new(handle: T) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ handle }
 	}
 
@@ -316,7 +316,7 @@
 <span class="kw">impl </span>EndUpdateResourceGuard {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(hupsrc: HUPDATERSRC) -&gt; EndUpdateResourceGuard {
+	</span><span class="kw">pub const fn </span>new(hupsrc: HUPDATERSRC) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hupsrc }
 	}
 
@@ -389,13 +389,13 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; UnlockFileGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: kernel_Hfile,
 {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the objects.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>new(
 		hfile: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
 		offset: u64,
-		num_bytes_to_lock: u64) -&gt; UnlockFileGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	{
+		num_bytes_to_lock: u64) -&gt; <span class="self">Self
+	</span>{
 		<span class="self">Self </span>{ hfile, offset, num_bytes_to_lock }
 	}
 }
@@ -419,10 +419,10 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>CloseHandlePiGuard {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.pi.hProcess.as_opt() {
-			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(h.as_ptr()); } <span class="comment">// ignore errors
-		</span>}
+			<span class="kw">let _ </span>= CloseHandleGuard::new(<span class="kw">unsafe </span>{ h.raw_copy() });
+		}
 		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.pi.hThread.as_opt() {
-			<span class="kw">unsafe </span>{ kernel::ffi::CloseHandle(h.as_ptr()); }
+			<span class="kw">let _ </span>= CloseHandleGuard::new(<span class="kw">unsafe </span>{ h.raw_copy() });
 		}
 	}
 }
@@ -436,9 +436,9 @@
 }
 
 <span class="kw">impl </span>CloseHandlePiGuard {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the struct.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(pi: PROCESS_INFORMATION) -&gt; CloseHandlePiGuard {
+	</span><span class="kw">pub const fn </span>new(pi: PROCESS_INFORMATION) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ pi }
 	}
 

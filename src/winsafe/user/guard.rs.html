@@ -178,12 +178,24 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::ops::Deref;
 
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HDC, HDWP, HWND, PAINTSTRUCT};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HCURSOR, HDC, HDWP, HICON, HWND, PAINTSTRUCT};
 
 <span class="doccomment">/// RAII implementation for clipboard which automatically calls
 /// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)
@@ -201,10 +213,26 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CloseClipboardGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(hwnd: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;) -&gt; CloseClipboardGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+	</span><span class="kw">pub const fn </span>new(hwnd: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ _hwnd: hwnd }
 	}
 }
+
+<span class="macro">handle_guard! </span>{ DestroyCursorGuard: HCURSOR;
+	user::ffi::DestroyCursor;
+	<span class="doccomment">/// RAII implementation for [`HCURSOR`](crate::HCURSOR) which automatically
+	/// calls
+	/// [`DestroyCursor`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroycursor)
+	/// when the object goes out of scope.
+</span>}
+
+<span class="macro">handle_guard! </span>{ DestroyIconGuard: HICON;
+	user::ffi::DestroyIcon;
+	<span class="doccomment">/// RAII implementation for [`HICON`](crate::HICON) which automatically
+	/// calls
+	/// [`DestroyIcon`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroyicon)
+	/// when the object goes out of scope.
+</span>}
 
 <span class="macro">handle_guard! </span>{ EndDeferWindowPosGuard: HDWP;
 	user::ffi::EndDeferWindowPos;
@@ -251,11 +279,9 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; EndPaintGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: user_Hwnd,
 {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the objects.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(
-		hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hdc: HDC, ps: PAINTSTRUCT) -&gt; EndPaintGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	{
+	</span><span class="kw">pub const fn </span>new(hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hdc: HDC, ps: PAINTSTRUCT) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hwnd, hdc, ps }
 	}
 
@@ -288,11 +314,9 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; ReleaseCaptureGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: user_Hwnd,
 {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the handles.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(
-		hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hwnd_prev: <span class="prelude-ty">Option</span>&lt;HWND&gt;) -&gt; ReleaseCaptureGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	{
+	</span><span class="kw">pub const fn </span>new(hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hwnd_prev: <span class="prelude-ty">Option</span>&lt;HWND&gt;) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ _hwnd: hwnd, hwnd_prev }
 	}
 
@@ -339,9 +363,9 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; ReleaseDCGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: user_Hwnd,
 {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the handles.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hdc: HDC) -&gt; ReleaseDCGuard&lt;<span class="lifetime">&#39;a</span>, H&gt; {
+	</span><span class="kw">pub const fn </span>new(hwnd: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, hdc: HDC) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hwnd, hdc }
 	}
 

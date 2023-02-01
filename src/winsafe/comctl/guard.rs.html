@@ -23,11 +23,31 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::comctl;
+<span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HIMAGELIST;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
-<span class="doccomment">/// RAII implementation for imagelist drag which automatically calls
+<span class="macro">handle_guard! </span>{ ImageListDestroyGuard: HIMAGELIST;
+	comctl::ffi::ImageList_Destroy;
+	<span class="doccomment">/// RAII implementation for [`HIMAGELIST`](crate::HIMAGELIST) which
+	/// automatically calls
+	/// [`ImageList_Destroy`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_destroy)
+	/// when the object goes out of scope.
+</span>}
+
+<span class="doccomment">/// RAII implementation for image list drag which automatically calls
 /// [`ImageList_EndDrag`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_enddrag)
 /// when the object goes out of scope.
 </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;comctl&quot;</span>)))]
@@ -42,9 +62,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ImageListEndDragGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	<span class="doccomment">/// Constructs the guard by taking ownership of the object.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>new(himagelist: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;) -&gt; ImageListEndDragGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+	</span><span class="kw">pub const fn </span>new(himagelist: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ _himagelist: himagelist }
 	}
 }

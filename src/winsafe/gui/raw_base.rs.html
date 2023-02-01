@@ -300,6 +300,10 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
@@ -355,12 +359,14 @@
 <span class="kw">impl </span>Cursor {
 	<span class="doccomment">/// Converts the contents of `Cursor` to `HCURSOR`.
 	</span><span class="kw">pub fn </span>as_hcursor(<span class="kw-2">&amp;</span><span class="self">self</span>, hinst: <span class="kw-2">&amp;</span>HINSTANCE) -&gt; SysResult&lt;HCURSOR&gt; {
-		<span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
-			Cursor::Handle(h) =&gt; <span class="kw">unsafe </span>{ h.raw_copy() },
-			Cursor::Id(id) =&gt; hinst.LoadCursor(IdIdcStr::Id(<span class="kw-2">*</span>id))<span class="question-mark">?</span>,
-			Cursor::Idc(idc) =&gt; HINSTANCE::NULL.LoadCursor(IdIdcStr::Idc(<span class="kw-2">*</span>idc))<span class="question-mark">?</span>,
-			Cursor::Str(s) =&gt; hinst.LoadCursor(IdIdcStr::Str(s.clone()))<span class="question-mark">?</span>,
-		})
+		<span class="kw">unsafe </span>{
+			<span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
+				Cursor::Handle(h) =&gt; h.raw_copy(),
+				Cursor::Id(id) =&gt; hinst.LoadCursor(IdIdcStr::Id(<span class="kw-2">*</span>id))<span class="question-mark">?</span>.leak(),
+				Cursor::Idc(idc) =&gt; HINSTANCE::NULL.LoadCursor(IdIdcStr::Idc(<span class="kw-2">*</span>idc))<span class="question-mark">?</span>.leak(),
+				Cursor::Str(s) =&gt; hinst.LoadCursor(IdIdcStr::Str(s.clone()))<span class="question-mark">?</span>.leak(),
+			})
+		}
 	}
 }
 
@@ -384,13 +390,15 @@
 <span class="kw">impl </span>Icon {
 	<span class="doccomment">/// Converts the contents of `Icon` to `HICON`.
 	</span><span class="kw">pub fn </span>as_hicon(<span class="kw-2">&amp;</span><span class="self">self</span>, hinst: <span class="kw-2">&amp;</span>HINSTANCE) -&gt; SysResult&lt;HICON&gt; {
-		<span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
-			Icon::Handle(h) =&gt; <span class="kw">unsafe </span>{ h.raw_copy() },
-			Icon::Id(id) =&gt; hinst.LoadIcon(IdIdiStr::Id(<span class="kw-2">*</span>id))<span class="question-mark">?</span>,
-			Icon::Idi(idi) =&gt; HINSTANCE::NULL.LoadIcon(IdIdiStr::Idi(<span class="kw-2">*</span>idi))<span class="question-mark">?</span>,
-			Icon::None =&gt; HICON::NULL,
-			Icon::Str(s) =&gt; hinst.LoadIcon(IdIdiStr::Str(s.clone()))<span class="question-mark">?</span>,
-		})
+		<span class="kw">unsafe </span>{
+			<span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
+				Icon::Handle(h) =&gt; h.raw_copy(),
+				Icon::Id(id) =&gt; hinst.LoadIcon(IdIdiStr::Id(<span class="kw-2">*</span>id))<span class="question-mark">?</span>.leak(),
+				Icon::Idi(idi) =&gt; HINSTANCE::NULL.LoadIcon(IdIdiStr::Idi(<span class="kw-2">*</span>idi))<span class="question-mark">?</span>.leak(),
+				Icon::None =&gt; HICON::NULL,
+				Icon::Str(s) =&gt; hinst.LoadIcon(IdIdiStr::Str(s.clone()))<span class="question-mark">?</span>.leak(),
+			})
+		}
 	}
 }
 

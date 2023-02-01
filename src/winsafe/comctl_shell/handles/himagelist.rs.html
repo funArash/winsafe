@@ -52,13 +52,16 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::HIMAGELIST;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{comctl_Himagelist, user_Hicon};
-<span class="kw">use </span><span class="kw">crate</span>::shell::decl::{SHFILEINFO, SHGetFileInfo};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::comctl_Himagelist;
+<span class="kw">use </span><span class="kw">crate</span>::shell::decl::SHGetFileInfo;
 
 <span class="kw">impl </span>comctl_shell_Himagelist <span class="kw">for </span>HIMAGELIST {}
 
@@ -89,19 +92,22 @@
 	/// himgl.Destroy()?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>add_icon_from_shell(<span class="kw-2">&amp;</span><span class="self">self</span>, file_extensions: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>add_icon_from_shell(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		file_extensions: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; SysResult&lt;()&gt;
+	{
 		<span class="kw">let </span>sz = <span class="self">self</span>.GetIconSize()<span class="question-mark">?</span>;
 		<span class="kw">if </span>!sz.is(<span class="number">16</span>, <span class="number">16</span>) &amp;&amp; !sz.is(<span class="number">32</span>, <span class="number">32</span>) {
 			<span class="kw">return </span><span class="prelude-val">Err</span>(co::ERROR::NOT_SUPPORTED); <span class="comment">// only 16x16 or 32x32 icons can be loaded
 		</span>}
 
-		<span class="kw">let </span><span class="kw-2">mut </span>shfi = SHFILEINFO::default();
 		<span class="kw">for </span>file_extension <span class="kw">in </span>file_extensions.iter() {
-			SHGetFileInfo(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;*.{}&quot;</span>, file_extension), co::FILE_ATTRIBUTE::NORMAL,
-				<span class="kw-2">&amp;mut </span>shfi, co::SHGFI::USEFILEATTRIBUTES | co::SHGFI::ICON |
-				<span class="kw">if </span>sz.is(<span class="number">16</span>, <span class="number">16</span>) { co::SHGFI::SMALLICON } <span class="kw">else </span>{ co::SHGFI::LARGEICON })<span class="question-mark">?</span>;
+			<span class="kw">let </span>(<span class="kw">_</span>, shfi) = SHGetFileInfo(
+				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;*.{}&quot;</span>, file_extension.as_ref()),
+				co::FILE_ATTRIBUTE::NORMAL,
+				co::SHGFI::USEFILEATTRIBUTES | co::SHGFI::ICON |
+				<span class="kw">if </span>sz.is(<span class="number">16</span>, <span class="number">16</span>) { co::SHGFI::SMALLICON } <span class="kw">else </span>{ co::SHGFI::LARGEICON },
+			)<span class="question-mark">?</span>;
 			<span class="self">self</span>.AddIcon(<span class="kw-2">&amp;</span>shfi.hIcon)<span class="question-mark">?</span>;
-			shfi.hIcon.DestroyIcon()<span class="question-mark">?</span>;
 		}
 		<span class="prelude-val">Ok</span>(())
 	}
