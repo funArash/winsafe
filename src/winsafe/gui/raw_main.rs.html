@@ -257,7 +257,6 @@
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -267,8 +266,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::WindowEventsAll;
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::multiply_dpi;
 <span class="kw">use </span><span class="kw">crate</span>::gui::raw_base::{Brush, Cursor, Icon, RawBase};
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, HINSTANCE, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	GuiEvents, Handle, kernel_Hinstance, user_Haccel, user_Hwnd,
 };
@@ -280,7 +279,7 @@
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of RawMain
 	</span>raw_base: RawBase,
 	opts: WindowMainOpts,
-	hchild_prev_focus: VeryUnsafeCell&lt;HWND&gt;, <span class="comment">// WM_ACTIVATE woes
+	hchild_prev_focus: HWND, <span class="comment">// WM_ACTIVATE woes
 	</span>_pin: PhantomPinned,
 }
 
@@ -297,7 +296,7 @@
 				Obj {
 					raw_base: RawBase::new(<span class="prelude-val">None</span>),
 					opts,
-					hchild_prev_focus: VeryUnsafeCell::new(HWND::NULL),
+					hchild_prev_focus: HWND::NULL,
 					_pin: PhantomPinned,
 				},
 			),
@@ -396,16 +395,15 @@
 	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) {
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
 		<span class="self">self</span>.on().wm_activate(<span class="kw">move </span>|p| {
-			<span class="kw">let </span>hchild_prev_focus = self2.<span class="number">0</span>.hchild_prev_focus.as_mut();
 			<span class="kw">if </span>!p.is_minimized {
 				<span class="kw">if </span>p.event == co::WA::INACTIVE {
 					<span class="kw">if let </span><span class="prelude-val">Some</span>(hwnd_cur_focus) = HWND::GetFocus() {
 						<span class="kw">if </span>self2.hwnd().IsChild(<span class="kw-2">&amp;</span>hwnd_cur_focus) {
-							<span class="kw-2">*</span>hchild_prev_focus = hwnd_cur_focus; <span class="comment">// save previously focused control
+							<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span>self2.<span class="number">0</span>.hchild_prev_focus) } = hwnd_cur_focus; <span class="comment">// save previously focused control
 						</span>}
 					}
-				} <span class="kw">else if </span><span class="kw-2">*</span>hchild_prev_focus != HWND::NULL {
-					hchild_prev_focus.SetFocus(); <span class="comment">// put focus back
+				} <span class="kw">else if </span>self2.<span class="number">0</span>.hchild_prev_focus != HWND::NULL {
+					self2.<span class="number">0</span>.hchild_prev_focus.SetFocus(); <span class="comment">// put focus back
 				</span>}
 			}
 			<span class="prelude-val">Ok</span>(())

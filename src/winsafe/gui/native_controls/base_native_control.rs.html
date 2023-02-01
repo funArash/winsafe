@@ -178,8 +178,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEvents};
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::post_quit_error;
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{comctl_Hwnd, Handle, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{AtomStr, HWND, IdMenu, POINT, SIZE};
@@ -204,7 +204,7 @@
 ///
 /// Owns the window procedure for all subclassed native child controls.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>BaseNativeControl {
-	hwnd: VeryUnsafeCell&lt;HWND&gt;,
+	hwnd: HWND,
 	parent_ptr: NonNull&lt;Base&gt;, <span class="comment">// base of WindowControl, WindowMain or WindowModal
 	</span>subclass_events: WindowEvents, <span class="comment">// for control subclassing
 </span>}
@@ -216,14 +216,14 @@
 		}
 
 		<span class="self">Self </span>{
-			hwnd: VeryUnsafeCell::new(HWND::NULL),
+			hwnd: HWND::NULL,
 			parent_ptr: NonNull::from(parent),
 			subclass_events: WindowEvents::new(),
 		}
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HWND {
-		<span class="kw-2">&amp;*</span><span class="self">self</span>.hwnd
+		<span class="kw-2">&amp;</span><span class="self">self</span>.hwnd
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Base {
@@ -256,8 +256,8 @@
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create control before parent window creation.&quot;</span>);
 		}
 
-		<span class="kw-2">*</span><span class="self">self</span>.hwnd.as_mut() = <span class="kw">unsafe </span>{
-			HWND::CreateWindowEx(
+		<span class="kw">unsafe </span>{
+			<span class="kw-2">*</span>as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.hwnd) = HWND::CreateWindowEx(
 				ex_styles,
 				AtomStr::from_str(class_name),
 				title, styles,
@@ -266,8 +266,8 @@
 				IdMenu::Id(ctrl_id),
 				<span class="kw-2">&amp;</span>hparent.hinstance(),
 				<span class="prelude-val">None</span>,
-			)<span class="question-mark">?
-		</span>};
+			)<span class="question-mark">?</span>;
+		}
 
 		<span class="self">self</span>.install_subclass_if_needed()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
@@ -286,7 +286,7 @@
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create control before parent window creation.&quot;</span>);
 		}
 
-		<span class="kw-2">*</span><span class="self">self</span>.hwnd.as_mut() = hparent.GetDlgItem(ctrl_id)<span class="question-mark">?</span>;
+		<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.hwnd) } = hparent.GetDlgItem(ctrl_id)<span class="question-mark">?</span>;
 		<span class="self">self</span>.install_subclass_if_needed()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}

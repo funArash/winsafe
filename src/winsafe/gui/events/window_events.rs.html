@@ -820,10 +820,12 @@
 <a href="#820" id="820">820</a>
 <a href="#821" id="821">821</a>
 <a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::HFONT;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::func_store::FuncStore;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSendRecv;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HICON, HMENU};
@@ -863,7 +865,7 @@
 
 	<span class="doccomment">/// Removes all stored events.
 	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.msgs.clear();
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.msgs) }.clear();
 	}
 
 	<span class="doccomment">/// Searches for the last added user function for the given message, and
@@ -900,7 +902,7 @@
 	<span class="kw">fn </span>wm&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: co::WM, func: F)
 		<span class="kw">where </span>F: Fn(WndMsg) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.msgs.push(ident, Box::new(func));
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.msgs) }.push(ident, Box::new(func));
 	}
 }
 

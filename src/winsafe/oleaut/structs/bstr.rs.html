@@ -117,8 +117,6 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -216,9 +214,9 @@
 		}
 	}
 
-	<span class="doccomment">/// Returns the underlying
+	<span class="doccomment">/// Ejects the underlying
 	/// [`LPWSTR`](https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
-	/// pointer and sets the internal pointer to null, so that
+	/// pointer leaving a null pointer in its place, so that
 	/// [`SysFreeString`](https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysfreestring)
 	/// won&#39;t be called.
 	///
@@ -228,9 +226,7 @@
 	/// implies, you will cause a memory leak.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub unsafe fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
-		<span class="kw">let </span>ptr = <span class="self">self</span>.<span class="number">0</span>;
-		<span class="self">self</span>.<span class="number">0 </span>= std::ptr::null_mut();
-		ptr
+		std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>, std::ptr::null_mut())
 	}
 
 	<span class="doccomment">/// Converts into

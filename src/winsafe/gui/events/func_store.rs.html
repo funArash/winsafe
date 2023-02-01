@@ -52,13 +52,7 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
-
-<span class="doccomment">/// An identifier and a closure.
+</pre><pre class="rust"><code><span class="doccomment">/// An identifier and a closure.
 </span><span class="kw">struct </span>Pair&lt;K: Copy + Eq, F&gt; {
 	id: K,
 	func: F,
@@ -66,22 +60,21 @@
 
 <span class="doccomment">/// Stores closures, associating them with an identifier.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>FuncStore&lt;K: Copy + Eq, F&gt; {
-	elems: VeryUnsafeCell&lt;Vec&lt;Pair&lt;K, F&gt;&gt;&gt;,
+	elems: Vec&lt;Pair&lt;K, F&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;K: Copy + Eq, F&gt; FuncStore&lt;K, F&gt; {
 	<span class="doccomment">/// Creates a new, empty store.
 	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ elems: VeryUnsafeCell::new(Vec::default()) }
+		<span class="self">Self </span>{ elems: Vec::default() }
 	}
 
 	<span class="doccomment">/// Adds a new function into the store, associated to the given identifier.
-	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, id: K, func: F) {
-		<span class="kw">let </span>elems = <span class="self">self</span>.elems.as_mut();
-		<span class="kw">if </span>elems.is_empty() {
-			elems.reserve(<span class="number">16</span>); <span class="comment">// arbitrary, prealloc for speed
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: K, func: F) {
+		<span class="kw">if </span><span class="self">self</span>.elems.is_empty() {
+			<span class="self">self</span>.elems.reserve(<span class="number">16</span>); <span class="comment">// arbitrary, prealloc for speed
 		</span>}
-		elems.push(Pair { id, func });
+		<span class="self">self</span>.elems.push(Pair { id, func });
 	}
 
 	<span class="doccomment">/// Finds the last added function associated to the given identifier, if
@@ -109,9 +102,8 @@
 	}
 
 	<span class="doccomment">/// Removes all identifiers and closures.
-	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="kw">let </span>elems = <span class="self">self</span>.elems.as_mut();
-		elems.clear();
+	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="self">self</span>.elems.clear();
 	}
 }
 </code></pre></div>

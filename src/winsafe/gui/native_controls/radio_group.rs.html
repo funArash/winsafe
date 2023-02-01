@@ -222,7 +222,6 @@
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::ops::Index;
 <span class="kw">use </span>std::pin::Pin;
@@ -235,7 +234,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::RadioGroupEvents;
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::radio_button::{RadioButton, RadioButtonOpts};
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	GuiChild, GuiEvents, GuiNativeControlEvents, GuiParent, GuiWindow, Handle,
@@ -244,7 +242,7 @@
 
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of RadioGroup
 	</span>parent_ptr: NonNull&lt;Base&gt;,
-	radios: VeryUnsafeCell&lt;Vec&lt;RadioButton&gt;&gt;,
+	radios: Vec&lt;RadioButton&gt;,
 	events: RadioGroupEvents,
 	_pin: PhantomPinned,
 }
@@ -322,7 +320,7 @@
 			Arc::pin(
 				Obj {
 					parent_ptr: NonNull::from(parent_ref),
-					radios: VeryUnsafeCell::new(radios),
+					radios,
 					events: RadioGroupEvents::new(parent_ref, ctrl_ids),
 					_pin: PhantomPinned,
 				},
@@ -375,7 +373,7 @@
 			Arc::pin(
 				Obj {
 					parent_ptr: NonNull::from(parent_ref),
-					radios: VeryUnsafeCell::new(radios),
+					radios,
 					events: RadioGroupEvents::new(parent_ref, ctrl_ids),
 					_pin: PhantomPinned,
 				},

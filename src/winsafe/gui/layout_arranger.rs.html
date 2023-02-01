@@ -161,8 +161,8 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::wm;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, user_Hdwp, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HDWP, HWND, HwndPlace, POINT, RECT, SIZE};
@@ -207,8 +207,8 @@
 }
 
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of LayoutArranger
-	</span>ctrls: VeryUnsafeCell&lt;Vec&lt;ChildInfo&gt;&gt;,
-	sz_parent_orig: VeryUnsafeCell&lt;SIZE&gt;, <span class="comment">// original parent client area
+	</span>ctrls: Vec&lt;ChildInfo&gt;,
+	sz_parent_orig: SIZE, <span class="comment">// original parent client area
 	</span>_pin: PhantomPinned,
 }
 
@@ -223,8 +223,8 @@
 		<span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					ctrls: VeryUnsafeCell::new(Vec::with_capacity(<span class="number">10</span>)), <span class="comment">// arbitrary
-					</span>sz_parent_orig: VeryUnsafeCell::new(SIZE::default()),
+					ctrls: Vec::with_capacity(<span class="number">10</span>), <span class="comment">// arbitrary
+					</span>sz_parent_orig: SIZE::default(),
 					_pin: PhantomPinned,
 				},
 			),
@@ -246,14 +246,14 @@
 
 		<span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.ctrls.is_empty() { <span class="comment">// first control being added?
 			</span><span class="kw">let </span>rc_parent = hparent.GetClientRect()<span class="question-mark">?</span>;
-			<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.as_mut() =
+			<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig) } =
 				SIZE::new(rc_parent.right, rc_parent.bottom); <span class="comment">// save original parent size
 		</span>}
 
 		<span class="kw">let </span><span class="kw-2">mut </span>rc_orig = hchild.GetWindowRect()<span class="question-mark">?</span>;
 		hparent.ScreenToClientRc(<span class="kw-2">&amp;mut </span>rc_orig)<span class="question-mark">?</span>; <span class="comment">// control client coordinates relative to parent
 
-		</span><span class="self">self</span>.<span class="number">0</span>.ctrls.as_mut().push(
+		</span><span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.ctrls) }.push(
 			ChildInfo {
 				hchild: <span class="kw">unsafe </span>{ hchild.raw_copy() },
 				rc_orig,
@@ -282,7 +282,7 @@
 				</span>uflags |= co::SWP::NOMOVE;
 			}
 
-			<span class="kw">let </span>sz_parent_orig = <span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig;
+			<span class="kw">let </span>sz_parent_orig = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig;
 
 			hdwp.DeferWindowPos(
 				<span class="kw-2">&amp;</span>ctrl.hchild,

@@ -108,8 +108,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HglobalGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, GMEM_INVALID_HANDLE, ptr_to_sysresult,
-	replace_handle_value,
+	as_mut, bool_to_sysresult, GMEM_INVALID_HANDLE, ptr_to_sysresult,
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -181,13 +180,14 @@
 	</span><span class="kw">fn </span>GlobalReAlloc(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		num_bytes: usize, flags: co::GMEM) -&gt; SysResult&lt;()&gt;
 	{
-		ptr_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::GlobalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.<span class="number">0</span>)
-			}, |ptr| {
-				replace_handle_value(<span class="self">self</span>, <span class="kw">unsafe </span>{ <span class="self">Self</span>::from_ptr(ptr) });
-			},
-		)
+		<span class="kw">unsafe </span>{
+			ptr_to_sysresult(
+				kernel::ffi::GlobalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.<span class="number">0</span>),
+				|ptr| {
+					<span class="kw-2">*</span>as_mut(<span class="self">self</span>) = <span class="self">Self</span>::from_ptr(ptr);
+				},
+			)
+		}
 	}
 
 	<span class="doccomment">/// [`GlobalSize`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalsize)

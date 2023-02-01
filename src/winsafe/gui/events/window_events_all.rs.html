@@ -209,13 +209,15 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::rc::Rc;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEvents};
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::func_store::FuncStore;
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::AnyResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::{wm, WndMsg};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiEvents, MsgSendRecv};
 
@@ -261,9 +263,11 @@
 
 	<span class="doccomment">/// Removes all stored events.
 	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.tmrs.clear();
-		<span class="self">self</span>.cmds.clear();
-		<span class="self">self</span>.nfys.clear();
+		<span class="kw">unsafe </span>{
+			as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.tmrs).clear();
+			as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.cmds).clear();
+			as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.nfys).clear();
+		}
 		<span class="self">self</span>.window_events.clear();
 	}
 
@@ -346,7 +350,7 @@
 	</span><span class="kw">pub fn </span>wm_timer&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, timer_id: u32, func: F)
 		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.tmrs.push(timer_id, Box::new(func));
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.tmrs) }.push(timer_id, Box::new(func));
 	}
 
 	<span class="doccomment">/// [`WM_COMMAND`](https://learn.microsoft.com/en-us/windows/win32/menurc/wm-command)
@@ -381,7 +385,7 @@
 		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
 		<span class="kw">let </span>code: co::CMD = code.into();
-		<span class="self">self</span>.cmds.push((code, ctrl_id), Box::new(func));
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.cmds) }.push((code, ctrl_id), Box::new(func));
 	}
 
 	<span class="doccomment">/// [`WM_COMMAND`](https://learn.microsoft.com/en-us/windows/win32/menurc/wm-command)
@@ -393,7 +397,7 @@
 	</span><span class="kw">pub fn </span>wm_command_accel_menu&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctrl_id: u16, func: F)
 		<span class="kw">where </span>F: Fn() -&gt; AnyResult&lt;()&gt; + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="kw">let </span>shared_func = Rc::new(VeryUnsafeCell::new(func));
+		<span class="kw">let </span>shared_func = Rc::new(func);
 
 		<span class="self">self</span>.wm_command(co::CMD::Menu, ctrl_id, {
 			<span class="kw">let </span>shared_func = shared_func.clone();
@@ -417,7 +421,7 @@
 		<span class="kw">where </span>F: Fn(wm::Notify) -&gt; AnyResult&lt;<span class="prelude-ty">Option</span>&lt;isize&gt;&gt; + <span class="lifetime">&#39;static</span>,
 	{
 		<span class="kw">let </span>code: co::NM = code.into();
-		<span class="self">self</span>.nfys.push((id_from, code), Box::new(func));
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.nfys) }.push((id_from, code), Box::new(func));
 	}
 }
 </code></pre></div>

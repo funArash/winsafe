@@ -57,15 +57,11 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, ptr_to_sysresult, replace_handle_value,
-};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{as_mut, bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HCURSOR;
@@ -108,7 +104,7 @@
 		<span class="kw">let </span>ret = bool_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::DestroyCursor(<span class="self">self</span>.as_ptr()) },
 		);
-		replace_handle_value(<span class="self">self</span>, <span class="self">Self</span>::INVALID);
+		<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="self">self</span>) } = <span class="self">Self</span>::INVALID;
 		ret
 	}
 

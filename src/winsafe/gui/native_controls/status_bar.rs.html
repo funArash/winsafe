@@ -235,6 +235,7 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -246,8 +247,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::BaseNativeControl;
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::status_bar_parts::StatusBarParts;
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{auto_ctrl_id, multiply_dpi_or_dtu};
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::{sb, wm};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	GuiChild, GuiEvents, GuiNativeControl, GuiNativeControlEvents, GuiParent,
@@ -259,8 +260,8 @@
 	</span>base: BaseNativeControl,
 	ctrl_id: u16,
 	events: StatusBarEvents,
-	parts_info: VeryUnsafeCell&lt;Vec&lt;StatusBarPart&gt;&gt;,
-	right_edges: VeryUnsafeCell&lt;Vec&lt;i32&gt;&gt;, <span class="comment">// buffer to speed up resize calls
+	parts_info: Vec&lt;StatusBarPart&gt;,
+	right_edges: Vec&lt;i32&gt;, <span class="comment">// buffer to speed up resize calls
 	</span>_pin: PhantomPinned,
 }
 
@@ -370,8 +371,8 @@
 					base: BaseNativeControl::new(parent_ref),
 					ctrl_id,
 					events: StatusBarEvents::new(parent_ref, ctrl_id),
-					parts_info: VeryUnsafeCell::new(parts.to_vec()),
-					right_edges: VeryUnsafeCell::new(<span class="macro">vec!</span>[<span class="number">0</span>; parts.len()]),
+					parts_info: parts.to_vec(),
+					right_edges: <span class="macro">vec!</span>[<span class="number">0</span>; parts.len()],
 					_pin: PhantomPinned,
 				},
 			),
@@ -394,7 +395,7 @@
 	}
 
 	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">for </span>part <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.parts_info.as_mut().iter_mut() {
+		<span class="kw">for </span>part <span class="kw">in unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.parts_info) }.iter_mut() {
 			<span class="kw">if let </span>StatusBarPart::Fixed(width) = part { <span class="comment">// adjust fixed-width parts to DPI
 				</span><span class="kw">let </span><span class="kw-2">mut </span>col_cx = SIZE::new(<span class="kw-2">*</span>width <span class="kw">as _</span>, <span class="number">0</span>);
 				multiply_dpi_or_dtu(<span class="self">self</span>.<span class="number">0</span>.base.parent(), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>col_cx))<span class="question-mark">?</span>;
@@ -449,14 +450,15 @@
 			}
 		}
 
-		<span class="kw">let </span>right_edges = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.right_edges.as_mut();
+		<span class="kw">let </span>right_edges = <span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.right_edges) };
 		<span class="kw">let </span><span class="kw-2">mut </span>total_cx = p.client_area.cx <span class="kw">as </span>u32;
 
 		<span class="kw">for </span>(idx, part_info) <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.parts_info.iter().rev().enumerate() {
 			right_edges[<span class="self">self</span>.<span class="number">0</span>.parts_info.len() - idx - <span class="number">1</span>] = total_cx <span class="kw">as _</span>;
 			total_cx -= <span class="kw">match </span>part_info {
 				StatusBarPart::Fixed(pixels) =&gt; <span class="kw-2">*</span>pixels,
-				StatusBarPart::Proportional(pp) =&gt; (cx_available / total_proportions <span class="kw">as </span>u32) * (<span class="kw-2">*</span>pp <span class="kw">as </span>u32),
+				StatusBarPart::Proportional(pp) =&gt;
+					(cx_available / total_proportions <span class="kw">as </span>u32) * (<span class="kw-2">*</span>pp <span class="kw">as </span>u32),
 			};
 		}
 		<span class="kw-2">*</span>right_edges.last_mut().unwrap() = -<span class="number">1</span>;

@@ -239,8 +239,6 @@
 <a href="#239" id="239">239</a>
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -248,9 +246,7 @@
 <span class="kw">use crate</span>::{co, comctl};
 <span class="kw">use </span><span class="kw">crate</span>::comctl::guard::HimagelistDragGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, ptr_to_sysresult, replace_handle_value,
-};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{as_mut, bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HBITMAP, HICON, POINT, SIZE};
 
@@ -401,7 +397,7 @@
 		<span class="kw">let </span>ret = bool_to_sysresult(
 			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_Destroy(<span class="self">self</span>.as_ptr()) },
 		);
-		replace_handle_value(<span class="self">self</span>, <span class="self">Self</span>::INVALID);
+		<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="self">self</span>) } = <span class="self">Self</span>::INVALID;
 		ret
 	}
 

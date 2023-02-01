@@ -230,8 +230,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, LayoutArranger, Vert};
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{post_quit_error, QUIT_ERROR};
-<span class="kw">use </span><span class="kw">crate</span>::gui::very_unsafe_cell::VeryUnsafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, HINSTANCE, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiEvents, GuiParent, Handle, kernel_Hinstance, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
@@ -245,7 +245,7 @@
 	parent_ptr: <span class="prelude-ty">Option</span>&lt;NonNull&lt;<span class="self">Self</span>&gt;&gt;,
 	user_events: WindowEventsAll, <span class="comment">// ordinary window events, inserted by user: only last added is executed (overwrite previous)
 	</span>privileged_events: WindowEventsAll, <span class="comment">// inserted internally to automate tasks: all will be executed
-	</span>layout_arranger: VeryUnsafeCell&lt;LayoutArranger&gt;,
+	</span>layout_arranger: LayoutArranger,
 }
 
 <span class="kw">impl </span>Base {
@@ -268,7 +268,7 @@
 			parent_ptr: parent.map(|parent| NonNull::from(parent)),
 			user_events: WindowEventsAll::new(),
 			privileged_events: WindowEventsAll::new(),
-			layout_arranger: VeryUnsafeCell::new(LayoutArranger::new()),
+			layout_arranger: LayoutArranger::new(),
 		};
 		new_self.default_message_handlers();
 		new_self
@@ -341,7 +341,7 @@
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>add_to_layout_arranger(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hchild: <span class="kw-2">&amp;</span>HWND, horz: Horz, vert: Vert) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="self">self</span>.layout_arranger.as_mut()
+		<span class="kw">unsafe </span>{ as_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.layout_arranger) }
 			.add_child(<span class="kw-2">&amp;</span><span class="self">self</span>.hwnd, hchild, horz, vert)<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}

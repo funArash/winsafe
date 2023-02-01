@@ -74,14 +74,10 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>GMEM_INVALID_HANDLE: u32 = <span class="number">0x8000</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>INFINITE: u32 = <span class="number">0xffff_ffff</span>;
@@ -102,6 +98,11 @@
 	val <span class="kw">as </span>u16 <span class="kw">as _
 </span>}
 
+<span class="doccomment">/// Forcibly casts a const reference into a mutable one.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>as_mut&lt;T&gt;(val: <span class="kw-2">&amp;</span>T) -&gt; <span class="kw-2">&amp;mut </span>T {
+	<span class="kw-2">&amp;mut *</span>(val <span class="kw">as </span><span class="kw-2">*const </span>T <span class="kw">as </span><span class="kw-2">*mut </span>T)
+}
+
 <span class="doccomment">/// If value is `FALSE`, yields `Err(GetLastError)`, otherwise `Ok()`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bool_to_sysresult(expr: BOOL) -&gt; SysResult&lt;()&gt; {
 	<span class="kw">match </span>expr {
@@ -119,13 +120,6 @@
 	} <span class="kw">else </span>{
 		<span class="prelude-val">Ok</span>(op(ptr))
 	}
-}
-
-<span class="doccomment">/// Forcibly replaces the underlying handle value.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>replace_handle_value&lt;H&gt;(h: <span class="kw-2">&amp;</span>H, new: H)
-	<span class="kw">where </span>H: Handle,
-{
-	<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(h <span class="kw">as </span><span class="kw-2">*const </span>H <span class="kw">as </span><span class="kw-2">*mut </span>H) } = new;
 }
 
 <span class="doccomment">/// Converts a string to an ISO-8859-1 null-terminated byte array.

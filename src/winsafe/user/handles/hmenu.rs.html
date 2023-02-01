@@ -538,15 +538,11 @@
 <a href="#538" id="538">538</a>
 <a href="#539" id="539">539</a>
 <a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, msg, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, ptr_to_sysresult, replace_handle_value,
-};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{as_mut, bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, NativeBitflag, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	BmpPtrStr, HBITMAP, HWND, IdMenu, IdPos, MenuEnum, MENUINFO, MENUITEMINFO,
@@ -744,7 +740,7 @@
 		<span class="kw">let </span>ret = bool_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::DestroyMenu(<span class="self">self</span>.as_ptr()) },
 		);
-		replace_handle_value(<span class="self">self</span>, <span class="self">Self</span>::INVALID);
+		<span class="kw-2">*</span><span class="kw">unsafe </span>{ as_mut(<span class="self">self</span>) } = <span class="self">Self</span>::INVALID;
 		ret
 	}
 
