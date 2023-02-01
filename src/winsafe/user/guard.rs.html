@@ -190,12 +190,20 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::ops::Deref;
 
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HCURSOR, HDC, HDWP, HICON, HWND, PAINTSTRUCT};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HACCEL, HCURSOR, HDC, HDWP, HICON, HWND, PAINTSTRUCT};
 
 <span class="doccomment">/// RAII implementation for clipboard which automatically calls
 /// [`CloseClipboard`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard)
@@ -217,6 +225,14 @@
 		<span class="self">Self </span>{ _hwnd: hwnd }
 	}
 }
+
+<span class="macro">handle_guard! </span>{ DestroyAcceleratorTableGuard: HACCEL;
+	user::ffi::DestroyAcceleratorTable;
+	<span class="doccomment">/// RAII implementation for [`HACCEL`](crate::HACCEL) which automatically
+	/// calls
+	/// [`DestroyAcceleratorTable`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-destroyacceleratortable)
+	/// when the object goes out of scope.
+</span>}
 
 <span class="macro">handle_guard! </span>{ DestroyCursorGuard: HCURSOR;
 	user::ffi::DestroyCursor;
