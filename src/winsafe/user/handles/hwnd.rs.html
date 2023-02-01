@@ -1628,9 +1628,6 @@
 <a href="#1628" id="1628">1628</a>
 <a href="#1629" id="1629">1629</a>
 <a href="#1630" id="1630">1630</a>
-<a href="#1631" id="1631">1631</a>
-<a href="#1632" id="1632">1632</a>
-<a href="#1633" id="1633">1633</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1650,7 +1647,7 @@
 	TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::guard::{
-	ClipboardGuard, HdcPaintGuard, HdcReleaseGuard, HwndCaptureGuard,
+	CloseClipboardGuard, EndPaintGuard, ReleaseCaptureGuard, ReleaseDCGuard,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_none;
 
@@ -1705,7 +1702,7 @@
 	/// [`PAINTSTRUCT`](crate::PAINTSTRUCT) object.
 	///
 	/// Here, the cleanup is performed automatically, because `BeginPaint`
-	/// returns an [`HdcPaintGuard`](crate::guard::HdcPaintGuard), which stores
+	/// returns an [`EndPaintGuard`](crate::guard::EndPaintGuard), which stores
 	/// the `PAINTSTRUCT` and automatically calls `EndPaint` when the guard goes
 	/// out of scope. You must, however, keep the guard alive, otherwise the
 	/// cleanup will be performed right away.
@@ -1741,13 +1738,13 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>BeginPaint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HdcPaintGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
+	</span><span class="kw">fn </span>BeginPaint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;EndPaintGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ps = PAINTSTRUCT::default();
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
-			|ptr| HdcPaintGuard { hwnd: <span class="self">self</span>, hdc: HDC(ptr), ps },
+			|ptr| EndPaintGuard::new(<span class="self">self</span>, HDC(ptr), ps),
 		)
 	}
 
@@ -2071,13 +2068,10 @@
 	/// To get the device context of the desktop window, use the predefined
 	/// [`HWND::DESKTOP`](crate::prelude::user_Hwnd::DESKTOP).
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HdcReleaseGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
+	</span><span class="kw">fn </span>GetDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::GetDC(<span class="self">self</span>.as_ptr()) },
-			|ptr| HdcReleaseGuard {
-				hwnd: <span class="self">self</span>,
-				hdc: HDC(ptr),
-			},
+			|ptr| ReleaseDCGuard::new(<span class="self">self</span>, HDC(ptr)),
 		)
 	}
 
@@ -2318,10 +2312,10 @@
 	<span class="doccomment">/// [`GetWindowDC`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowdc)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetWindowDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HdcReleaseGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
+	</span><span class="kw">fn </span>GetWindowDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::GetWindowDC(<span class="self">self</span>.as_ptr()) },
-			|ptr| HdcReleaseGuard { hwnd: <span class="self">self</span>, hdc: HDC(ptr) },
+			|ptr| ReleaseDCGuard::new(<span class="self">self</span>, HDC(ptr)),
 		)
 	}
 
@@ -2748,10 +2742,10 @@
 	/// as a cleanup operation.
 	///
 	/// Here, the cleanup is performed automatically, because `OpenClipboard`
-	/// returns a [`ClipboardGuard`](crate::guard::ClipboardGuard), which
-	/// automatically calls `CloseClipboard` when the guard goes out of scope.
-	/// You must, however, keep the guard alive, otherwise the cleanup will be
-	/// performed right away.
+	/// returns a [`CloseClipboardGuard`](crate::guard::CloseClipboardGuard),
+	/// which automatically calls `CloseClipboard` when the guard goes out of
+	/// scope. You must, however, keep the guard alive, otherwise the cleanup
+	/// will be performed right away.
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -2774,9 +2768,9 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ClipboardGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;CloseClipboardGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
 		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::OpenClipboard(<span class="self">self</span>.as_ptr()) })
-			.map(|<span class="kw">_</span>| ClipboardGuard { _hwnd: PhantomData })
+			.map(|<span class="kw">_</span>| CloseClipboardGuard::new(PhantomData))
 	}
 
 	<span class="doccomment">/// [`PostMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postmessagew)
@@ -2961,12 +2955,12 @@
 
 	<span class="doccomment">/// [`SetCapture`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcapture)
 	/// method.
-	</span><span class="kw">fn </span>SetCapture(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HwndCaptureGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt; {
-		HwndCaptureGuard {
-			_hwnd: <span class="self">self</span>,
-			hwnd_prev: <span class="kw">unsafe </span>{ user::ffi::SetCapture(<span class="self">self</span>.as_ptr()).as_mut() }
-				.map(|ptr| HWND(ptr))
-		}
+	</span><span class="kw">fn </span>SetCapture(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReleaseCaptureGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt; {
+		ReleaseCaptureGuard::new(
+			<span class="self">self</span>,
+			<span class="kw">unsafe </span>{ user::ffi::SetCapture(<span class="self">self</span>.as_ptr()).as_mut() }
+				.map(|ptr| HWND(ptr)),
+		)
 	}
 
 	<span class="doccomment">/// [`SetFocus`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setfocus)

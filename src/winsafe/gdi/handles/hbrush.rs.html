@@ -117,7 +117,7 @@
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGBRUSH;
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
@@ -148,10 +148,10 @@
 	<span class="doccomment">/// [`CreateBrushIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbrushindirect)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateBrushIndirect(lb: <span class="kw-2">&amp;</span>LOGBRUSH) -&gt; SysResult&lt;GdiObjectGuard&lt;HBRUSH&gt;&gt; {
+	</span><span class="kw">fn </span>CreateBrushIndirect(lb: <span class="kw-2">&amp;</span>LOGBRUSH) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBRUSH&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateBrushIndirect(lb <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
-			|ptr| GdiObjectGuard { handle: HBRUSH(ptr) },
+			|ptr| DeleteObjectGuard::new(HBRUSH(ptr)),
 		)
 	}
 
@@ -159,31 +159,31 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateHatchBrush(
-		hatch: co::HS, color: COLORREF) -&gt; SysResult&lt;GdiObjectGuard&lt;HBRUSH&gt;&gt;
+		hatch: co::HS, color: COLORREF) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBRUSH&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateHatchBrush(hatch.<span class="number">0</span>, color.<span class="number">0</span>) },
-			|ptr| GdiObjectGuard { handle: HBRUSH(ptr) },
+			|ptr| DeleteObjectGuard::new(HBRUSH(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreatePatternBrush`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createpatternbrush)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreatePatternBrush(hbmp: <span class="kw-2">&amp;</span>HBITMAP) -&gt; SysResult&lt;GdiObjectGuard&lt;HBRUSH&gt;&gt; {
+	</span><span class="kw">fn </span>CreatePatternBrush(hbmp: <span class="kw-2">&amp;</span>HBITMAP) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBRUSH&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreatePatternBrush(hbmp.<span class="number">0</span>) },
-			|ptr| GdiObjectGuard { handle: HBRUSH(ptr) },
+			|ptr| DeleteObjectGuard::new(HBRUSH(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreateSolidBrush`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createsolidbrush)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateSolidBrush(color: COLORREF) -&gt; SysResult&lt;GdiObjectGuard&lt;HBRUSH&gt;&gt; {
+	</span><span class="kw">fn </span>CreateSolidBrush(color: COLORREF) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBRUSH&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateSolidBrush(color.<span class="number">0</span>) },
-			|ptr| GdiObjectGuard { handle: HBRUSH(ptr) },
+			|ptr| DeleteObjectGuard::new(HBRUSH(ptr)),
 		)
 	}
 

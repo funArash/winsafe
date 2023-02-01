@@ -72,7 +72,7 @@
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::CloseHandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -97,7 +97,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>DuplicateToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		level: co::SECURITY_IMPERSONATION) -&gt; SysResult&lt;HandleGuard&lt;HACCESSTOKEN&gt;&gt;
+		level: co::SECURITY_IMPERSONATION) -&gt; SysResult&lt;CloseHandleGuard&lt;HACCESSTOKEN&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
 		bool_to_sysresult(
@@ -108,7 +108,7 @@
 					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| HandleGuard { handle })
+		).map(|<span class="kw">_</span>| CloseHandleGuard::new(handle))
 	}
 
 	<span class="doccomment">/// [`GetCurrentProcessToken`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocesstoken)

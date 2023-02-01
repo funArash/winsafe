@@ -74,7 +74,7 @@
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WIN32_FIND_DATA, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HfindfileGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::FindCloseGuard;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HFINDFILE;
@@ -102,7 +102,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>FindFirstFile(
 		file_name: <span class="kw-2">&amp;</span>str,
-		wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;(HfindfileGuard, bool)&gt;
+		wfd: <span class="kw-2">&amp;mut </span>WIN32_FIND_DATA) -&gt; SysResult&lt;(FindCloseGuard, bool)&gt;
 	{
 		<span class="kw">match unsafe </span>{
 			kernel::ffi::FindFirstFileW(
@@ -111,12 +111,12 @@
 			).as_mut()
 		} {
 			<span class="prelude-val">Some</span>(ptr) =&gt; <span class="prelude-val">Ok</span>((
-				HfindfileGuard { handle: HFINDFILE(ptr) }, <span class="comment">// first file found
+				FindCloseGuard::new(HFINDFILE(ptr)), <span class="comment">// first file found
 				</span><span class="bool-val">true</span>,
 			)),
 			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::FILE_NOT_FOUND =&gt; <span class="prelude-val">Ok</span>((
-					HfindfileGuard { handle: HFINDFILE::NULL }, <span class="comment">// not an error, first file not found
+					FindCloseGuard::new(HFINDFILE::NULL), <span class="comment">// not an error, first file not found
 					</span><span class="bool-val">false</span>,
 				)),
 				err =&gt; <span class="prelude-val">Err</span>(err),

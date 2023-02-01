@@ -64,7 +64,7 @@
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGPEN;
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
@@ -94,21 +94,21 @@
 	</span><span class="kw">fn </span>CreatePen(
 		style: co::PS,
 		width: i32,
-		color: COLORREF) -&gt; SysResult&lt;GdiObjectGuard&lt;HPEN&gt;&gt;
+		color: COLORREF) -&gt; SysResult&lt;DeleteObjectGuard&lt;HPEN&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreatePen(style.<span class="number">0</span>, width, color.<span class="number">0</span>) },
-			|ptr| GdiObjectGuard { handle: HPEN(ptr) },
+			|ptr| DeleteObjectGuard::new(HPEN(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreatePenIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createpenindirect)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreatePenIndirect(lp: <span class="kw-2">&amp;mut </span>LOGPEN) -&gt; SysResult&lt;GdiObjectGuard&lt;HPEN&gt;&gt; {
+	</span><span class="kw">fn </span>CreatePenIndirect(lp: <span class="kw-2">&amp;mut </span>LOGPEN) -&gt; SysResult&lt;DeleteObjectGuard&lt;HPEN&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreatePenIndirect(lp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
-			|ptr| GdiObjectGuard { handle: HPEN(ptr) },
+			|ptr| DeleteObjectGuard::new(HPEN(ptr)),
 		)
 	}
 

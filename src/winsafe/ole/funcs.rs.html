@@ -157,7 +157,7 @@
 
 </span><span class="kw">use crate</span>::{co, ole};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult, IUnknown};
-<span class="kw">use </span><span class="kw">crate</span>::ole::guard::ComLibraryGuard;
+<span class="kw">use </span><span class="kw">crate</span>::ole::guard::CoUninitializeGuard;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 
@@ -219,7 +219,7 @@
 /// as a cleanup operation.
 ///
 /// Here, the cleanup is performed automatically, because `CoInitializeEx`
-/// returns a [`ComLibraryGuard`](crate::guard::ComLibraryGuard), which
+/// returns a [`CoUninitializeGuard`](crate::guard::CoUninitializeGuard), which
 /// automatically calls `CoUninitialize` when the guard goes out of scope. You
 /// must, however, keep the guard alive, otherwise the cleanup will be performed
 /// right away.
@@ -238,14 +238,14 @@
 /// // program runs...
 /// # Ok::&lt;_, co::HRESULT&gt;(())
 /// ```
-</span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;ComLibraryGuard&gt; {
+</span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;CoUninitializeGuard&gt; {
 	<span class="kw">let </span>hr = co::HRESULT(
 		<span class="kw">unsafe </span>{ ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.<span class="number">0</span>) },
 	);
 	<span class="kw">match </span>hr {
 		co::HRESULT::S_OK
 		| co::HRESULT::S_FALSE
-		| co::HRESULT::RPC_E_CHANGED_MODE =&gt; <span class="prelude-val">Ok</span>(ComLibraryGuard { hr }),
+		| co::HRESULT::RPC_E_CHANGED_MODE =&gt; <span class="prelude-val">Ok</span>(CoUninitializeGuard::new(hr)),
 		hr =&gt; <span class="prelude-val">Err</span>(hr),
 	}
 }

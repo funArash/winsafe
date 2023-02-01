@@ -72,7 +72,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{as_mut, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HWND, HwndPlace, POINT, SIZE};
-<span class="kw">use </span><span class="kw">crate</span>::user::guard::HdwpGuard;
+<span class="kw">use </span><span class="kw">crate</span>::user::guard::EndDeferWindowPosGuard;
 
 <span class="macro">impl_handle! </span>{ HDWP;
 	<span class="doccomment">/// Handle to a
@@ -93,10 +93,10 @@
 	<span class="doccomment">/// [`BeginDeferWindowPos`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-begindeferwindowpos)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>BeginDeferWindowPos(num_windows: u32) -&gt; SysResult&lt;HdwpGuard&gt; {
+	</span><span class="kw">fn </span>BeginDeferWindowPos(num_windows: u32) -&gt; SysResult&lt;EndDeferWindowPosGuard&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::BeginDeferWindowPos(num_windows <span class="kw">as _</span>) },
-			|ptr| HdwpGuard { handle: HDWP(ptr) },
+			|ptr| EndDeferWindowPosGuard::new(HDWP(ptr)),
 		)
 	}
 

@@ -974,7 +974,7 @@
 
 </span><span class="kw">use crate</span>::{advapi, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
-<span class="kw">use </span><span class="kw">crate</span>::advapi::guard::HkeyGuard;
+<span class="kw">use </span><span class="kw">crate</span>::advapi::guard::RegCloseKeyGuard;
 <span class="kw">use </span><span class="kw">crate</span>::advapi::privs::VALENT;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SECURITY_ATTRIBUTES, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
@@ -1030,7 +1030,7 @@
 	/// - [`HKEY::USERS`](crate::prelude::advapi_Hkey::USERS).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegConnectRegistry(
-		machine_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, predef_hkey: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;HkeyGuard&gt;
+		machine_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, predef_hkey: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">if </span><span class="kw-2">*</span>predef_hkey != HKEY::LOCAL_MACHINE
 			&amp;&amp; <span class="kw-2">*</span>predef_hkey != HKEY::PERFORMANCE_DATA
@@ -1049,7 +1049,7 @@
 				)
 			} <span class="kw">as _</span>,
 		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(HkeyGuard { hkey }),
+			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(RegCloseKeyGuard::new(hkey)),
 			err =&gt; <span class="prelude-val">Err</span>(err),
 		}
 	}
@@ -1079,7 +1079,7 @@
 		class: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		options: co::REG_OPTION,
 		access_rights: co::KEY,
-		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;) -&gt; SysResult&lt;(HkeyGuard, co::REG_DISPOSITION)&gt;
+		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;) -&gt; SysResult&lt;(RegCloseKeyGuard, co::REG_DISPOSITION)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
@@ -1099,7 +1099,7 @@
 				)
 			} <span class="kw">as _</span>,
 		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>((HkeyGuard { hkey }, disposition)),
+			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>((RegCloseKeyGuard::new(hkey), disposition)),
 			err =&gt; <span class="prelude-val">Err</span>(err),
 		}
 	}
@@ -1369,7 +1369,7 @@
 	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="kw-2">&amp;</span>str,
 		options: co::REG_OPTION,
-		access_rights: co::KEY) -&gt; SysResult&lt;HkeyGuard&gt;
+		access_rights: co::KEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">match </span>co::ERROR(
@@ -1383,7 +1383,7 @@
 				)
 			} <span class="kw">as _</span>,
 		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(HkeyGuard { hkey }),
+			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(RegCloseKeyGuard::new(hkey)),
 			err =&gt; <span class="prelude-val">Err</span>(err),
 		}
 	}

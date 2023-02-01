@@ -55,7 +55,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::gdi;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::BITMAP;
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
@@ -78,14 +78,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateBitmap(
 		sz: SIZE, num_planes: u32,
-		bit_count: u32, bits: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;GdiObjectGuard&lt;HBITMAP&gt;&gt;
+		bit_count: u32, bits: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBITMAP&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::CreateBitmap(
 					sz.cx, sz.cy, num_planes, bit_count, bits <span class="kw">as _</span>)
 			},
-			|ptr| GdiObjectGuard { handle: HBITMAP(ptr) },
+			|ptr| DeleteObjectGuard::new(HBITMAP(ptr)),
 		)
 	}
 

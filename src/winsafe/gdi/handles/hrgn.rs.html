@@ -94,7 +94,7 @@
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
@@ -115,23 +115,23 @@
 	<span class="doccomment">/// [`CreateRectRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgn)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateRectRgn(bounds: RECT) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt; {
+	</span><span class="kw">fn </span>CreateRectRgn(bounds: RECT) -&gt; SysResult&lt;DeleteObjectGuard&lt;HRGN&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::CreateRectRgn(
 					bounds.left, bounds.top, bounds.right, bounds.bottom)
 			},
-			|ptr| GdiObjectGuard { handle: HRGN(ptr) },
+			|ptr| DeleteObjectGuard::new(HRGN(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreateRectRgnIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgnindirect)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateRectRgnIndirect(rc: RECT) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt; {
+	</span><span class="kw">fn </span>CreateRectRgnIndirect(rc: RECT) -&gt; SysResult&lt;DeleteObjectGuard&lt;HRGN&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateRectRgnIndirect(<span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
-			|ptr| GdiObjectGuard { handle: HRGN(ptr) },
+			|ptr| DeleteObjectGuard::new(HRGN(ptr)),
 		)
 	}
 
@@ -139,7 +139,7 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateRoundRectRgn(
-		bounds: RECT, size: SIZE) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt;
+		bounds: RECT, size: SIZE) -&gt; SysResult&lt;DeleteObjectGuard&lt;HRGN&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -148,7 +148,7 @@
 					size.cx, size.cy,
 				)
 			},
-			|ptr| GdiObjectGuard { handle: HRGN(ptr) },
+			|ptr| DeleteObjectGuard::new(HRGN(ptr)),
 		)
 	}
 

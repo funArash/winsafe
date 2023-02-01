@@ -75,7 +75,7 @@
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{IdObmStr, IdOcrStr, IdOicStr};
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
@@ -96,14 +96,14 @@
 	/// method for [`HBITMAP`](crate::HBITMAP).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LoadImageBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		name: IdObmStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;GdiObjectGuard&lt;HBITMAP&gt;&gt;
+		name: IdObmStr, sz: SIZE, load: co::LR) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBITMAP&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::LoadImageW(
 					<span class="self">self</span>.as_ptr(), name.as_ptr(), <span class="number">0</span>, sz.cx, sz.cy, load.<span class="number">0</span>)
 			},
-			|ptr| GdiObjectGuard { handle: HBITMAP(ptr) },
+			|ptr| DeleteObjectGuard::new(HBITMAP(ptr)),
 		)
 	}
 

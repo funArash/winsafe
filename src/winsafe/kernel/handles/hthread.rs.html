@@ -152,7 +152,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	FILETIME, GetLastError, HACCESSTOKEN, SECURITY_ATTRIBUTES, SysResult,
 };
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::CloseHandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -183,7 +183,7 @@
 		stack_size: usize,
 		start_addr: <span class="kw-2">*mut </span>std::ffi::c_void,
 		parameter: <span class="kw-2">*mut </span>std::ffi::c_void,
-		flags: co::THREAD_CREATE) -&gt; SysResult&lt;(HandleGuard&lt;HTHREAD&gt;, u32)&gt;
+		flags: co::THREAD_CREATE) -&gt; SysResult&lt;(CloseHandleGuard&lt;HTHREAD&gt;, u32)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>thread_id = u32::default();
 		ptr_to_sysresult(
@@ -197,7 +197,7 @@
 					<span class="kw-2">&amp;mut </span>thread_id,
 				)
 			},
-			|ptr| (HandleGuard { handle: HTHREAD(ptr) }, thread_id),
+			|ptr| (CloseHandleGuard::new(HTHREAD(ptr)), thread_id),
 		)
 	}
 
@@ -279,7 +279,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenThreadToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		desired_access: co::TOKEN,
-		open_as_self: bool) -&gt; SysResult&lt;HandleGuard&lt;HACCESSTOKEN&gt;&gt;
+		open_as_self: bool) -&gt; SysResult&lt;CloseHandleGuard&lt;HACCESSTOKEN&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
 		bool_to_sysresult(
@@ -291,7 +291,7 @@
 					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| HandleGuard { handle })
+		).map(|<span class="kw">_</span>| CloseHandleGuard::new(handle))
 	}
 }
 </code></pre></div>

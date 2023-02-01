@@ -295,7 +295,7 @@
 	SECURITY_ATTRIBUTES, STARTUPINFO, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{HandleGuard, ProcessInformationGuard};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{CloseHandleGuard, CloseHandlePiGuard};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, INFINITE, MAX_PATH, ptr_to_sysresult,
 };
@@ -330,7 +330,7 @@
 		creation_flags: co::CREATE,
 		environment: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt;&gt;,
 		current_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;ProcessInformationGuard&gt;
+		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;CloseHandlePiGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>buf_cmd_line = WString::from_opt_str(command_line);
 		<span class="kw">let </span><span class="kw-2">mut </span>pi = PROCESS_INFORMATION::default();
@@ -356,7 +356,7 @@
 					<span class="kw-2">&amp;mut </span>pi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| ProcessInformationGuard { pi })
+		).map(|<span class="kw">_</span>| CloseHandlePiGuard::new(pi))
 	}
 
 	<span class="doccomment">/// [`ExitProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitprocess)
@@ -505,7 +505,7 @@
 	</span><span class="kw">fn </span>OpenProcess(
 		desired_access: co::PROCESS,
 		inherit_handle: bool,
-		process_id: u32) -&gt; SysResult&lt;HandleGuard&lt;HPROCESS&gt;&gt;
+		process_id: u32) -&gt; SysResult&lt;CloseHandleGuard&lt;HPROCESS&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -515,7 +515,7 @@
 					process_id,
 				)
 			},
-			|ptr| HandleGuard { handle: HPROCESS(ptr) },
+			|ptr| CloseHandleGuard::new(HPROCESS(ptr)),
 		)
 	}
 
@@ -523,7 +523,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenProcessToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		desired_access: co::TOKEN) -&gt; SysResult&lt;HandleGuard&lt;HACCESSTOKEN&gt;&gt;
+		desired_access: co::TOKEN) -&gt; SysResult&lt;CloseHandleGuard&lt;HACCESSTOKEN&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
 		bool_to_sysresult(
@@ -534,7 +534,7 @@
 					<span class="kw-2">&amp;mut </span>handle.<span class="number">0</span>,
 				)
 			},
-		).map(|<span class="kw">_</span>| HandleGuard { handle })
+		).map(|<span class="kw">_</span>| CloseHandleGuard::new(handle))
 	}
 
 	<span class="doccomment">/// [`QueryFullProcessImageName`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-queryfullprocessimagenamew)

@@ -326,7 +326,7 @@
 	GetLastError, HRSRC, HRSRCMEM, IdStr, LANGID, RtStr, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HinstanceGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::FreeLibraryGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, MAX_PATH, ptr_to_sysresult, str_to_iso88591,
 };
@@ -523,12 +523,12 @@
 	<span class="doccomment">/// [`LoadLibrary`](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HinstanceGuard&gt; {
+	</span><span class="kw">fn </span>LoadLibrary(lib_file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;FreeLibraryGuard&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::LoadLibraryW(WString::from_str(lib_file_name).as_ptr())
 			},
-			|ptr| HinstanceGuard { handle: HINSTANCE(ptr) },
+			|ptr| FreeLibraryGuard::new(HINSTANCE(ptr)),
 		)
 	}
 

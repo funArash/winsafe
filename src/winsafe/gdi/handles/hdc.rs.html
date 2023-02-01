@@ -916,7 +916,7 @@
 
 <span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{BITMAPINFO, TEXTMETRIC};
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::{GdiObjectGuard, HdcDeleteGuard, SelectObjectGuard};
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::{DeleteDCGuard, DeleteObjectGuard, SelectObjectGuard};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::privs::{CLR_INVALID, GDI_ERROR, LF_FACESIZE};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
@@ -1054,21 +1054,21 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateCompatibleBitmap(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		cx: i32, cy: i32) -&gt; SysResult&lt;GdiObjectGuard&lt;HBITMAP&gt;&gt;
+		cx: i32, cy: i32) -&gt; SysResult&lt;DeleteObjectGuard&lt;HBITMAP&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateCompatibleBitmap(<span class="self">self</span>.as_ptr(), cx, cy) },
-			|ptr| GdiObjectGuard { handle: HBITMAP(ptr) },
+			|ptr| DeleteObjectGuard::new(HBITMAP(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreateCompatibleDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatibledc)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateCompatibleDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HdcDeleteGuard&gt; {
+	</span><span class="kw">fn </span>CreateCompatibleDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;DeleteDCGuard&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateCompatibleDC(<span class="self">self</span>.as_ptr()) },
-			|ptr| HdcDeleteGuard { handle: HDC(ptr) },
+			|ptr| DeleteDCGuard::new(HDC(ptr)),
 		)
 	}
 
@@ -1415,10 +1415,10 @@
 	<span class="doccomment">/// [`PathToRegion`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-pathtoregion)
 	/// method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>PathToRegion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;GdiObjectGuard&lt;HRGN&gt;&gt; {
+	</span><span class="kw">fn </span>PathToRegion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;DeleteObjectGuard&lt;HRGN&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::PathToRegion(<span class="self">self</span>.as_ptr()) },
-			|ptr| GdiObjectGuard { handle: HRGN(ptr) },
+			|ptr| DeleteObjectGuard::new(HRGN(ptr)),
 		)
 	}
 
@@ -1584,17 +1584,17 @@
 			<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(<span class="self">self</span>.as_ptr(), hgdiobj.as_ptr()) },
 			|ptr| {
 				<span class="kw">if </span>hgdiobj.type_id() == TypeId::of::&lt;HRGN&gt;() {
-					SelectObjectGuard {
-						hdc: <span class="self">self</span>,
-						prev_hgdi: G::NULL, <span class="comment">// regions don&#39;t need cleanup
-						</span>region: <span class="prelude-val">Some</span>(co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)),
-					}
+					SelectObjectGuard::new(
+						<span class="self">self</span>,
+						G::NULL, <span class="comment">// regions don&#39;t need cleanup
+						</span><span class="prelude-val">Some</span>(co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)),
+					)
 				} <span class="kw">else </span>{
-					SelectObjectGuard {
-						hdc: <span class="self">self</span>,
-						prev_hgdi: <span class="kw">unsafe </span>{ G::from_ptr(ptr) },
-						region: <span class="prelude-val">None</span>,
-					}
+					SelectObjectGuard::new(
+						<span class="self">self</span>,
+						<span class="kw">unsafe </span>{ G::from_ptr(ptr) },
+						<span class="prelude-val">None</span>,
+					)
 				}
 			},
 		)

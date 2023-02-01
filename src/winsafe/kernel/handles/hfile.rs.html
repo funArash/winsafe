@@ -281,7 +281,7 @@
 	BY_HANDLE_FILE_INFORMATION, GetLastError, HFILEMAP, HIDWORD, LODWORD,
 	OVERLAPPED, SECURITY_ATTRIBUTES, SysResult, WString,
 };
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{HandleGuard, HfileLockGuard};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{CloseHandleGuard, UnlockFileGuard};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -356,7 +356,7 @@
 		security_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		creation_disposition: co::DISPOSITION,
 		flags_and_attrs: co::FILE_ATTRIBUTE,
-		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;) -&gt; SysResult&lt;(HandleGuard&lt;HFILE&gt;, co::ERROR)&gt;
+		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;) -&gt; SysResult&lt;(CloseHandleGuard&lt;HFILE&gt;, co::ERROR)&gt;
 	{
 		<span class="kw">match </span>HFILE(<span class="kw">unsafe </span>{
 			kernel::ffi::CreateFileW(
@@ -370,7 +370,7 @@
 			) <span class="kw">as _
 		</span>}) {
 			HFILE::NULL =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			handle =&gt; <span class="prelude-val">Ok</span>((HandleGuard { handle }, GetLastError())),
+			handle =&gt; <span class="prelude-val">Ok</span>((CloseHandleGuard::new(handle), GetLastError())),
 		}
 	}
 
@@ -381,7 +381,7 @@
 		mapping_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		protect: co::PAGE,
 		max_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HandleGuard&lt;HFILEMAP&gt;&gt;
+		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;CloseHandleGuard&lt;HFILEMAP&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -393,7 +393,7 @@
 					WString::from_opt_str(mapping_name).as_ptr(),
 				)
 			},
-			|ptr| HandleGuard { handle: HFILEMAP(ptr) },
+			|ptr| CloseHandleGuard::new(HFILEMAP(ptr)),
 		)
 	}
 
@@ -443,10 +443,10 @@
 	/// as a cleanup operation.
 	///
 	/// Here, the cleanup is performed automatically, because `LockFile` returns
-	/// an [`HfileLockGuard`](crate::guard::HfileLockGuard), which automatically
-	/// calls `UnlockFile` when the guard goes out of scope. You must, however,
-	/// keep the guard alive, otherwise the cleanup will be performed right
-	/// away.
+	/// an [`UnlockFileGuard`](crate::guard::UnlockFileGuard), which
+	/// automatically calls `UnlockFile` when the guard goes out of scope. You
+	/// must, however, keep the guard alive, otherwise the cleanup will be
+	/// performed right away.
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
@@ -465,7 +465,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LockFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		offset: u64,
-		num_bytes_to_lock: u64) -&gt; SysResult&lt;HfileLockGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt;
+		num_bytes_to_lock: u64) -&gt; SysResult&lt;UnlockFileGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -477,7 +477,7 @@
 					HIDWORD(num_bytes_to_lock),
 				)
 			},
-		).map(|<span class="kw">_</span>| HfileLockGuard { hfile: <span class="self">self</span>, offset, num_bytes_to_lock })
+		).map(|<span class="kw">_</span>| UnlockFileGuard::new(<span class="self">self</span>, offset, num_bytes_to_lock))
 	}
 
 	<span class="doccomment">/// [`ReadFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)

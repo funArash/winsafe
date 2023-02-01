@@ -67,7 +67,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::kernel;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{IdStr, LANGID, RtStr, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HupdatersrcGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::EndUpdateResourceGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -93,7 +93,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>BeginUpdateResource(
 		file_name: <span class="kw-2">&amp;</span>str,
-		delete_existing_resources: bool) -&gt; SysResult&lt;HupdatersrcGuard&gt;
+		delete_existing_resources: bool) -&gt; SysResult&lt;EndUpdateResourceGuard&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -102,7 +102,7 @@
 					delete_existing_resources <span class="kw">as _</span>,
 				)
 			},
-			|ptr| HupdatersrcGuard { hupsrc: HUPDATERSRC(ptr) },
+			|ptr| EndUpdateResourceGuard::new(HUPDATERSRC(ptr)),
 		)
 	}
 

@@ -91,7 +91,7 @@
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGFONT;
-<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::GdiObjectGuard;
+<span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
@@ -123,7 +123,7 @@
 		char_set: co::CHARSET,
 		out_precision: co::OUT_PRECIS, clip_precision: co::CLIP,
 		quality: co::QUALITY, pitch_and_family: co::PITCH,
-		face_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt;
+		face_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;DeleteObjectGuard&lt;HFONT&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -137,17 +137,17 @@
 					WString::from_str(face_name).as_ptr(),
 				)
 			},
-			|ptr| GdiObjectGuard { handle: HFONT(ptr) },
+			|ptr| DeleteObjectGuard::new(HFONT(ptr)),
 		)
 	}
 
 	<span class="doccomment">/// [`CreateFontIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createfontindirectw)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>CreateFontIndirect(lf: <span class="kw-2">&amp;</span>LOGFONT) -&gt; SysResult&lt;GdiObjectGuard&lt;HFONT&gt;&gt; {
+	</span><span class="kw">fn </span>CreateFontIndirect(lf: <span class="kw-2">&amp;</span>LOGFONT) -&gt; SysResult&lt;DeleteObjectGuard&lt;HFONT&gt;&gt; {
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ gdi::ffi::CreateFontIndirectW(lf <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
-			|ptr| GdiObjectGuard { handle: HFONT(ptr) },
+			|ptr| DeleteObjectGuard::new(HFONT(ptr)),
 		)
 	}
 

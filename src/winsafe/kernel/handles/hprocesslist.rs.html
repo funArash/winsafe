@@ -626,7 +626,7 @@
 	GetLastError, HEAPLIST32, MODULEENTRY32, PROCESSENTRY32, SysResult,
 	THREADENTRY32,
 };
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HandleGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::CloseHandleGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{as_mut, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -775,7 +775,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CreateToolhelp32Snapshot(
 		flags: co::TH32CS,
-		th32_process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;HandleGuard&lt;HPROCESSLIST&gt;&gt;
+		th32_process_id: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;CloseHandleGuard&lt;HPROCESSLIST&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -784,7 +784,7 @@
 					th32_process_id.unwrap_or_default(),
 				)
 			},
-			|ptr| HandleGuard { handle: HPROCESSLIST(ptr) },
+			|ptr| CloseHandleGuard::new(HPROCESSLIST(ptr)),
 		)
 	}
 

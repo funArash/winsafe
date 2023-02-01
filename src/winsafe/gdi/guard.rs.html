@@ -115,23 +115,46 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Deref;
 
 <span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{gdi_Hdc, GdiObject, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HDC;
 
+<span class="macro">handle_guard! </span>{ DeleteDCGuard: HDC;
+	gdi::ffi::DeleteDC;
+	<span class="doccomment">/// RAII implementation for [`HDC`](crate::HDC) which automatically calls
+	/// [`DeleteDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deletedc)
+	/// when the object goes out of scope.
+</span>}
+
 <span class="doccomment">/// RAII implementation for a [`GdiObject`](crate::prelude::GdiObject) which
 /// automatically calls
 /// [`DeleteObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject)
 /// when the object goes out of scope.
-</span><span class="kw">pub struct </span>GdiObjectGuard&lt;T&gt;
+</span><span class="kw">pub struct </span>DeleteObjectGuard&lt;T&gt;
 	<span class="kw">where </span>T: GdiObject,
 {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) handle: T,
+	handle: T,
 }
 
-<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>GdiObjectGuard&lt;T&gt;
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>DeleteObjectGuard&lt;T&gt;
 	<span class="kw">where </span>T: GdiObject,
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
@@ -141,7 +164,7 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>GdiObjectGuard&lt;T&gt;
+<span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>DeleteObjectGuard&lt;T&gt;
 	<span class="kw">where </span>T: GdiObject,
 {
 	<span class="kw">type </span>Target = T;
@@ -151,9 +174,15 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;T&gt; GdiObjectGuard&lt;T&gt;
+<span class="kw">impl</span>&lt;T&gt; DeleteObjectGuard&lt;T&gt;
 	<span class="kw">where </span>T: GdiObject,
 {
+	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>new(handle: T) -&gt; DeleteObjectGuard&lt;T&gt; {
+		<span class="self">Self </span>{ handle }
+	}
+
 	<span class="doccomment">/// Ejects the underlying handle, leaving a
 	/// [`Handle::INVALID`](crate::prelude::Handle::INVALID) in its place.
 	///
@@ -168,13 +197,6 @@
 	}
 }
 
-<span class="macro">handle_guard! </span>{ HdcDeleteGuard: HDC;
-	gdi::ffi::DeleteDC;
-	<span class="doccomment">/// RAII implementation for [`HDC`](crate::HDC) which automatically calls
-	/// [`DeleteDC`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deletedc)
-	/// when the object goes out of scope.
-</span>}
-
 <span class="doccomment">/// RAII implementation for
 /// [`HDC::SelectObject`](crate::prelude::gdi_Hdc::SelectObject) calls, which
 /// automatically selects the previous GDI object at the end of the scope.
@@ -182,9 +204,9 @@
 	<span class="kw">where </span>H: gdi_Hdc,
 		G: GdiObject,
 {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) hdc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
-	<span class="kw">pub</span>(<span class="kw">crate</span>) prev_hgdi: G,
-	<span class="kw">pub</span>(<span class="kw">crate</span>) region: <span class="prelude-ty">Option</span>&lt;co::REGION&gt;,
+	hdc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
+	prev_hgdi: G,
+	region: <span class="prelude-ty">Option</span>&lt;co::REGION&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H, G&gt; Drop <span class="kw">for </span>SelectObjectGuard&lt;<span class="lifetime">&#39;a</span>, H, G&gt;
@@ -204,6 +226,16 @@
 	<span class="kw">where </span>H: gdi_Hdc,
 		G: GdiObject,
 {
+	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>new(
+		hdc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
+		prev_hgdi: G,
+		region: <span class="prelude-ty">Option</span>&lt;co::REGION&gt;) -&gt; SelectObjectGuard&lt;<span class="lifetime">&#39;a</span>, H, G&gt;
+	{
+		<span class="self">Self </span>{ hdc, prev_hgdi, region }
+	}
+
 	<span class="doccomment">/// Returns a handle to the object that has been replaced.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>prev_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>G {

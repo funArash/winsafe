@@ -51,7 +51,7 @@
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HFILEMAPVIEW, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HfilemapviewGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::UnmapViewOfFileGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -81,7 +81,7 @@
 	</span><span class="kw">fn </span>MapViewOfFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		desired_access: co::FILE_MAP,
 		offset: u64,
-		number_of_bytes_to_map: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; SysResult&lt;HfilemapviewGuard&gt;
+		number_of_bytes_to_map: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; SysResult&lt;UnmapViewOfFileGuard&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -92,7 +92,7 @@
 					number_of_bytes_to_map.unwrap_or_default(),
 				)
 			},
-			|ptr| HfilemapviewGuard { handle: HFILEMAPVIEW(ptr) },
+			|ptr| UnmapViewOfFileGuard::new(HFILEMAPVIEW(ptr)),
 		)
 	}
 }

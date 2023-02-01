@@ -106,7 +106,7 @@
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::HglobalGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::GlobalFreeGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	as_mut, bool_to_sysresult, GMEM_INVALID_HANDLE, ptr_to_sysresult,
 };
@@ -133,11 +133,11 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GlobalAlloc(
-		flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;HglobalGuard&gt;
+		flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;GlobalFreeGuard&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ kernel::ffi::GlobalAlloc(flags.<span class="number">0</span>, num_bytes) },
-			|ptr| HglobalGuard { handle: HGLOBAL(ptr) },
+			|ptr| GlobalFreeGuard::new(HGLOBAL(ptr)),
 		)
 	}
 
