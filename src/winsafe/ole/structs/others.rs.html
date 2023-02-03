@@ -152,6 +152,14 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -159,7 +167,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::as_mut;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::ComPtr;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 
 <span class="doccomment">/// [`COAUTHIDENTITY`](https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ns-wtypesbase-coauthidentity)
@@ -285,6 +293,14 @@
 }
 
 <span class="macro">impl_default!</span>(MULTI_QI, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>MULTI_QI&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.pItf.as_opt() {
+			<span class="kw">let _ </span>= IUnknown::from(<span class="kw-2">*</span>p); <span class="comment">// increased safety, in case pItf() method is not called
+		</span>}
+	}
+}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MULTI_QI&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pIID, set_pIID, co::IID);
