@@ -110,16 +110,11 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use crate</span>::{co, oleaut};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::oleaut;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 
 <span class="doccomment">/// A
 /// [string data type](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/automat/bstr)
@@ -154,36 +149,31 @@
 <span class="kw">impl </span>BSTR {
 	<span class="doccomment">/// [`SysAllocString`](https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysallocstring)
 	/// function.
-	///
-	/// # Panics
-	///
-	/// Panics if there is not enough memory.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>SysAllocString(s: <span class="kw-2">&amp;</span>str) -&gt; BSTR {
+	</span><span class="kw">pub fn </span>SysAllocString(s: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;BSTR&gt; {
 		<span class="kw">let </span>str_obj = WString::from_str(s);
 		<span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ oleaut::ffi::SysAllocString(str_obj.as_ptr()) };
 		<span class="kw">if </span>ptr.is_null() {
-			<span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, co::HRESULT::E_OUTOFMEMORY)
+			<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
 		} <span class="kw">else </span>{
-			<span class="self">Self</span>(ptr)
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span>(ptr))
 		}
 	}
 
 	<span class="doccomment">/// [`SysReAllocString`](https://learn.microsoft.com/en-us/windows/win32/api/oleauto/nf-oleauto-sysreallocstring)
 	/// function.
 	///
-	/// # Panics
-	///
-	/// Panics if there is not enough memory.
-	</span><span class="kw">pub fn </span>SysReAllocString(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) {
+	/// The underlying pointer is automatically updated.
+	</span><span class="kw">pub fn </span>SysReAllocString(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">let </span>str_obj = WString::from_str(s);
 		<span class="kw">let </span>ptr = <span class="kw">unsafe </span>{
 			oleaut::ffi::SysReAllocString(<span class="self">self</span>.<span class="number">0</span>, str_obj.as_ptr())
 		};
 		<span class="kw">if </span>ptr.is_null() {
-			<span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, co::HRESULT::E_OUTOFMEMORY);
+			<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
 		} <span class="kw">else </span>{
 			<span class="self">self</span>.<span class="number">0 </span>= ptr;
+			<span class="prelude-val">Ok</span>(())
 		}
 	}
 
@@ -196,7 +186,7 @@
 
 	<span class="doccomment">/// Returns the underlying
 	/// [`LPWSTR`](https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
-	/// pointer.
+	/// pointer to the null-terminated wide string.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
 		<span class="self">self</span>.<span class="number">0
