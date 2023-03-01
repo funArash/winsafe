@@ -3551,9 +3551,56 @@
 <a href="#3551" id="3551">3551</a>
 <a href="#3552" id="3552">3552</a>
 <a href="#3553" id="3553">3553</a>
+<a href="#3554" id="3554">3554</a>
+<a href="#3555" id="3555">3555</a>
+<a href="#3556" id="3556">3556</a>
+<a href="#3557" id="3557">3557</a>
+<a href="#3558" id="3558">3558</a>
+<a href="#3559" id="3559">3559</a>
+<a href="#3560" id="3560">3560</a>
+<a href="#3561" id="3561">3561</a>
+<a href="#3562" id="3562">3562</a>
+<a href="#3563" id="3563">3563</a>
+<a href="#3564" id="3564">3564</a>
+<a href="#3565" id="3565">3565</a>
+<a href="#3566" id="3566">3566</a>
+<a href="#3567" id="3567">3567</a>
+<a href="#3568" id="3568">3568</a>
+<a href="#3569" id="3569">3569</a>
+<a href="#3570" id="3570">3570</a>
+<a href="#3571" id="3571">3571</a>
+<a href="#3572" id="3572">3572</a>
+<a href="#3573" id="3573">3573</a>
+<a href="#3574" id="3574">3574</a>
+<a href="#3575" id="3575">3575</a>
+<a href="#3576" id="3576">3576</a>
+<a href="#3577" id="3577">3577</a>
+<a href="#3578" id="3578">3578</a>
+<a href="#3579" id="3579">3579</a>
+<a href="#3580" id="3580">3580</a>
+<a href="#3581" id="3581">3581</a>
+<a href="#3582" id="3582">3582</a>
+<a href="#3583" id="3583">3583</a>
+<a href="#3584" id="3584">3584</a>
+<a href="#3585" id="3585">3585</a>
+<a href="#3586" id="3586">3586</a>
+<a href="#3587" id="3587">3587</a>
+<a href="#3588" id="3588">3588</a>
+<a href="#3589" id="3589">3589</a>
+<a href="#3590" id="3590">3590</a>
+<a href="#3591" id="3591">3591</a>
+<a href="#3592" id="3592">3592</a>
+<a href="#3593" id="3593">3593</a>
+<a href="#3594" id="3594">3594</a>
+<a href="#3595" id="3595">3595</a>
+<a href="#3596" id="3596">3596</a>
+<a href="#3597" id="3597">3597</a>
+<a href="#3598" id="3598">3598</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_upper_case_globals)]
 
-</span><span class="macro">const_bitflag! </span>{ ACCELF: u8;
+</span><span class="kw">use </span><span class="kw">crate</span>::co::{ACCESS_RIGHTS, STANDARD_RIGHTS};
+
+<span class="macro">const_bitflag! </span>{ ACCELF: u8;
 	<span class="doccomment">/// [`ACCELL`](crate::ACCEL) `fVirt` (`u8`).
 	///
 	/// Originally has `F` prefix.
@@ -3980,6 +4027,49 @@
 	</span>POSTMSGS <span class="number">0x2000
 	</span>DRIVES <span class="number">0x4000
 	</span>EXCLUSIVE <span class="number">0x8000
+</span>}
+
+<span class="macro">const_bitflag! </span>{ DESKTOP_RIGHTS: u32;
+	<span class="doccomment">/// Desktop security and access rights
+	/// [flags](https://learn.microsoft.com/en-us/windows/win32/winstation/desktop-security-and-access-rights)
+	/// (`u32`).
+	///
+	/// Originally aglutinates [`co::ACCESS_RIGHTS`](crate::co::ACCESS_RIGHTS)
+	/// and specific constants with `DESKTOP` prefix.
+	</span>=&gt;
+	=&gt;
+	DELETE ACCESS_RIGHTS::DELETE.<span class="number">0
+	</span>READ_CONTROL ACCESS_RIGHTS::READ_CONTROL.<span class="number">0
+	</span>WRITE_DAC ACCESS_RIGHTS::WRITE_DAC.<span class="number">0
+	</span>WRITE_OWNER ACCESS_RIGHTS::WRITE_OWNER.<span class="number">0
+	</span>SYNCHRONIZE ACCESS_RIGHTS::SYNCHRONIZE.<span class="number">0
+
+	</span>READOBJECTS <span class="number">0x0001
+	</span>CREATEWINDOW <span class="number">0x0002
+	</span>CREATEMENU <span class="number">0x0004
+	</span>HOOKCONTROL <span class="number">0x0008
+	</span>JOURNALRECORD <span class="number">0x0010
+	</span>JOURNALPLAYBACK <span class="number">0x0020
+	</span>ENUMERATE <span class="number">0x0040
+	</span>WRITEOBJECTS <span class="number">0x0080
+	</span>SWITCHDESKTOP <span class="number">0x0100
+
+	</span>GENERIC_READ <span class="self">Self</span>::ENUMERATE.<span class="number">0 </span>| <span class="self">Self</span>::READOBJECTS.<span class="number">0 </span>| STANDARD_RIGHTS::READ.<span class="number">0
+	</span>GENERIC_WRITE <span class="self">Self</span>::CREATEMENU.<span class="number">0 </span>| <span class="self">Self</span>::CREATEWINDOW.<span class="number">0 </span>| <span class="self">Self</span>::HOOKCONTROL.<span class="number">0 </span>| <span class="self">Self</span>::JOURNALPLAYBACK.<span class="number">0 </span>| <span class="self">Self</span>::JOURNALRECORD.<span class="number">0 </span>| <span class="self">Self</span>::WRITEOBJECTS.<span class="number">0 </span>| STANDARD_RIGHTS::WRITE.<span class="number">0
+	</span>GENERICE_EXECUTE <span class="self">Self</span>::SWITCHDESKTOP.<span class="number">0 </span>| STANDARD_RIGHTS::EXECUTE.<span class="number">0
+	</span>GENERIC_ALL <span class="self">Self</span>::CREATEMENU.<span class="number">0 </span>| <span class="self">Self</span>::CREATEWINDOW.<span class="number">0 </span>| <span class="self">Self</span>::ENUMERATE.<span class="number">0 </span>| <span class="self">Self</span>::HOOKCONTROL.<span class="number">0 </span>| <span class="self">Self</span>::JOURNALPLAYBACK.<span class="number">0 </span>| <span class="self">Self</span>::JOURNALRECORD.<span class="number">0 </span>| <span class="self">Self</span>::READOBJECTS.<span class="number">0 </span>| <span class="self">Self</span>::SWITCHDESKTOP.<span class="number">0 </span>| <span class="self">Self</span>::WRITEOBJECTS.<span class="number">0 </span>| STANDARD_RIGHTS::REQUIRED.<span class="number">0
+</span>}
+
+<span class="macro">const_ordinary! </span>{ DF: u32;
+	<span class="doccomment">/// [`HDESK::OpenDesktop`](crate::prelude::user_Hdesk::OpenDesktop) `flags`
+	/// (`u32`).
+	</span>=&gt;
+	=&gt;
+	<span class="doccomment">/// None of the actual values (zero).
+	</span>NoValue <span class="number">0
+	</span><span class="doccomment">/// Allows processes running in other accounts on the desktop to set hooks
+	/// in this process.
+	</span>ALLOWOTHERACCOUNTHOOK <span class="number">0x0001
 </span>}
 
 <span class="macro">const_ordinary! </span>{ DISP_CHANGE: i32;
