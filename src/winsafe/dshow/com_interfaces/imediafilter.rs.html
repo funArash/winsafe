@@ -66,11 +66,32 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PVOID};
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::INFINITE;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::okfalse_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IPersist;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IPersistVT;
 
@@ -81,7 +102,7 @@
 	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
 	<span class="kw">pub </span>Pause: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
    <span class="kw">pub </span>Run: <span class="kw">fn</span>(ComPtr, i64) -&gt; HRES,
-	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(ComPtr, i64, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(ComPtr, u32, PVOID) -&gt; HRES,
 	<span class="kw">pub </span>SetSyncSource: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
 	<span class="kw">pub </span>GetSyncSource: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
 }
@@ -107,6 +128,23 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>dshow_IMediaFilter: ole_IPersist {
+	<span class="doccomment">/// [`IMediaFilter::GetState`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediafilter-getstate)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetState(<span class="kw-2">&amp;</span><span class="self">self</span>, ms_timeout: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; HrResult&lt;co::FILTER_STATE&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>fs = co::FILTER_STATE::Stopped;
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaFilterVT&gt;();
+			ok_to_hrresult(
+				(vt.GetState)(
+					<span class="self">self</span>.ptr(),
+					ms_timeout.unwrap_or(INFINITE),
+					<span class="kw-2">&amp;mut </span>fs.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				),
+			).map(|<span class="kw">_</span>| fs)
+		}
+	}
+
 	<span class="doccomment">/// [`IMediaFilter::Pause`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediafilter-pause)
 	/// method.
 	</span><span class="kw">fn </span>Pause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
