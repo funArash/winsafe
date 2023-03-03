@@ -82,12 +82,29 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi_ktm, co};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::decl::HKEY;
 <span class="kw">use </span><span class="kw">crate</span>::advapi::guard::RegCloseKeyGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SECURITY_ATTRIBUTES, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::error_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::ktm::decl::HTRANSACTION;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -116,7 +133,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
 
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi_ktm::ffi::RegCreateKeyTransactedW(
 					<span class="self">self</span>.as_ptr(),
@@ -131,11 +148,29 @@
 					htransaction.as_ptr(),
 					std::ptr::null_mut(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>((RegCloseKeyGuard::new(hkey), disposition)),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		).map(|<span class="kw">_</span>| (RegCloseKeyGuard::new(hkey), disposition))
+	}
+
+	<span class="doccomment">/// [`RegDeleteKeyTransacted`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeytransactedw)
+	/// method.
+	</span><span class="kw">fn </span>RegDeleteKeyTransacted(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		sub_key: <span class="kw-2">&amp;</span>str,
+		access_rights: co::KEY,
+		htransaction: <span class="kw-2">&amp;</span>HTRANSACTION) -&gt; SysResult&lt;()&gt;
+	{
+		error_to_sysresult(
+			<span class="kw">unsafe </span>{
+				advapi_ktm::ffi::RegDeleteKeyTransactedW(
+					<span class="self">self</span>.as_ptr(),
+					WString::from_str(sub_key).as_ptr(),
+					access_rights.<span class="number">0</span>,
+					<span class="number">0</span>,
+					htransaction.as_ptr(),
+					std::ptr::null_mut(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegOpenKeyTransacted`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeytransactedw)
@@ -148,7 +183,7 @@
 		htransaction: <span class="kw-2">&amp;</span>HTRANSACTION) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi_ktm::ffi::RegOpenKeyTransactedW(
 					<span class="self">self</span>.as_ptr(),
@@ -159,11 +194,8 @@
 					htransaction.as_ptr(),
 					std::ptr::null_mut(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(RegCloseKeyGuard::new(hkey)),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
 	}
 }
 </code></pre></div>
