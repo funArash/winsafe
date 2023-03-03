@@ -11,37 +11,17 @@
 <a href="#11" id="11">11</a>
 <a href="#12" id="12">12</a>
 <a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a>
-<a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co::ERROR;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>SECURITY_DESCRIPTOR_REVISION: u32 = <span class="number">1</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>UNLEN: usize = <span class="number">256</span>;
 
-<span class="attr">#[repr(C)]
-#[derive(Clone)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>VALENT {
-	<span class="kw">pub </span>ve_valuename: <span class="kw-2">*mut </span>u16,
-	<span class="kw">pub </span>ve_valuelen: u32,
-	<span class="kw">pub </span>ve_valueptr: usize,
-	<span class="kw">pub </span>ve_type: co::REG,
-}
-
-<span class="macro">impl_default!</span>(VALENT);
-
-<span class="kw">impl </span>VALENT {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>buf_projection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
-		<span class="kw">let </span>proj_idx = <span class="self">self</span>.ve_valueptr - src.as_ptr() <span class="kw">as </span>usize;
-		<span class="kw">let </span>proj_past_idx = proj_idx + <span class="self">self</span>.ve_valuelen <span class="kw">as </span>usize;
-		<span class="kw-2">&amp;</span>src[proj_idx..proj_past_idx]
+<span class="doccomment">/// If value is `ERROR::SUCCESS`, yields `Ok(())`, otherwise `Err(err)`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>error_to_sysresult(lstatus: i32) -&gt; SysResult&lt;()&gt; {
+	<span class="kw">match </span>ERROR(lstatus <span class="kw">as _</span>) {
+		ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
+		err =&gt; <span class="prelude-val">Err</span>(err),
 	}
 }
 </code></pre></div>

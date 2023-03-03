@@ -965,17 +965,12 @@
 <a href="#965" id="965">965</a>
 <a href="#966" id="966">966</a>
 <a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi, co};
-<span class="kw">use </span><span class="kw">crate</span>::advapi::decl::RegistryValue;
+<span class="kw">use </span><span class="kw">crate</span>::advapi::decl::{RegistryValue, VALENT};
 <span class="kw">use </span><span class="kw">crate</span>::advapi::guard::RegCloseKeyGuard;
-<span class="kw">use </span><span class="kw">crate</span>::advapi::privs::VALENT;
+<span class="kw">use </span><span class="kw">crate</span>::advapi::privs::error_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, SECURITY_ATTRIBUTES, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
@@ -1040,35 +1035,29 @@
 		}
 
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegConnectRegistryW(
 					WString::from_opt_str(machine_name).as_ptr(),
 					predef_hkey.as_ptr(),
 					<span class="kw-2">&amp;mut </span>hkey.<span class="number">0</span>,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(RegCloseKeyGuard::new(hkey)),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
 	}
 
 	<span class="doccomment">/// [`RegCopyTree`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcopytreew)
 	/// method.
-	</span><span class="kw">fn </span>RegCopyTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str, dest: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(
+	</span><span class="kw">fn </span>RegCopyTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, dest: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegCopyTreeW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(sub_key).as_ptr(),
+					WString::from_opt_str(sub_key).as_ptr(),
 					dest.as_ptr(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegCreateKeyEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regcreatekeyexw)
@@ -1084,7 +1073,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
 
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegCreateKeyExW(
 					<span class="self">self</span>.as_ptr(),
@@ -1097,27 +1086,21 @@
 					<span class="kw-2">&amp;mut </span>hkey.<span class="number">0</span>,
 					<span class="kw-2">&amp;mut </span>disposition.<span class="number">0</span>,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>((RegCloseKeyGuard::new(hkey), disposition)),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		).map(|<span class="kw">_</span>| (RegCloseKeyGuard::new(hkey), disposition))
 	}
 
 	<span class="doccomment">/// [`RegDeleteKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyw)
 	/// method.
 	</span><span class="kw">fn </span>RegDeleteKey(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegDeleteKeyW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(sub_key).as_ptr(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegDeleteKeyEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletekeyexw)
@@ -1137,7 +1120,7 @@
 			<span class="macro">panic!</span>(<span class="string">&quot;Platform view must be co::KEY::WOW64_32KEY or co::KEY::WOW64_64KEY&quot;</span>);
 		}
 
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegDeleteKeyExW(
 					<span class="self">self</span>.as_ptr(),
@@ -1145,43 +1128,62 @@
 					platform_view.<span class="number">0</span>,
 					<span class="number">0</span>,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegDeleteTree`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletetreew)
 	/// method.
-	</span><span class="kw">fn </span>RegDeleteTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(
+	</span><span class="kw">fn </span>RegDeleteTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegDeleteTreeW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(sub_key).as_ptr(),
+					WString::from_opt_str(sub_key).as_ptr(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegDeleteValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdeletevaluew)
 	/// method.
-	</span><span class="kw">fn </span>RegDeleteValue(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(
+	</span><span class="kw">fn </span>RegDeleteValue(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegDeleteValueW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(value_name).as_ptr(),
+					WString::from_opt_str(value_name).as_ptr(),
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
+	}
+
+	<span class="doccomment">/// [`RegDisablePredefinedCache`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablepredefinedcache)
+	/// static method.
+	</span><span class="kw">fn </span>RegDisablePredefinedCache() -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(<span class="kw">unsafe </span>{ advapi::ffi::RegDisablePredefinedCache() })
+	}
+
+	<span class="doccomment">/// [`RegDisablePredefinedCacheEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablepredefinedcacheex)
+	/// static method.
+	</span><span class="kw">fn </span>RegDisablePredefinedCacheEx() -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(<span class="kw">unsafe </span>{ advapi::ffi::RegDisablePredefinedCacheEx() })
+	}
+
+	<span class="doccomment">/// [`RegDisableReflectionKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablereflectionkey)
+	/// method.
+	</span><span class="kw">fn </span>RegDisableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
+			<span class="kw">unsafe </span>{ advapi::ffi::RegDisableReflectionKey(<span class="self">self</span>.as_ptr()) },
+		)
+	}
+
+	<span class="doccomment">/// [`RegEnableReflectionKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenablereflectionkey)
+	/// method.
+	</span><span class="kw">fn </span>RegEnableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
+			<span class="kw">unsafe </span>{ advapi::ffi::RegEnableReflectionKey(<span class="self">self</span>.as_ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// Returns an iterator over the names of the keys, which calls
@@ -1195,7 +1197,7 @@
 	/// use winsafe::{co, HKEY};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Control Panel&quot;,
+	///     Some(&quot;Control Panel&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
@@ -1222,7 +1224,7 @@
 	/// use winsafe::{co, HKEY, SysResult};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Control Panel\\Appearance&quot;,
+	///     Some(&quot;Control Panel\\Appearance&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
@@ -1246,10 +1248,7 @@
 	<span class="doccomment">/// [`RegFlushKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regflushkey)
 	/// method.
 	</span><span class="kw">fn </span>RegFlushKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span>co::ERROR(<span class="kw">unsafe </span>{ advapi::ffi::RegFlushKey(<span class="self">self</span>.as_ptr()) } <span class="kw">as _</span>) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+		error_to_sysresult(<span class="kw">unsafe </span>{ advapi::ffi::RegFlushKey(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`RegGetValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew)
@@ -1303,7 +1302,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len1 = u32::default();
 
 		<span class="comment">// Query data type and length.
-		</span><span class="kw">match </span>co::ERROR(
+		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegGetValueW(
 					<span class="self">self</span>.as_ptr(),
@@ -1314,11 +1313,8 @@
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>data_len1,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; {},
-			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
-		}
+			},
+		)<span class="question-mark">?</span>;
 
 		<span class="comment">// Alloc the receiving block.
 		</span><span class="kw">let </span><span class="kw-2">mut </span>buf: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0x00</span>; data_len1 <span class="kw">as _</span>];
@@ -1327,7 +1323,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len2 = data_len1;
 
 		<span class="comment">// Retrieve the value content.
-		</span><span class="kw">match </span>co::ERROR(
+		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegGetValueW(
 					<span class="self">self</span>.as_ptr(),
@@ -1338,11 +1334,8 @@
 					buf.as_mut_ptr() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>data_len2,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; {},
-			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
-		}
+			},
+		)<span class="question-mark">?</span>;
 
 		validate_retrieved_reg_val(
 			co::REG(raw_data_type1), data_len1,
@@ -1359,7 +1352,7 @@
 	/// use winsafe::{co, HKEY};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Control Panel\\Mouse&quot;,
+	///     Some(&quot;Control Panel\\Mouse&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
@@ -1367,25 +1360,22 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		sub_key: <span class="kw-2">&amp;</span>str,
+		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		options: co::REG_OPTION,
 		access_rights: co::KEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegOpenKeyExW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(sub_key).as_ptr(),
+					WString::from_opt_str(sub_key).as_ptr(),
 					options.<span class="number">0</span>,
 					access_rights.<span class="number">0</span>,
 					<span class="kw-2">&amp;mut </span>hkey.<span class="number">0</span>,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(RegCloseKeyGuard::new(hkey)),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
 	}
 
 	<span class="doccomment">/// [`RegQueryInfoKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regqueryinfokeyw)
@@ -1471,7 +1461,7 @@
 	/// use winsafe::{co, HKEY, RegistryValue};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Control Panel\\Desktop&quot;,
+	///     Some(&quot;Control Panel\\Desktop&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
@@ -1545,7 +1535,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len2 = data_len1;
 
 		<span class="comment">// Retrieve the values content.
-		</span><span class="kw">match </span>co::ERROR(
+		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegQueryMultipleValuesW(
 					<span class="self">self</span>.as_ptr(),
@@ -1554,11 +1544,8 @@
 					buf.as_mut_ptr() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>data_len2,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; {},
-			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
-		}
+			},
+		)<span class="question-mark">?</span>;
 
 		<span class="kw">if </span>data_len1 != data_len2 {
 			<span class="comment">// Race condition: someone modified the data content in between our calls.
@@ -1594,12 +1581,12 @@
 	/// use winsafe::{co, HKEY, RegistryValue};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Control Panel\\Mouse&quot;,
+	///     Some(&quot;Control Panel\\Mouse&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::READ,
 	/// )?;
 	///
-	/// let val = hkey.RegQueryValueEx(&quot;Beep&quot;)?;
+	/// let val = hkey.RegQueryValueEx(Some(&quot;Beep&quot;))?;
 	///
 	/// match val {
 	///     RegistryValue::Dword(n) =&gt; println!(&quot;Number u32: {}&quot;, n),
@@ -1624,13 +1611,13 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;RegistryValue&gt; {
-		<span class="kw">let </span>value_name_w = WString::from_str(value_name);
+	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt; {
+		<span class="kw">let </span>value_name_w = WString::from_opt_str(value_name);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type1 = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len1 = u32::default();
 
 		<span class="comment">// Query data type and length.
-		</span><span class="kw">match </span>co::ERROR(
+		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegQueryValueExW(
 					<span class="self">self</span>.as_ptr(),
@@ -1640,11 +1627,8 @@
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>data_len1,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; {},
-			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
-		}
+			},
+		)<span class="question-mark">?</span>;
 
 		<span class="comment">// Alloc the receiving block.
 		</span><span class="kw">let </span><span class="kw-2">mut </span>buf: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0x00</span>; data_len1 <span class="kw">as _</span>];
@@ -1653,7 +1637,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len2 = data_len1;
 
 		<span class="comment">// Retrieve the value content.
-		</span><span class="kw">match </span>co::ERROR(
+		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegQueryValueExW(
 					<span class="self">self</span>.as_ptr(),
@@ -1663,18 +1647,15 @@
 					buf.as_mut_ptr() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>data_len2,
 				)
-			} <span class="kw">as _
-		</span>) {
-			co::ERROR::SUCCESS =&gt; {},
-			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
-		}
+			},
+		)<span class="question-mark">?</span>;
 
 		validate_retrieved_reg_val(
 			co::REG(raw_data_type1), data_len1,
 			co::REG(raw_data_type2), data_len2, buf)
 	}
 
-	<span class="doccomment">/// [`RegSetKeyValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexw)
+	<span class="doccomment">/// [`RegSetKeyValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetkeyvaluew)
 	/// method.
 	///
 	/// If the value doesn&#39;t exist, if will be created. If new type is different
@@ -1687,33 +1668,32 @@
 	/// use winsafe::{HKEY, RegistryValue, WString};
 	///
 	/// HKEY::CURRENT_USER.RegSetKeyValue(
-	///     &quot;Software\\My Company&quot;,
-	///     &quot;Color&quot;,
+	///     Some(&quot;Software\\My Company&quot;),
+	///     Some(&quot;Color&quot;),
 	///     RegistryValue::Sz(&quot;blue&quot;.to_owned()),
 	/// )?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetKeyValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		sub_key: <span class="kw-2">&amp;</span>str, value_name: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt;
+		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		data: RegistryValue) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
 		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
 
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegSetKeyValueW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(sub_key).as_ptr(),
-					WString::from_str(value_name).as_ptr(),
+					WString::from_opt_str(sub_key).as_ptr(),
+					WString::from_opt_str(value_name).as_ptr(),
 					data.reg_type().<span class="number">0</span>,
 					data_ptr,
 					data_len,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RegSetValueEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexw)
@@ -1729,38 +1709,48 @@
 	/// use winsafe::{co, HKEY, RegistryValue, WString};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
-	///     &quot;Console\\Git Bash&quot;,
+	///     Some(&quot;Console\\Git Bash&quot;),
 	///     co::REG_OPTION::default(),
 	///     co::KEY::ALL_ACCESS,
 	/// )?;
 	///
 	/// hkey.RegSetValueEx(
-	///     &quot;Color&quot;,
+	///     Some(&quot;Color&quot;),
 	///     RegistryValue::Sz(&quot;blue&quot;.to_owned()),
 	/// )?;
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		value_name: <span class="kw-2">&amp;</span>str, data: RegistryValue) -&gt; SysResult&lt;()&gt;
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, data: RegistryValue) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
 		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
 
-		<span class="kw">match </span>co::ERROR(
+		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				advapi::ffi::RegSetValueExW(
 					<span class="self">self</span>.as_ptr(),
-					WString::from_str(value_name).as_ptr(),
+					WString::from_opt_str(value_name).as_ptr(),
 					<span class="number">0</span>,
 					data.reg_type().<span class="number">0</span>,
 					data_ptr <span class="kw">as _</span>,
 					data_len,
 				)
-			} <span class="kw">as _</span>,
-		) {
-			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
-			err =&gt; <span class="prelude-val">Err</span>(err),
-		}
+			},
+		)
+	}
+
+	<span class="doccomment">/// [`RegUnLoadKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regunloadkeyw)
+	/// method.
+	</span><span class="kw">fn </span>RegUnLoadKey(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
+		error_to_sysresult(
+			<span class="kw">unsafe </span>{
+				advapi::ffi::RegUnLoadKeyW(
+					<span class="self">self</span>.as_ptr(),
+					WString::from_opt_str(sub_key).as_ptr(),
+				)
+			},
+		)
 	}
 }
 
