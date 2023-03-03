@@ -288,6 +288,8 @@
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -322,10 +324,10 @@
 /// control.
 ///
 /// Note that if the `UpDown` is created with
-/// [`UDS::AUTOBUDDY`](create::co::UDS::AUTOBUDDY) style, it takes the control
+/// [`UDS::AUTOBUDDY`](crate::co::UDS::AUTOBUDDY) style, it takes the control
 /// created immediately before the `UpDown` as the buddy one, attaching the
 /// `UpDown` to it. This control should be an [`Edit`](crate::gui::Edit) with
-/// [`ES::NUMBER`](create::co::ES::NUMBER) style.
+/// [`ES::NUMBER`](crate::co::ES::NUMBER) style.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>UpDown(Pin&lt;Arc&lt;Obj&gt;&gt;);
 
@@ -438,10 +440,12 @@
 		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
 			OptsId::Wnd(opts) =&gt; {
 				<span class="kw">let </span><span class="kw-2">mut </span>pos = POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>);
-				multiply_dpi_or_dtu(<span class="self">self</span>.<span class="number">0</span>.base.parent(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+				<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::new(<span class="number">0</span>, opts.height <span class="kw">as _</span>);
+				multiply_dpi_or_dtu(
+					<span class="self">self</span>.<span class="number">0</span>.base.parent(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>pos), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>sz))<span class="question-mark">?</span>;
 
 				<span class="self">self</span>.<span class="number">0</span>.base.create_window( <span class="comment">// may panic
-					</span><span class="string">&quot;msctls_updown32&quot;</span>, <span class="prelude-val">None</span>, pos, SIZE::new(<span class="number">0</span>, <span class="number">40</span>),
+					</span><span class="string">&quot;msctls_updown32&quot;</span>, <span class="prelude-val">None</span>, pos, SIZE::new(<span class="number">0</span>, opts.height <span class="kw">as _</span>),
 					opts.ctrl_id,
 					opts.window_ex_style,
 					opts.window_style | opts.up_down_style.into(),
@@ -529,7 +533,7 @@
 	/// Note that the `UDS::AUTOBUDDY` style will take the control created
 	/// immediately before the `UpDown` as the buddy one, attaching the `UpDown`
 	/// to it. This control should be an [`Edit`](crate::gui::Edit) with
-	/// [`ES::NUMBER`](create::co::ES::NUMBER) style.
+	/// [`ES::NUMBER`](crate::co::ES::NUMBER) style.
 	///
 	/// Defaults to `UDS::AUTOBUDDY | UDS::SETBUDDYINT | UDS::ALIGNRIGHT | UDS::ARROWKEYS | UDS::HOTTRACK`.
 	</span><span class="kw">pub </span>up_down_style: co::UDS,
