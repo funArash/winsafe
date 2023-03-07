@@ -98,11 +98,31 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::parse_multi_z_str;
 
 <span class="doccomment">/// Registry value types.
+///
+/// This is a high-level abstraction over the [`co::REG`](crate::co::REG)
+/// constants, plus the value they carry.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub enum </span>RegistryValue {
 	<span class="doccomment">/// Binary value, defined as [`REG::BINARY`](crate::co::REG::BINARY).
@@ -113,6 +133,11 @@
 	</span>Qword(u64),
 	<span class="doccomment">/// String value, defined as [`REG::SZ`](crate::co::REG::SZ).
 	</span>Sz(String),
+	<span class="doccomment">/// String value that contains unexpanded references to environment
+	/// variables, for example, `%PATH%`. To expand the environment variable
+	/// references, use
+	/// [`ExpandEnvironmentStrings`](crate::ExpandEnvironmentStrings).
+	</span>ExpandSz(String),
 	<span class="doccomment">/// Multiple strings, defined as [`REG::MULTI_SZ`](crate::co::REG::MULTI_SZ).
 	</span>MultiSz(Vec&lt;String&gt;),
 	<span class="doccomment">/// No value, defined as [`REG::NONE`](crate::co::REG::NONE). Also used for
@@ -148,6 +173,10 @@
 				<span class="kw">let </span>(<span class="kw">_</span>, vec16, <span class="kw">_</span>) = <span class="kw">unsafe </span>{ buf.align_to::&lt;u16&gt;() };
 				RegistryValue::Sz(WString::from_wchars_slice(<span class="kw-2">&amp;</span>vec16).to_string())
 			},
+			co::REG::EXPAND_SZ =&gt; {
+				<span class="kw">let </span>(<span class="kw">_</span>, vec16, <span class="kw">_</span>) = <span class="kw">unsafe </span>{ buf.align_to::&lt;u16&gt;() };
+				RegistryValue::Sz(WString::from_wchars_slice(<span class="kw-2">&amp;</span>vec16).to_string())
+			},
 			co::REG::MULTI_SZ =&gt; {
 				<span class="kw">let </span>(<span class="kw">_</span>, vec16, <span class="kw">_</span>) = <span class="kw">unsafe </span>{ buf.align_to::&lt;u16&gt;() };
 				RegistryValue::MultiSz(parse_multi_z_str(vec16.as_ptr()))
@@ -167,6 +196,10 @@
 			<span class="self">Self</span>::Dword(n) =&gt; (n <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, std::mem::size_of::&lt;u32&gt;() <span class="kw">as _</span>),
 			<span class="self">Self</span>::Qword(n) =&gt; (n <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, std::mem::size_of::&lt;u64&gt;() <span class="kw">as _</span>),
 			<span class="self">Self</span>::Sz(s) =&gt; {
+				<span class="kw-2">*</span>str_buf = WString::from_str(s);
+				<span class="self">Self</span>::as_ptr_with_len_str(<span class="kw-2">&amp;</span>str_buf)
+			},
+			<span class="self">Self</span>::ExpandSz(s) =&gt; {
 				<span class="kw-2">*</span>str_buf = WString::from_str(s);
 				<span class="self">Self</span>::as_ptr_with_len_str(<span class="kw-2">&amp;</span>str_buf)
 			},
@@ -193,6 +226,7 @@
 			<span class="self">Self</span>::Dword(<span class="kw">_</span>) =&gt; co::REG::DWORD,
 			<span class="self">Self</span>::Qword(<span class="kw">_</span>) =&gt; co::REG::QWORD,
 			<span class="self">Self</span>::Sz(<span class="kw">_</span>) =&gt; co::REG::SZ,
+			<span class="self">Self</span>::ExpandSz(<span class="kw">_</span>) =&gt; co::REG::EXPAND_SZ,
 			<span class="self">Self</span>::MultiSz(<span class="kw">_</span>) =&gt; co::REG::MULTI_SZ,
 			<span class="self">Self</span>::None =&gt; co::REG::NONE,
 		}

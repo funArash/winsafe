@@ -1098,6 +1098,15 @@
 <a href="#1098" id="1098">1098</a>
 <a href="#1099" id="1099">1099</a>
 <a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi, co};
@@ -1396,7 +1405,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{HKEY, RegistryValue};
+	/// use winsafe::{ExpandEnvironmentStrings, HKEY, RegistryValue};
 	///
 	/// let val = HKEY::CURRENT_USER.RegGetValue(
 	///     Some(&quot;Control Panel\\Mouse&quot;),
@@ -1406,7 +1415,10 @@
 	/// match val {
 	///     RegistryValue::Dword(n) =&gt; println!(&quot;Number u32: {}&quot;, n),
 	///     RegistryValue::Qword(n) =&gt; println!(&quot;Number u64: {}&quot;, n),
-	///     RegistryValue::Sz(str) =&gt; println!(&quot;String: {}&quot;, str),
+	///     RegistryValue::Sz(s) =&gt; println!(&quot;String: {}&quot;, s),
+	///     RegistryValue::ExpandSz(s) =&gt; {
+	///         println!(&quot;Env string: {}&quot;, ExpandEnvironmentStrings(&amp;s)?);
+	///     },
 	///     RegistryValue::MultiSz(strs) =&gt; {
 	///        println!(&quot;Multi string:&quot;);
 	///        for s in strs.iter() {
@@ -1625,7 +1637,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HKEY, RegistryValue};
+	/// use winsafe::{co, ExpandEnvironmentStrings, HKEY, RegistryValue};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
 	///     Some(&quot;Control Panel\\Desktop&quot;),
@@ -1637,7 +1649,10 @@
 	///     match val {
 	///         RegistryValue::Dword(n) =&gt; println!(&quot;Number u32: {}&quot;, n),
 	///         RegistryValue::Qword(n) =&gt; println!(&quot;Number u64: {}&quot;, n),
-	///         RegistryValue::Sz(str) =&gt; println!(&quot;String: {}&quot;, str),
+	///         RegistryValue::Sz(s) =&gt; println!(&quot;String: {}&quot;, s),
+	///         RegistryValue::ExpandSz(s) =&gt; {
+	///             println!(&quot;Env string: {}&quot;, ExpandEnvironmentStrings(&amp;s)?);
+	///         },
 	///         RegistryValue::MultiSz(strs) =&gt; {
 	///            println!(&quot;Multi string:&quot;);
 	///            for s in strs.iter() {
@@ -1757,7 +1772,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HKEY, RegistryValue};
+	/// use winsafe::{co, ExpandEnvironmentStrings, HKEY, RegistryValue};
 	///
 	/// let hkey = HKEY::CURRENT_USER.RegOpenKeyEx(
 	///     Some(&quot;Control Panel\\Mouse&quot;),
@@ -1770,7 +1785,10 @@
 	/// match val {
 	///     RegistryValue::Dword(n) =&gt; println!(&quot;Number u32: {}&quot;, n),
 	///     RegistryValue::Qword(n) =&gt; println!(&quot;Number u64: {}&quot;, n),
-	///     RegistryValue::Sz(str) =&gt; println!(&quot;String: {}&quot;, str),
+	///     RegistryValue::Sz(s) =&gt; println!(&quot;String: {}&quot;, s),
+	///     RegistryValue::ExpandSz(s) =&gt; {
+	///         println!(&quot;Env string: {}&quot;, ExpandEnvironmentStrings(&amp;s)?);
+	///     },
 	///     RegistryValue::MultiSz(strs) =&gt; {
 	///        println!(&quot;Multi string:&quot;);
 	///        for s in strs.iter() {
