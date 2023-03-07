@@ -165,17 +165,9 @@
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span>std::mem::ManuallyDrop;
-
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -241,7 +233,7 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;PROPERTYKEY&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt; {
-		<span class="prelude-val">Ok</span>(Box::new(PropertyStoreIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() })<span class="question-mark">?</span>))
+		<span class="prelude-val">Ok</span>(Box::new(PropertyStoreIter::new(<span class="self">self</span>)<span class="question-mark">?</span>))
 	}
 
 	<span class="doccomment">/// [`IPropertyStore::Commit`](https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-commit)
@@ -301,14 +293,17 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	array: ManuallyDrop&lt;IPropertyStore&gt;,
+</span><span class="kw">struct </span>PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: oleaut_IPropertyStore,
+{
+	prop_st: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I,
 	count: u32,
 	current: u32,
-	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: oleaut_IPropertyStore,
+{
 	<span class="kw">type </span>Item = HrResult&lt;PROPERTYKEY&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -316,7 +311,7 @@
 			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match </span><span class="self">self</span>.array.GetAt(<span class="self">self</span>.current) {
+		<span class="kw">match </span><span class="self">self</span>.prop_st.GetAt(<span class="self">self</span>.current) {
 			<span class="prelude-val">Err</span>(e) =&gt; {
 				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made
 				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
@@ -329,17 +324,12 @@
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(com_ptr: ComPtr) -&gt; HrResult&lt;<span class="self">Self</span>&gt; {
-		<span class="kw">let </span>array = ManuallyDrop::new(IPropertyStore(com_ptr));
-		<span class="kw">let </span>count = array.GetCount()<span class="question-mark">?</span>;
-
-		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-			array,
-			count,
-			current: <span class="number">0</span>,
-			_owner: PhantomData,
-		})
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; PropertyStoreIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: oleaut_IPropertyStore,
+{
+	<span class="kw">fn </span>new(prop_st: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I) -&gt; HrResult&lt;<span class="self">Self</span>&gt; {
+		<span class="kw">let </span>count = prop_st.GetCount()<span class="question-mark">?</span>;
+		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{ prop_st, count, current: <span class="number">0 </span>})
 	}
 }
 </code></pre></div>

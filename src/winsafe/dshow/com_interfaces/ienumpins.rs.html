@@ -132,13 +132,9 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span>std::mem::ManuallyDrop;
-
-<span class="kw">use </span><span class="kw">crate</span>::co;
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dshow::decl::IPin;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
@@ -196,7 +192,7 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IPin&gt;&gt; + <span class="lifetime">&#39;_</span>&gt; {
-		Box::new(EnumPinsIter::new(<span class="kw">unsafe </span>{ <span class="self">self</span>.ptr() }))
+		Box::new(EnumPinsIter::new(<span class="self">self</span>))
 	}
 
 	<span class="doccomment">/// [`IEnumPins::Next`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ienumpins-next)
@@ -244,28 +240,30 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>EnumPinsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	array: ManuallyDrop&lt;IEnumPins&gt;,
-	_owner: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
+</span><span class="kw">struct </span>EnumPinsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: dshow_IEnumPins,
+{
+	enum_pins: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>EnumPinsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>EnumPinsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: dshow_IEnumPins,
+{
 	<span class="kw">type </span>Item = HrResult&lt;IPin&gt;;
 
 	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-		<span class="kw">match </span><span class="self">self</span>.array.Next() {
+		<span class="kw">match </span><span class="self">self</span>.enum_pins.Next() {
 			<span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
 			<span class="prelude-val">Ok</span>(maybe_item) =&gt; maybe_item.map(|item| <span class="prelude-val">Ok</span>(item)),
 		}
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumPinsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(com_ptr: ComPtr) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			array: ManuallyDrop::new(IEnumPins(com_ptr)),
-			_owner: PhantomData,
-		}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; EnumPinsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+	<span class="kw">where </span>I: dshow_IEnumPins,
+{
+	<span class="kw">fn </span>new(enum_pins: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ enum_pins }
 	}
 }
 </code></pre></div>
