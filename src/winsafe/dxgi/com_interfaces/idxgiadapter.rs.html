@@ -54,9 +54,35 @@
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::GUID;
+</span><span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::DXGI_ADAPTER_DESC;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::GUID;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -108,6 +134,30 @@
 				),
 			)
 		}.map(|<span class="kw">_</span>| umd_ver)
+	}
+
+	<span class="doccomment">/// [`IDXGIAdapter::GetDesc`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-getdesc)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{IDXGIAdapter, DXGI_ADAPTER_DESC};
+	///
+	/// let adapter: IDXGIAdapter; // initialized somewhere
+	/// # let adapter = IDXGIAdapter::from(unsafe { winsafe::ComPtr::null() });
+	/// let mut desc = DXGI_ADAPTER_DESC::default();
+	///
+	/// adapter.GetDesc(&amp;mut desc)?;
+	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+	/// ```
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetDesc(<span class="kw-2">&amp;</span><span class="self">self</span>, desc: <span class="kw-2">&amp;mut </span>DXGI_ADAPTER_DESC) -&gt; HrResult&lt;()&gt; {
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIAdapterVT&gt;();
+			ok_to_hrresult((vt.GetDesc)(<span class="self">self</span>.ptr(), desc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
+		}
 	}
 }
 </code></pre></div>
