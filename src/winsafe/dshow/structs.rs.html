@@ -109,6 +109,23 @@
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -117,6 +134,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::dshow::decl::IBaseFilter;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::GUID;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::ComPtr;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::dshow_IFilterGraph;
 
 <span class="doccomment">/// [`AM_MEDIA_TYPE`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/ns-strmif-am_media_type)
 /// struct.
@@ -176,6 +195,21 @@
 	<span class="kw">pub </span>dwDVVAuxSrc: u32,
 	<span class="kw">pub </span>dwDVVAuxCtl: u32,
 	dwDVReserved: [u32; <span class="number">2</span>],
+}
+
+<span class="doccomment">/// [`FILTER_INFO`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/ns-strmif-filter_info)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>FILTER_INFO {
+	achName: [u16; <span class="number">128</span>],
+	pGraph: ComPtr,
+}
+
+<span class="macro">impl_default!</span>(FILTER_INFO);
+<span class="macro">impl_drop_comptr!</span>(pGraph, FILTER_INFO);
+
+<span class="kw">impl </span>FILTER_INFO {
+	<span class="macro">pub_fn_comptr_get_set!</span>(pGraph, set_pGraph, dshow_IFilterGraph);
 }
 
 <span class="doccomment">/// [`MFVideoNormalizedRect`](https://learn.microsoft.com/en-us/windows/win32/api/evr/ns-evr-mfvideonormalizedrect)
