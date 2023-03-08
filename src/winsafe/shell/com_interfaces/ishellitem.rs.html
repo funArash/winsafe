@@ -165,39 +165,9 @@
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{co, shell};
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IBindCtx};
@@ -223,6 +193,10 @@
 	/// Automatically calls
 	/// [`IUnknown::Release`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 	/// when the object goes out of scope.
+	///
+	/// Usually created with
+	/// [`SHCreateItemFromParsingName`](crate::SHCreateItemFromParsingName)
+	/// function.
 </span>}
 
 <span class="kw">impl </span>shell_IShellItem <span class="kw">for </span>IShellItem {}
@@ -236,40 +210,6 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>shell_IShellItem: ole_IUnknown {
-	<span class="doccomment">/// [`SHCreateItemFromParsingName`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromparsingname)
-	/// static method.
-	///
-	/// # Examples
-	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::IShellItem;
-	///
-	/// let shi = IShellItem::SHCreateItemFromParsingName(
-	///     &quot;C:\\Temp\\foo.txt&quot;,
-	///     None,
-	/// )?;
-	///
-	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
-	/// ```
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>SHCreateItemFromParsingName(
-		file_or_folder_path: <span class="kw-2">&amp;</span>str,
-		bind_ctx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;) -&gt; HrResult&lt;IShellItem&gt;
-	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			ok_to_hrresult(
-				shell::ffi::SHCreateItemFromParsingName(
-					WString::from_str(file_or_folder_path).as_ptr(),
-					bind_ctx.map_or(std::ptr::null_mut(), |i| i.ptr().<span class="number">0 </span><span class="kw">as _</span>),
-					<span class="kw-2">&amp;</span>IShellItem::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-				),
-			).map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
-		}
-	}
-
 	<span class="doccomment">/// [`IShellItem::BindToHandler`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-bindtohandler)
 	/// method.
 	///
@@ -335,9 +275,9 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, IShellItem};
+	/// use winsafe::{co, IShellItem, SHCreateItemFromParsingName};
 	///
-	/// let shi = IShellItem::SHCreateItemFromParsingName(
+	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
 	///     &quot;C:\\Temp\\foo.txt&quot;,
 	///     None,
 	/// )?;
@@ -369,9 +309,9 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{co, IShellItem};
+	/// use winsafe::{co, IShellItem, SHCreateItemFromParsingName};
 	///
-	/// let shi = IShellItem::SHCreateItemFromParsingName(
+	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
 	///     &quot;C:\\Temp\\foo.txt&quot;,
 	///     None,
 	/// )?;

@@ -275,6 +275,40 @@
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, shell};
@@ -282,9 +316,9 @@
 	GetLastError, HACCESSTOKEN, HLOCAL, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, ptr_to_sysresult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IBindCtx};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal, ole_IUnknown, shell_IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::{
 	NOTIFYICONDATA, SHFILEINFO, SHFILEOPSTRUCT, SHSTOCKICONINFO,
 };
@@ -441,6 +475,40 @@
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{ shell::ffi::Shell_NotifyIconW(message.<span class="number">0</span>, data <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 	)
+}
+
+<span class="doccomment">/// [`SHCreateItemFromParsingName`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-shcreateitemfromparsingname)
+/// function.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// use winsafe::{IShellItem2, SHCreateItemFromParsingName};
+///
+/// let shi = SHCreateItemFromParsingName::&lt;IShellItem2&gt;(
+///     &quot;C:\\Temp\\foo.txt&quot;,
+///     None,
+/// )?;
+/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+/// ```
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>SHCreateItemFromParsingName&lt;T&gt;(
+	file_or_folder_path: <span class="kw-2">&amp;</span>str,
+	bind_ctx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;) -&gt; HrResult&lt;T&gt;
+	<span class="kw">where </span>T: shell_IShellItem,
+{
+	<span class="kw">unsafe </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
+		ok_to_hrresult(
+			shell::ffi::SHCreateItemFromParsingName(
+				WString::from_str(file_or_folder_path).as_ptr(),
+				bind_ctx.map_or(std::ptr::null_mut(), |i| i.ptr().<span class="number">0 </span><span class="kw">as _</span>),
+				<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				<span class="kw-2">&amp;mut </span>ppv_queried <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			),
+		).map(|<span class="kw">_</span>| T::from(ppv_queried))
+	}
 }
 
 <span class="doccomment">/// [`SHFileOperation`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationw)
