@@ -149,6 +149,9 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -159,6 +162,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HINSTANCE, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{IS_INTRESOURCE, MAKEINTRESOURCE};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::ComPtr;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HICON, HWND};
 
 <span class="doccomment">/// [`NMOBJECTNOTIFY`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-nmobjectnotify)
@@ -168,7 +172,7 @@
 	<span class="kw">pub </span>hdr: NMHDR,
 	<span class="kw">pub </span>iItem: i32,
 	piid: <span class="kw-2">*mut </span>co::IID,
-	<span class="kw">pub </span>Object: ComPtr,
+	Object: ComPtr,
 	<span class="kw">pub </span>hrResult: co::HRESULT,
 	<span class="kw">pub </span>dwFlags: u32,
 
@@ -176,9 +180,11 @@
 }
 
 <span class="macro">impl_default!</span>(NMOBJECTNOTIFY, <span class="lifetime">&#39;a</span>);
+<span class="macro">impl_drop_comptr!</span>(Object, NMOBJECTNOTIFY, <span class="lifetime">&#39;a</span>);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NMOBJECTNOTIFY&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, piid, set_piid, co::IID);
+	<span class="macro">pub_fn_comptr_get_set!</span>(Object, set_Object, ole_IUnknown);
 }
 
 <span class="doccomment">/// [`TASKDIALOG_BUTTON`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-taskdialog_button)

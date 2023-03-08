@@ -139,33 +139,13 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::ComPtr;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 
 <span class="doccomment">/// [`COAUTHIDENTITY`](https://learn.microsoft.com/en-us/windows/win32/api/wtypesbase/ns-wtypesbase-coauthidentity)
@@ -281,6 +261,9 @@
 
 <span class="doccomment">/// [`MULTI_QI`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/ns-objidl-multi_qi)
 /// struct.
+///
+/// Used to query multiple interfaces with
+/// [`CoCreateInstanceEx`](crate::CoCreateInstanceEx).
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>MULTI_QI&lt;<span class="lifetime">&#39;a</span>&gt; {
 	pIID: <span class="kw-2">*mut </span>co::IID,
@@ -291,34 +274,11 @@
 }
 
 <span class="macro">impl_default!</span>(MULTI_QI, <span class="lifetime">&#39;a</span>);
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>MULTI_QI&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.pItf.as_opt() {
-			<span class="kw">let _ </span>= IUnknown::from(<span class="kw-2">*</span>p); <span class="comment">// increased safety, in case pItf() method is not called
-		</span>}
-	}
-}
+<span class="macro">impl_drop_comptr!</span>(pItf, MULTI_QI, <span class="lifetime">&#39;a</span>);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MULTI_QI&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, pIID, set_pIID, co::IID);
-
-	<span class="doccomment">/// Returns the `pItf` field.
-	///
-	/// Note that once this method is called, a COM object will be returned and
-	/// a null pointer will be left in its place. This is done for security
-	/// reasons, since the returned COM object will call
-	/// [`IUnknown::Release`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
-	/// automatically. So if you call this method a second time, a null COM
-	/// object will be returned.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>pItf&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; T
-		<span class="kw">where </span>T: ole_IUnknown,
-	{
-		<span class="kw">let </span>obj = T::from(<span class="self">self</span>.pItf);
-		<span class="self">self</span>.pItf = <span class="kw">unsafe </span>{ ComPtr::null() };
-		obj
-	}
+	<span class="macro">pub_fn_comptr_get_set!</span>(pItf, set_pItf, ole_IUnknown);
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0-nightly (13471d3b2 2023-03-02)" data-search-js="search-2cde8914278f97ed.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
