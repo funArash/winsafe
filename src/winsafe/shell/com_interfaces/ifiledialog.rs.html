@@ -319,6 +319,8 @@
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -326,7 +328,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IUnknown, shell_IModalWindow};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{shell_IModalWindow, shell_IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::{COMDLG_FILTERSPEC, IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IModalWindowVT;
 
@@ -382,7 +384,9 @@
 </span><span class="kw">pub trait </span>shell_IFileDialog: shell_IModalWindow {
 	<span class="doccomment">/// [`IFileDialog::AddPlace`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-addplace)
 	/// method.
-	</span><span class="kw">fn </span>AddPlace(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem, fdap: co::FDAP) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>AddPlace(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem, fdap: co::FDAP) -&gt; HrResult&lt;()&gt;
+	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.AddPlace)(<span class="self">self</span>.ptr(), si.ptr(), fdap.<span class="number">0</span>))
@@ -507,7 +511,7 @@
 
 	<span class="doccomment">/// [`IFileDialog::SetDefaultFolder`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setdefaultfolder)
 	/// method.
-	</span><span class="kw">fn </span>SetDefaultFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>SetDefaultFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetDefaultFolder)(<span class="self">self</span>.ptr(), si.ptr()))
@@ -602,7 +606,7 @@
 
 	<span class="doccomment">/// [`IFileDialog::SetFolder`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfolder)
 	/// method.
-	</span><span class="kw">fn </span>SetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span>IShellItem) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>SetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.SetFolder)(<span class="self">self</span>.ptr(), si.ptr()))

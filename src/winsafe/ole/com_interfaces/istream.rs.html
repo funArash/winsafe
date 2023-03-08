@@ -135,13 +135,16 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IUnknown, ole_ISequentialStream};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_ISequentialStream;
 <span class="kw">use </span><span class="kw">crate</span>::vt::ISequentialStreamVT;
 
 <span class="doccomment">/// [`IStream`](crate::IStream) virtual table.
@@ -188,7 +191,10 @@
 	/// method.
 	///
 	/// Returns the number of bytes read and written.
-	</span><span class="kw">fn </span>CopyTo(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;</span>IStream, num_bytes: u64) -&gt; HrResult&lt;(u64, u64)&gt; {
+	</span><span class="kw">fn </span>CopyTo(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		dest: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IStream,
+		num_bytes: u64) -&gt; HrResult&lt;(u64, u64)&gt;
+	{
 		<span class="kw">let </span>(<span class="kw-2">mut </span>read, <span class="kw-2">mut </span>written) = (u64::default(), u64::default());
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{

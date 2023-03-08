@@ -105,6 +105,9 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{IBaseFilter, IEnumFilters};
@@ -112,7 +115,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IBaseFilter, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
 <span class="doccomment">/// [`IFilterGraph`](crate::IFilterGraph) virtual table.
@@ -151,7 +154,10 @@
 </span><span class="kw">pub trait </span>dshow_IFilterGraph: ole_IUnknown {
 	<span class="doccomment">/// [`IFilterGraph::AddFilter`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-addfilter)
 	/// method.
-	</span><span class="kw">fn </span>AddFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span>IBaseFilter, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>AddFilter(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		filter: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IBaseFilter,
+		name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
+	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
 			ok_to_hrresult(
@@ -196,7 +202,7 @@
 
 	<span class="doccomment">/// [`IFilterGraph::RemoveFilter`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-removefilter)
 	/// method.
-	</span><span class="kw">fn </span>RemoveFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span>IBaseFilter) -&gt; HrResult&lt;()&gt; {
+	</span><span class="kw">fn </span>RemoveFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IBaseFilter) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
 			ok_to_hrresult((vt.RemoveFilter)(<span class="self">self</span>.ptr(), filter.ptr()))
