@@ -65,6 +65,9 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
@@ -93,7 +96,9 @@
 	<span class="doccomment">/// [`BeginDeferWindowPos`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-begindeferwindowpos)
 	/// static method.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>BeginDeferWindowPos(num_windows: u32) -&gt; SysResult&lt;EndDeferWindowPosGuard&gt; {
+	</span><span class="kw">fn </span>BeginDeferWindowPos(
+		num_windows: u32) -&gt; SysResult&lt;EndDeferWindowPosGuard&gt;
+	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{ user::ffi::BeginDeferWindowPos(num_windows <span class="kw">as _</span>) },
 			|ptr| EndDeferWindowPosGuard::new(HDWP(ptr)),
@@ -110,7 +115,8 @@
 		hwnd_insert_after: HwndPlace,
 		top_left: POINT,
 		sz: SIZE,
-		flags: co::SWP) -&gt; SysResult&lt;()&gt;
+		flags: co::SWP,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::DeferWindowPos(

@@ -142,9 +142,7 @@
 <span class="kw">impl </span>FileMapped {
 	<span class="doccomment">/// Opens a file with the desired access, then map its contents in memory.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>open(
-		file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;FileMapped&gt;
-	{
+	</span><span class="kw">pub fn </span>open(file_path: <span class="kw-2">&amp;</span>str, access: FileAccess) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">let </span>file = File::open(file_path, access)<span class="question-mark">?</span>;
 		<span class="kw">let </span>(hmap, hview) = <span class="self">Self</span>::map_in_memory(<span class="kw-2">&amp;</span>file, access)<span class="question-mark">?</span>;
 		<span class="kw">let </span>size = file.hfile().GetFileSizeEx()<span class="question-mark">?</span>; <span class="comment">// cache
@@ -152,8 +150,10 @@
 	}
 
 	<span class="attr">#[must_use]
-	</span><span class="kw">fn </span>map_in_memory(file: <span class="kw-2">&amp;</span>File, access: FileAccess)
-		-&gt; SysResult&lt;(CloseHandleGuard&lt;HFILEMAP&gt;, UnmapViewOfFileGuard)&gt;
+	</span><span class="kw">fn </span>map_in_memory(
+		file: <span class="kw-2">&amp;</span>File,
+		access: FileAccess,
+	) -&gt; SysResult&lt;(CloseHandleGuard&lt;HFILEMAP&gt;, UnmapViewOfFileGuard)&gt;
 	{
 		<span class="kw">let </span>hmap = file.hfile().CreateFileMapping(
 			<span class="prelude-val">None</span>,

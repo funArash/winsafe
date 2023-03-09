@@ -243,25 +243,25 @@
 	<span class="doccomment">/// Guesses the encoding of the given raw data, also returning the size of
 	/// its [BOM](https://en.wikipedia.org/wiki/Byte_order_mark), if any.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>guess(data: <span class="kw-2">&amp;</span>[u8]) -&gt; (Encoding, usize) {
+	</span><span class="kw">pub fn </span>guess(data: <span class="kw-2">&amp;</span>[u8]) -&gt; (<span class="self">Self</span>, usize) {
 		<span class="kw">if let </span><span class="prelude-val">Some</span>((enc, bom_sz)) = <span class="self">Self</span>::guess_bom(data) {
 			<span class="kw">return </span>(enc, bom_sz); <span class="comment">// BOM found, we already guessed the encoding
 		</span>}
 
 		<span class="kw">if </span><span class="self">Self</span>::guess_utf8(data) {
-			<span class="kw">return </span>(Encoding::Utf8, <span class="number">0</span>);
+			<span class="kw">return </span>(<span class="self">Self</span>::Utf8, <span class="number">0</span>);
 		}
 
 		<span class="kw">let </span>has_non_ansi_char = data.iter().find(|ch| <span class="kw-2">**</span>ch &gt; <span class="number">0x7f</span>).is_some();
 		<span class="kw">if </span>has_non_ansi_char {
-			(Encoding::Win1252, <span class="number">0</span>) <span class="comment">// by exclusion, not assertive
+			(<span class="self">Self</span>::Win1252, <span class="number">0</span>) <span class="comment">// by exclusion, not assertive
 		</span>} <span class="kw">else </span>{
-			(Encoding::Ansi, <span class="number">0</span>)
+			(<span class="self">Self</span>::Ansi, <span class="number">0</span>)
 		}
 	}
 
 	<span class="attr">#[must_use]
-	</span><span class="kw">fn </span>guess_bom(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(Encoding, usize)&gt; {
+	</span><span class="kw">fn </span>guess_bom(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="self">Self</span>, usize)&gt; {
 		<span class="kw">let </span>has_bom = |bom_bytes: <span class="kw-2">&amp;</span>[u8]| -&gt; bool {
 			data.len() &gt;= bom_bytes.len()
 				&amp;&amp; data[..bom_bytes.len()].cmp(bom_bytes) == Ordering::Equal
@@ -269,37 +269,37 @@
 
 		<span class="kw">const </span>UTF8: [u8; <span class="number">3</span>] = [<span class="number">0xef</span>, <span class="number">0xbb</span>, <span class="number">0xbf</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF8) { <span class="comment">// UTF-8 BOM
-			</span><span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Utf8, UTF8.len()));
+			</span><span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Utf8, UTF8.len()));
 		}
 
 		<span class="kw">const </span>UTF16BE: [u8; <span class="number">2</span>] = [<span class="number">0xfe</span>, <span class="number">0xff</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF16BE) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Utf16be, UTF16BE.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Utf16be, UTF16BE.len()));
 		}
 
 		<span class="kw">const </span>UTF16LE: [u8; <span class="number">2</span>] = [<span class="number">0xff</span>, <span class="number">0xfe</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF16LE) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Utf16le, UTF16LE.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Utf16le, UTF16LE.len()));
 		}
 
 		<span class="kw">const </span>UTF32BE: [u8; <span class="number">4</span>] = [<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF32BE) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Utf32be, UTF32BE.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Utf32be, UTF32BE.len()));
 		}
 
 		<span class="kw">const </span>UTF32LE: [u8; <span class="number">4</span>] = [<span class="number">0xff</span>, <span class="number">0xfe</span>, <span class="number">0x00</span>, <span class="number">0x00</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>UTF32LE) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Utf32le, UTF32LE.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Utf32le, UTF32LE.len()));
 		}
 
 		<span class="kw">const </span>SCSU: [u8; <span class="number">3</span>] = [<span class="number">0x0e</span>, <span class="number">0xfe</span>, <span class="number">0xff</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>SCSU) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Scsu, SCSU.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Scsu, SCSU.len()));
 		}
 
 		<span class="kw">const </span>BOCU1: [u8; <span class="number">3</span>] = [<span class="number">0xfb</span>, <span class="number">0xee</span>, <span class="number">0x28</span>];
 		<span class="kw">if </span>has_bom(<span class="kw-2">&amp;</span>BOCU1) {
-			<span class="kw">return </span><span class="prelude-val">Some</span>((Encoding::Bocu1, BOCU1.len()));
+			<span class="kw">return </span><span class="prelude-val">Some</span>((<span class="self">Self</span>::Bocu1, BOCU1.len()));
 		}
 
 		<span class="prelude-val">None </span><span class="comment">// no BOM found

@@ -440,7 +440,7 @@
 	/// If `s` is `None`, the internal buffer is not allocated – it simply calls
 	/// `WString::default`.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="self">Self </span>{
 		<span class="kw">match </span>s {
 			<span class="prelude-val">Some</span>(s) =&gt; <span class="self">Self</span>::from_str(s),
 			<span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::default(),
@@ -452,7 +452,7 @@
 	///
 	/// The string will be stored with a terminating null.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			vec_u16: s.encode_utf16()
 				.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null
@@ -469,7 +469,7 @@
 	/// This method is intended to pass multi-strings to native APIs, not to
 	/// retrieve them.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; <span class="self">Self </span>{
 		<span class="kw">let </span>tot_chars = v.iter() <span class="comment">// number of chars of all strings, including terminating nulls
 			</span>.fold(<span class="number">0</span>, |tot, s| tot + s.as_ref().chars().count() + <span class="number">1</span>) <span class="comment">// include terminating null
 				</span>+ <span class="number">1</span>; <span class="comment">// double terminating null
@@ -491,7 +491,7 @@
 	///
 	/// The string will be stored with a terminating null.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; <span class="self">Self </span>{
 		<span class="kw">if </span>src.is_null() || num_chars == <span class="number">0 </span>{
 			<span class="self">Self</span>::default()
 		} <span class="kw">else </span>{
@@ -510,7 +510,7 @@
 	///
 	/// The string will be stored with a terminating null.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
 		<span class="kw">if </span>src.is_null() {
 			<span class="self">Self</span>::default()
 		} <span class="kw">else </span>{
@@ -523,14 +523,14 @@
 	///
 	/// The string will be stored with a terminating null.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; WString {
+	</span><span class="kw">pub fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; <span class="self">Self </span>{
 		<span class="self">Self</span>::from_wchars_count(src.as_ptr(), src.len())
 	}
 
 	<span class="doccomment">/// Creates a new UTF-16 buffer allocated with an specific length. All
 	/// UTF-16 chars will be set to zero.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>new_alloc_buf(num_chars: usize) -&gt; WString {
+	</span><span class="kw">pub fn </span>new_alloc_buf(num_chars: usize) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ vec_u16: <span class="macro">vec!</span>[<span class="number">0x0000</span>; num_chars] }
 	}
 
@@ -749,16 +749,16 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>parse(data: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;WString&gt; {
+	</span><span class="kw">pub fn </span>parse(data: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>data = data;
 		<span class="kw">if </span>data.is_empty() { <span class="comment">// nothing to parse
-			</span><span class="kw">return </span><span class="prelude-val">Ok</span>(WString::default());
+			</span><span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::default());
 		}
 
 		<span class="kw">let </span>(encoding, sz_bom) = Encoding::guess(data);
 		data = <span class="kw-2">&amp;</span>data[sz_bom..]; <span class="comment">// skip BOM, if any
 
-		</span><span class="kw">let </span>wstr = WString::from_wchars_slice(
+		</span><span class="kw">let </span>wstr = <span class="self">Self</span>::from_wchars_slice(
 			<span class="kw-2">&amp;</span><span class="kw">match </span>encoding {
 				Encoding::Ansi =&gt; <span class="self">Self</span>::parse_ansi(data),
 				Encoding::Win1252 =&gt; MultiByteToWideChar(co::CP::WINDOWS_1252, co::MBC::NoValue, data)<span class="question-mark">?</span>,

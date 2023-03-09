@@ -274,6 +274,9 @@
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -356,7 +359,8 @@
 		security_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		creation_disposition: co::DISPOSITION,
 		flags_and_attrs: co::FILE_ATTRIBUTE,
-		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;) -&gt; SysResult&lt;(CloseHandleGuard&lt;HFILE&gt;, co::ERROR)&gt;
+		hfile_template: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HFILE&gt;,
+	) -&gt; SysResult&lt;(CloseHandleGuard&lt;HFILE&gt;, co::ERROR)&gt;
 	{
 		<span class="kw">match </span>HFILE(<span class="kw">unsafe </span>{
 			kernel::ffi::CreateFileW(
@@ -381,7 +385,8 @@
 		mapping_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>SECURITY_ATTRIBUTES&gt;,
 		protect: co::PAGE,
 		max_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;CloseHandleGuard&lt;HFILEMAP&gt;&gt;
+		mapping_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	) -&gt; SysResult&lt;CloseHandleGuard&lt;HFILEMAP&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -465,7 +470,8 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LockFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		offset: u64,
-		num_bytes_to_lock: u64) -&gt; SysResult&lt;UnlockFileGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt;
+		num_bytes_to_lock: u64,
+	) -&gt; SysResult&lt;UnlockFileGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -485,8 +491,7 @@
 	///
 	/// Returns the number of bytes read.
 	</span><span class="kw">fn </span>ReadFile(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		buffer: <span class="kw-2">&amp;mut </span>[u8],
-		overlapped: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>OVERLAPPED&gt;) -&gt; SysResult&lt;u32&gt;
+		buffer: <span class="kw-2">&amp;mut </span>[u8], overlapped: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>OVERLAPPED&gt;) -&gt; SysResult&lt;u32&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>bytes_read = u32::default();
 		bool_to_sysresult(
@@ -512,7 +517,8 @@
 	/// method.
 	</span><span class="kw">fn </span>SetFilePointerEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		distance_to_move: i64,
-		move_method: co::FILE_STARTING_POINT) -&gt; SysResult&lt;i64&gt;
+		move_method: co::FILE_STARTING_POINT,
+	) -&gt; SysResult&lt;i64&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>new_offset = i64::default();
 

@@ -897,6 +897,18 @@
 <a href="#897" id="897">897</a>
 <a href="#898" id="898">898</a>
 <a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -915,8 +927,7 @@
 <span class="doccomment">/// [`CopyFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-copyfilew)
 /// function.
 </span><span class="kw">pub fn </span>CopyFile(
-	existing_file: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str,
-	fail_if_exists: bool) -&gt; SysResult&lt;()&gt;
+	existing_file: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str, fail_if_exists: bool) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
@@ -1218,7 +1229,8 @@
 </span><span class="kw">pub fn </span>GetSystemTimes(
 	idle_time: <span class="kw-2">&amp;mut </span>FILETIME,
 	kernel_time: <span class="kw-2">&amp;mut </span>FILETIME,
-	user_time: <span class="kw-2">&amp;mut </span>FILETIME) -&gt; SysResult&lt;()&gt;
+	user_time: <span class="kw-2">&amp;mut </span>FILETIME,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
@@ -1303,7 +1315,8 @@
 	serial_number: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
 	max_component_len: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
 	file_system_flags: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>co::FILE_VOL&gt;,
-	file_system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt;) -&gt; SysResult&lt;()&gt;
+	file_system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt;,
+) -&gt; SysResult&lt;()&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>name_buf = <span class="kw">match </span>name {
 		<span class="prelude-val">None </span>=&gt; (WString::default(), <span class="number">0</span>),
@@ -1442,8 +1455,10 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindowsVersionOrGreater(
-	major_version: u16, minor_version: u16,
-	service_pack_major: u16) -&gt; SysResult&lt;bool&gt;
+	major_version: u16,
+	minor_version: u16,
+	service_pack_major: u16,
+) -&gt; SysResult&lt;bool&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>osvi = OSVERSIONINFOEX::default();
 	<span class="kw">let </span>cond_mask = VerSetConditionMask(
@@ -1546,8 +1561,10 @@
 /// The resulting `Vec&lt;u16&gt;` includes a terminating null.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>MultiByteToWideChar(
-	code_page: co::CP, flags: co::MBC,
-	multi_byte_str: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;Vec&lt;u16&gt;&gt;
+	code_page: co::CP,
+	flags: co::MBC,
+	multi_byte_str: <span class="kw-2">&amp;</span>[u8],
+) -&gt; SysResult&lt;Vec&lt;u16&gt;&gt;
 {
 	<span class="kw">match unsafe </span>{
 		kernel::ffi::MultiByteToWideChar(
@@ -1636,8 +1653,11 @@
 <span class="doccomment">/// [`ReplaceFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilew)
 /// function.
 </span><span class="kw">pub fn </span>ReplaceFile(
-	replaced: <span class="kw-2">&amp;</span>str, replacement: <span class="kw-2">&amp;</span>str,
-	backup: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, flags: co::REPLACEFILE) -&gt; SysResult&lt;()&gt;
+	replaced: <span class="kw-2">&amp;</span>str,
+	replacement: <span class="kw-2">&amp;</span>str,
+	backup: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	flags: co::REPLACEFILE,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
@@ -1695,7 +1715,8 @@
 </span><span class="kw">pub fn </span>SystemTimeToTzSpecificLocalTime(
 	time_zone: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TIME_ZONE_INFORMATION&gt;,
 	universal_time: <span class="kw-2">&amp;</span>SYSTEMTIME,
-	local_time: <span class="kw-2">&amp;mut </span>SYSTEMTIME) -&gt; SysResult&lt;()&gt;
+	local_time: <span class="kw-2">&amp;mut </span>SYSTEMTIME,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
@@ -1714,7 +1735,8 @@
 </span><span class="kw">pub fn </span>VerifyVersionInfo(
 	osvix: <span class="kw-2">&amp;mut </span>OSVERSIONINFOEX,
 	type_mask: co::VER_MASK,
-	condition_mask: u64) -&gt; SysResult&lt;bool&gt;
+	condition_mask: u64,
+) -&gt; SysResult&lt;bool&gt;
 {
 	<span class="kw">match unsafe </span>{
 		kernel::ffi::VerifyVersionInfoW(
@@ -1748,10 +1770,12 @@
 /// The resulting `Vec&lt;u16&gt;` includes a terminating null.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>WideCharToMultiByte(
-	code_page: co::CP, flags: co::WC,
-	wide_char_str: <span class="kw-2">&amp;</span>[u16], default_char: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-	used_default_char: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>bool&gt;) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
-
+	code_page: co::CP,
+	flags: co::WC,
+	wide_char_str: <span class="kw-2">&amp;</span>[u16],
+	default_char: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+	used_default_char: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>bool&gt;,
+) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>default_char_buf = default_char.unwrap_or_default();
 
 	<span class="kw">match unsafe </span>{

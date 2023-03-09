@@ -287,6 +287,9 @@
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -330,7 +333,8 @@
 		creation_flags: co::CREATE,
 		environment: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt;&gt;,
 		current_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-		si: <span class="kw-2">&amp;mut </span>STARTUPINFO) -&gt; SysResult&lt;CloseHandlePiGuard&gt;
+		si: <span class="kw-2">&amp;mut </span>STARTUPINFO,
+	) -&gt; SysResult&lt;CloseHandlePiGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>buf_cmd_line = WString::from_opt_str(command_line);
 		<span class="kw">let </span><span class="kw-2">mut </span>pi = PROCESS_INFORMATION::default();
@@ -449,7 +453,8 @@
 		creation: <span class="kw-2">&amp;mut </span>FILETIME,
 		exit: <span class="kw-2">&amp;mut </span>FILETIME,
 		kernel: <span class="kw-2">&amp;mut </span>FILETIME,
-		user: <span class="kw-2">&amp;mut </span>FILETIME) -&gt; SysResult&lt;()&gt;
+		user: <span class="kw-2">&amp;mut </span>FILETIME,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -505,7 +510,8 @@
 	</span><span class="kw">fn </span>OpenProcess(
 		desired_access: co::PROCESS,
 		inherit_handle: bool,
-		process_id: u32) -&gt; SysResult&lt;CloseHandleGuard&lt;HPROCESS&gt;&gt;
+		process_id: u32,
+	) -&gt; SysResult&lt;CloseHandleGuard&lt;HPROCESS&gt;&gt;
 	{
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{

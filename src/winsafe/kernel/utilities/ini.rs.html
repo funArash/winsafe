@@ -293,6 +293,8 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, FileMapped, SysResult, WString};
 
 <span class="doccomment">/// High-level abstraction to load, manage and serialize sections and key/value
@@ -336,7 +338,7 @@
 <span class="kw">impl </span>Ini {
 	<span class="doccomment">/// Parses an `Ini` from a string.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>parse_str(contents: <span class="kw-2">&amp;</span>str) -&gt; Ini {
+	</span><span class="kw">pub fn </span>parse_str(contents: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
 		<span class="kw">let </span><span class="kw-2">mut </span>sections = Vec::&lt;IniSection&gt;::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>cur_section = IniSection {
 			name: <span class="string">&quot;&quot;</span>.to_owned(),
@@ -374,7 +376,7 @@
 	<span class="doccomment">/// Parses an `Ini` from raw bytes with
 	/// [`WString::parse`](crate::WString::parse).
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;Ini&gt; {
+	</span><span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="prelude-val">Ok</span>(
 			<span class="self">Self</span>::parse_str(<span class="kw-2">&amp;</span>WString::parse(bytes)<span class="question-mark">?</span>.to_string()),
 		)
@@ -385,7 +387,7 @@
 	/// [mapped in memory](crate::FileMapped) during reading for maximum
 	/// performance.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Ini&gt; {
+	</span><span class="kw">pub fn </span>parse_from_file(ini_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
 		<span class="kw">let </span>fin = FileMapped::open(ini_path, FileAccess::ExistingReadOnly)<span class="question-mark">?</span>;
 		<span class="self">Self</span>::parse_bytes(fin.as_slice())
 	}
@@ -533,7 +535,9 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt; {
+	</span><span class="kw">pub fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+		section: <span class="kw-2">&amp;</span>str, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>String&gt;
+	{
 		<span class="self">self</span>.find_section_mut(section)
 			.and_then(|sec| {
 				sec.find_entry_mut(key)

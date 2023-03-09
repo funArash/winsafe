@@ -1107,6 +1107,23 @@
 <a href="#1107" id="1107">1107</a>
 <a href="#1108" id="1108">1108</a>
 <a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi, co};
@@ -1168,7 +1185,9 @@
 	/// - [`HKEY::USERS`](crate::prelude::advapi_Hkey::USERS).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegConnectRegistry(
-		machine_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, predef_hkey: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
+		machine_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		predef_hkey: <span class="kw-2">&amp;</span>HKEY,
+	) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">if </span><span class="kw-2">*</span>predef_hkey != HKEY::LOCAL_MACHINE
 			&amp;&amp; <span class="kw-2">*</span>predef_hkey != HKEY::PERFORMANCE_DATA
@@ -1211,7 +1230,8 @@
 		class: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		options: co::REG_OPTION,
 		access_rights: co::KEY,
-		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;) -&gt; SysResult&lt;(RegCloseKeyGuard, co::REG_DISPOSITION)&gt;
+		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;,
+	) -&gt; SysResult&lt;(RegCloseKeyGuard, co::REG_DISPOSITION)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
@@ -1352,7 +1372,9 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegEnumKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt; {
+	</span><span class="kw">fn </span>RegEnumKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt;
+	{
 		<span class="prelude-val">Ok</span>(Box::new(EnumKeyIter::new(<span class="self">self</span>)<span class="question-mark">?</span>))
 	}
 
@@ -1384,7 +1406,9 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegEnumValue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt; {
+	</span><span class="kw">fn </span>RegEnumValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	) -&gt; SysResult&lt;Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;(String, co::REG)&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;&gt;
+	{
 		<span class="prelude-val">Ok</span>(Box::new(EnumValueIter::new(<span class="self">self</span>)<span class="question-mark">?</span>))
 	}
 
@@ -1440,7 +1464,8 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegGetValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt;
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	) -&gt; SysResult&lt;RegistryValue&gt;
 	{
 		<span class="kw">let </span>sub_key_w = WString::from_opt_str(sub_key);
 		<span class="kw">let </span>value_name_w = WString::from_opt_str(value_name);
@@ -1541,7 +1566,8 @@
 	</span><span class="kw">fn </span>RegOpenKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		options: co::REG_OPTION,
-		access_rights: co::KEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
+		access_rights: co::KEY,
+	) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		error_to_sysresult(
@@ -1568,7 +1594,8 @@
 		max_value_name_len: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
 		max_value_len: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
 		security_descr_len: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u32&gt;,
-		last_write_time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>FILETIME&gt;) -&gt; SysResult&lt;()&gt;
+		last_write_time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>FILETIME&gt;,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">const </span>BLOCK: usize = <span class="number">32</span>; <span class="comment">// arbitrary
 
@@ -1808,7 +1835,9 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt; {
+	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt;
+	{
 		<span class="kw">let </span>value_name_w = WString::from_opt_str(value_name);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type1 = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len1 = u32::default();
@@ -1873,7 +1902,8 @@
 	</span><span class="kw">fn </span>RegReplaceKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		new_src_file: <span class="kw-2">&amp;</span>str,
-		old_file_backup: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt;
+		old_file_backup: <span class="kw-2">&amp;</span>str,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1907,7 +1937,8 @@
 	/// method.
 	</span><span class="kw">fn </span>RegSaveKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		dest_file_path: <span class="kw-2">&amp;</span>str,
-		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;) -&gt; SysResult&lt;()&gt;
+		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1925,7 +1956,8 @@
 	</span><span class="kw">fn </span>RegSaveKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		dest_file_path: <span class="kw-2">&amp;</span>str,
 		security_attributes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SECURITY_ATTRIBUTES&gt;,
-		flags: co::REG_SAVE) -&gt; SysResult&lt;()&gt;
+		flags: co::REG_SAVE,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1961,7 +1993,8 @@
 	</span><span class="kw">fn </span>RegSetKeyValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-		data: RegistryValue) -&gt; SysResult&lt;()&gt;
+		data: RegistryValue,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
 		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
@@ -2045,7 +2078,8 @@
 	data_len1: u32,
 	data_type2: co::REG,
 	<span class="kw-2">mut </span>data_len2: u32,
-	buf: Vec&lt;u8&gt;) -&gt; SysResult&lt;RegistryValue&gt;
+	buf: Vec&lt;u8&gt;,
+) -&gt; SysResult&lt;RegistryValue&gt;
 {
 	<span class="kw">if </span>data_type1 != data_type2 {
 		<span class="comment">// Race condition: someone modified the data type in between our calls.

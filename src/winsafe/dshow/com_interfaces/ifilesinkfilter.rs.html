@@ -188,7 +188,7 @@
 	<span class="doccomment">/// [`IFileSinkFilter::SetFileName`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifilesinkfilter-setfilename)
 	/// method.
 	</span><span class="kw">fn </span>SetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		file_name: <span class="kw-2">&amp;</span>str, amt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
+		file_name: <span class="kw-2">&amp;</span>str, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileSinkFilterVT&gt;();
@@ -196,7 +196,7 @@
 				(vt.SetFileName)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(file_name).as_ptr(),
-					amt.map_or(std::ptr::null(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+					mt.map_or(std::ptr::null(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				),
 			)
 		}
