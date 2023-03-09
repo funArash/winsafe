@@ -237,6 +237,19 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Global objects used within `gui` module.
 
 </span><span class="kw">use </span>std::error::Error;
@@ -438,7 +451,20 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="doccomment">/// Paints the themed border of an user control, if it has the proper styles.
+</span><span class="doccomment">/// Adjusts the position of a modeless window on parent.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>adjust_modeless_pos(
+	modeless_base: <span class="kw-2">&amp;</span>Base, hparent: <span class="kw-2">&amp;</span>HWND, <span class="kw-2">mut </span>user_pos: POINT) -&gt; SysResult&lt;POINT&gt;
+{
+	<span class="comment">// For a modeless (0,0) is the left/topmost point in parent&#39;s client area.
+	</span>multiply_dpi_or_dtu(modeless_base, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>user_pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+	<span class="kw">let </span><span class="kw-2">mut </span>parent_rc = hparent.GetClientRect()<span class="question-mark">?</span>;
+	hparent.ClientToScreenRc(<span class="kw-2">&amp;mut </span>parent_rc)<span class="question-mark">?</span>;
+	user_pos.x += parent_rc.left;
+	user_pos.y += parent_rc.top;
+	<span class="prelude-val">Ok</span>(user_pos)
+}
+
+<span class="doccomment">/// Paints the themed border of an user control, if it has the proper styles.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>paint_control_borders(
 	hwnd: <span class="kw-2">&amp;</span>HWND, wm_ncp: wm::NcPaint) -&gt; AnyResult&lt;()&gt;
 {
