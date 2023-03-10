@@ -130,12 +130,12 @@
 <a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{FILTER_INFO, IEnumPins, IFilterGraph, IPin};
+</span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{FILTER_INFO, IEnumPins, IPin};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IMediaFilter, ole_IPersist, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IFilterGraph, dshow_IMediaFilter, ole_IPersist};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IMediaFilterVT;
 
 <span class="doccomment">/// [`IBaseFilter`](crate::IBaseFilter) virtual table.
@@ -218,7 +218,7 @@
 	<span class="doccomment">/// [`IBaseFilter::JoinFilterGraph`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ibasefilter-joinfiltergraph)
 	/// method.
 	</span><span class="kw">fn </span>JoinFilterGraph(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		graph: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IFilterGraph&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
+		graph: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IFilterGraph&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IBaseFilterVT&gt;();

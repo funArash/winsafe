@@ -347,9 +347,9 @@
 	GetLastError, HACCESSTOKEN, HLOCAL, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, ptr_to_sysresult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IBindCtx, IStream};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IStream};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal, ole_IUnknown, shell_IShellItem};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal, ole_IBindCtx, shell_IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::{
 	NOTIFYICONDATA, SHFILEINFO, SHFILEOPSTRUCT, SHSTOCKICONINFO,
 };
@@ -514,18 +514,18 @@
 ///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
-/// use winsafe::{IShellItem2, SHCreateItemFromParsingName};
+/// use winsafe::{IBindCtx, IShellItem2, SHCreateItemFromParsingName};
 ///
 /// let shi = SHCreateItemFromParsingName::&lt;IShellItem2&gt;(
 ///     &quot;C:\\Temp\\foo.txt&quot;,
-///     None,
+///     None::&lt;&amp;IBindCtx&gt;,
 /// )?;
 /// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>SHCreateItemFromParsingName&lt;T&gt;(
 	file_or_folder_path: <span class="kw-2">&amp;</span>str,
-	bind_ctx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;,
+	bind_ctx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IBindCtx&gt;,
 ) -&gt; HrResult&lt;T&gt;
 	<span class="kw">where </span>T: shell_IShellItem,
 {

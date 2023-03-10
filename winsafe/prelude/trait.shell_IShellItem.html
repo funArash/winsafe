@@ -2,7 +2,7 @@
     // Provided methods
     fn <a href="#method.BindToHandler" class="fn">BindToHandler</a>&lt;T&gt;(
         &amp;self,
-        bind_ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="struct" href="../struct.IBindCtx.html" title="struct winsafe::IBindCtx">IBindCtx</a>&gt;,
+        bind_ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;impl <a class="trait" href="trait.ole_IBindCtx.html" title="trait winsafe::prelude::ole_IBindCtx">ole_IBindCtx</a>&gt;,
         bhid: &amp;<a class="struct" href="../co/struct.BHID.html" title="struct winsafe::co::BHID">BHID</a>
     ) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;T&gt;
        <span class="where">where T: <a class="trait" href="trait.ole_IUnknown.html" title="trait winsafe::prelude::ole_IUnknown">ole_IUnknown</a></span> { ... }
@@ -16,7 +16,7 @@
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;</code></pre></div>
 </div></details><h2 id="provided-methods" class="small-section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.BindToHandler" class="method"><a class="srclink rightside" href="../../src/winsafe/shell\com_interfaces/ishellitem.rs.html#67-86">source</a><h4 class="code-header">fn <a href="#method.BindToHandler" class="fn">BindToHandler</a>&lt;T&gt;(
     &amp;self,
-    bind_ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="struct" href="../struct.IBindCtx.html" title="struct winsafe::IBindCtx">IBindCtx</a>&gt;,
+    bind_ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;impl <a class="trait" href="trait.ole_IBindCtx.html" title="trait winsafe::prelude::ole_IBindCtx">ole_IBindCtx</a>&gt;,
     bhid: &amp;<a class="struct" href="../co/struct.BHID.html" title="struct winsafe::co::BHID">BHID</a>
 ) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;T&gt;<span class="where fmt-newline">where
     T: <a class="trait" href="trait.ole_IUnknown.html" title="trait winsafe::prelude::ole_IUnknown">ole_IUnknown</a>,</span></h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-bindtohandler"><code>IShellItem::BindToHandler</code></a>
@@ -25,12 +25,12 @@ method.</p>
 <p>Retrieving the items inside a directory:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{co, IEnumShellItems, IShellItem};
+<span class="kw">use </span>winsafe::{co, IBindCtx, IEnumShellItems, IShellItem};
 
 <span class="kw">let </span>sh_folder: IShellItem; <span class="comment">// initialized somewhere
 
 </span><span class="kw">let </span>sh_items = sh_folder.BindToHandler::&lt;IEnumShellItems&gt;(
-    <span class="prelude-val">None</span>,
+    <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;,
     <span class="kw-2">&amp;</span>co::BHID::EnumItems,
 )<span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.GetAttributes" class="method"><a class="srclink rightside" href="../../src/winsafe/shell\com_interfaces/ishellitem.rs.html#91-103">source</a><h4 class="code-header">fn <a href="#method.GetAttributes" class="fn">GetAttributes</a>(&amp;self, sfgao_mask: <a class="struct" href="../co/struct.SFGAO.html" title="struct winsafe::co::SFGAO">SFGAO</a>) -&gt; <a class="type" href="../type.HrResult.html" title="type winsafe::HrResult">HrResult</a>&lt;<a class="struct" href="../co/struct.SFGAO.html" title="struct winsafe::co::SFGAO">SFGAO</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-getattributes"><code>IShellItem::GetAttributes</code></a>
@@ -39,11 +39,11 @@ method.</p>
 method.</p>
 <h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{co, IShellItem, SHCreateItemFromParsingName};
+<span class="kw">use </span>winsafe::{co, IBindCtx, IShellItem, SHCreateItemFromParsingName};
 
 <span class="kw">let </span>shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
     <span class="string">&quot;C:\\Temp\\foo.txt&quot;</span>,
-    <span class="prelude-val">None</span>,
+    <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;,
 )<span class="question-mark">?</span>;
 
 <span class="kw">let </span>full_path = shi.GetDisplayName(co::SIGDN::FILESYSPATH)<span class="question-mark">?</span>;
@@ -53,11 +53,11 @@ method.</p>
 method.</p>
 <h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{co, IShellItem, SHCreateItemFromParsingName};
+<span class="kw">use </span>winsafe::{co, IBindCtx, IShellItem, SHCreateItemFromParsingName};
 
 <span class="kw">let </span>shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
     <span class="string">&quot;C:\\Temp\\foo.txt&quot;</span>,
-    <span class="prelude-val">None</span>,
+    <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>IBindCtx&gt;,
 )<span class="question-mark">?</span>;
 
 <span class="kw">let </span>parent_shi = shi.GetParent()<span class="question-mark">?</span>;
