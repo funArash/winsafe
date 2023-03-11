@@ -286,6 +286,35 @@
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{advapi, co};
@@ -338,10 +367,7 @@
 		},
 	)<span class="question-mark">?</span>;
 	<span class="kw">let </span>pbuf_sid = <span class="kw">unsafe </span>{ std::mem::transmute::&lt;<span class="kw">_</span>, <span class="kw-2">&amp;</span>SID&gt;(pbuf) };
-	<span class="kw">let </span>pbuf_sid_sz = std::mem::size_of::&lt;SID&gt;() -
-		std::mem::size_of::&lt;[u32; <span class="number">1</span>]&gt;() + 
-		(pbuf_sid.SubAuthorityCount() <span class="kw">as </span>usize * std::mem::size_of::&lt;u32&gt;());
-	<span class="kw">let </span>pbuf_slice = <span class="kw">unsafe </span>{ std::slice::from_raw_parts(pbuf, pbuf_sid_sz) };
+	<span class="kw">let </span>pbuf_slice = <span class="kw">unsafe </span>{ std::slice::from_raw_parts(pbuf, GetLengthSid(pbuf_sid) <span class="kw">as _</span>) };
 	<span class="kw">let </span>raw_sid_copied = Vec::from_iter(pbuf_slice.iter().cloned());
 	HLOCAL(pbuf <span class="kw">as _</span>).LocalFree()<span class="question-mark">?</span>;
 	<span class="prelude-val">Ok</span>(SID_wrap::new(raw_sid_copied))
@@ -475,6 +501,20 @@
 	}
 }
 
+<span class="doccomment">/// [`GetLengthSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getlengthsid)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetLengthSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; u32 {
+	<span class="kw">unsafe </span>{ advapi::ffi::GetLengthSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) }
+}
+
+<span class="doccomment">/// [`GetSidLengthRequired`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getsidlengthrequired)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetSidLengthRequired(sub_authority_count: u8) -&gt; u32 {
+	<span class="kw">unsafe </span>{ advapi::ffi::GetSidLengthRequired(sub_authority_count) }
+}
+
 <span class="doccomment">/// [`GetUserName`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew)
 /// function.
 </span><span class="attr">#[must_use]
@@ -486,6 +526,24 @@
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
 	}
+}
+
+<span class="doccomment">/// [`GetWindowsAccountDomainSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getwindowsaccountdomainsid)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetWindowsAccountDomainSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;SID_wrap&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>domain_sid = SID::new_raw();
+	<span class="kw">let </span><span class="kw-2">mut </span>domain_sid_sz = domain_sid.len() <span class="kw">as </span>u32;
+
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			advapi::ffi::GetWindowsAccountDomainSid(
+				sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				domain_sid.as_mut_ptr(),
+				<span class="kw-2">&amp;mut </span>domain_sid_sz,
+			)
+		},
+	).map(|<span class="kw">_</span>| SID_wrap::new(domain_sid))
 }
 
 <span class="doccomment">/// [`InitializeSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-initializesecuritydescriptor)
