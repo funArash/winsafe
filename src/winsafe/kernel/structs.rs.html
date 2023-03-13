@@ -702,6 +702,10 @@
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
 <a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -710,7 +714,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
 	ConvertSidToStringSid, HEVENT, HINSTANCE, HPIPE, HPROCESS, HTHREAD,
-	MAKEQWORD, WString,
+	InitializeSecurityDescriptor, MAKEQWORD, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{MAX_MODULE_NAME32, MAX_PATH};
 
@@ -1076,22 +1080,6 @@
 
 <span class="macro">impl_default!</span>(PROCESS_INFORMATION);
 
-<span class="doccomment">/// [`SECURITY_DESCRIPTOR`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor)
-/// struct.
-///
-/// This struct is created by
-/// [`InitializeSecurityDescriptor`](crate::InitializeSecurityDescriptor).
-</span><span class="attr">#[repr(C)]
-</span><span class="kw">pub struct </span>SECURITY_DESCRIPTOR {
-	<span class="kw">pub </span>Revision: u8,
-	<span class="kw">pub </span>Sbz1: u8,
-	<span class="kw">pub </span>Control: co::SE,
-	<span class="kw">pub </span>Owner: <span class="kw-2">*mut </span>std::ffi::c_void,
-	<span class="kw">pub </span>Group: <span class="kw-2">*mut </span>std::ffi::c_void,
-	<span class="kw">pub </span>Sacl: <span class="kw-2">*mut </span>ACL,
-	<span class="kw">pub </span>Dacl: <span class="kw-2">*mut </span>ACL,
-}
-
 <span class="doccomment">/// [`PROCESSENTRY32`](https://learn.microsoft.com/en-us/windows/win32/api/tlhelp32/ns-tlhelp32-processentry32w)
 /// struct.
 </span><span class="attr">#[repr(C)]
@@ -1130,6 +1118,25 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SECURITY_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, lpSecurityDescriptor, set_lpSecurityDescriptor, SECURITY_DESCRIPTOR);
 	<span class="macro">pub_fn_bool_get_set!</span>(bInheritHandle, set_bInheritHandle);
+}
+
+<span class="doccomment">/// [`SECURITY_DESCRIPTOR`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-security_descriptor)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>SECURITY_DESCRIPTOR {
+	<span class="kw">pub </span>Revision: u8,
+	<span class="kw">pub </span>Sbz1: u8,
+	<span class="kw">pub </span>Control: co::SE,
+	<span class="kw">pub </span>Owner: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>Group: <span class="kw-2">*mut </span>std::ffi::c_void,
+	<span class="kw">pub </span>Sacl: <span class="kw-2">*mut </span>ACL,
+	<span class="kw">pub </span>Dacl: <span class="kw-2">*mut </span>ACL,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>SECURITY_DESCRIPTOR {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		InitializeSecurityDescriptor().unwrap()
+	}
 }
 
 <span class="doccomment">/// [`SID`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-sid)
@@ -1229,7 +1236,8 @@
 }
 
 <span class="kw">impl </span>SID_IDENTIFIER_AUTHORITY {
-	<span class="macro">predef_sid_ident_au!</span>(NULL, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]);
+	<span class="macro">predef_sid_ident_au!</span>(NULL, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+	<span class="macro">predef_sid_ident_au!</span>(WORLD, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]);
 	<span class="macro">predef_sid_ident_au!</span>(LOCAL, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>]);
 	<span class="macro">predef_sid_ident_au!</span>(CREATOR, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>]);
 	<span class="macro">predef_sid_ident_au!</span>(NON_UNIQUE, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>]);
