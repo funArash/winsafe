@@ -293,13 +293,6 @@
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -415,7 +408,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{gui, AnyResult, HTHREAD};
+	/// use winsafe::{gui, AnyResult, GetCurrentThreadId, HTHREAD};
 	///
 	/// let wnd: gui::WindowMain; // initialized somewhere
 	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
@@ -425,14 +418,12 @@
 	/// btn.on().bn_clicked({
 	///     let wnd = wnd.clone();
 	///     move || -&gt; AnyResult&lt;()&gt; {
-	///         println!(&quot;Click event at {:#x}&quot;,
-	///             HTHREAD::GetCurrentThreadId());
+	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
 	///
 	///         wnd.spawn_new_thread({
 	///             let wnd = wnd.clone();
 	///             move || {
-	///                 println!(&quot;This is another thread: {:#x}&quot;,
-	///                     HTHREAD::GetCurrentThreadId());
+	///                 println!(&quot;This is another thread: {:#x}&quot;, GetCurrentThreadId());
 	///                 if 1 != 2 {
 	///                     Err(&quot;Unexpected condition, goodbye.&quot;.into())
 	///                 } else {
@@ -480,7 +471,7 @@
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{gui, AnyResult, HTHREAD, Sleep};
+	/// use winsafe::{gui, AnyResult, GetCurrentThreadId, HTHREAD, Sleep};
 	///
 	/// let wnd: gui::WindowMain; // initialized somewhere
 	/// # let wnd = gui::WindowMain::new(gui::WindowMainOpts::default());
@@ -490,35 +481,30 @@
 	/// btn.on().bn_clicked({
 	///     let wnd = wnd.clone();
 	///     move || -&gt; AnyResult&lt;()&gt; {
-	///         println!(&quot;Click event at {:#x}&quot;,
-	///             HTHREAD::GetCurrentThreadId());
+	///         println!(&quot;Click event at {:#x}&quot;, GetCurrentThreadId());
 	///
 	///         std::thread::spawn({
 	///             let wnd = wnd.clone();
 	///             move || {
-	///                 println!(&quot;Parallel task starts at {:#x}&quot;,
-	///                     HTHREAD::GetCurrentThreadId());
+	///                 println!(&quot;Parallel task starts at {:#x}&quot;, GetCurrentThreadId());
 	///                 Sleep(2000);
 	///
 	///                 wnd.run_ui_thread({
 	///                     let wnd = wnd.clone();
 	///                     move || -&gt; AnyResult&lt;()&gt; {
-	///                         println!(&quot;Updating UI at {:#x}&quot;,
-	///                             HTHREAD::GetCurrentThreadId());
+	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
 	///                         wnd.hwnd().SetWindowText(&quot;Status... 50%&quot;)?;
 	///                         Ok(())
 	///                     }
 	///                 });
 	///
-	///                 println!(&quot;Parallel task keeps going at {:#x}&quot;,
-	///                     HTHREAD::GetCurrentThreadId());
+	///                 println!(&quot;Parallel task keeps going at {:#x}&quot;, GetCurrentThreadId());
 	///                 Sleep(2000);
 	///
 	///                 wnd.run_ui_thread({
 	///                     let wnd = wnd.clone();
 	///                     move || -&gt; AnyResult&lt;()&gt; {
-	///                         println!(&quot;Updating UI at {:#x}&quot;,
-	///                             HTHREAD::GetCurrentThreadId());
+	///                         println!(&quot;Updating UI at {:#x}&quot;, GetCurrentThreadId());
 	///                         wnd.hwnd().SetWindowText(&quot;Status... 100%&quot;)?;
 	///                         Ok(())
 	///                     }
