@@ -514,6 +514,39 @@
 <a href="#514" id="514">514</a>
 <a href="#515" id="515">515</a>
 <a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::{Deref, DerefMut};
 
 <span class="kw">use </span><span class="kw">crate</span>::kernel;
@@ -571,6 +604,9 @@
 	/// Be sure the handle must be freed with
 	/// [`CloseHandle`](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
 	/// at the end of scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(handle: T) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ handle }
@@ -631,6 +667,9 @@
 	/// Be sure the handles must be freed with
 	/// [`CloseHandle`](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
 	/// at the end of the scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(pi: PROCESS_INFORMATION) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ pi }
@@ -689,6 +728,9 @@
 	/// Be sure the handle must be freed with
 	/// [`EndUpdateResource`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-endupdateresourcew)
 	/// at the end of scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(hupsrc: HUPDATERSRC) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hupsrc }
@@ -823,6 +865,9 @@
 	/// Be sure the handle must be freed with
 	/// [`GlobalUnlock`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-globalunlock)
 	/// at the end of scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(hglobal: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hglobal }
@@ -919,6 +964,9 @@
 	/// Be sure the handle must be freed with
 	/// [`RegCloseKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey)
 	/// at the end of scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(hkey: HKEY) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ hkey }
@@ -976,6 +1024,9 @@
 	/// Be sure the handle must be freed with
 	/// [`UnlockFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)
 	/// at the end of scope.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(
 		hfile: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
@@ -983,6 +1034,18 @@
 		num_bytes_to_lock: u64) -&gt; <span class="self">Self
 	</span>{
 		<span class="self">Self </span>{ hfile, offset, num_bytes_to_lock }
+	}
+
+	<span class="doccomment">/// Returns the memory offset of the lock.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+		<span class="self">self</span>.offset
+	}
+
+	<span class="doccomment">/// Returns the number of locked bytes.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>num_bytes_to_lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+		<span class="self">self</span>.num_bytes_to_lock
 	}
 }
 
@@ -1024,7 +1087,10 @@
 	/// 
 	/// # Safety
 	/// 
-	/// Be sure the data is an allocated `SID` structure.
+	/// Be sure the data is an allocated [`SID`](crate::SID) structure.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const unsafe fn </span>new(raw: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ raw }
