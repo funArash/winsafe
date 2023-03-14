@@ -1466,9 +1466,6 @@
 <a href="#1466" id="1466">1466</a>
 <a href="#1467" id="1467">1467</a>
 <a href="#1468" id="1468">1468</a>
-<a href="#1469" id="1469">1469</a>
-<a href="#1470" id="1470">1470</a>
-<a href="#1471" id="1471">1471</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1480,7 +1477,9 @@
 	TIME_ZONE_INFORMATION, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{FreeSidGuard, LocalFreeGuard, SidGuard};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{
+	FreeSidGuard, LocalFreeGuard, LocalFreeSidGuard, SidGuard,
+};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, INVALID_FILE_ATTRIBUTES, MAX_COMPUTERNAME_LENGTH,
 	MAX_PATH, parse_multi_z_str, ptr_to_sysresulA, SECURITY_DESCRIPTOR_REVISION,
@@ -1538,8 +1537,8 @@
 
 	<span class="kw">let </span><span class="kw-2">mut </span>psid = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>SID;
 
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::AllocateAndInitializeSid(
 				identifier_authority <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				sub_authorities.len() <span class="kw">as _</span>,
@@ -1552,9 +1551,9 @@
 				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">7 </span>{ sub_authorities[<span class="number">6</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
 				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">8 </span>{ sub_authorities[<span class="number">7</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
 				<span class="kw-2">&amp;mut </span>psid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			)
-		},
-	).map(|<span class="kw">_</span>| FreeSidGuard::new(psid))
+			),
+		).map(|<span class="kw">_</span>| FreeSidGuard::new(psid))
+	}
 }
 
 <span class="doccomment">/// [`ConvertSidToStringSid`](https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertsidtostringsidw)
@@ -1580,21 +1579,16 @@
 <span class="doccomment">/// [`ConvertStringSidToSid`](https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsidtosidw)
 /// function.
 </span><span class="attr">#[must_use]
-</span><span class="kw">pub fn </span>ConvertStringSidToSid(str_sid: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;SidGuard&gt; {
+</span><span class="kw">pub fn </span>ConvertStringSidToSid(str_sid: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;LocalFreeSidGuard&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>pbuf = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u8;
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::ConvertStringSidToSidW(
 				WString::from_str(str_sid).as_ptr(),
 				<span class="kw-2">&amp;mut </span>pbuf,
-			)
-		},
-	)<span class="question-mark">?</span>;
-	<span class="kw">let </span>pbuf_sid = <span class="kw">unsafe </span>{ std::mem::transmute::&lt;<span class="kw">_</span>, <span class="kw-2">&amp;</span>SID&gt;(pbuf) };
-	<span class="kw">let </span>pbuf_slice = <span class="kw">unsafe </span>{ std::slice::from_raw_parts(pbuf, GetLengthSid(pbuf_sid) <span class="kw">as _</span>) };
-	<span class="kw">let </span>raw_sid_copied = Vec::from_iter(pbuf_slice.iter().cloned());
-	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pbuf <span class="kw">as _</span>)) };
-	<span class="prelude-val">Ok</span>(SidGuard::new(raw_sid_copied))
+			),
+		).map(|<span class="kw">_</span>| LocalFreeSidGuard::new(HLOCAL::from_ptr(pbuf <span class="kw">as _</span>)))
+	}
 }
 
 <span class="doccomment">/// [`CopyFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-copyfilew)
@@ -1620,15 +1614,15 @@
 	<span class="kw">let </span>sid_sz = GetLengthSid(<span class="kw-2">&amp;</span>src);
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
 
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::CopySid(
 				sid_sz,
 				sid_buf.as_mut_ptr(),
 				src <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-			)
-		},
-	).map(|<span class="kw">_</span>| SidGuard::new(sid_buf))
+			),
+		).map(|<span class="kw">_</span>| SidGuard::new(sid_buf))
+	}
 }
 
 <span class="doccomment">/// [`CreateWellKnownSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createwellknownsid)
@@ -1666,16 +1660,16 @@
 
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
 
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::CreateWellKnownSid(
 				well_known_sid.<span class="number">0</span>,
 				domain_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				sid_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>sid_sz,
-			)
-		},
-	).map(|<span class="kw">_</span>| SidGuard::new(sid_buf))
+			),
+		).map(|<span class="kw">_</span>| SidGuard::new(sid_buf))
+	}
 }
 
 <span class="doccomment">/// [`DeleteFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-deletefilew)
@@ -2300,15 +2294,15 @@
 
 	<span class="kw">let </span><span class="kw-2">mut </span>ad_sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; ad_sid_sz <span class="kw">as _</span>];
 
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::GetWindowsAccountDomainSid(
 				sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				ad_sid_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>ad_sid_sz,
-			)
-		},
-	).map(|<span class="kw">_</span>| SidGuard::new(ad_sid_buf))
+			),
+		).map(|<span class="kw">_</span>| SidGuard::new(ad_sid_buf))
+	}
 }
 
 <span class="doccomment">/// [`GlobalMemoryStatusEx`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-globalmemorystatusex)
@@ -2561,8 +2555,8 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
 	<span class="kw">let </span><span class="kw-2">mut </span>domain_buf = WString::new_alloc_buf(domain_sz <span class="kw">as _</span>);
 
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		bool_to_sysresult(
 			kernel::ffi::LookupAccountNameW(
 				WString::from_opt_str(system_name).as_ptr(),
 				WString::from_str(account_name).as_ptr(),
@@ -2571,9 +2565,9 @@
 				domain_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>domain_sz,
 				<span class="kw-2">&amp;mut </span>sid_name_use.<span class="number">0</span>,
-			)
-		},
-	).map(|<span class="kw">_</span>| (domain_buf.to_string(), SidGuard::new(sid_buf), sid_name_use))
+			),
+		).map(|<span class="kw">_</span>| (domain_buf.to_string(), SidGuard::new(sid_buf), sid_name_use))
+	}
 }
 
 <span class="doccomment">/// [`LookupAccountSid`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountsidw)
