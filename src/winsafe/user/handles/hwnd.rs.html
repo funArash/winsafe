@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\user\handles\hwnd.rs`."><title>hwnd.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (8a73f50d8 2023-03-11)" data-search-js="search-ab3e9174d42dd6c2.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../..\../static.files/storage-9184409068f70b79.js"></script><script defer src="../../..\../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../..\../source-files.js"></script><script defer src="../../..\../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../..\../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\user\handles\hwnd.rs`."><title>hwnd.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (7b4f48927 2023-03-12)" data-search-js="search-d1bc581867fd0849.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../..\../static.files/storage-9184409068f70b79.js"></script><script defer src="../../..\../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../..\../source-files.js"></script><script defer src="../../..\../static.files/main-f5a2577c5297a973.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../..\../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1638,6 +1638,12 @@
 <a href="#1638" id="1638">1638</a>
 <a href="#1639" id="1639">1639</a>
 <a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1647,10 +1653,12 @@
 	GetLastError, HINSTANCE, HIWORD, LOWORD, SetLastError, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, ptr_to_sysresult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
+	bool_to_sysresult, MAX_PATH, ptr_to_option_handle, ptr_to_sysresult_handle,
+};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
-	ALTTABINFO, AtomStr, HACCEL, HDC, HMENU, HMONITOR, HRGN, HwndPlace, IdMenu,
+	ALTTABINFO, AtomStr, HACCEL, HMENU, HMONITOR, HRGN, HwndPlace, IdMenu,
 	IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, RECT, SCROLLINFO, SIZE,
 	TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
 };
@@ -1688,7 +1696,9 @@
 	/// wrapper to retrieve the window [`HINSTANCE`](crate::HINSTANCE).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>hinstance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HINSTANCE {
-		HINSTANCE(<span class="self">self</span>.GetWindowLongPtr(co::GWLP::HINSTANCE) <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{
+			HINSTANCE::from_ptr(<span class="self">self</span>.GetWindowLongPtr(co::GWLP::HINSTANCE) <span class="kw">as _</span>)
+		}
 	}
 
 	<span class="doccomment">/// [`ArrangeIconicWindows`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-arrangeiconicwindows)
@@ -1748,12 +1758,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>BeginPaint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;EndPaintGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ps = PAINTSTRUCT::default();
-		ptr_to_sysresult(
-			<span class="kw">unsafe </span>{
-				user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-			},
-			|ptr| EndPaintGuard::new(<span class="self">self</span>, HDC(ptr), ps),
-		)
+		<span class="kw">unsafe </span>{
+			ptr_to_sysresult_handle(
+				user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			).map(|h| EndPaintGuard::new(<span class="self">self</span>, h, ps))
+		}
 	}
 
 	<span class="doccomment">/// [`BringWindowToTop`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-bringwindowtotop)
@@ -1766,9 +1775,9 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>ChildWindowFromPoint(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: POINT) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{
-			user::ffi::ChildWindowFromPoint(<span class="self">self</span>.as_ptr(), pt.x, pt.y).as_mut()
-		}.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::ChildWindowFromPoint(<span class="self">self</span>.as_ptr(), pt.x, pt.y) },
+		)
 	}
 
 	<span class="doccomment">/// [`ClientToScreen`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clienttoscreen)
@@ -1837,7 +1846,7 @@
 		lparam: <span class="prelude-ty">Option</span>&lt;isize&gt;,
 	) -&gt; SysResult&lt;HWND&gt;
 	{
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			user::ffi::CreateWindowExW(
 				ex_style.<span class="number">0</span>,
 				class_name.as_ptr(),
@@ -1850,7 +1859,6 @@
 				hinstance.as_ptr(),
 				lparam.unwrap_or_default() <span class="kw">as _</span>,
 			),
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -1938,14 +1946,13 @@
 	</span><span class="kw">fn </span>FindWindow(
 		class_name: <span class="prelude-ty">Option</span>&lt;AtomStr&gt;, title: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HWND&gt;
 	{
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::FindWindowW(
 					class_name.map_or(std::ptr::null_mut(), |p| p.as_ptr()),
 					WString::from_opt_str(title).as_ptr(),
 				)
 			},
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -1958,7 +1965,7 @@
 		title: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 	) -&gt; SysResult&lt;HWND&gt;
 	{
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::FindWindowExW(
 					<span class="self">self</span>.as_ptr(),
@@ -1967,7 +1974,6 @@
 					WString::from_opt_str(title).as_ptr(),
 				)
 			},
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -1975,8 +1981,9 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetActiveWindow() -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetActiveWindow().as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::GetActiveWindow() },
+		)
 	}
 
 	<span class="doccomment">/// [`GetAltTabInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getalttabinfow)
@@ -2015,16 +2022,16 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetAncestor(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::GA) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetAncestor(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>).as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::GetAncestor(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>) },
+		)
 	}
 
 	<span class="doccomment">/// [`GetCapture`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcapture)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCapture() -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetCapture().as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetCapture() })
 	}
 
 	<span class="doccomment">/// [`GetClassLongPtr`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclasslongptrw)
@@ -2071,17 +2078,17 @@
 	/// [`HWND::DESKTOP`](crate::prelude::user_Hwnd::DESKTOP).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
-		ptr_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::GetDC(<span class="self">self</span>.as_ptr()) },
-			|ptr| ReleaseDCGuard::new(<span class="self">self</span>, HDC(ptr)),
-		)
+		<span class="kw">unsafe </span>{
+			ptr_to_sysresult_handle(user::ffi::GetDC(<span class="self">self</span>.as_ptr()))
+				.map(|h| ReleaseDCGuard::new(<span class="self">self</span>, h))
+		}
 	}
 
 	<span class="doccomment">/// [`GetDesktopWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdesktopwindow)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDesktopWindow() -&gt; HWND {
-		HWND(<span class="kw">unsafe </span>{ user::ffi::GetDesktopWindow() })
+		<span class="kw">unsafe </span>{ HWND::from_ptr(user::ffi::GetDesktopWindow()) }
 	}
 
 	<span class="doccomment">/// [`GetDlgCtrlID`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdlgctrlid)
@@ -2102,9 +2109,8 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDlgItem(<span class="kw-2">&amp;</span><span class="self">self</span>, ctrl_id: u16) -&gt; SysResult&lt;HWND&gt; {
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{ user::ffi::GetDlgItem(<span class="self">self</span>.as_ptr(), ctrl_id <span class="kw">as _</span>) },
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -2112,32 +2118,30 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetFocus() -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetFocus().as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetFocus() })
 	}
 
 	<span class="doccomment">/// [`GetForegroundWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getforegroundwindow)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetForegroundWindow() -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetForegroundWindow().as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetForegroundWindow() })
 	}
 
 	<span class="doccomment">/// [`GetLastActivePopup`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getlastactivepopup)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetLastActivePopup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetLastActivePopup(<span class="self">self</span>.as_ptr()).as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::GetLastActivePopup(<span class="self">self</span>.as_ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`GetMenu`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenu)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetMenu(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetMenu(<span class="self">self</span>.as_ptr()).as_mut() }
-			.map(|ptr| HMENU(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetMenu(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`GetMenuBarInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenubarinfo)
@@ -2180,14 +2184,13 @@
 	</span><span class="kw">fn </span>GetNextDlgGroupItem(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd_ctrl: <span class="kw-2">&amp;</span>HWND, previous: bool) -&gt; SysResult&lt;HWND&gt;
 	{
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetNextDlgGroupItem(
 					<span class="self">self</span>.as_ptr(),
 					hwnd_ctrl.as_ptr(), previous <span class="kw">as _</span>,
 				)
 			},
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -2197,7 +2200,7 @@
 	</span><span class="kw">fn </span>GetNextDlgTabItem(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd_ctrl: <span class="kw-2">&amp;</span>HWND, previous: bool) -&gt; SysResult&lt;HWND&gt;
 	{
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetNextDlgTabItem(
 					<span class="self">self</span>.as_ptr(),
@@ -2205,7 +2208,6 @@
 					previous <span class="kw">as _</span>,
 				)
 			},
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -2213,10 +2215,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetParent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HWND&gt; {
-		ptr_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::GetParent(<span class="self">self</span>.as_ptr()) },
-			|ptr| HWND(ptr),
-		)
+		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ user::ffi::GetParent(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`GetScrollInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getscrollinfo)
@@ -2248,28 +2247,30 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetShellWindow() -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetShellWindow().as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetShellWindow() })
 	}
 
 	<span class="doccomment">/// [`GetSystemMenu`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmenu)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetSystemMenu(<span class="kw-2">&amp;</span><span class="self">self</span>, revert: bool) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::GetSystemMenu(<span class="self">self</span>.as_ptr(), revert <span class="kw">as _</span>).as_mut() }
-			.map(|ptr| HMENU(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::GetSystemMenu(<span class="self">self</span>.as_ptr(), revert <span class="kw">as _</span>) },
+		)
 	}
 
 	<span class="doccomment">/// [`GetTopWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-gettopwindow)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetTopWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;<span class="prelude-ty">Option</span>&lt;HWND&gt;&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::GetTopWindow(<span class="self">self</span>.as_ptr()).as_mut() } {
-			<span class="prelude-val">Some</span>(ptr) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(HWND(ptr))),
+		<span class="kw">match </span>ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::GetTopWindow(<span class="self">self</span>.as_ptr()) },
+		) {
 			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no child window
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
+			<span class="prelude-val">Some</span>(h) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(h)),
 		}
 	}
 
@@ -2305,9 +2306,8 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: co::GW) -&gt; SysResult&lt;HWND&gt; {
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{ user::ffi::GetWindow(<span class="self">self</span>.as_ptr(), cmd.<span class="number">0</span>) },
-			|ptr| HWND(ptr),
 		)
 	}
 
@@ -2315,10 +2315,10 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
-		ptr_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::GetWindowDC(<span class="self">self</span>.as_ptr()) },
-			|ptr| ReleaseDCGuard::new(<span class="self">self</span>, HDC(ptr)),
-		)
+		<span class="kw">unsafe </span>{
+			ptr_to_sysresult_handle(user::ffi::GetWindowDC(<span class="self">self</span>.as_ptr()))
+				.map(|h| ReleaseDCGuard::new(<span class="self">self</span>, h))
+		}
 	}
 
 	<span class="doccomment">/// [`GetWindowDisplayAffinity`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowdisplayaffinity)
@@ -2718,7 +2718,11 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>MonitorFromWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::MONITOR) -&gt; HMONITOR {
-		HMONITOR(<span class="kw">unsafe </span>{ user::ffi::MonitorFromWindow(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>) })
+		<span class="kw">unsafe </span>{
+			HMONITOR::from_ptr(
+				user::ffi::MonitorFromWindow(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>),
+			)
+		}
 	}
 
 	<span class="doccomment">/// [`MoveWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-movewindow)
@@ -2773,8 +2777,10 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;CloseClipboardGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::OpenClipboard(<span class="self">self</span>.as_ptr()) })
-			.map(|<span class="kw">_</span>| CloseClipboardGuard::new(PhantomData))
+		<span class="kw">unsafe </span>{
+			bool_to_sysresult(user::ffi::OpenClipboard(<span class="self">self</span>.as_ptr()))
+				.map(|<span class="kw">_</span>| CloseClipboardGuard::new(PhantomData))
+		}
 	}
 
 	<span class="doccomment">/// [`PostMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-postmessagew)
@@ -2799,13 +2805,15 @@
 	</span><span class="kw">fn </span>RealChildWindowFromPoint(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		pt_parent_client_coords: POINT) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt;
 	{
-		<span class="kw">unsafe </span>{
-			user::ffi::RealChildWindowFromPoint(
-				<span class="self">self</span>.as_ptr(),
-				pt_parent_client_coords.x,
-				pt_parent_client_coords.y,
-			).as_mut()
-		}.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{
+				user::ffi::RealChildWindowFromPoint(
+					<span class="self">self</span>.as_ptr(),
+					pt_parent_client_coords.x,
+					pt_parent_client_coords.y,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`RealGetWindowClassW`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-realgetwindowclassw)
@@ -2866,14 +2874,15 @@
 					<span class="kw-2">&amp;mut </span>rc.left <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		).and_then(|<span class="kw">_</span>| bool_to_sysresult(
+		)<span class="question-mark">?</span>;
+		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::ScreenToClient(
 					<span class="self">self</span>.as_ptr(),
 					<span class="kw-2">&amp;mut </span>rc.right <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
-		))
+		)
 	}
 
 	<span class="doccomment">/// [`SendMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessagew)
@@ -2963,27 +2972,28 @@
 	<span class="doccomment">/// [`SetActiveWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setactivewindow)
 	/// method.
 	</span><span class="kw">fn </span>SetActiveWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HWND&gt; {
-		ptr_to_sysresult(
+		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{ user::ffi::SetActiveWindow(<span class="self">self</span>.as_ptr()) },
-			|ptr| HWND(ptr),
 		)
 	}
 
 	<span class="doccomment">/// [`SetCapture`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcapture)
 	/// method.
 	</span><span class="kw">fn </span>SetCapture(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReleaseCaptureGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt; {
-		ReleaseCaptureGuard::new(
-			<span class="self">self</span>,
-			<span class="kw">unsafe </span>{ user::ffi::SetCapture(<span class="self">self</span>.as_ptr()).as_mut() }
-				.map(|ptr| HWND(ptr)),
-		)
+		<span class="kw">unsafe </span>{
+			ReleaseCaptureGuard::new(
+				<span class="self">self</span>,
+				user::ffi::SetCapture(<span class="self">self</span>.as_ptr())
+					.as_mut()
+					.map(|ptr| HWND::from_ptr(ptr)),
+			)
+		}
 	}
 
 	<span class="doccomment">/// [`SetFocus`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setfocus)
 	/// method.
 	</span><span class="kw">fn </span>SetFocus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::SetFocus(<span class="self">self</span>.as_ptr()).as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::SetFocus(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`SetForegroundWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow)
@@ -3003,14 +3013,16 @@
 	<span class="doccomment">/// [`SetParent`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setparent)
 	/// method.
 	</span><span class="kw">fn </span>SetParent(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_new_parent: <span class="kw-2">&amp;</span>HWND) -&gt; SysResult&lt;<span class="prelude-ty">Option</span>&lt;HWND&gt;&gt; {
-		<span class="kw">match unsafe </span>{
-			user::ffi::SetParent(<span class="self">self</span>.as_ptr(), hwnd_new_parent.as_ptr()).as_mut()
-		} {
-			<span class="prelude-val">Some</span>(ptr) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(HWND(ptr))),
+		<span class="kw">match </span>ptr_to_option_handle(
+			<span class="kw">unsafe </span>{
+				user::ffi::SetParent(<span class="self">self</span>.as_ptr(), hwnd_new_parent.as_ptr())
+			},
+		) {	
 			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no previous parent
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
 			},
+			<span class="prelude-val">Some</span>(h) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(h)),
 		}
 	}
 
@@ -3239,16 +3251,16 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>WindowFromPhysicalPoint(pt: POINT) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::WindowFromPhysicalPoint(pt.x, pt.y).as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(
+			<span class="kw">unsafe </span>{ user::ffi::WindowFromPhysicalPoint(pt.x, pt.y) },
+		)
 	}
 
 	<span class="doccomment">/// [`WindowFromPoint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-windowfrompoint)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>WindowFromPoint(pt: POINT) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		<span class="kw">unsafe </span>{ user::ffi::WindowFromPoint(pt.x, pt.y).as_mut() }
-			.map(|ptr| HWND(ptr))
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::WindowFromPoint(pt.x, pt.y) })
 	}
 
 	<span class="doccomment">/// [`WinHelp`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-winhelpw)
