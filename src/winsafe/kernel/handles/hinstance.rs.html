@@ -332,7 +332,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::FreeLibraryGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, MAX_PATH, ptr_to_sysresulA, ptr_to_sysresult_handle,
+	bool_to_sysresult, MAX_PATH, ptr_to_sysresult, ptr_to_sysresult_handle,
 	str_to_iso88591,
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
@@ -518,7 +518,7 @@
 	</span><span class="kw">fn </span>GetProcAddress(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		proc_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;<span class="kw-2">*const </span>std::ffi::c_void&gt;
 	{
-		ptr_to_sysresulA(
+		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetProcAddress(
 					<span class="self">self</span>.as_ptr(),
@@ -600,7 +600,7 @@
 	{
 		<span class="kw">let </span>sz = <span class="self">self</span>.SizeofResource(res_info)<span class="question-mark">?</span>;
 		<span class="kw">unsafe </span>{
-			ptr_to_sysresulA(
+			ptr_to_sysresult(
 				kernel::ffi::LockResource(hres_loaded.as_ptr()),
 			).map(|ptr| std::slice::from_raw_parts(ptr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sz <span class="kw">as _</span>))
 		}

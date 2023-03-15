@@ -887,7 +887,7 @@
 </span><span class="kw">use crate</span>::{co, user};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresulA};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	ATOM, COLORREF, DEVMODE, DISPLAY_DEVICE, GmidxEnum, GUITHREADINFO,
@@ -1256,7 +1256,7 @@
 /// `format`.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub unsafe fn </span>GetClipboardData(format: co::CF) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt; {
-	ptr_to_sysresulA(user::ffi::GetClipboardData(format.<span class="number">0</span>))
+	ptr_to_sysresult(user::ffi::GetClipboardData(format.<span class="number">0</span>))
 		.map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 }
 
@@ -1638,7 +1638,7 @@
 </span><span class="kw">pub unsafe fn </span>SetClipboardData(
 	format: co::CF, hmem: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt;
 {
-	ptr_to_sysresulA(
+	ptr_to_sysresult(
 		user::ffi::SetClipboardData(format.<span class="number">0</span>, hmem <span class="kw">as _</span>),
 	).map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 }

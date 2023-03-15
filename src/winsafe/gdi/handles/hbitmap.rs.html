@@ -53,6 +53,7 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::gdi;
@@ -60,10 +61,11 @@
 <span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult_handle;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObject, GdiObjectSelect, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, SIZE};
 
 <span class="kw">impl </span>GdiObject <span class="kw">for </span>HBITMAP {}
+<span class="kw">impl </span>GdiObjectSelect <span class="kw">for </span>HBITMAP {}
 <span class="kw">impl </span>gdi_Hbitmap <span class="kw">for </span>HBITMAP {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -74,7 +76,7 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="kw">pub trait </span>gdi_Hbitmap: GdiObject {
+</span><span class="kw">pub trait </span>gdi_Hbitmap: Handle {
 	<span class="doccomment">/// [`CreateBitmap`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap)
 	/// static method.
 	</span><span class="attr">#[must_use]

@@ -90,16 +90,18 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult_handle;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::GdiObject;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObject, GdiObjectSelect, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HRGN, RECT, SIZE};
 
 <span class="kw">impl </span>GdiObject <span class="kw">for </span>HRGN {}
+<span class="kw">impl </span>GdiObjectSelect <span class="kw">for </span>HRGN {}
 <span class="kw">impl </span>gdi_Hrgn <span class="kw">for </span>HRGN {}
 
 <span class="doccomment">/// This trait is enabled with the `gdi` feature, and provides methods for
@@ -110,7 +112,7 @@
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// ```
-</span><span class="kw">pub trait </span>gdi_Hrgn: GdiObject {
+</span><span class="kw">pub trait </span>gdi_Hrgn: Handle {
 	<span class="doccomment">/// [`CreateRectRgn`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createrectrgn)
 	/// static method.
 	</span><span class="attr">#[must_use]
