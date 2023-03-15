@@ -986,6 +986,44 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
+</span><span class="doccomment">/// RAII implementation for [`SID`](crate::SID) which automatically frees the
+/// underlying [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) when
+/// the object goes out of scope.
+</span><span class="kw">pub struct </span>SidGuard {
+	raw: Vec&lt;u8&gt;,
+}
+
+<span class="kw">impl </span>Deref <span class="kw">for </span>SidGuard {
+	<span class="kw">type </span>Target = SID;
+
+	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+		<span class="kw">unsafe </span>{ std::mem::transmute::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;(<span class="self">self</span>.raw.as_ptr()) }
+	}
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>SidGuard {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="self">self</span>.deref().fmt(f) <span class="comment">// delegate the underlying SID
+	</span>}
+}
+
+<span class="kw">impl </span>SidGuard {
+	<span class="doccomment">/// Constructs a new guard by taking ownership of the data.
+	/// 
+	/// # Safety
+	/// 
+	/// Be sure the data is an allocated [`SID`](crate::SID) structure.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const unsafe fn </span>new(raw: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ raw }
+	}
+}
+
+<span class="comment">//------------------------------------------------------------------------------
+
 </span><span class="doccomment">/// RAII implementation for the [`HFILE`](crate::HFILE) lock which automatically
 /// calls
 /// [`UnlockFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile)
@@ -1058,43 +1096,5 @@
 	/// [`UnmapViewOfFile`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-unmapviewoffile)
 	/// when the object goes out of scope.
 </span>}
-
-<span class="comment">//------------------------------------------------------------------------------
-
-</span><span class="doccomment">/// RAII implementation for [`SID`](crate::SID) which automatically frees the
-/// underlying [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) when
-/// the object goes out of scope.
-</span><span class="kw">pub struct </span>SidGuard {
-	raw: Vec&lt;u8&gt;,
-}
-
-<span class="kw">impl </span>Deref <span class="kw">for </span>SidGuard {
-	<span class="kw">type </span>Target = SID;
-
-	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
-		<span class="kw">unsafe </span>{ std::mem::transmute::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;(<span class="self">self</span>.raw.as_ptr()) }
-	}
-}
-
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>SidGuard {
-	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-		<span class="self">self</span>.deref().fmt(f) <span class="comment">// delegate the underlying SID
-	</span>}
-}
-
-<span class="kw">impl </span>SidGuard {
-	<span class="doccomment">/// Constructs a new guard by taking ownership of the data.
-	/// 
-	/// # Safety
-	/// 
-	/// Be sure the data is an allocated [`SID`](crate::SID) structure.
-	/// 
-	/// This method is used internally by the library, and not intended to be
-	/// used externally.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const unsafe fn </span>new(raw: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ raw }
-	}
-}
 </code></pre></div>
 </section></main></body></html>

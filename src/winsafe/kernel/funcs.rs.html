@@ -1466,6 +1466,26 @@
 <a href="#1466" id="1466">1466</a>
 <a href="#1467" id="1467">1467</a>
 <a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1901,6 +1921,19 @@
 	<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThreadId() }
 }
 
+<span class="doccomment">/// [`GetDriveType`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdrivetypew)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetDriveType(root_path_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; co::DRIVE {
+	co::DRIVE(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetDriveTypeW(
+				WString::from_opt_str(root_path_name).as_ptr(),
+			)
+		},
+	)
+}
+
 <span class="doccomment">/// [`GetEnvironmentStrings`](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getenvironmentstringsw)
 /// function.
 ///
@@ -1971,6 +2004,13 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLengthSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; u32 {
 	<span class="kw">unsafe </span>{ kernel::ffi::GetLengthSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) }
+}
+
+<span class="doccomment">/// [`GetLogicalDrives`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getlogicaldrives)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetLogicalDrives() -&gt; u32 {
+	<span class="kw">unsafe </span>{ kernel::ffi::GetLogicalDrives() }
 }
 
 <span class="doccomment">/// [`GetLogicalDriveStrings`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getlogicaldrivestringsw)
