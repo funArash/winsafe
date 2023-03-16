@@ -405,194 +405,189 @@
 <a href="#405" id="405">405</a>
 <a href="#406" id="406">406</a>
 <a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{co, kernel};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{MultiByteToWideChar, Encoding, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{Encoding, HLOCAL, MultiByteToWideChar, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::LocalFreeGuard;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal};
 
-<span class="doccomment">/// Stores a `Vec&lt;u16&gt;` buffer for a null-terminated
+<span class="kw">pub const </span>SSO_LEN: usize = <span class="number">20</span>;
+
+<span class="doccomment">/// Stores a `[u16]` buffer for a null-terminated
 /// [Unicode UTF-16](https://learn.microsoft.com/en-us/windows/win32/intl/unicode-in-the-windows-api)
 /// wide string natively used by Windows.
+/// 
+/// Uses
+/// [Short String Optimization](https://joellaity.com/2020/01/31/string.html)
+/// technique for faster performance.
 ///
 /// This is struct is mostly used internally by the library, as a bridge between
 /// Windows and Rust strings.
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Default, Clone)]
 </span><span class="kw">pub struct </span>WString {
-	vec_u16: Vec&lt;u16&gt;,
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>WString {
-	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ vec_u16: Vec::&lt;u16&gt;::default() }
-	}
+	buf: Buffer,
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>WString {
 	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.to_string())
+		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.buf.to_string_checked().unwrap())
 	}
 }
 
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>WString {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+		&lt;<span class="kw">dyn </span>std::fmt::Debug&gt;::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.buf, f) <span class="comment">// simply delegate
+	</span>}
+}
+
 <span class="kw">impl </span>WString {
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from an optional
+	<span class="doccomment">/// Stores an UTF-16 null-terminated string from an optional
 	/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).
-	///
-	/// The string will be stored with a terminating null.
-	///
-	/// If `s` is `None`, the internal buffer is not allocated – it simply calls
-	/// `WString::default`.
+	/// 
+	/// If `s` is `None`, no allocation is made.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="self">Self </span>{
-		<span class="kw">match </span>s {
-			<span class="prelude-val">Some</span>(s) =&gt; <span class="self">Self</span>::from_str(s),
-			<span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::default(),
-		}
+		<span class="self">Self </span>{ buf: Buffer::from_opt_str(s) }
 	}
 
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from an ordinary
+	<span class="doccomment">/// Stores an UTF-16 null-terminated string from a
 	/// [`&amp;str`](https://doc.rust-lang.org/std/primitive.str.html).
-	///
-	/// The string will be stored with a terminating null.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			vec_u16: s.encode_utf16()
-				.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null
-				</span>.collect(),
-		}
+		<span class="self">Self </span>{ buf: Buffer::from_str(s) }
 	}
 
-	<span class="doccomment">/// Creates and stores a new UTF-16 string from a
-	/// [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) of ordinary
-	/// strings. This new string will be stored as sequential null-separated
-	/// strings, terminated with two nulls. That means that further retrieval
-	/// operations will &quot;see&quot; only the first string.
-	///
-	/// This method is intended to pass multi-strings to native APIs, not to
-	/// retrieve them.
+	<span class="doccomment">/// Stores a series of UTF-16 null-terminated strings. The buffer will end
+	/// with two terminating nulls – that means further retrieval operations
+	/// will &quot;see&quot; only the first string.
+	/// 
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>tot_chars = v.iter() <span class="comment">// number of chars of all strings, including terminating nulls
-			</span>.fold(<span class="number">0</span>, |tot, s| tot + s.as_ref().chars().count() + <span class="number">1</span>) <span class="comment">// include terminating null
-				</span>+ <span class="number">1</span>; <span class="comment">// double terminating null
-
-		</span><span class="kw">let </span><span class="kw-2">mut </span>vec_u16 = Vec::&lt;u16&gt;::with_capacity(tot_chars); <span class="comment">// prealloc
-		</span>v.iter().for_each(|s|
-			vec_u16.extend(
-				s.as_ref().encode_utf16() <span class="comment">// convert each string
-					</span>.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append a terminating null
-			</span>),
-		);
-		vec_u16.push(<span class="number">0x0000</span>); <span class="comment">// double terminating null
-
-		</span><span class="self">Self </span>{ vec_u16 }
+		<span class="self">Self </span>{ buf: Buffer::from_str_vec(v) }
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a buffer, specifying the
-	/// number of existing chars, not counting a terminating null.
-	///
-	/// The string will be stored with a terminating null.
+	<span class="doccomment">/// Stores an UTF-16 null-terminated string by copying from a buffer,
+	/// specifying the number of chars to be copied.
+	/// 
+	/// The `src` buffer doesn&#39;t need to be null-terminated.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; <span class="self">Self </span>{
-		<span class="kw">if </span>src.is_null() || num_chars == <span class="number">0 </span>{
-			<span class="self">Self</span>::default()
-		} <span class="kw">else </span>{
-			<span class="kw">let </span>tot_chars = num_chars + <span class="number">1</span>; <span class="comment">// add room for terminating null
-			</span><span class="kw">let </span><span class="kw-2">mut </span>vec_u16 = <span class="macro">vec!</span>[<span class="number">0x0000</span>; tot_chars]; <span class="comment">// alloc right away
-			</span><span class="kw">unsafe </span>{
-				src.copy_to_nonoverlapping(vec_u16.as_mut_ptr(), tot_chars - <span class="number">1</span>); <span class="comment">// no terminating null to copy
-				</span><span class="kw-2">*</span>vec_u16.get_unchecked_mut(tot_chars - <span class="number">1</span>) = <span class="number">0x0000</span>; <span class="comment">// terminating null
-			</span>}
-
-			<span class="self">Self </span>{ vec_u16 }
-		}
+		<span class="self">Self </span>{ buf: Buffer::from_wchars_count(src, num_chars) }
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a null-terminated buffer.
-	///
-	/// The string will be stored with a terminating null.
+	<span class="doccomment">/// Stores an UTF-16 null-terminated string by copying from a
+	/// null-terminated buffer. The string length is retrieved with
+	/// [`lstrlen`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
-		<span class="kw">if </span>src.is_null() {
-			<span class="self">Self</span>::default()
-		} <span class="kw">else </span>{
-			<span class="self">Self</span>::from_wchars_count(
-				src, <span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(src) } <span class="kw">as _</span>)
-		}
+		<span class="self">Self </span>{ buf: Buffer::from_wchars_nullt(src) }
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 string by copying from a slice.
-	///
-	/// The string will be stored with a terminating null.
+	<span class="doccomment">/// Stores an UTF-16 null-terminated string by copying from a slice.
+	/// 
+	/// The `src` slice doesn&#39;t need to be null-terminated.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; <span class="self">Self </span>{
-		<span class="self">Self</span>::from_wchars_count(src.as_ptr(), src.len())
+		<span class="self">Self </span>{ buf: Buffer::from_wchars_slice(src) }
 	}
 
-	<span class="doccomment">/// Creates a new UTF-16 buffer allocated with an specific length. All
-	/// UTF-16 chars will be set to zero.
+	<span class="doccomment">/// Allocates an UTF-16 buffer with an specific length. All elements will be
+	/// set to zero.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>new_alloc_buf(num_chars: usize) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ vec_u16: <span class="macro">vec!</span>[<span class="number">0x0000</span>; num_chars] }
+	</span><span class="kw">pub fn </span>new_alloc_buf(sz: usize) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ buf: Buffer::new_alloc_buf(sz) }
 	}
 
-	<span class="doccomment">/// Returns a
+	<span class="doccomment">/// Returns a mutable
 	/// [`LPWSTR`](https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
-	/// mut pointer to the internal UTF-16 string buffer, to be passed to native
+	/// pointer to the internal UTF-16 string buffer, to be passed to native
 	/// Win32 functions. This is useful to receive strings.
-	///
+	/// 
 	/// # Panics
-	///
-	/// Panics if the buffer wasn&#39;t previously allocated.
-	///
+	/// 
+	/// Panics if the buffer was not allocated.
+	/// 
 	/// # Safety
-	///
+	/// 
 	/// Be sure to alloc enough room, otherwise a buffer overrun may occur.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub unsafe fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
-		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
-			<span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>)
-		} <span class="kw">else </span>{
-			<span class="self">self</span>.vec_u16.as_mut_ptr()
-		}
+		<span class="self">self</span>.buf.as_mut_ptr()
+	}
+
+	<span class="doccomment">/// Returns a mutable slice to the internal UTF-16 string buffer.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
+		<span class="self">self</span>.buf.as_mut_slice()
 	}
 
 	<span class="doccomment">/// Returns a
 	/// [`LPCWSTR`](https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings)
-	/// const pointer to the internal UTF-16 string buffer, to be passed to
-	/// native Win32 functions.
-	///
-	/// Safely returns a null pointer if the buffer wasn&#39;t previously allocated.
-	///
-	/// # Safety
-	///
-	/// Make sure the `WString` object outlives the function call, otherwise it
-	/// will point to an invalid memory location.
+	/// pointer to the internal UTF-16 string buffer, to be passed to native
+	/// Win32 functions.
+	/// 
+	/// If the buffer was not allocated, returns a null pointer.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub unsafe fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
-		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
-			std::ptr::null()
-		} <span class="kw">else </span>{
-			<span class="self">self</span>.vec_u16.as_ptr()
-		}
-	}
-
-	<span class="doccomment">/// Returns a slice to the internal
-	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) buffer. This
-	/// is useful to receive strings.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
-		<span class="self">self</span>.vec_u16.as_mut_slice()
+	</span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="self">self</span>.buf.as_ptr()
 	}
 
 	<span class="doccomment">/// Returns a slice to the internal UTF-16 string buffer.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
-		<span class="self">self</span>.vec_u16.as_slice()
-	}
-
-	<span class="doccomment">/// Tells whether the internal bufer has not been allocated.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>buf_is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="self">self</span>.vec_u16.is_empty()
+		<span class="self">self</span>.buf.as_slice()
 	}
 
 	<span class="doccomment">/// Returns the size of the allocated internal buffer. Note that the
@@ -600,32 +595,8 @@
 	///
 	/// If the buffer was not allocated yet, returns zero.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>buf_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-		<span class="self">self</span>.vec_u16.len()
-	}
-
-	<span class="doccomment">/// Resizes the internal buffer, to be used as a buffer for native Win32
-	/// functions. All new UTF-16 chars will be set to zero.
-	///
-	/// The underlying `Vec` will be resized with a call to
-	/// [`Vec::resize`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.resize).
-	///
-	/// If the new size is zero, the internal buffer is deallocated.
-	///
-	/// # Safety
-	///
-	/// The internal memory can be moved after a realloc, so if you&#39;re using a
-	/// pointer to the internal buffer, it may then point to an invalid memory
-	/// location. After a realloc, the following methods must be called again:
-	///
-	/// * [`as_mut_ptr`](crate::WString::as_mut_ptr);
-	/// * [`as_ptr`](crate::WString::as_ptr).
-	</span><span class="kw">pub unsafe fn </span>buf_realloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_size: usize) {
-		<span class="kw">if </span>new_size == <span class="number">0 </span>{
-			<span class="self">self</span>.vec_u16 = Vec::&lt;u16&gt;::default();
-		} <span class="kw">else </span>{
-			<span class="self">self</span>.vec_u16.resize(new_size, <span class="number">0x0000</span>);
-		}
+	</span><span class="kw">pub const fn </span>buf_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.buf.buf_len()
 	}
 
 	<span class="doccomment">/// Copies the content into an external buffer. A terminating null will be
@@ -635,76 +606,22 @@
 	///
 	/// If `dest` has 1 element, it will receive only the terminating null.
 	</span><span class="kw">pub fn </span>copy_to_slice(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u16]) {
-		<span class="kw">if </span>dest.is_empty() {
-			<span class="comment">// Do nothing.
-		</span>} <span class="kw">else if </span><span class="self">self</span>.vec_u16.is_empty() {
-			dest.iter_mut()
-				.for_each(|dest| <span class="kw-2">*</span>dest = <span class="number">0x0000</span>);
-		} <span class="kw">else </span>{
-			<span class="kw">let </span>num_chars = std::cmp::min(<span class="self">self</span>.vec_u16.len() - <span class="number">1</span>, dest.len() - <span class="number">1</span>); <span class="comment">// no terminating null
-			</span><span class="kw">let </span>src_wri = <span class="kw-2">&amp;</span><span class="self">self</span>.vec_u16[..num_chars];
-			<span class="kw">let </span>dest_wri = <span class="kw-2">&amp;mut </span>dest[..num_chars];
-
-			src_wri.iter()
-				.zip(dest_wri.iter_mut())
-				.for_each(|(src_ch, dest_ch)| <span class="kw-2">*</span>dest_ch = <span class="kw-2">*</span>src_ch);
-
-			dest.iter_mut()
-				.skip(num_chars)
-				.for_each(|dest_ch| <span class="kw-2">*</span>dest_ch = <span class="number">0x0000</span>);
-		}
+		<span class="kw">if </span>!dest.is_empty() {
+			<span class="kw">let </span>usable_len = dest.len() - <span class="number">1</span>; <span class="comment">// leave room for terminating null
+			</span><span class="self">self</span>.as_slice()
+				.iter()
+				.zip(dest[..usable_len].iter_mut())
+				.for_each(|(src, dest)| <span class="kw-2">*</span>dest = <span class="kw-2">*</span>src);
+			dest[usable_len..].iter_mut()
+				.for_each(|dest| <span class="kw-2">*</span>dest = <span class="number">0x0000</span>); <span class="comment">// fill the rest with zero
+		</span>}			
 	}
 
-	<span class="doccomment">/// Fills the entire buffer with zero values. The buffer size is not
-	/// changed.
+	<span class="doccomment">/// Fills the entire buffer with zeros.
 	</span><span class="kw">pub fn </span>fill_with_zero(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="self">self</span>.vec_u16.iter_mut()
+		<span class="self">self</span>.as_mut_slice()
+			.iter_mut()
 			.for_each(|ch| <span class="kw-2">*</span>ch = <span class="number">0x0000</span>);
-	}
-
-	<span class="doccomment">/// Wrapper to
-	/// [`lstrlen`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).
-	///
-	/// Returns the number of
-	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) characters
-	/// stored in the internal buffer, not counting the terminating null.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>str_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-		<span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}
-	}
-
-	<span class="doccomment">/// Wrapper to
-	/// [`lstrcat`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrcatw).
-	///
-	/// Appends a string onto the current one, repositioning the null terminator
-	/// at the end of the new string. If the internal buffer hasn&#39;t been
-	/// allocated yet, simply calls
-	/// [`WString::from_str`](crate::WString::from_str).
-	</span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) {
-		<span class="kw">if </span><span class="self">self</span>.buf_is_empty() {
-			<span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::from_str(s)
-		} <span class="kw">else </span>{
-			<span class="kw">let </span>new_text = <span class="self">Self</span>::from_str(s);
-			<span class="kw">unsafe </span>{
-				<span class="self">self</span>.buf_realloc(<span class="self">self</span>.str_len() + new_text.str_len() + <span class="number">1</span>);
-				kernel::ffi::lstrcatW(<span class="self">self</span>.as_mut_ptr(), new_text.as_ptr());
-			}
-		}
-	}
-
-	<span class="doccomment">/// Converts into
-	/// [`String`](https://doc.rust-lang.org/std/string/struct.String.html). An
-	/// unallocated buffer will simply be converted into an empty string.
-	///
-	/// # Panics
-	///
-	/// Panics if any invalid character is found.
-	///
-	/// If you&#39;re parsing raw data which may contain errors, prefer using
- 	/// [`to_string_checked`](crate::WString::to_string_checked) instead.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-		<span class="self">self</span>.to_string_checked().unwrap()
 	}
 
 	<span class="doccomment">/// Converts into
@@ -715,14 +632,24 @@
 	///
 	/// This method is useful if you&#39;re parsing raw data which may contain
 	/// invalid characters. If you&#39;re dealing with a string known to be valid,
-	/// [`to_string`](crate::WString::to_string) is more practical.
+	/// [`to_string`](https://doc.rust-lang.org/std/string/trait.ToString.html#tymethod.to_string)
+	/// is more practical.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>to_string_checked(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::string::FromUtf16Error&gt; {
-		<span class="kw">if </span><span class="self">self</span>.vec_u16.is_empty() {
-			<span class="prelude-val">Ok</span>(String::default())
-		} <span class="kw">else </span>{
-			String::from_utf16(<span class="kw-2">&amp;</span><span class="self">self</span>.vec_u16[..<span class="self">self</span>.str_len()]) <span class="comment">// without terminating null
-		</span>}
+	</span><span class="kw">pub fn </span>to_string_checked(<span class="kw-2">&amp;</span><span class="self">self
+	</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::string::FromUtf16Error&gt;
+	{
+		<span class="self">self</span>.buf.to_string_checked()
+	}
+
+	<span class="doccomment">/// Wrapper to
+	/// [`lstrlen`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).
+	///
+	/// Returns the number of
+	/// [`u16`](https://doc.rust-lang.org/std/primitive.u16.html) characters
+	/// stored in the internal buffer, not counting the terminating null.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>str_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(<span class="self">self</span>.buf.as_ptr()) <span class="kw">as _ </span>}
 	}
 
 	<span class="doccomment">/// Guesses the encoding with [`Encoding::guess`](crate::Encoding::guess)
@@ -737,15 +664,16 @@
 	///
 	/// # Examples
 	///
-	/// Parsing a file as string by [memory-mapping](crate::FileMapped) the file
-	/// (usually the fastest method):
+	/// Usually the fastest way to read the text from a file is by mapping its
+	/// contents in memory with [`FileMapped`](crate::FileMapped), then parsing:
 	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::{FileAccess, FileMapped, WString};
 	///
 	/// let file_in = FileMapped::open(&quot;C:\\Temp\\foo.txt&quot;, FileAccess::ExistingReadOnly)?;
-	/// let str_contents = WString::parse(file_in.as_slice())?.to_string();
+	/// let wstr = WString::parse(file_in.as_slice())?;
+	/// let str_contents = wstr.to_string();
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -758,7 +686,7 @@
 		<span class="kw">let </span>(encoding, sz_bom) = Encoding::guess(data);
 		data = <span class="kw-2">&amp;</span>data[sz_bom..]; <span class="comment">// skip BOM, if any
 
-		</span><span class="kw">let </span>wstr = <span class="self">Self</span>::from_wchars_slice(
+		</span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_wchars_slice(
 			<span class="kw-2">&amp;</span><span class="kw">match </span>encoding {
 				Encoding::Ansi =&gt; <span class="self">Self</span>::parse_ansi(data),
 				Encoding::Win1252 =&gt; MultiByteToWideChar(co::CP::WINDOWS_1252, co::MBC::NoValue, data)<span class="question-mark">?</span>,
@@ -771,21 +699,16 @@
 				| Encoding::Bocu1
 				| Encoding::Unknown =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encoding {} not implemented.&quot;</span>, encoding),
 			}
-		);
-		<span class="prelude-val">Ok</span>(wstr)
+		))
 	}
 
 	<span class="kw">fn </span>parse_ansi(data: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u16&gt; {
-		<span class="kw">let </span>the_len = data.iter()
-			.position(|ch| <span class="kw-2">*</span>ch == <span class="number">0x00</span>) <span class="comment">// a terminating null means end of the string
-			</span>.unwrap_or(data.len());
-
-		<span class="kw">let </span><span class="kw-2">mut </span>str16 = Vec::&lt;u16&gt;::with_capacity(the_len + <span class="number">1</span>); <span class="comment">// room for terminating null
-		</span>data.iter().for_each(|by| str16.push(<span class="kw-2">*</span>by <span class="kw">as _</span>)); <span class="comment">// u8 to u16 raw conversion
-		</span>str16.push(<span class="number">0x0000</span>); <span class="comment">// terminating null
-		</span>str16
+		data.iter()
+			.take_while(|ch| <span class="kw-2">**</span>ch != <span class="number">0x0000</span>) <span class="comment">// ignore terminating null, if any
+			</span>.map(|ch| <span class="kw-2">*</span>ch <span class="kw">as </span>u16) <span class="comment">// raw u8 to u16 conversion
+			</span>.collect()
 	}
-
+	
 	<span class="kw">fn </span>parse_utf16(data: <span class="kw-2">&amp;</span>[u8], is_big_endian: bool) -&gt; Vec&lt;u16&gt; {
 		<span class="kw">let </span>data = <span class="kw">if </span>data.len() % <span class="number">2 </span>== <span class="number">1 </span>{
 			<span class="kw-2">&amp;</span>data[..data.len() - <span class="number">1</span>] <span class="comment">// if odd number of bytes, discard last one
@@ -793,23 +716,202 @@
 			data
 		};
 
-		<span class="kw">let </span>the_len = data.chunks(<span class="number">2</span>)
-			.position(|ch2| ch2 == <span class="kw-2">&amp;</span>[<span class="number">0x00</span>, <span class="number">0x00</span>]) <span class="comment">// a terminating null means end of the string
-			</span>.unwrap_or(data.len() / <span class="number">2</span>);
+		data.chunks(<span class="number">2</span>)
+			.take_while(|ch2| <span class="kw-2">**</span>ch2 != [<span class="number">0x00</span>, <span class="number">0x00</span>]) <span class="comment">// ignore terminating null, if any
+			</span>.map(|ch2| {
+				<span class="kw">if </span>is_big_endian {
+					u16::from_be_bytes(ch2.try_into().unwrap())
+				} <span class="kw">else </span>{
+					u16::from_le_bytes(ch2.try_into().unwrap())
+				}
+			})
+			.collect()
+	}
+}
 
-		<span class="kw">let </span><span class="kw-2">mut </span>str16 = Vec::&lt;u16&gt;::with_capacity(the_len + <span class="number">1</span>); <span class="comment">// room for terminating null
-		</span>data.chunks(<span class="number">2</span>)
-			.for_each(|ch2| {
-				str16.push(
-					<span class="kw">if </span>is_big_endian {
-						u16::from_be_bytes(ch2.try_into().unwrap())
-					} <span class="kw">else </span>{
-						u16::from_le_bytes(ch2.try_into().unwrap())
-					},
-				);
-			});
-		str16.push(<span class="number">0x0000</span>); <span class="comment">// terminating null
-		</span>str16
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="kw">enum </span>Buffer {
+	Stack([u16; SSO_LEN]),
+	Heap((LocalFreeGuard, usize)), <span class="comment">// pointer, char count
+	</span>Unallocated,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Buffer {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::Unallocated
+	}
+}
+
+<span class="kw">impl </span>Clone <span class="kw">for </span>Buffer {
+	<span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Unallocated =&gt; <span class="self">Self</span>::Unallocated,
+			<span class="kw">_ </span>=&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self</span>::new_alloc_buf(<span class="self">self</span>.buf_len());
+				<span class="self">self</span>.as_slice()
+					.iter()
+					.zip(new_self.as_mut_slice())
+					.for_each(|(src, dest)| <span class="kw-2">*</span>dest = <span class="kw-2">*</span>src);
+				new_self
+			},
+		}
+	}
+}
+
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>Buffer {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt;
+				<span class="macro">format!</span>(<span class="string">&quot;STACK({}) \&quot;{}\&quot;&quot;</span>, arr.len(), <span class="self">self</span>.to_string_checked().unwrap()),
+			<span class="self">Self</span>::Heap((<span class="kw">_</span>, num_chars)) =&gt;
+				<span class="macro">format!</span>(<span class="string">&quot;HEAP({}) \&quot;{}\&quot;&quot;</span>, num_chars, <span class="self">self</span>.to_string_checked().unwrap()),
+			<span class="self">Self</span>::Unallocated =&gt;
+				<span class="string">&quot;(UNALLOCATED)&quot;</span>.to_owned(),
+		})
+	}
+}
+
+<span class="kw">impl </span>Buffer {
+	<span class="kw">fn </span>from_opt_str(s: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="self">Self </span>{
+		<span class="kw">match </span>s {
+			<span class="prelude-val">Some</span>(s) =&gt; <span class="self">Self</span>::from_str(s),
+			<span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::Unallocated,
+		}
+	}
+
+	<span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span>s_len = s.encode_utf16().count();
+		<span class="kw">if </span>s_len == <span class="number">0 </span>{
+			<span class="self">Self</span>::Unallocated
+		} <span class="kw">else </span>{
+			<span class="kw">let </span>num_chars = s_len + <span class="number">1</span>; <span class="comment">// room for terminating null
+			</span><span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self</span>::new_alloc_buf(num_chars);
+			s.encode_utf16()
+				.into_iter()
+				.zip(new_self.as_mut_slice())
+				.for_each(|(src, dest)| <span class="kw-2">*</span>dest = src);
+			new_self
+		}
+	}
+
+	<span class="kw">fn </span>from_str_vec(v: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span>tot_chars = v.iter() <span class="comment">// number of chars of all strings, including terminating nulls
+			</span>.fold(<span class="number">0</span>, |tot, s| tot + s.as_ref().chars().count() + <span class="number">1</span>) <span class="comment">// include terminating null
+			</span>+ <span class="number">1</span>; <span class="comment">// double terminating null
+		</span><span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self</span>::new_alloc_buf(tot_chars);
+		v.iter()
+			.map(|s| {
+				s.as_ref()
+					.encode_utf16()
+					.into_iter()
+			})
+			.flatten()
+			.zip(new_self.as_mut_slice())
+			.for_each(|(src, dest)| <span class="kw-2">*</span>dest = src);
+		new_self
+	}
+
+	<span class="kw">fn </span>from_wchars_count(src: <span class="kw-2">*const </span>u16, num_chars: usize) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span>src.is_null() || num_chars == <span class="number">0 </span>{
+			<span class="self">Self</span>::Unallocated
+		} <span class="kw">else </span>{
+			<span class="self">Self</span>::from_wchars_slice(
+				<span class="kw">unsafe </span>{ std::slice::from_raw_parts(src, num_chars) },
+			)
+		}
+	}
+
+	<span class="kw">fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::from_wchars_count(src, <span class="kw">unsafe </span>{ kernel::ffi::lstrlenW(src) <span class="kw">as _ </span>})
+	}
+
+	<span class="kw">fn </span>from_wchars_slice(src: <span class="kw-2">&amp;</span>[u16]) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span>src.is_empty() {
+			<span class="self">Self</span>::Unallocated
+		} <span class="kw">else </span>{
+			<span class="kw">let </span>num_chars = src.iter()
+				.take_while(|ch| <span class="kw-2">**</span>ch != <span class="number">0x0000</span>) <span class="comment">// skip terminating null, if any
+				</span>.count()
+				+ <span class="number">1</span>; <span class="comment">// room for terminating null
+			</span><span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self</span>::new_alloc_buf(num_chars);
+			src.iter()
+				.take_while(|ch| <span class="kw-2">**</span>ch != <span class="number">0x0000</span>) <span class="comment">// skip terminating null, if any
+				</span>.zip(new_self.as_mut_slice())
+				.for_each(|(src, dest)| <span class="kw-2">*</span>dest = <span class="kw-2">*</span>src);
+			new_self
+		}
+	}
+
+	<span class="kw">fn </span>new_alloc_buf(num_chars: usize) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span>num_chars == <span class="number">0 </span>{
+			<span class="self">Self</span>::Unallocated
+		} <span class="kw">else if </span>num_chars &lt;= SSO_LEN {
+			<span class="self">Self</span>::Stack([<span class="number">0x0000</span>; SSO_LEN])
+		} <span class="kw">else </span>{
+			<span class="self">Self</span>::Heap((
+				HLOCAL::LocalAlloc(
+					co::LMEM::FIXED | co::LMEM::ZEROINIT,
+					num_chars * std::mem::size_of::&lt;u16&gt;(),
+				).unwrap(),
+				num_chars,
+			))
+		}
+	}
+
+	<span class="kw">unsafe fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt; arr.as_mut_ptr(),
+			<span class="self">Self</span>::Heap((hlocal, <span class="kw">_</span>)) =&gt; hlocal.as_ptr() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Unallocated =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
+		}
+	}
+
+	<span class="kw">fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt; arr,
+			<span class="self">Self</span>::Heap((hlocal, num_chars)) =&gt;
+				<span class="kw">unsafe </span>{ std::slice::from_raw_parts_mut(hlocal.as_ptr() <span class="kw">as _</span>, <span class="kw-2">*</span>num_chars) },
+			<span class="self">Self</span>::Unallocated =&gt; <span class="kw-2">&amp;mut </span>[],
+		}
+	}
+
+	<span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt; arr.as_ptr(),
+			<span class="self">Self</span>::Heap((hlocal, <span class="kw">_</span>)) =&gt; hlocal.as_ptr() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Unallocated =&gt; std::ptr::null(),
+		}
+	}
+
+	<span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt; arr,
+			<span class="self">Self</span>::Heap((hlocal, num_chars)) =&gt;
+				<span class="kw">unsafe </span>{ std::slice::from_raw_parts(hlocal.as_ptr() <span class="kw">as _</span>, <span class="kw-2">*</span>num_chars) },
+			<span class="self">Self</span>::Unallocated =&gt; <span class="kw-2">&amp;</span>[],
+		}
+	}
+
+	<span class="kw">const fn </span>buf_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Stack(arr) =&gt; arr.len(),
+			<span class="self">Self</span>::Heap((<span class="kw">_</span>, num_chars)) =&gt; <span class="kw-2">*</span>num_chars,
+			<span class="self">Self</span>::Unallocated =&gt; <span class="number">0</span>,
+		}
+	}
+
+	<span class="kw">fn </span>to_string_checked(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, std::string::FromUtf16Error&gt; {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Unallocated =&gt; <span class="prelude-val">Ok</span>(String::default()),
+			<span class="kw">_ </span>=&gt; String::from_utf16(
+				<span class="kw-2">&amp;</span><span class="self">self</span>.as_slice()
+					.into_iter()
+					.take_while(|ch| <span class="kw-2">**</span>ch != <span class="number">0x0000</span>) <span class="comment">// remove all trailing zeros
+					</span>.map(|ch| <span class="kw-2">*</span>ch)
+					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+			),
+		}
 	}
 }
 </code></pre></div>

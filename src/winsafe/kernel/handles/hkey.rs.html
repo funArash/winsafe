@@ -1767,12 +1767,12 @@
 		last_write_time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>FILETIME&gt;,
 	) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="kw">const </span>BLOCK: usize = <span class="number">32</span>; <span class="comment">// arbitrary
+		<span class="kw">const </span>BLOCK_SZ: usize = <span class="number">32</span>; <span class="comment">// arbitrary
 
 		</span><span class="kw">let </span>(<span class="kw-2">mut </span>class_ptr, <span class="kw-2">mut </span>class_len) = <span class="kw">match </span><span class="kw-2">&amp;mut </span>class {
 			<span class="prelude-val">Some</span>(class) =&gt; {
-				<span class="kw">if </span>class.buf_len() &lt; BLOCK {
-					<span class="kw">unsafe </span>{ class.buf_realloc(BLOCK); } <span class="comment">// make it at least BLOCK_SZ
+				<span class="kw">if </span>class.buf_len() &lt; BLOCK_SZ {
+					<span class="kw-2">**</span>class = WString::new_alloc_buf(BLOCK_SZ); <span class="comment">// make it at least BLOCK_SZ
 				</span>}
 				(<span class="kw">unsafe </span>{ class.as_mut_ptr() }, class.buf_len() <span class="kw">as </span>u32)
 			},
@@ -1809,7 +1809,7 @@
 			) {
 				co::ERROR::MORE_DATA =&gt; <span class="kw">match </span><span class="kw-2">&amp;mut </span>class {
 					<span class="prelude-val">Some</span>(class) =&gt; {
-						<span class="kw">unsafe </span>{ class.buf_realloc(class.buf_len() + BLOCK); }
+						<span class="kw-2">**</span>class = WString::new_alloc_buf(class.buf_len() + BLOCK_SZ);
 						class_ptr = <span class="kw">unsafe </span>{ class.as_mut_ptr() };
 						class_len = class.buf_len() <span class="kw">as _</span>;
 					},
@@ -1879,7 +1879,7 @@
 			.zip(valents1.iter_mut())
 			.map(|(value_name, valent)| {
 				<span class="kw">let </span>value_name_w = WString::from_str(value_name.as_ref());
-				valent.ve_valuename = <span class="kw">unsafe </span>{ value_name_w.as_ptr() <span class="kw">as _ </span>};
+				valent.ve_valuename = value_name_w.as_ptr() <span class="kw">as _</span>;
 				value_name_w
 			})
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
@@ -1907,7 +1907,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>valents2 = value_names_w.iter()
 			.map(|value_name_w| {
 				<span class="kw">let </span><span class="kw-2">mut </span>valent = VALENT::default();
-				valent.ve_valuename = <span class="kw">unsafe </span>{ value_name_w.as_ptr() <span class="kw">as _ </span>};
+				valent.ve_valuename = value_name_w.as_ptr() <span class="kw">as _</span>;
 				valent
 			})
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();

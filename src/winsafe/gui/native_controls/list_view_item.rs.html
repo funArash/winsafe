@@ -243,9 +243,6 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::LVITEM;
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::list_view::ListView;
@@ -467,15 +464,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>text(<span class="kw-2">&amp;</span><span class="self">self</span>, column_index: u32) -&gt; String {
 		<span class="comment">// https://forums.codeguru.com/showthread.php?351972-Getting-listView-item-text-length
-		</span><span class="kw">const </span>BLOCK: usize = <span class="number">64</span>; <span class="comment">// arbitrary
-		</span><span class="kw">let </span><span class="kw-2">mut </span>buf_sz = BLOCK;
-		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::default();
+		</span><span class="kw">const </span>BLOCK_SZ: usize = <span class="number">64</span>; <span class="comment">// arbitrary
+		</span><span class="kw">let </span><span class="kw-2">mut </span>buf_sz = BLOCK_SZ;
 
 		<span class="kw">loop </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
 			lvi.iSubItem = column_index <span class="kw">as _</span>;
 
-			<span class="kw">unsafe </span>{ buf.buf_realloc(buf_sz); }
+			<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(buf_sz);
 			lvi.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>buf));
 
 			<span class="kw">let </span>num_chars = <span class="self">self</span>.owner.hwnd()
@@ -485,13 +481,11 @@
 				});
 
 			<span class="kw">if </span>(num_chars <span class="kw">as </span>usize) + <span class="number">1 </span>&lt; buf_sz { <span class="comment">// to break, must have at least 1 char gap
-				</span><span class="kw">break</span>;
+				</span><span class="kw">return </span>buf.to_string();
 			}
 
-			buf_sz += BLOCK; <span class="comment">// increase buffer size to try again
+			buf_sz += BLOCK_SZ; <span class="comment">// increase buffer size to try again
 		</span>}
-
-		buf.to_string()
 	}
 }
 </code></pre></div>
