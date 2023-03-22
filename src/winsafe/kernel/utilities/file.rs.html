@@ -198,7 +198,7 @@
 	///
 	/// The internal file pointer will be rewound to the beginning of the file.
 	</span><span class="kw">pub fn </span>erase_and_write(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) -&gt; SysResult&lt;()&gt; {
-		<span class="self">self</span>.resize(data.len())<span class="question-mark">?</span>;
+		<span class="self">self</span>.resize(data.len() <span class="kw">as _</span>)<span class="question-mark">?</span>;
 		<span class="self">self</span>.write(data)<span class="question-mark">?</span>;
 		<span class="self">self</span>.rewind_pointer()
 	}
@@ -211,7 +211,7 @@
 
 	<span class="doccomment">/// Returns the current offset of the internal pointer.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>pointer_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="kw">pub fn </span>pointer_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u64&gt; {
 		<span class="self">self</span>.hfile.SetFilePointerEx(<span class="number">0</span>, co::FILE_STARTING_POINT::CURRENT) <span class="comment">// https://stackoverflow.com/a/17707021/6923555
 			</span>.map(|off| off <span class="kw">as _</span>)
 	}
@@ -221,7 +221,7 @@
 	/// Note that the bytes will start being read from the current offset of the
 	/// internal file pointer, which is then incremented by the size of
 	/// `buffer`.
-	</span><span class="kw">pub fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="kw">pub fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; SysResult&lt;u64&gt; {
 		<span class="self">self</span>.hfile.ReadFile(buffer, <span class="prelude-val">None</span>)
 			.map(|n| n <span class="kw">as _</span>)
 	}
@@ -232,9 +232,9 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>read_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
 		<span class="self">self</span>.rewind_pointer()<span class="question-mark">?</span>;
-		<span class="kw">let </span><span class="kw-2">mut </span>data: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.size()<span class="question-mark">?</span>];
+		<span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="self">self</span>.size()<span class="question-mark">? </span><span class="kw">as _</span>];
 		<span class="kw">let </span>bytes_read = <span class="self">self</span>.read(<span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
-		data.resize(bytes_read, <span class="number">0</span>);
+		data.resize(bytes_read <span class="kw">as _</span>, <span class="number">0</span>);
 		<span class="self">self</span>.rewind_pointer()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(data)
 	}
@@ -243,7 +243,7 @@
 	/// the file.
 	///
 	/// The internal file pointer will be rewound to the beginning of the file.
-	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;</span><span class="self">self</span>, num_bytes: usize) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;</span><span class="self">self</span>, num_bytes: u64) -&gt; SysResult&lt;()&gt; {
 		<span class="self">self</span>.hfile.SetFilePointerEx(num_bytes <span class="kw">as _</span>, co::FILE_STARTING_POINT::BEGIN)<span class="question-mark">?</span>;
 		<span class="self">self</span>.hfile.SetEndOfFile()<span class="question-mark">?</span>;
 		<span class="self">self</span>.rewind_pointer()
@@ -257,7 +257,7 @@
 
 	<span class="doccomment">/// Returns the size of the file.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;usize&gt; {
+	</span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u64&gt; {
 		<span class="self">self</span>.hfile.GetFileSizeEx()
 	}
 

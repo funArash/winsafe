@@ -138,7 +138,7 @@
 	file: File,
 	hmap: CloseHandleGuard&lt;HFILEMAP&gt;,
 	hview: UnmapViewOfFileGuard,
-	size: usize,
+	size: u64,
 }
 
 <span class="kw">impl </span>FileMapped {
@@ -184,13 +184,13 @@
 	<span class="doccomment">/// Returns a mutable slice to the mapped memory.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
-		<span class="self">self</span>.hview.as_mut_slice(<span class="self">self</span>.size)
+		<span class="self">self</span>.hview.as_mut_slice(<span class="self">self</span>.size <span class="kw">as _</span>)
 	}
 
 	<span class="doccomment">/// Returns a slice to the mapped memory.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-		<span class="self">self</span>.hview.as_slice(<span class="self">self</span>.size)
+		<span class="self">self</span>.hview.as_slice(<span class="self">self</span>.size <span class="kw">as _</span>)
 	}
 
 	<span class="doccomment">/// Resizes the file, which will be remapped in memory.
@@ -199,7 +199,7 @@
 	/// must be recreated. The following functions must be called again:
 	/// * [`as_mut_slice`](crate::FileMapped::as_mut_slice);
 	/// * [`as_slice`](crate::FileMapped::as_slice).
-	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: usize) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_bytes: u64) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="self">self</span>.hview = UnmapViewOfFileGuard::new(HFILEMAPVIEW::NULL); <span class="comment">// close mapping handles
 			</span><span class="self">self</span>.hmap = CloseHandleGuard::new(HFILEMAP::NULL);
@@ -216,7 +216,7 @@
 
 	<span class="doccomment">/// Returns the size of the file. This value is cached.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+	</span><span class="kw">pub const fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
 		<span class="self">self</span>.size
 	}
 }

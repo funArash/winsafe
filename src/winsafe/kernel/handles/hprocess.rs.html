@@ -274,7 +274,6 @@
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -452,12 +451,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsProcessCritical(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>critical: BOOL = <span class="number">0</span>;
-		<span class="kw">match unsafe </span>{
-			kernel::ffi::IsProcessCritical(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>critical) }
-		{
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(critical != <span class="number">0</span>),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::IsProcessCritical(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>critical)
+			},
+		).map(|<span class="kw">_</span>| critical != <span class="number">0</span>)
 	}
 
 	<span class="doccomment">/// [`IsWow64Process`](https://learn.microsoft.com/en-us/windows/win32/api/wow64apiset/nf-wow64apiset-iswow64process)

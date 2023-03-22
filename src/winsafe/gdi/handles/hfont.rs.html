@@ -92,14 +92,13 @@
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::LOGFONT;
 <span class="kw">use </span><span class="kw">crate</span>::gdi::guard::DeleteObjectGuard;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult_handle;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult_handle};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObject, GdiObjectSelect, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::SIZE;
 
@@ -169,16 +168,15 @@
 	<span class="doccomment">/// [`GetObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobjectw)
 	/// method.
 	</span><span class="kw">fn </span>GetObject(<span class="kw-2">&amp;</span><span class="self">self</span>, lf: <span class="kw-2">&amp;mut </span>LOGFONT) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match unsafe </span>{
-			gdi::ffi::GetObjectW(
-				<span class="self">self</span>.as_ptr(),
-				std::mem::size_of::&lt;LOGFONT&gt;() <span class="kw">as _</span>,
-				lf <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				gdi::ffi::GetObjectW(
+					<span class="self">self</span>.as_ptr(),
+					std::mem::size_of::&lt;LOGFONT&gt;() <span class="kw">as _</span>,
+					lf <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`GetStockObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstockobject)

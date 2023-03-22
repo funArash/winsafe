@@ -1680,12 +1680,6 @@
 <a href="#1680" id="1680">1680</a>
 <a href="#1681" id="1681">1681</a>
 <a href="#1682" id="1682">1682</a>
-<a href="#1683" id="1683">1683</a>
-<a href="#1684" id="1684">1684</a>
-<a href="#1685" id="1685">1685</a>
-<a href="#1686" id="1686">1686</a>
-<a href="#1687" id="1687">1687</a>
-<a href="#1688" id="1688">1688</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -2100,16 +2094,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetClassName(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(<span class="number">256 </span>+ <span class="number">1</span>); <span class="comment">// according to WNDCLASSEX docs
-		</span><span class="kw">match unsafe </span>{
-			user::ffi::GetClassNameW(
-				<span class="self">self</span>.as_ptr(),
-				buf.as_mut_ptr(),
-				buf.buf_len() <span class="kw">as _</span>,
-			)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-		}
+		</span>bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetClassNameW(
+					<span class="self">self</span>.as_ptr(),
+					buf.as_mut_ptr(),
+					buf.buf_len() <span class="kw">as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| buf.to_string())
 	}
 
 	<span class="doccomment">/// [`GetClientRect`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclientrect)
@@ -2117,12 +2110,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetClientRect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;RECT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
-		<span class="kw">match unsafe </span>{
-			user::ffi::GetClientRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(rc),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetClientRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			},
+		).map(|<span class="kw">_</span>| rc)
 	}
 
 	<span class="doccomment">/// [`GetDC`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc)
@@ -2380,15 +2372,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowDisplayAffinity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::WDA&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>affinity = co::WDA::default();
-		<span class="kw">match unsafe </span>{
-			user::ffi::GetWindowDisplayAffinity(
-				<span class="self">self</span>.as_ptr(),
-				<span class="kw-2">&amp;mut </span>affinity <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(affinity),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetWindowDisplayAffinity(
+					<span class="self">self</span>.as_ptr(),
+					<span class="kw-2">&amp;mut </span>affinity <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| affinity)
 	}
 
 	<span class="doccomment">/// [`GetWindowInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowinfo)
@@ -2440,12 +2431,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowRect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;RECT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
-		<span class="kw">match unsafe </span>{
-			user::ffi::GetWindowRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(rc),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::GetWindowRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			},
+		).map(|<span class="kw">_</span>| rc)
 	}
 
 	<span class="doccomment">/// [`GetWindowRgn`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrgn)
@@ -2877,16 +2867,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RealGetWindowClass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(<span class="number">256 </span>+ <span class="number">1</span>); <span class="comment">// according to WNDCLASSEX docs
-		</span><span class="kw">match unsafe </span>{
-			user::ffi::RealGetWindowClassW(
-				<span class="self">self</span>.as_ptr(),
-				buf.as_mut_ptr(),
-				buf.buf_len() <span class="kw">as _</span>,
-			)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-		}
+		</span>bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::RealGetWindowClassW(
+					<span class="self">self</span>.as_ptr(),
+					buf.as_mut_ptr(),
+					buf.buf_len() <span class="kw">as _</span>,
+				)
+			} <span class="kw">as _</span>,
+		).map(|<span class="kw">_</span>| buf.to_string())
 	}
 
 	<span class="doccomment">/// [`RedrawWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-redrawwindow)
@@ -3295,16 +3284,15 @@
 	</span><span class="kw">fn </span>TranslateAccelerator(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		haccel_table: <span class="kw-2">&amp;</span>HACCEL, msg: <span class="kw-2">&amp;mut </span>MSG) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="kw">match unsafe </span>{
-			user::ffi::TranslateAcceleratorW(
-				<span class="self">self</span>.as_ptr(),
-				haccel_table.as_ptr(),
-				msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			)
-		} {
-			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
-		}
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::TranslateAcceleratorW(
+					<span class="self">self</span>.as_ptr(),
+					haccel_table.as_ptr(),
+					msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`UpdateWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-updatewindow)

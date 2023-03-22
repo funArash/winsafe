@@ -338,9 +338,6 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, shell};
@@ -576,12 +573,9 @@
 <span class="doccomment">/// [`SHFileOperation`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shfileoperationw)
 /// function.
 </span><span class="kw">pub fn </span>SHFileOperation(file_op: <span class="kw-2">&amp;mut </span>SHFILEOPSTRUCT) -&gt; SysResult&lt;()&gt; {
-	<span class="kw">match unsafe </span>{
-		shell::ffi::SHFileOperationW(file_op <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-	} {
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ shell::ffi::SHFileOperationW(file_op <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+	)
 }
 
 <span class="doccomment">/// [`SHGetFileInfo`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shgetfileinfow)

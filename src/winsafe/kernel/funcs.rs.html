@@ -1490,18 +1490,6 @@
 <a href="#1490" id="1490">1490</a>
 <a href="#1491" id="1491">1491</a>
 <a href="#1492" id="1492">1492</a>
-<a href="#1493" id="1493">1493</a>
-<a href="#1494" id="1494">1494</a>
-<a href="#1495" id="1495">1495</a>
-<a href="#1496" id="1496">1496</a>
-<a href="#1497" id="1497">1497</a>
-<a href="#1498" id="1498">1498</a>
-<a href="#1499" id="1499">1499</a>
-<a href="#1500" id="1500">1500</a>
-<a href="#1501" id="1501">1501</a>
-<a href="#1502" id="1502">1502</a>
-<a href="#1503" id="1503">1503</a>
-<a href="#1504" id="1504">1504</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1608,8 +1596,8 @@
 		},
 	)<span class="question-mark">?</span>;	
 	<span class="kw">let </span>name = WString::from_wchars_nullt(pstr).to_string();
-	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pstr <span class="kw">as _</span>)) };
-	<span class="prelude-val">Ok</span>(name)
+	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pstr <span class="kw">as _</span>)) }; <span class="comment">// free returned pointer
+	</span><span class="prelude-val">Ok</span>(name)
 }
 
 <span class="doccomment">/// [`ConvertStringSidToSid`](https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsidtosidw)
@@ -1837,16 +1825,15 @@
 	};
 
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as _</span>);
-	<span class="kw">match unsafe </span>{
-		kernel::ffi::ExpandEnvironmentStringsW(
-			wsrc.as_ptr(),
-			buf.as_mut_ptr(),
-			len,
-		)
-	} {
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::ExpandEnvironmentStringsW(
+				wsrc.as_ptr(),
+				buf.as_mut_ptr(),
+				len,
+			)
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`FileTimeToSystemTime`](https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-filetimetosystemtime)
@@ -1912,15 +1899,14 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetCurrentDirectory() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
-	<span class="kw">match unsafe </span>{
-		kernel::ffi::GetCurrentDirectoryW(
-			buf.buf_len() <span class="kw">as _</span>,
-			buf.as_mut_ptr(),
-		)
-	} {
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetCurrentDirectoryW(
+				buf.buf_len() <span class="kw">as _</span>,
+				buf.as_mut_ptr(),
+			)
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`GetCurrentProcessId`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessid)
@@ -1956,7 +1942,7 @@
 /// Returns the parsed strings, and automatically frees the retrieved
 /// environment block with
 /// [`FreeEnvironmentStrings`](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-freeenvironmentstringsw).
-///
+/// 
 /// # Examples
 ///
 /// Retrieving and printing the key/value pairs of all environment strings:
@@ -1978,13 +1964,14 @@
 	).map(|ptr| {
 		<span class="kw">let </span>vec_env_strs = parse_multi_z_str(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>);
 		<span class="kw">unsafe </span>{ kernel::ffi::FreeEnvironmentStringsW(ptr); }
-
-		<span class="kw">let </span><span class="kw-2">mut </span>map = HashMap::with_capacity(vec_env_strs.len());
-		<span class="kw">for </span>env_str <span class="kw">in </span>vec_env_strs {
-			<span class="kw">let </span>pair: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = env_str.split(<span class="string">&quot;=&quot;</span>).collect();
-			map.insert(pair[<span class="number">0</span>].to_owned(), pair[<span class="number">1</span>].to_owned());
-		}
-		map
+		vec_env_strs.iter()
+			.map(|env_str| {
+				<span class="kw">let </span><span class="kw-2">mut </span>pair = env_str.split(<span class="string">&quot;=&quot;</span>); <span class="comment">// assumes correctly formatted pairs
+				</span><span class="kw">let </span>key = pair.next().unwrap();
+				<span class="kw">let </span>val = pair.next().unwrap();
+				(key.to_owned(), val.to_owned())
+			})
+			.collect()
 	})
 }
 
@@ -2033,21 +2020,20 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLogicalDriveStrings() -&gt; SysResult&lt;Vec&lt;String&gt;&gt; {
-	<span class="kw">match unsafe </span>{
+	<span class="kw">let </span>len = <span class="kw">match unsafe </span>{
 		kernel::ffi::GetLogicalDriveStringsW(<span class="number">0</span>, std::ptr::null_mut())
 	} {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		len =&gt; {
-			<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as </span>usize + <span class="number">1</span>);
+		len =&gt; <span class="prelude-val">Ok</span>(len),
+	}<span class="question-mark">?</span>;
 
-			<span class="kw">match unsafe </span>{
-				kernel::ffi::GetLogicalDriveStringsW(len, buf.as_mut_ptr())
-			} {
-				<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-				<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(parse_multi_z_str(buf.as_ptr())),
-			}
-		},
-	}
+	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as </span>usize + <span class="number">1</span>); <span class="comment">// room for terminating null
+
+	</span>bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetLogicalDriveStringsW(len, buf.as_mut_ptr())
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| parse_multi_z_str(buf.as_ptr()))
 }
 
 <span class="doccomment">/// [`GetFileAttributes`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesw)
@@ -2143,12 +2129,11 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSystemDirectory() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
-	<span class="kw">match unsafe </span>{
-		kernel::ffi::GetSystemDirectoryW(buf.as_mut_ptr(), buf.buf_len() <span class="kw">as _</span>)
-	} {
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetSystemDirectoryW(buf.as_mut_ptr(), buf.buf_len() <span class="kw">as _</span>)
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`GetSystemFileCacheSize`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-getsystemfilecachesize)
@@ -2238,12 +2223,11 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetTempPath() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
-	<span class="kw">match unsafe </span>{
-		kernel::ffi::GetTempPathW(buf.buf_len() <span class="kw">as _</span>, buf.as_mut_ptr()) }
-	{
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(buf.to_string()),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetTempPathW(buf.buf_len() <span class="kw">as _</span>, buf.as_mut_ptr())
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`GetTickCount64`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-gettickcount64)
@@ -2437,10 +2421,9 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsNativeVhdBoot() -&gt; SysResult&lt;bool&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>is_native: BOOL = <span class="number">0</span>;
-	<span class="kw">match unsafe </span>{ kernel::ffi::IsNativeVhdBoot(<span class="kw-2">&amp;mut </span>is_native) } {
-		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(is_native != <span class="number">0</span>),
-	}
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{ kernel::ffi::IsNativeVhdBoot(<span class="kw-2">&amp;mut </span>is_native) },
+	).map(|<span class="kw">_</span>| is_native != <span class="number">0</span>)
 }
 
 <span class="doccomment">/// [`IsValidSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-isvalidsecuritydescriptor)
@@ -2752,7 +2735,7 @@
 	multi_byte_str: <span class="kw-2">&amp;</span>[u8],
 ) -&gt; SysResult&lt;Vec&lt;u16&gt;&gt;
 {
-	<span class="kw">match unsafe </span>{
+	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
 		kernel::ffi::MultiByteToWideChar(
 			code_page.<span class="number">0 </span><span class="kw">as _</span>,
 			flags.<span class="number">0</span>,
@@ -2763,28 +2746,23 @@
 		)
 	} {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		num_bytes =&gt; {
-			<span class="kw">let </span>num_bytes = num_bytes <span class="kw">as </span>usize + <span class="number">1</span>; <span class="comment">// add room for terminating null
-			</span><span class="kw">let </span><span class="kw-2">mut </span>dest_buf: Vec&lt;u16&gt; = <span class="macro">vec!</span>[<span class="number">0x0000</span>; num_bytes <span class="kw">as _</span>];
+		num_bytes =&gt; <span class="prelude-val">Ok</span>(num_bytes),
+	}<span class="question-mark">? </span>+ <span class="number">1</span>; <span class="comment">// room for terminating null
 
-			<span class="kw">match unsafe </span>{
-				kernel::ffi::MultiByteToWideChar(
-					code_page.<span class="number">0 </span><span class="kw">as _</span>,
-					flags.<span class="number">0</span>,
-					multi_byte_str.as_ptr(),
-					multi_byte_str.len() <span class="kw">as _</span>,
-					dest_buf.as_mut_ptr(),
-					num_bytes <span class="kw">as _</span>,
-				)
-			} {
-				<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-				<span class="kw">_ </span>=&gt; {
-					<span class="kw">unsafe </span>{ <span class="kw-2">*</span>dest_buf.get_unchecked_mut(num_bytes - <span class="number">1</span>) = <span class="number">0x0000</span>; } <span class="comment">// terminating null
-					</span><span class="prelude-val">Ok</span>(dest_buf)
-				},
-			}
+	</span><span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u16</span>; num_bytes <span class="kw">as _</span>];
+
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::MultiByteToWideChar(
+				code_page.<span class="number">0 </span><span class="kw">as _</span>,
+				flags.<span class="number">0</span>,
+				multi_byte_str.as_ptr(),
+				multi_byte_str.len() <span class="kw">as _</span>,
+				buf.as_mut_ptr(),
+				num_bytes <span class="kw">as _</span>,
+			)
 		},
-	}
+	).map(|<span class="kw">_</span>| buf)
 }
 
 <span class="doccomment">/// [`OutputDebugString`](https://learn.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw)
@@ -2961,10 +2939,11 @@
 	wide_char_str: <span class="kw-2">&amp;</span>[u16],
 	default_char: <span class="prelude-ty">Option</span>&lt;u8&gt;,
 	used_default_char: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>bool&gt;,
-) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
+) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt;
+{
 	<span class="kw">let </span><span class="kw-2">mut </span>default_char_buf = default_char.unwrap_or_default();
 
-	<span class="kw">match unsafe </span>{
+	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
 		kernel::ffi::WideCharToMultiByte(
 			code_page.<span class="number">0 </span><span class="kw">as _</span>,
 			flags.<span class="number">0</span>,
@@ -2977,34 +2956,31 @@
 		)
 	} {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		num_bytes =&gt; {
-			<span class="kw">let </span>num_bytes = num_bytes <span class="kw">as </span>usize + <span class="number">1</span>; <span class="comment">// add room for terminating null
-			</span><span class="kw">let </span><span class="kw-2">mut </span>dest_buf: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0x00</span>; num_bytes <span class="kw">as _</span>];
-			<span class="kw">let </span><span class="kw-2">mut </span>bool_buf: BOOL = <span class="number">0</span>;
+		num_bytes =&gt; <span class="prelude-val">Ok</span>(num_bytes),
+	}<span class="question-mark">? </span>+ <span class="number">1</span>; <span class="comment">// room for terminating null
 
-			<span class="kw">match unsafe </span>{
-				kernel::ffi::WideCharToMultiByte(
-					code_page.<span class="number">0 </span><span class="kw">as _</span>,
-					flags.<span class="number">0</span>,
-					wide_char_str.as_ptr(),
-					wide_char_str.len() <span class="kw">as _</span>,
-					dest_buf.as_mut_ptr() <span class="kw">as _</span>,
-					num_bytes <span class="kw">as _</span>,
-					<span class="kw-2">&amp;mut </span>default_char_buf,
-					<span class="kw-2">&amp;mut </span>bool_buf,
-				)
-			} {
-				<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-				<span class="kw">_ </span>=&gt; {
-					<span class="kw">if let </span><span class="prelude-val">Some</span>(lp) = used_default_char {
-						<span class="kw-2">*</span>lp = bool_buf != <span class="number">0</span>;
-					}
-					<span class="kw">unsafe </span>{ <span class="kw-2">*</span>dest_buf.get_unchecked_mut(num_bytes - <span class="number">1</span>) = <span class="number">0x00</span>; } <span class="comment">// terminating null
-					</span><span class="prelude-val">Ok</span>(dest_buf)
-				},
-			}
-		},
-	}
+	</span><span class="kw">let </span><span class="kw-2">mut </span>u8_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; num_bytes <span class="kw">as _</span>];
+	<span class="kw">let </span><span class="kw-2">mut </span>bool_buf: BOOL = <span class="number">0</span>;
+
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::WideCharToMultiByte(
+				code_page.<span class="number">0 </span><span class="kw">as _</span>,
+				flags.<span class="number">0</span>,
+				wide_char_str.as_ptr(),
+				wide_char_str.len() <span class="kw">as _</span>,
+				u8_buf.as_mut_ptr() <span class="kw">as _</span>,
+				num_bytes <span class="kw">as _</span>,
+				<span class="kw-2">&amp;mut </span>default_char_buf,
+				<span class="kw-2">&amp;mut </span>bool_buf,
+			)
+		},	
+	).map(|<span class="kw">_</span>| {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(used_default_char) = used_default_char {
+			<span class="kw-2">*</span>used_default_char = bool_buf != <span class="number">0</span>;
+		}
+		u8_buf
+	})
 }
 </code></pre></div>
 </section></main></body></html>
