@@ -209,6 +209,34 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{IS_INTRESOURCE, MAKEINTRESOURCE, parse_multi_z_str};
@@ -286,6 +314,34 @@
 	<span class="doccomment">/// No value, defined as [`REG::NONE`](crate::co::REG::NONE). Also used for
 	/// non-implemented value types.
 	</span><span class="prelude-val">None</span>,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>RegistryValue {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="kw">match </span><span class="self">self </span>{
+			<span class="self">Self</span>::Binary(b) =&gt; <span class="macro">write!</span>(
+				f,
+				<span class="string">&quot;[REG_BINARY] {}&quot;</span>,
+				b.iter()
+					.map(|n| <span class="macro">format!</span>(<span class="string">&quot;{:02}&quot;</span>, <span class="kw-2">*</span>n))
+					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+					.join(<span class="string">&quot; &quot;</span>),
+			),
+			<span class="self">Self</span>::Dword(n) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;[REG_DWORD] {}&quot;</span>, <span class="kw-2">*</span>n),
+			<span class="self">Self</span>::Qword(n) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;[REG_QWORD] {}&quot;</span>, <span class="kw-2">*</span>n),
+			<span class="self">Self</span>::Sz(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;[REG_SZ] \&quot;{}\&quot;&quot;</span>, s),
+			<span class="self">Self</span>::ExpandSz(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;[REG_EXPAND_SZ] \&quot;{}\&quot;&quot;</span>, s),
+			<span class="self">Self</span>::MultiSz(v) =&gt; <span class="macro">write!</span>(
+				f,
+				<span class="string">&quot;[REG_MULTI_SZ] {}&quot;</span>,
+				v.iter()
+					.map(|s| <span class="macro">format!</span>(<span class="string">&quot;\&quot;{}\&quot;&quot;</span>, s))
+					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+					.join(<span class="string">&quot;, &quot;</span>),
+			),
+			<span class="self">Self</span>::None =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;[REG_NONE]&quot;</span>),
+		}
+	}
 }
 
 <span class="kw">impl </span>RegistryValue {
