@@ -163,14 +163,58 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	FILETIME, GetLastError, HACCESSTOKEN, SECURITY_ATTRIBUTES, SysResult,
+	FILETIME, GetLastError, HACCESSTOKEN, PROCESSOR_NUMBER, SECURITY_ATTRIBUTES,
+	SysResult,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::CloseHandleGuard;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult_handle};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
+	bool_to_sysresult, minus1_as_error, ptr_to_sysresult_handle,
+};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
 
 <span class="macro">impl_handle! </span>{ HTHREAD;
@@ -303,21 +347,59 @@
 	<span class="doccomment">/// [`ResumeThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-resumethread)
 	/// method.
 	</span><span class="kw">fn </span>ResumeThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">const </span>MINUS_ONE: u32 = -<span class="number">1i32 </span><span class="kw">as </span>u32;
-		<span class="kw">match unsafe </span>{ kernel::ffi::ResumeThread(<span class="self">self</span>.as_ptr()) } {
-			MINUS_ONE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			c =&gt; <span class="prelude-val">Ok</span>(c),
-		}
+		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::ResumeThread(<span class="self">self</span>.as_ptr()) })
+	}
+
+	<span class="doccomment">/// [`SetThreadIdealProcessor`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadidealprocessor)
+	/// method.
+	/// 
+	/// Returns the previous ideal processor.
+	</span><span class="kw">fn </span>SetThreadIdealProcessor(<span class="kw-2">&amp;</span><span class="self">self</span>, ideal_processor: u32) -&gt; SysResult&lt;u32&gt; {
+		minus1_as_error(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::SetThreadIdealProcessor(<span class="self">self</span>.as_ptr(), ideal_processor)
+			},
+		)
+	}
+
+	<span class="doccomment">/// [`SetThreadIdealProcessorEx`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadidealprocessorex)
+	/// method.
+	/// 
+	/// Returns the previous ideal processor.
+	</span><span class="kw">fn </span>SetThreadIdealProcessorEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		ideal_processor: PROCESSOR_NUMBER) -&gt; SysResult&lt;PROCESSOR_NUMBER&gt;
+	{
+		<span class="kw">let </span><span class="kw-2">mut </span>prev = PROCESSOR_NUMBER::default();
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::SetThreadIdealProcessorEx(
+					<span class="self">self</span>.as_ptr(),
+					<span class="kw-2">&amp;</span>ideal_processor <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>prev <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| prev)
+	}
+
+	<span class="doccomment">/// [`SetThreadPriorityBoost`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadpriorityboost)
+	/// method.
+	</span><span class="kw">fn </span>SetThreadPriorityBoost(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		disable_priority_boost: bool) -&gt; SysResult&lt;()&gt;
+	{
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				kernel::ffi::SetThreadPriorityBoost(
+					<span class="self">self</span>.as_ptr(),
+					disable_priority_boost <span class="kw">as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`SuspendThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-suspendthread)
 	/// method.
 	</span><span class="kw">fn </span>SuspendThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">const </span>MINUS_ONE: u32 = -<span class="number">1i32 </span><span class="kw">as </span>u32;
-		<span class="kw">match unsafe </span>{ kernel::ffi::SuspendThread(<span class="self">self</span>.as_ptr()) } {
-			MINUS_ONE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			c =&gt; <span class="prelude-val">Ok</span>(c),
-		}
+		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::SuspendThread(<span class="self">self</span>.as_ptr()) })
 	}
 
 	<span class="doccomment">/// [`TerminateThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminatethread)

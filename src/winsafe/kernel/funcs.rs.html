@@ -1526,6 +1526,22 @@
 <a href="#1526" id="1526">1526</a>
 <a href="#1527" id="1527">1527</a>
 <a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -2925,10 +2941,26 @@
 	<span class="kw">unsafe </span>{ kernel::ffi::SetLastError(err_code.<span class="number">0</span>) }
 }
 
+<span class="doccomment">/// [`SetThreadStackGuarantee`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadstackguarantee)
+/// function.
+/// 
+/// Returns the size of the previous stack.
+</span><span class="kw">pub fn </span>SetThreadStackGuarantee(stack_size_in_bytes: u32) -&gt; SysResult&lt;u32&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>sz = stack_size_in_bytes;
+	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SetThreadStackGuarantee(<span class="kw-2">&amp;mut </span>sz) })
+		.map(|<span class="kw">_</span>| sz)
+}
+
 <span class="doccomment">/// [`Sleep`](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep)
 /// function.
 </span><span class="kw">pub fn </span>Sleep(milliseconds: u32) {
 	<span class="kw">unsafe </span>{ kernel::ffi::Sleep(milliseconds) }
+}
+
+<span class="doccomment">/// [`SwitchToThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-switchtothread)
+/// function.
+</span><span class="kw">pub fn </span>SwitchToThread() -&gt; SysResult&lt;()&gt; {
+	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SwitchToThread() })
 }
 
 <span class="doccomment">/// [`SystemTimeToFileTime`](https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-systemtimetofiletime)
