@@ -1758,7 +1758,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	ALTTABINFO, AtomStr, HACCEL, HMENU, HMONITOR, HRGN, HwndPlace, IdMenu,
-	IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, PtsRcs, RECT, SCROLLINFO, SIZE,
+	IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, PtsRc, RECT, SCROLLINFO, SIZE,
 	TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::guard::{
@@ -2755,14 +2755,14 @@
 	<span class="doccomment">/// [`MapWindowPoints`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-mapwindowpoints)
 	/// method.
 	/// 
-	/// This method can convert either a series of [`POINT`](crate::POINT) or
-	/// [`RECT`](crate::RECT) structs.
+	/// This method can convert either a series of [`POINT`](crate::POINT)
+	/// structs or a single [`RECT`](crate::RECT).
 	/// 
 	/// # Examples
 	/// 
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
-	/// use winsafe::{HWND, POINT, PtsRcs};
+	/// use winsafe::{HWND, POINT, PtsRc};
 	/// 
 	/// let hwnd: HWND; // initialized somewhere
 	/// # let hwnd = HWND::NULL;
@@ -2773,17 +2773,17 @@
 	/// 
 	/// hwnd.MapWindowPoints(
 	///     &amp;hwnd_dest,
-	///     PtsRcs::Pts(&amp;mut points),
+	///     PtsRc::Pts(&amp;mut points),
 	/// )?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>MapWindowPoints(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		hdest: <span class="kw-2">&amp;</span>HWND, points: PtsRcs) -&gt; SysResult&lt;(i16, i16)&gt;
+		hdest: <span class="kw-2">&amp;</span>HWND, points: PtsRc) -&gt; SysResult&lt;(i16, i16)&gt;
 	{
 		<span class="kw">let </span>forced_pts = <span class="kw">match </span>points {
-			PtsRcs::Pts(pts) =&gt; pts,
-			PtsRcs::Rcs(rcs) =&gt; <span class="kw">unsafe </span>{
-				std::slice::from_raw_parts_mut(rcs.as_mut_ptr() <span class="kw">as _</span>, rcs.len() * <span class="number">2</span>)
+			PtsRc::Pts(pts) =&gt; pts,
+			PtsRc::Rc(rc) =&gt; <span class="kw">unsafe </span>{
+				std::slice::from_raw_parts_mut(rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>, <span class="number">2</span>)
 			},
 		};
 
