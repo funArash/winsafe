@@ -64,11 +64,24 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::status_bar::StatusBar;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::msg::sb;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::HICON;
 
 <span class="doccomment">/// A single part of a [`StatusBar`](crate::gui::StatusBar) control.
 ///
@@ -87,6 +100,17 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatusBarPart&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>new(owner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>StatusBar, index: u8) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ owner, index }
+	}
+
+	<span class="doccomment">/// Sets the icon of a part by sending an
+	/// [`sb::SetIcon`](crate::msg::sb::SetIcon) message.
+	</span><span class="kw">pub fn </span>set_icon(<span class="kw-2">&amp;</span><span class="self">self</span>, hicon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HICON&gt;) {
+		<span class="self">self</span>.owner.hwnd()
+			.SendMessage(sb::SetIcon {
+				part_index: <span class="self">self</span>.index,
+				hicon,
+			})
+			.unwrap();
 	}
 
 	<span class="doccomment">/// Sets the text of a part by sending an
