@@ -130,10 +130,90 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::{
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::{
 	DXGI_FRAME_STATISTICS, DXGI_GAMMA_CONTROL, DXGI_GAMMA_CONTROL_CAPABILITIES,
+	DXGI_MODE_DESC, DXGI_OUTPUT_DESC,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
@@ -180,44 +260,120 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>dxgi_IDXGIOutput: dxgi_IDXGIObject {
-	<span class="doccomment">/// [`IDXGIOutput::GetFrameStatistics`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getframestatistics)
+	<span class="doccomment">/// [`IDXGIOutput::FindClosestMatchingMode`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-findclosestmatchingmode)
 	/// method.
-	</span><span class="kw">fn </span>GetFrameStatistics(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		stats: <span class="kw-2">&amp;mut </span>DXGI_FRAME_STATISTICS) -&gt; HrResult&lt;()&gt;
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>FindClosestMatchingMode(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		mode_to_match: <span class="kw-2">&amp;</span>DXGI_MODE_DESC,
+		device_interface: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown&gt;,
+	) -&gt; HrResult&lt;DXGI_MODE_DESC&gt;
 	{
+		<span class="kw">let </span><span class="kw-2">mut </span>closest_match = DXGI_MODE_DESC::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
 			ok_to_hrresult(
-				(vt.GetFrameStatistics)(<span class="self">self</span>.ptr(), stats <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				(vt.FindClosestMatchingMode)(
+					<span class="self">self</span>.ptr(),
+					mode_to_match <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>closest_match <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					device_interface.map_or(ComPtr::null(), |p| p.ptr()),
+				),
 			)
+		}.map(|<span class="kw">_</span>| closest_match)
+	}
+
+	<span class="doccomment">/// [`IDXGIOutput::GetDesc`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getdesc)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetDesc(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;DXGI_OUTPUT_DESC&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>desc = DXGI_OUTPUT_DESC::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
+			ok_to_hrresult(
+				(vt.GetDesc)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>desc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			)
+		}.map(|<span class="kw">_</span>| desc)
+	}
+
+	<span class="doccomment">/// [`IDXGIOutput::GetDisplayModeList`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getdisplaymodelist)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetDisplayModeList(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		format: co::DXGI_FORMAT,
+		flags: co::DXGI_ENUM_MODES,
+	) -&gt; HrResult&lt;Vec&lt;DXGI_MODE_DESC&gt;&gt;
+	{
+		<span class="kw">let </span><span class="kw-2">mut </span>num_modes = u32::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
+			ok_to_hrresult(
+				(vt.GetDisplayModeList)(
+					<span class="self">self</span>.ptr(),
+					format.<span class="number">0</span>,
+					flags.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>num_modes,
+					std::ptr::null_mut(),
+				),
+			)<span class="question-mark">?</span>;
 		}
+
+		<span class="kw">let </span><span class="kw-2">mut </span>modes = <span class="macro">vec!</span>[DXGI_MODE_DESC::default(); num_modes <span class="kw">as _</span>];
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
+			ok_to_hrresult(
+				(vt.GetDisplayModeList)(
+					<span class="self">self</span>.ptr(),
+					format.<span class="number">0</span>,
+					flags.<span class="number">0</span>,
+					<span class="kw-2">&amp;mut </span>num_modes,
+					modes.as_mut_ptr() <span class="kw">as _</span>,
+				),
+			)
+		}.map(|<span class="kw">_</span>| modes)
+	}
+
+	<span class="doccomment">/// [`IDXGIOutput::GetFrameStatistics`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getframestatistics)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetFrameStatistics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;DXGI_FRAME_STATISTICS&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>stats = DXGI_FRAME_STATISTICS::default();
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
+			ok_to_hrresult(
+				(vt.GetFrameStatistics)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>stats <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+			)
+		}.map(|<span class="kw">_</span>| stats)
 	}
 
 	<span class="doccomment">/// [`IDXGIOutput::GetGammaControl`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getgammacontrol)
 	/// method.
-	</span><span class="kw">fn </span>GetGammaControl(<span class="kw-2">&amp;</span><span class="self">self</span>, array: <span class="kw-2">&amp;mut </span>DXGI_GAMMA_CONTROL) -&gt; HrResult&lt;()&gt; {
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetGammaControl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;DXGI_GAMMA_CONTROL&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>array = DXGI_GAMMA_CONTROL::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
 			ok_to_hrresult(
-				(vt.GetGammaControl)(<span class="self">self</span>.ptr(), array <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				(vt.GetGammaControl)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>array <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			)
-		}
+		}.map(|<span class="kw">_</span>| array)
 	}
 
 	<span class="doccomment">/// [`IDXGIOutput::GetGammaControlCapabilities`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-getgammacontrolcapabilities)
 	/// method.
+	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetGammaControlCapabilities(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		gamma_caps: <span class="kw-2">&amp;mut </span>DXGI_GAMMA_CONTROL_CAPABILITIES) -&gt; HrResult&lt;()&gt;
+	) -&gt; HrResult&lt;DXGI_GAMMA_CONTROL_CAPABILITIES&gt;
 	{
+		<span class="kw">let </span><span class="kw-2">mut </span>capa = DXGI_GAMMA_CONTROL_CAPABILITIES::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIOutputVT&gt;();
 			ok_to_hrresult(
 				(vt.GetGammaControlCapabilities)(
 					<span class="self">self</span>.ptr(),
-					gamma_caps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="kw-2">&amp;mut </span>capa <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				),
 			)
-		}
+		}.map(|<span class="kw">_</span>| capa)
 	}
 
 	<span class="doccomment">/// [`IDXGIOutput::ReleaseOwnership`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgioutput-releaseownership)

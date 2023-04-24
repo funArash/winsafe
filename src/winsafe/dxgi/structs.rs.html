@@ -127,12 +127,31 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::LUID;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::{HMONITOR, HWND, RECT};
 
 <span class="doccomment">/// [`DXGI_ADAPTER_DESC`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/ns-dxgi-dxgi_adapter_desc)
 /// struct.
@@ -198,7 +217,7 @@
 <span class="doccomment">/// [`DXGI_MODE_DESC`](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/bb173064(v=vs.85))
 /// struct.
 </span><span class="attr">#[repr(C)]
-#[derive(Default, PartialEq, Eq)]
+#[derive(Default, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>DXGI_MODE_DESC {
 	<span class="kw">pub </span>Width: u32,
 	<span class="kw">pub </span>Height: u32,
@@ -208,10 +227,29 @@
 	<span class="kw">pub </span>Scaling: co::DXGI_MODE_SCALING,
 }
 
+<span class="doccomment">/// [`DXGI_OUTPUT_DESC`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/ns-dxgi-dxgi_output_desc)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>DXGI_OUTPUT_DESC {
+	DeviceName: [u16; <span class="number">32</span>],
+	<span class="kw">pub </span>DesktopCoordinates: RECT,
+	AttachedToDesktop: BOOL,
+	<span class="kw">pub </span>Rotation: co::DXGI_MODE_ROTATION,
+	<span class="kw">pub </span>Monitor: HMONITOR,
+}
+
+<span class="macro">impl_default!</span>(DXGI_OUTPUT_DESC);
+
+<span class="kw">impl </span>DXGI_OUTPUT_DESC {
+	<span class="macro">pub_fn_string_arr_get_set!</span>(DeviceName, set_DeviceName);
+	<span class="macro">pub_fn_bool_get_set!</span>(AttachedToDesktop, set_AttachedToDesktop);
+
+}
+
 <span class="doccomment">/// [`DXGI_RATIONAL`](https://learn.microsoft.com/en-us/windows/win32/api/dxgicommon/ns-dxgicommon-dxgi_rational?redirectedfrom=MSDN)
 /// struct.
 </span><span class="attr">#[repr(C)]
-#[derive(Default, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>DXGI_RATIONAL {
 	<span class="kw">pub </span>Numerator: u32,
 	<span class="kw">pub </span>Denominator: u32,
@@ -220,7 +258,7 @@
 <span class="doccomment">/// [`DXGI_RGB`](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/legacy/bb173071(v=vs.85))
 /// struct.
 </span><span class="attr">#[repr(C)]
-#[derive(Default, PartialEq)]
+#[derive(Default, Clone, Copy, PartialEq)]
 </span><span class="kw">pub struct </span>DXGI_RGB {
 	<span class="kw">pub </span>Red: f32,
 	<span class="kw">pub </span>Green: f32,
@@ -230,7 +268,7 @@
 <span class="doccomment">/// [`DXGI_SAMPLE_DESC`](https://learn.microsoft.com/en-us/windows/win32/api/dxgicommon/ns-dxgicommon-dxgi_sample_desc)
 /// struct.
 </span><span class="attr">#[repr(C)]
-#[derive(Default, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>DXGI_SAMPLE_DESC {
 	<span class="kw">pub </span>Count: u32,
 	<span class="kw">pub </span>Quality: u32,
