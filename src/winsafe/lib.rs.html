@@ -570,6 +570,12 @@
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
 <a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Windows API and GUI in safe, idiomatic Rust.
 //!
 //! [Crate](https://crates.io/crates/winsafe) •
@@ -617,6 +623,7 @@
 //! | `ole` | OLE and basic COM support |
 //! | `oleaut` | [OLE Automation](https://learn.microsoft.com/en-us/windows/win32/api/_automat/) |
 //! | `shell` | Shell32.dll and Shlwapi.dll, the COM-based [Windows Shell](https://learn.microsoft.com/en-us/windows/win32/shell/shell-entry) |
+//! | `taskschd` | [Task Scheduler](https://learn.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page) |
 //! | `user` | User32.dll, the basic Windows GUI support |
 //! | `uxtheme` | UxTheme.dll, extended window theming |
 //! | `version` | Version.dll, to manipulate *.exe version info |
@@ -841,6 +848,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">mod </span>ole;
 <span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">mod </span>oleaut;
 <span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">mod </span>shell;
+<span class="attr">#[cfg(feature = <span class="string">&quot;taskschd&quot;</span>)] </span><span class="kw">mod </span>taskschd;
 <span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">mod </span>user;
 <span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">mod </span>uxtheme;
 <span class="attr">#[cfg(feature = <span class="string">&quot;version&quot;</span>)] </span><span class="kw">mod </span>version;
@@ -865,6 +873,7 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span>ole::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span>oleaut::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span>shell::decl::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(feature = <span class="string">&quot;taskschd&quot;</span>)] </span><span class="kw">pub use </span>taskschd::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">pub use </span>user::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">pub use </span>uxtheme::decl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;version&quot;</span>)] </span><span class="kw">pub use </span>version::decl::<span class="kw-2">*</span>;
@@ -892,6 +901,7 @@
 	<span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::ole::co::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::oleaut::co::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::shell::co::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(feature = <span class="string">&quot;taskschd&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::taskschd::co::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::user::co::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::uxtheme::co::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;version&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::version::co::<span class="kw-2">*</span>;
@@ -1125,6 +1135,7 @@
 	<span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::ole::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::oleaut::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::shell::traits::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(feature = <span class="string">&quot;taskschd&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::taskschd::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;user&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::user::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;uxtheme&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::uxtheme::traits::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(all(feature = <span class="string">&quot;gdi&quot;</span>, feature = <span class="string">&quot;ole&quot;</span>))] </span><span class="kw">pub use </span><span class="kw">super</span>::gdi_ole::traits::<span class="kw-2">*</span>;
@@ -1141,5 +1152,6 @@
 	<span class="attr">#[cfg(feature = <span class="string">&quot;ole&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::ole::vt::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;oleaut&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::oleaut::vt::<span class="kw-2">*</span>;
 	<span class="attr">#[cfg(feature = <span class="string">&quot;shell&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::shell::vt::<span class="kw-2">*</span>;
+	<span class="attr">#[cfg(feature = <span class="string">&quot;taskschd&quot;</span>)] </span><span class="kw">pub use </span><span class="kw">super</span>::taskschd::vt::<span class="kw-2">*</span>;
 }
 </code></pre></div></section></main></body></html>

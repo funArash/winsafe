@@ -349,7 +349,7 @@
 	</span><span class="kw">fn </span>bstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::BSTR {
 			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
-			<span class="kw">let </span>bstr = ManuallyDrop::new(BSTR(ptr <span class="kw">as _</span>)); <span class="comment">// won&#39;t release the stored pointer
+			<span class="kw">let </span>bstr = ManuallyDrop::new(<span class="kw">unsafe </span>{ BSTR::from_ptr(ptr <span class="kw">as _</span>) }); <span class="comment">// won&#39;t release the stored pointer
 			</span><span class="prelude-val">Some</span>(bstr.to_string())
 		} <span class="kw">else </span>{
 			<span class="prelude-val">None
