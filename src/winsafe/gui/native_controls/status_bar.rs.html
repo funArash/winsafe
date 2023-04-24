@@ -235,6 +235,9 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::cell::UnsafeCell;
 <span class="kw">use </span>std::marker::PhantomPinned;
@@ -443,7 +446,9 @@
 		<span class="kw">let </span>parts_info = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.parts_info.get() };
 		<span class="kw">for </span>part_info <span class="kw">in </span>parts_info.iter() {
 			<span class="kw">match </span>part_info {
-				StatusBarPart::Fixed(pixels) =&gt; cx_available -= pixels,
+				StatusBarPart::Fixed(pixels) =&gt; {
+					cx_available -= <span class="kw">if </span><span class="kw-2">*</span>pixels &gt; cx_available { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="kw-2">*</span>pixels }; <span class="comment">// prevent subtract overflow
+				</span>},
 				StatusBarPart::Proportional(prop) =&gt; total_proportions += prop,
 			}
 		}
@@ -453,12 +458,13 @@
 
 		<span class="kw">for </span>(idx, part_info) <span class="kw">in </span>parts_info.iter().rev().enumerate() {
 			right_edges[parts_info.len() - idx - <span class="number">1</span>] = total_cx <span class="kw">as _</span>;
-			total_cx -= <span class="kw">match </span>part_info {
+			<span class="kw">let </span>minus = <span class="kw">match </span>part_info {
 				StatusBarPart::Fixed(pixels) =&gt; <span class="kw-2">*</span>pixels,
 				StatusBarPart::Proportional(pp) =&gt;
 					(cx_available / total_proportions <span class="kw">as </span>u32) * (<span class="kw-2">*</span>pp <span class="kw">as </span>u32),
 			};
-		}
+			total_cx -= <span class="kw">if </span>minus &gt; total_cx { <span class="number">0 </span>} <span class="kw">else </span>{ minus }; <span class="comment">// prevent subtract overflow
+		</span>}
 		<span class="kw-2">*</span>right_edges.last_mut().unwrap() = -<span class="number">1</span>;
 
 		<span class="self">self</span>.hwnd()
