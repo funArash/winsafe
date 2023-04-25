@@ -131,11 +131,9 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -194,7 +192,7 @@
 			ok_to_hrresult(
 				(vt.DeleteTask)(
 					<span class="self">self</span>.ptr(),
-					WString::from_str(name).as_ptr(),
+					BSTR::SysAllocString(name)<span class="question-mark">?</span>.as_ptr(),
 					<span class="number">0</span>,
 				),
 			)
@@ -247,7 +245,7 @@
 			ok_to_hrresult(
 				(vt.RegisterTaskDefinition)(
 					<span class="self">self</span>.ptr(),
-					WString::from_opt_str(path).as_ptr(),
+					BSTR::SysAllocString(path.unwrap_or_default())<span class="question-mark">?</span>.as_ptr(),
 					definition.ptr(),
 					flags.<span class="number">0 </span><span class="kw">as _</span>,
 					<span class="kw">match </span>user_id {
