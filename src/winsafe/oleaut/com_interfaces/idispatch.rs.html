@@ -68,10 +68,40 @@
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::LCID;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{LCID, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::ITypeInfo;
@@ -84,7 +114,7 @@
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
 	<span class="kw">pub </span>GetTypeInfoCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 	<span class="kw">pub </span>GetTypeInfo: <span class="kw">fn</span>(ComPtr, u32, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetIDsOfNames: <span class="kw">fn</span>(ComPtr, PCVOID, PVOID, u32, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetIDsOfNames: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*const </span>PCSTR, u32, u32, PVOID) -&gt; HRES,
 	<span class="kw">pub </span>Invoke: <span class="kw">fn</span>(ComPtr, i32, PCVOID, u32, u16, PVOID, PVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
@@ -108,6 +138,35 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>oleaut_IDispatch: ole_IUnknown {
+	<span class="doccomment">/// [`IDispatch::GetIDsOfNames`](https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-getidsofnames)
+	/// method.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>GetIDsOfNames(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		names: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;], lcid: LCID) -&gt; HrResult&lt;Vec&lt;i32&gt;&gt;
+	{
+		<span class="kw">let </span>wnames = names.iter()
+			.map(|name| WString::from_str(name.as_ref()))
+			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+		<span class="kw">let </span>wptrs = wnames.iter()
+			.map(|wname| wname.as_ptr())
+			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+		<span class="kw">let </span><span class="kw-2">mut </span>ids = <span class="macro">vec!</span>[i32::default(); names.len()];
+
+		<span class="kw">unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
+			ok_to_hrresult(
+				(vt.GetIDsOfNames)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;</span>co::IID::default() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					wptrs.as_ptr(),
+					names.len() <span class="kw">as _</span>,
+					lcid.<span class="number">0</span>,
+					ids.as_mut_ptr() <span class="kw">as _</span>,
+				),
+			)
+		}.map(|<span class="kw">_</span>| ids)
+	}
+
 	<span class="doccomment">/// [`IDispatch::GetTypeInfoCount`](https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfocount)
 	/// method.
 	</span><span class="attr">#[must_use]
@@ -117,7 +176,6 @@
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
 			ok_to_hrresult((vt.GetTypeInfoCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
 		}.map(|<span class="kw">_</span>| count)
-
 	}
 
 	<span class="doccomment">/// [`IDispatch::GetTypeInfo`](https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfo)
