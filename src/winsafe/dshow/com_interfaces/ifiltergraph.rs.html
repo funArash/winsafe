@@ -138,14 +138,6 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, IBaseFilter, IEnumFilters};
@@ -237,18 +229,10 @@
 		}
 	}
 
-	<span class="doccomment">/// [`IFilterGraph::EnumFilters`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-enumfilters)
-	/// method.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>EnumFilters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IEnumFilters&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult(
-				(vt.EnumFilters)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried),
-			).map(|<span class="kw">_</span>| IEnumFilters::from(ppv_queried))
-		}
-	}
+	<span class="macro">fn_com_get! </span>{ EnumFilters: IFilterGraphVT, IEnumFilters;
+		<span class="doccomment">/// [`IFilterGraph::EnumFilters`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-enumfilters)
+		/// method.
+	</span>}
 
 	<span class="doccomment">/// [`IFilterGraph::FindFilterByName`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-findfilterbyname)
 	/// method.

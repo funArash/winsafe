@@ -980,6 +980,37 @@
 <a href="#980" id="980">980</a>
 <a href="#981" id="981">981</a>
 <a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::any::TypeId;
@@ -1037,7 +1068,7 @@
 	<span class="doccomment">/// [`Arc`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arc)
 	/// method.
 	</span><span class="kw">fn </span>Arc(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
+		bound: RECT, radial_start: POINT, radial_end: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1045,8 +1076,8 @@
 					<span class="self">self</span>.as_ptr(),
 					bound.left, bound.top,
 					bound.right, bound.bottom,
-					radialStart.x, radialStart.y,
-					radialEnd.x, radialEnd.y,
+					radial_start.x, radial_start.y,
+					radial_end.x, radial_end.y,
 				)
 			},
 		)
@@ -1055,7 +1086,7 @@
 	<span class="doccomment">/// [`ArcTo`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-arcto)
 	/// method.
 	</span><span class="kw">fn </span>ArcTo(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		bound: RECT, radialStart: POINT, radialEnd: POINT) -&gt; SysResult&lt;()&gt;
+		bound: RECT, radial_start: POINT, radial_end: POINT) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
@@ -1063,8 +1094,8 @@
 					<span class="self">self</span>.as_ptr(),
 					bound.left, bound.top,
 					bound.right, bound.bottom,
-					radialStart.x, radialStart.y,
-					radialEnd.x, radialEnd.y,
+					radial_start.x, radial_start.y,
+					radial_end.x, radial_end.y,
 				)
 			},
 		)
@@ -1332,9 +1363,9 @@
 	/// ```
 	</span><span class="kw">unsafe fn </span>GetDIBits(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hbm: <span class="kw-2">&amp;</span>HBITMAP,
-		firstScanLine: u32,
-		numScanLines: u32,
-		bmpDataBuf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt;,
+		first_scan_line: u32,
+		num_scan_lines: u32,
+		bmp_data_buf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt;,
 		bmi: <span class="kw-2">&amp;mut </span>BITMAPINFO,
 		usage: co::DIB,
 	) -&gt; SysResult&lt;i32&gt;
@@ -1342,8 +1373,9 @@
 		<span class="kw">let </span>ret = gdi::ffi::GetDIBits(
 			<span class="self">self</span>.as_ptr(),
 			hbm.as_ptr(),
-			firstScanLine, numScanLines,
-			bmpDataBuf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr() <span class="kw">as _</span>),
+			first_scan_line,
+			num_scan_lines,
+			bmp_data_buf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr() <span class="kw">as _</span>),
 			bmi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 			usage.<span class="number">0</span>,
 		);
@@ -1794,6 +1826,36 @@
 		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCPenColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
+		}
+	}
+
+	<span class="doccomment">/// [`SetDIBits`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdibits)
+	/// method.
+	</span><span class="kw">fn </span>SetDIBits(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		hbm: <span class="kw-2">&amp;</span>HBITMAP,
+		first_scan_line: u32,
+		num_scan_lines: u32,
+		dib_color_data: <span class="kw-2">&amp;</span>[u8],
+		bmi: <span class="kw-2">&amp;</span>BITMAPINFO,
+		color_use: co::DIB,
+	) -&gt; SysResult&lt;i32&gt;
+	{
+		<span class="kw">match unsafe </span>{
+			gdi::ffi::SetDIBits(
+				<span class="self">self</span>.as_ptr(),
+				hbm.as_ptr(),
+				first_scan_line,
+				num_scan_lines,
+				dib_color_data.as_ptr() <span class="kw">as _</span>,
+				bmi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				color_use.<span class="number">0</span>,
+			)
+		} {
+			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
+				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>),
+				err =&gt; <span class="prelude-val">Err</span>(err),
+			},
+			n =&gt; <span class="prelude-val">Ok</span>(n),
 		}
 	}
 

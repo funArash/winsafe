@@ -58,29 +58,12 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::BSTR;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::oleaut_IDispatch;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
@@ -114,19 +97,10 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>taskschd_IAction: oleaut_IDispatch {
-	<span class="doccomment">/// [`IAction::get_Id`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iaction-get_id)
-	/// method.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>get_Id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IActionVT&gt;();
-			ok_to_hrresult((vt.get_Id)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-		}.map(|<span class="kw">_</span>| {
-			<span class="kw">let </span>bstr = <span class="kw">unsafe </span>{ BSTR::from_ptr(pstr) };
-			bstr.to_string()
-		})
-	}
+	<span class="macro">fn_bstr_get! </span>{ get_Id: IActionVT;
+		<span class="doccomment">/// [`IAction::get_Id`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iaction-get_id)
+		/// method.
+	</span>}
 
 	<span class="doccomment">/// [`IAction::get_Type`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iaction-get_type)
 	/// method.
@@ -139,15 +113,9 @@
 		}.map(|<span class="kw">_</span>| at)
 	}
 
-	<span class="doccomment">/// [`IAction::put_Id`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iaction-put_id)
-	/// method.
-	</span><span class="kw">fn </span>put_Id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IActionVT&gt;();
-			ok_to_hrresult(
-				(vt.put_Id)(<span class="self">self</span>.ptr(), BSTR::SysAllocString(id)<span class="question-mark">?</span>.as_ptr()),
-			)
-		}
-	}
+	<span class="macro">fn_bstr_set! </span>{ put_Id: IActionVT, id;
+		<span class="doccomment">/// [`IAction::put_Id`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iaction-put_id)
+		/// method.
+	</span>}
 }
 </code></pre></div></section></main></body></html>

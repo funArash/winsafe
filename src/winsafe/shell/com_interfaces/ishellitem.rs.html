@@ -159,13 +159,6 @@
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -304,34 +297,27 @@
 		})
 	}
 
-	<span class="doccomment">/// [`IShellItem::GetParent`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-getparent)
-	/// method.
-	///
-	/// # Examples
-	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, IBindCtx, IShellItem, SHCreateItemFromParsingName};
-	///
-	/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
-	///     &quot;C:\\Temp\\foo.txt&quot;,
-	///     None::&lt;&amp;IBindCtx&gt;,
-	/// )?;
-	///
-	/// let parent_shi = shi.GetParent()?;
-	/// let full_path = parent_shi.GetDisplayName(co::SIGDN::FILESYSPATH)?;
-	///
-	/// println!(&quot;{}&quot;, full_path);
-	/// # Ok::&lt;_, co::HRESULT&gt;(())
-	/// ```
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>GetParent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;IShellItem&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IShellItemVT&gt;();
-			ok_to_hrresult((vt.GetParent)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
-				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
-		}
-	}
+	<span class="macro">fn_com_get! </span>{ GetParent: IShellItemVT, IShellItem;
+		<span class="doccomment">/// [`IShellItem::GetParent`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitem-getparent)
+		/// method.
+		///
+		/// # Examples
+		///
+		/// ```rust,no_run
+		/// use winsafe::prelude::*;
+		/// use winsafe::{co, IBindCtx, IShellItem, SHCreateItemFromParsingName};
+		///
+		/// let shi = SHCreateItemFromParsingName::&lt;IShellItem&gt;(
+		///     &quot;C:\\Temp\\foo.txt&quot;,
+		///     None::&lt;&amp;IBindCtx&gt;,
+		/// )?;
+		///
+		/// let parent_shi = shi.GetParent()?;
+		/// let full_path = parent_shi.GetDisplayName(co::SIGDN::FILESYSPATH)?;
+		///
+		/// println!(&quot;{}&quot;, full_path);
+		/// # Ok::&lt;_, co::HRESULT&gt;(())
+		/// ```
+	</span>}
 }
 </code></pre></div></section></main></body></html>

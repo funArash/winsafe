@@ -72,51 +72,10 @@
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::BSTR;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::oleaut_IDispatch;
 <span class="kw">use </span><span class="kw">crate</span>::taskschd::decl::ITriggerCollection;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
@@ -144,7 +103,7 @@
 <span class="macro">com_interface! </span>{ ITaskDefinition: <span class="string">&quot;f5bc8fc5-536d-4f77-b852-fbc1356fdeb6&quot;</span>;
 	<span class="doccomment">/// [`ITaskDefinition`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nn-taskschd-itaskdefinition)
 	/// COM interface over [`ITaskDefinitionVT`](crate::vt::ITaskDefinitionVT).
-	/// 
+	///
 	/// Automatically calls
 	/// [`Release`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
 	/// when the object goes out of scope.
@@ -162,66 +121,29 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>taskschd_ITaskDefinition: oleaut_IDispatch {
-	<span class="doccomment">/// [`ITaskDefinition::get_Data`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_data)
-	/// method.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>get_Data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskDefinitionVT&gt;();
-			ok_to_hrresult((vt.get_Data)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-		}.map(|<span class="kw">_</span>| {
-			<span class="kw">let </span>bstr = <span class="kw">unsafe </span>{ BSTR::from_ptr(pstr) };
-			bstr.to_string()
-		})
-	}
+	<span class="macro">fn_bstr_get! </span>{ get_Data: ITaskDefinitionVT;
+		<span class="doccomment">/// [`ITaskDefinition::get_Data`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_data)
+		/// method.
+	</span>}
 
-	<span class="doccomment">/// [`ITaskDefinition::get_Triggers`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_triggers)
-	/// method.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>get_Triggers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;ITriggerCollection&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskDefinitionVT&gt;();
-			ok_to_hrresult((vt.get_Triggers)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried))
-				.map(|<span class="kw">_</span>| ITriggerCollection::from(ppv_queried))
-		}
-	}
+	<span class="macro">fn_com_get! </span>{ get_Triggers: ITaskDefinitionVT, ITriggerCollection;
+		<span class="doccomment">/// [`ITaskDefinition::get_Triggers`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_triggers)
+		/// method.
+	</span>}
 
-	<span class="doccomment">/// [`ITaskDefinition::get_XmlText`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_xmltext)
-	/// method.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>get_XmlText(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskDefinitionVT&gt;();
-			ok_to_hrresult((vt.get_XmlText)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-		}.map(|<span class="kw">_</span>| {
-			<span class="kw">let </span>bstr = <span class="kw">unsafe </span>{ BSTR::from_ptr(pstr) };
-			bstr.to_string()
-		})
-	}
+	<span class="macro">fn_bstr_get! </span>{ get_XmlText: ITaskDefinitionVT;
+		<span class="doccomment">/// [`ITaskDefinition::get_XmlText`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-get_xmltext)
+		/// method.
+	</span>}
 
-	<span class="doccomment">/// [`ITaskDefinition::put_Data`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-put_data)
-	/// method.
-	</span><span class="kw">fn </span>put_Data(<span class="kw-2">&amp;</span><span class="self">self</span>, xml: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskDefinitionVT&gt;();
-			ok_to_hrresult(
-				(vt.put_Data)(<span class="self">self</span>.ptr(), BSTR::SysAllocString(xml)<span class="question-mark">?</span>.as_ptr()),
-			)
-		}
-	}
+	<span class="macro">fn_bstr_set! </span>{ put_Data: ITaskDefinitionVT, data;
+		<span class="doccomment">/// [`ITaskDefinition::put_Data`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-put_data)
+		/// method.
+	</span>}
 
-	<span class="doccomment">/// [`ITaskDefinition::put_XmlText`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-put_xmltext)
-	/// method.
-	</span><span class="kw">fn </span>put_XmlText(<span class="kw-2">&amp;</span><span class="self">self</span>, xml: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskDefinitionVT&gt;();
-			ok_to_hrresult(
-				(vt.put_XmlText)(<span class="self">self</span>.ptr(), BSTR::SysAllocString(xml)<span class="question-mark">?</span>.as_ptr()),
-			)
-		}
-	}
+	<span class="macro">fn_bstr_set! </span>{ put_XmlText: ITaskDefinitionVT, xml;
+		<span class="doccomment">/// [`ITaskDefinition::put_XmlText`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itaskdefinition-put_xmltext)
+		/// method.
+	</span>}
 }
 </code></pre></div></section></main></body></html>
