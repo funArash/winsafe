@@ -102,6 +102,8 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::{fmt, hash};
@@ -160,13 +162,15 @@
 	}
 
 	<span class="doccomment">/// Returns a mutable reference to the underlying raw pointer.
-	/// 
-	/// This method exposes the raw pointer used by raw Windows calls. It&#39;s an
-	/// opaque pointer to an internal Windows structure, and no dereferencings
-	/// should be attempted.
 	///
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
+	///
+	/// # Safety
+	///
+	/// This method exposes the raw pointer used by raw Windows calls. It&#39;s an
+	/// opaque pointer to an internal Windows structure, and no dereferencings
+	/// should be attempted.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut *mut </span>std::ffi::c_void;
 
@@ -183,15 +187,15 @@
 
 	<span class="doccomment">/// Returns `None` if the handle is null or invalid, otherwise returns
 	/// `Some(&amp;self)`.
-	/// 
+	///
 	/// # Examples
-	/// 
+	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::HFILE;
-	/// 
+	///
 	/// let hfile = HFILE::NULL;
-	/// 
+	///
 	/// match hfile.as_opt() {
 	///     Some(hfile) =&gt; println!(&quot;Never prints&quot;),
 	///     None =&gt; println!(&quot;The handle is null&quot;),
