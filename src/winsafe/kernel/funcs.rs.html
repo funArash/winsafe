@@ -1564,19 +1564,19 @@
 
 <span class="doccomment">/// [`AllocateAndInitializeSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-allocateandinitializesid)
 /// function.
-/// 
+///
 /// # Panics
-/// 
+///
 /// Panics if `sub_authorities` has more than 8 elements.
-/// 
+///
 /// # Examples
-/// 
+///
 /// Create a well-known SID for the Everyone group:
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{AllocateAndInitializeSid, co, SID_IDENTIFIER_AUTHORITY};
-/// 
+///
 /// let sid_everyone = AllocateAndInitializeSid(
 ///     &amp;SID_IDENTIFIER_AUTHORITY::WORLD,
 ///     &amp;[
@@ -1585,13 +1585,13 @@
 /// )?;
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
-/// 
+///
 /// Create a SID for the BUILTIN\Administrators group:
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{AllocateAndInitializeSid, co, SID_IDENTIFIER_AUTHORITY};
-/// 
+///
 /// let sid_builtin_administrators = AllocateAndInitializeSid(
 ///     &amp;SID_IDENTIFIER_AUTHORITY::NT,
 ///     &amp;[
@@ -1634,7 +1634,7 @@
 
 <span class="doccomment">/// [`ConvertSidToStringSid`](https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertsidtostringsidw)
 /// function.
-/// 
+///
 /// You don&#39;t need to call this function directly, because [`SID`](crate::SID)
 /// implements [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html)
 /// and [`ToString`](https://doc.rust-lang.org/std/string/trait.ToString.html)
@@ -1646,7 +1646,7 @@
 		<span class="kw">unsafe </span>{
 			kernel::ffi::ConvertSidToStringSidW(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, <span class="kw-2">&amp;mut </span>pstr)
 		},
-	)<span class="question-mark">?</span>;	
+	)<span class="question-mark">?</span>;
 	<span class="kw">let </span>name = WString::from_wchars_nullt(pstr).to_string();
 	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pstr <span class="kw">as _</span>)) }; <span class="comment">// free returned pointer
 	</span><span class="prelude-val">Ok</span>(name)
@@ -1703,13 +1703,13 @@
 
 <span class="doccomment">/// [`CreateWellKnownSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-createwellknownsid)
 /// function.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{co, CreateWellKnownSid};
-/// 
+///
 /// let sid = CreateWellKnownSid(co::WELL_KNOWN_SID_TYPE::LocalSystem, None)?;
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
@@ -1911,7 +1911,7 @@
 
 <span class="doccomment">/// [`FormatMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)
 /// function.
-/// 
+///
 /// You don&#39;t need to call this function: all error types implement the
 /// [`FormattedError`](crate::prelude::FormattedError) trait which will
 /// automatically call `FormatMessage`.
@@ -1925,12 +1925,12 @@
 ) -&gt; SysResult&lt;String&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>ptr_buf = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u16;
-	
+
 	<span class="kw">let </span>nchars = <span class="kw">match </span>kernel::ffi::FormatMessageW(
 		flags.<span class="number">0</span>,
 		source.unwrap_or(std::ptr::null_mut()),
 		message_id,
-		lang_id.<span class="number">0 </span><span class="kw">as _</span>,
+		u16::from(lang_id) <span class="kw">as _</span>,
 		<span class="kw-2">&amp;mut </span>ptr_buf <span class="kw">as </span><span class="kw-2">*mut *mut </span><span class="kw">_ as _</span>, <span class="comment">// pass pointer to pointer
 		</span><span class="number">0</span>,
 		args.map_or(std::ptr::null_mut(), |arr| arr.as_ptr() <span class="kw">as _</span>),
@@ -2030,7 +2030,7 @@
 /// Returns the parsed strings, and automatically frees the retrieved
 /// environment block with
 /// [`FreeEnvironmentStrings`](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-freeenvironmentstringsw).
-/// 
+///
 /// # Examples
 ///
 /// Retrieving and printing the key/value pairs of all environment strings:
@@ -2166,16 +2166,16 @@
 
 <span class="doccomment">/// [`GetLocalTime`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getlocaltime)
 /// function.
-/// 
+///
 /// This function retrieves local time; for UTC time use
 /// [`GetSystemTime`](crate::GetSystemTime).
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{GetLocalTime, SYSTEMTIME};
-/// 
+///
 /// let mut st = SYSTEMTIME::default();
 /// GetLocalTime(&amp;mut st);
 /// ```
@@ -2198,13 +2198,13 @@
 
 <span class="doccomment">/// [`GetStartupInfo`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getstartupinfow)
 /// function.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{GetStartupInfo, STARTUPINFO};
-/// 
+///
 /// let mut si = STARTUPINFO::default();
 /// GetStartupInfo(&amp;mut si);
 /// ```
@@ -2226,7 +2226,7 @@
 
 <span class="doccomment">/// [`GetSystemFileCacheSize`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-getsystemfilecachesize)
 /// function.
-/// 
+///
 /// Returns minimum and maximum size of file cache (in bytes), and enabled cache
 /// limit flags, respectively.
 </span><span class="attr">#[must_use]
@@ -2242,13 +2242,13 @@
 
 <span class="doccomment">/// [`GetSystemInfo`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsysteminfo)
 /// function.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{GetSystemInfo, SYSTEM_INFO};
-/// 
+///
 /// let mut si = SYSTEM_INFO::default();
 /// GetSystemInfo(&amp;mut si);
 /// ```
@@ -2261,13 +2261,13 @@
 ///
 /// This function retrieves UTC time; for local time use
 /// [`GetLocalTime`](crate::GetLocalTime).
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{GetSystemTime, SYSTEMTIME};
-/// 
+///
 /// let mut st = SYSTEMTIME::default();
 /// GetSystemTime(&amp;mut st);
 /// ```
@@ -2479,7 +2479,7 @@
 
 <span class="doccomment">/// [`InitializeSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-initializesecuritydescriptor)
 /// function.
-/// 
+///
 /// You don&#39;t need to call this function directly, because
 /// [`SECURITY_DESCRIPTOR`](crate::SECURITY_DESCRIPTOR) implements the
 /// [`Default`](https://doc.rust-lang.org/std/default/trait.Default.html) trait,
@@ -2656,15 +2656,15 @@
 
 <span class="doccomment">/// [`LookupAccountName`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamew)
 /// function.
-/// 
+///
 /// Returns account&#39;s domain name, `SID` and type, respectively.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```rust,no_run
 /// use winsafe::prelude::*;
 /// use winsafe::{GetUserName, LookupAccountName};
-/// 
+///
 /// let user_name = GetUserName()?;
 /// let (domain_name, sid, kind) = LookupAccountName(None, &amp;user_name)?;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
@@ -2715,7 +2715,7 @@
 
 <span class="doccomment">/// [`LookupAccountSid`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountsidw)
 /// function.
-/// 
+///
 /// Returns account name, domain name and type, respectively.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>LookupAccountSid(
@@ -2943,7 +2943,7 @@
 
 <span class="doccomment">/// [`SetThreadStackGuarantee`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadstackguarantee)
 /// function.
-/// 
+///
 /// Returns the size of the previous stack.
 </span><span class="kw">pub fn </span>SetThreadStackGuarantee(stack_size_in_bytes: u32) -&gt; SysResult&lt;u32&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>sz = stack_size_in_bytes;
@@ -3078,7 +3078,7 @@
 				<span class="kw-2">&amp;mut </span>default_char_buf,
 				<span class="kw-2">&amp;mut </span>bool_buf,
 			)
-		},	
+		},
 	).map(|<span class="kw">_</span>| {
 		<span class="kw">if let </span><span class="prelude-val">Some</span>(used_default_char) = used_default_char {
 			<span class="kw-2">*</span>used_default_char = bool_buf != <span class="number">0</span>;

@@ -423,7 +423,7 @@
 	HIWORD, LOWORD, MAKEDWORD, MAKEWORD, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HICON, RECT};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::zero_as_badargs;
 
@@ -656,7 +656,7 @@
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
 		<span class="kw">match </span>v <span class="kw">as </span>u32 {
 			CLR_DEFAULT =&gt; <span class="prelude-val">None</span>,
-			v =&gt; <span class="prelude-val">Some</span>(COLORREF(v)),
+			v =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(v) }),
 		}
 	}
 
@@ -664,7 +664,7 @@
 		WndMsg {
 			msg_id: co::SB::SETBKCOLOR.into(),
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.color.map_or(CLR_DEFAULT, |color| color.<span class="number">0</span>) <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.color.map_or(CLR_DEFAULT, |color| color.into()) <span class="kw">as _</span>,
 		}
 	}
 }

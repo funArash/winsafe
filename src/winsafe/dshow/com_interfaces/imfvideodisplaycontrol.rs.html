@@ -250,7 +250,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE, HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, RECT, SIZE};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -330,10 +330,10 @@
 	/// method;
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetBorderColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;COLORREF&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>color = COLORREF::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>color = COLORREF::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMFVideoDisplayControlVT&gt;();
-			ok_to_hrresult((vt.GetBorderColor)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>color.<span class="number">0</span>))
+			ok_to_hrresult((vt.GetBorderColor)(<span class="self">self</span>.ptr(), color.as_mut()))
 		}.map(|<span class="kw">_</span>| color)
 	}
 
@@ -447,7 +447,7 @@
 	</span><span class="kw">fn </span>SetBorderColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMFVideoDisplayControlVT&gt;();
-			ok_to_hrresult((vt.SetBorderColor)(<span class="self">self</span>.ptr(), color.<span class="number">0</span>))
+			ok_to_hrresult((vt.SetBorderColor)(<span class="self">self</span>.ptr(), color.into()))
 		}
 	}
 

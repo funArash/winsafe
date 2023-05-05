@@ -763,7 +763,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{MCGRIDINFO, MCHITTESTINFO, MONTHDAYSTATE};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LOWORD, SysResult, SYSTEMTIME};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, RECT};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::{minus1_as_badargs, minus1_as_none, zero_as_badargs};
 
@@ -869,7 +869,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;COLORREF&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		minus1_as_badargs(v).map(|v| COLORREF(v <span class="kw">as _</span>))
+		minus1_as_badargs(v).map(|v| <span class="kw">unsafe </span>{ COLORREF::from_raw(v <span class="kw">as _</span>) })
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -1244,14 +1244,14 @@
 	<span class="kw">type </span>RetType = <span class="prelude-ty">Option</span>&lt;COLORREF&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		minus1_as_none(v).map(|v| COLORREF(v <span class="kw">as _</span>))
+		minus1_as_none(v).map(|v| <span class="kw">unsafe </span>{ COLORREF::from_raw(v <span class="kw">as _</span>) })
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::MCM::SETCOLOR.into(),
 			wparam: <span class="self">self</span>.which.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.color.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: u32::from(<span class="self">self</span>.color) <span class="kw">as _</span>,
 		}
 	}
 }

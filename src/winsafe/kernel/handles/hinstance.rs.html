@@ -334,7 +334,7 @@
 	bool_to_sysresult, MAX_PATH, ptr_to_sysresult, ptr_to_sysresult_handle,
 	str_to_iso88591,
 };
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 
 <span class="macro">impl_handle! </span>{ HINSTANCE;
 	<span class="doccomment">/// Handle to an
@@ -449,7 +449,7 @@
 					<span class="self">self</span>.as_ptr(),
 					resource_id.as_ptr(),
 					resource_type.as_ptr(),
-					language.unwrap_or(LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL)).<span class="number">0</span>,
+					language.unwrap_or(LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL)).into(),
 				)
 			},
 		)
@@ -628,7 +628,7 @@
 	<span class="kw">where </span>F: Fn(LANGID) -&gt; bool,
 {
 	<span class="kw">let </span>func = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(lparam <span class="kw">as </span><span class="kw-2">*const </span>F) };
-	func(LANGID(language_id)) <span class="kw">as _
+	func(<span class="kw">unsafe </span>{ LANGID::from_raw(language_id) }) <span class="kw">as _
 </span>}
 
 <span class="kw">extern </span><span class="string">&quot;system&quot; </span><span class="kw">fn </span>enum_resource_names_proc&lt;F&gt;(

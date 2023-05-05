@@ -1072,7 +1072,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LCID, LOWORD, MAKEDWORD, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::MsgSend;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{POINT, RECT};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::{LB_ERR, LB_ERRSPACE, zero_as_badargs};
 
@@ -1475,7 +1475,7 @@
 	<span class="kw">type </span>RetType = LCID;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		LCID(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ LCID::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -2049,14 +2049,14 @@
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
 		<span class="kw">match </span>v <span class="kw">as </span>i32 {
 			LB_ERR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
-			lcid =&gt; <span class="prelude-val">Ok</span>(LCID(lcid <span class="kw">as _</span>)),
+			lcid =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ LCID::from_raw(lcid <span class="kw">as _</span>) }),
 		}
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::LB::SETLOCALE.into(),
-			wparam: <span class="self">self</span>.locale.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: u32::from(<span class="self">self</span>.locale) <span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
 		}
 	}

@@ -1023,7 +1023,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, ptr_to_sysresult, ptr_to_sysresult_handle,
 };
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObjectSelect, Handle};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObjectSelect, Handle, IntUnderlying};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	COLORREF, HBITMAP, HBRUSH, HDC, HRGN, POINT, RECT, SIZE,
 };
@@ -1272,7 +1272,7 @@
 	</span><span class="kw">fn </span>GetBkColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetBkColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			c =&gt; <span class="prelude-val">Ok</span>(COLORREF(c)),
+			c =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(c) }),
 		}
 	}
 
@@ -1292,7 +1292,7 @@
 	</span><span class="kw">fn </span>GetDCBrushColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCBrushColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
+			color =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(color) }),
 		}
 	}
 
@@ -1302,7 +1302,7 @@
 	</span><span class="kw">fn </span>GetDCPenColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetDCPenColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
+			color =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(color) }),
 		}
 	}
 
@@ -1412,7 +1412,7 @@
 	</span><span class="kw">fn </span>GetTextColor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;COLORREF&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetTextColor(<span class="self">self</span>.as_ptr()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			color =&gt; <span class="prelude-val">Ok</span>(COLORREF(color)),
+			color =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(color) }),
 		}
 	}
 
@@ -1781,9 +1781,9 @@
 	<span class="doccomment">/// [`SetBkColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkcolor)
 	/// method.
 	</span><span class="kw">fn </span>SetBkColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkColor(<span class="self">self</span>.as_ptr(), color.into()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
+			old =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(old) }),
 		}
 	}
 
@@ -1814,18 +1814,18 @@
 	<span class="doccomment">/// [`SetDCBrushColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcbrushcolor)
 	/// method.
 	</span><span class="kw">fn </span>SetDCBrushColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCBrushColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCBrushColor(<span class="self">self</span>.as_ptr(), color.into()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
+			old =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(old) }),
 		}
 	}
 
 	<span class="doccomment">/// [`SetDCPenColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setdcpencolor)
 	/// method.
 	</span><span class="kw">fn </span>SetDCPenColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCPenColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetDCPenColor(<span class="self">self</span>.as_ptr(), color.into()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
+			old =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(old) }),
 		}
 	}
 
@@ -1893,9 +1893,9 @@
 	<span class="doccomment">/// [`SetTextColor`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextcolor)
 	/// method.
 	</span><span class="kw">fn </span>SetTextColor(<span class="kw-2">&amp;</span><span class="self">self</span>, color: COLORREF) -&gt; SysResult&lt;COLORREF&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextColor(<span class="self">self</span>.as_ptr(), color.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextColor(<span class="self">self</span>.as_ptr(), color.into()) } {
 			CLR_INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			old =&gt; <span class="prelude-val">Ok</span>(COLORREF(old)),
+			old =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ COLORREF::from_raw(old) }),
 		}
 	}
 

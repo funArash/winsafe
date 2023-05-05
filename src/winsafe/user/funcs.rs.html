@@ -908,7 +908,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, ptr_to_sysresult};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	ATOM, AtomStr, COLORREF, DEVMODE, DISPLAY_DEVICE, GmidxEnum, GUITHREADINFO,
 	HwKbMouse, HWND, INPUT, MSG, POINT, RECT, SIZE, TRACKMOUSEEVENT, WNDCLASSEX,
@@ -1419,7 +1419,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSysColor(index: co::COLOR) -&gt; COLORREF {
-	COLORREF(<span class="kw">unsafe </span>{ user::ffi::GetSysColor(index.<span class="number">0</span>) })
+	<span class="kw">unsafe </span>{ COLORREF::from_raw(user::ffi::GetSysColor(index.<span class="number">0</span>)) }
 }
 
 <span class="doccomment">/// [`GetSystemMetrics`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics)
@@ -1586,7 +1586,7 @@
 </span><span class="kw">pub unsafe fn </span>RegisterClassEx(wcx: <span class="kw-2">&amp;</span>WNDCLASSEX) -&gt; SysResult&lt;ATOM&gt; {
 	<span class="kw">match unsafe </span>{ user::ffi::RegisterClassExW(wcx <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) } {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		atom =&gt; <span class="prelude-val">Ok</span>(ATOM(atom)),
+		atom =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ ATOM::from_raw(atom) }),
 	}
 }
 

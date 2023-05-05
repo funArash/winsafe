@@ -755,8 +755,6 @@
 <a href="#755" id="755">755</a>
 <a href="#756" id="756">756</a>
 <a href="#757" id="757">757</a>
-<a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -932,14 +930,10 @@
 <span class="doccomment">/// [`LANGID`](https://learn.microsoft.com/en-us/windows/win32/intl/language-identifiers)
 /// language identifier.
 </span><span class="attr">#[repr(transparent)]
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-</span><span class="kw">pub struct </span>LANGID(<span class="kw">pub</span>(<span class="kw">crate</span>) u16);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>LANGID(u16);
 
-<span class="kw">impl </span>From&lt;LANGID&gt; <span class="kw">for </span>u16 {
-	<span class="kw">fn </span>from(v: LANGID) -&gt; <span class="self">Self </span>{
-		v.<span class="number">0
-	</span>}
-}
+<span class="macro">impl_intunderlying!</span>(LANGID, u16);
 
 <span class="kw">impl </span>LANGID {
 	<span class="doccomment">/// [`LANGID`](crate::LANGID) composed of
@@ -980,8 +974,10 @@
 <span class="doccomment">/// [`LCID`](https://learn.microsoft.com/en-us/windows/win32/intl/locale-identifiers)
 /// locale identifier.
 </span><span class="attr">#[repr(transparent)]
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-</span><span class="kw">pub struct </span>LCID(<span class="kw">pub</span>(<span class="kw">crate</span>) u32);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>LCID(u32);
+
+<span class="macro">impl_intunderlying!</span>(LCID, u32);
 
 <span class="kw">impl </span>LCID {
 	<span class="doccomment">/// [`LCID`](crate::LCID) composed of
@@ -1273,11 +1269,11 @@
 
 <span class="doccomment">/// [`SID`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-sid)
 /// struct.
-/// 
+///
 /// Note that you cannot directly instantiate this struct, because the
 /// `SubAuthority` field is dynamically allocated. There are 3 possible types of
 /// allocations:
-/// 
+///
 /// * handled by the OS, which yields a [`FreeSidGuard`](crate::guard::FreeSidGuard);
 /// * handled by the OS, which yields a [`LocalFreeSidGuard`](crate::guard::LocalFreeSidGuard);
 /// * handled by WinSafe, which yields a [`SidGuard`](crate::guard::SidGuard).

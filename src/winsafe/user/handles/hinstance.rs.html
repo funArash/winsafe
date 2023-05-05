@@ -195,7 +195,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HINSTANCE, IdStr, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::ptr_to_sysresult_handle;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 <span class="kw">use </span><span class="kw">crate</span>::user;
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	ATOM, DLGPROC, HACCEL, HMENU, HWND, IdIdcStr, IdIdiStr, WNDCLASSEX,
@@ -293,7 +293,7 @@
 			)
 		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			atom =&gt; <span class="prelude-val">Ok</span>(ATOM(atom <span class="kw">as _</span>)),
+			atom =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ ATOM::from_raw(atom <span class="kw">as _</span>) }),
 		}
 	}
 

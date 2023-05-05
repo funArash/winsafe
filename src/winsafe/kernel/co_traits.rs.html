@@ -86,12 +86,81 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::{fmt, hash, ops};
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FormatMessage, LANGID};
+
+<span class="doccomment">/// A type which as a primitive integer as its underlying type.
+</span><span class="kw">pub trait </span>IntUnderlying: Sized
+	+ Clone + Copy + PartialEq + Eq + hash::Hash + Send
+	+ Into&lt;<span class="self">Self</span>::Raw&gt; + AsRef&lt;<span class="self">Self</span>::Raw&gt;
+{
+	<span class="doccomment">/// The underlying raw integer type.
+	</span><span class="kw">type </span>Raw;
+
+	<span class="doccomment">/// Constructs a new `IntUnderlying` by wrapping the given integer value.
+	///
+	/// # Safety
+	///
+	/// Be sure the given value is meaningful for the actual type.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>from_raw(v: <span class="self">Self</span>::Raw) -&gt; <span class="self">Self</span>;
+
+	<span class="doccomment">/// Returns a mutable reference to the underlying raw value.
+	///
+	/// # Safety
+	///
+	/// Be sure the integer being set is meaningful for the actual type.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Raw;
+}
+
+<span class="doccomment">/// A native typed constant.
+///
+/// If the values of this constant type can be combined as bitflags, it will
+/// also implement the [`NativeBitflag`](crate::prelude::NativeBitflag) trait.
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="kw">pub trait </span>NativeConst: IntUnderlying
+	+ Default + fmt::Debug + fmt::Display
+	+ fmt::LowerHex + fmt::UpperHex
+	+ fmt::Binary + fmt::Octal
+{}
+
+<span class="doccomment">/// A native typed bitflag constant.
+///
+/// Prefer importing this trait through the prelude:
+///
+/// ```rust,no_run
+/// use winsafe::prelude::*;
+/// ```
+</span><span class="kw">pub trait </span>NativeBitflag: NativeConst
+	+ ops::BitAnd + ops::BitAndAssign
+	+ ops::BitOr + ops::BitOrAssign
+	+ ops::BitXor + ops::BitXorAssign
+	+ ops::Not
+{
+	<span class="doccomment">/// Tells whether other bitflag style is present.
+	///
+	/// Equivalent to `(val &amp; other) != 0`.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>has(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool;
+}
 
 <span class="doccomment">/// A system error which can be formatted with
 /// [`FormatMessage`](crate::FormatMessage).
@@ -120,58 +189,5 @@
 			<span class="prelude-val">Ok</span>(s) =&gt; s,
 		}
 	}
-}
-
-<span class="doccomment">/// A native typed constant.
-///
-/// If the values of this constant type can be combined as bitflags, it will
-/// also implement the [`NativeBitflag`](crate::prelude::NativeBitflag) trait.
-///
-/// Prefer importing this trait through the prelude:
-///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// ```
-</span><span class="kw">pub trait </span>NativeConst: Sized
-	+ Default + Clone + Copy + PartialEq + Eq + Send + hash::Hash
-	+ Into&lt;<span class="self">Self</span>::Raw&gt; + AsRef&lt;<span class="self">Self</span>::Raw&gt;
-	+ fmt::Debug + fmt::Display
-	+ fmt::LowerHex + fmt::UpperHex
-	+ fmt::Binary + fmt::Octal
-{
-	<span class="doccomment">/// The underlying type of this constant.
-	</span><span class="kw">type </span>Raw;
-
-	<span class="doccomment">/// Returns a mutable reference to the underlying raw value.
-	///
-	/// # Safety
-	///
-	/// Be sure the value being set is a valid constant value for the given
-	/// type.
-	///
-	/// This method is used internally by the library, and not intended to be
-	/// used externally.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Raw;
-}
-
-<span class="doccomment">/// A native typed bitflag constant.
-///
-/// Prefer importing this trait through the prelude:
-///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// ```
-</span><span class="kw">pub trait </span>NativeBitflag: NativeConst
-	+ ops::BitAnd + ops::BitAndAssign
-	+ ops::BitOr + ops::BitOrAssign
-	+ ops::BitXor + ops::BitXorAssign
-	+ ops::Not
-{
-	<span class="doccomment">/// Tells whether other bitflag style is present.
-	///
-	/// Equivalent to `(val &amp; other) != 0`.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>has(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool;
 }
 </code></pre></div></section></main></body></html>
