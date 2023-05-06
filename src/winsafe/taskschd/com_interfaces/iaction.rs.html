@@ -64,7 +64,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::oleaut_IDispatch;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
 <span class="doccomment">/// [`IAction`](crate::IAction) virtual table.
@@ -109,7 +109,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>at = co::TASK_ACTION_TYPE::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IActionVT&gt;();
-			ok_to_hrresult((vt.get_Type)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>at.<span class="number">0</span>))
+			ok_to_hrresult((vt.get_Type)(<span class="self">self</span>.ptr(), at.as_mut()))
 		}.map(|<span class="kw">_</span>| at)
 	}
 

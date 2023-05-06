@@ -368,7 +368,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.AddPlace)(<span class="self">self</span>.ptr(), si.ptr(), fdap.<span class="number">0</span>))
+			ok_to_hrresult((vt.AddPlace)(<span class="self">self</span>.ptr(), si.ptr(), fdap.raw()))
 		}
 	}
 
@@ -386,7 +386,7 @@
 	</span><span class="kw">fn </span>Close(<span class="kw-2">&amp;</span><span class="self">self</span>, hr: co::ERROR) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.Close)(<span class="self">self</span>.ptr(), hr.<span class="number">0 </span><span class="kw">as _</span>))
+			ok_to_hrresult((vt.Close)(<span class="self">self</span>.ptr(), hr.raw() <span class="kw">as _</span>))
 		}
 	}
 
@@ -434,7 +434,7 @@
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
 			ok_to_hrresult((vt.GetOptions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>opts))
-		}.map(|<span class="kw">_</span>| co::FOS(opts))
+		}.map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::FOS::from_raw(opts) })
 	}
 
 	<span class="macro">fn_com_get! </span>{ GetResult: IFileDialogVT, IShellItem;
@@ -587,7 +587,7 @@
 	</span><span class="kw">fn </span>SetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>, opts: co::FOS) -&gt; HrResult&lt;()&gt; {
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetOptions)(<span class="self">self</span>.ptr(), opts.<span class="number">0</span>))
+			ok_to_hrresult((vt.SetOptions)(<span class="self">self</span>.ptr(), opts.raw()))
 		}
 	}
 

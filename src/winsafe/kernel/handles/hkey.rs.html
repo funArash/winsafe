@@ -1213,6 +1213,10 @@
 <a href="#1213" id="1213">1213</a>
 <a href="#1214" id="1214">1214</a>
 <a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -1223,7 +1227,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::RegCloseKeyGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::error_to_sysresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 
 <span class="macro">impl_handle! </span>{ HKEY;
 	<span class="doccomment">/// Handle to a
@@ -1325,7 +1329,7 @@
 	) -&gt; SysResult&lt;(RegCloseKeyGuard, co::REG_DISPOSITION)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
-		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
+		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::default();
 
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
@@ -1334,11 +1338,11 @@
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
 					WString::from_opt_str(class).as_ptr(),
-					options.<span class="number">0</span>,
-					access_rights.<span class="number">0</span>,
+					options.raw(),
+					access_rights.raw(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					hkey.as_mut(),
-					<span class="kw-2">&amp;mut </span>disposition.<span class="number">0</span>,
+					disposition.as_mut(),
 				),
 			).map(|<span class="kw">_</span>| (RegCloseKeyGuard::new(hkey), disposition))
 		}
@@ -1357,7 +1361,7 @@
 	) -&gt; SysResult&lt;(RegCloseKeyGuard, co::REG_DISPOSITION)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
-		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::NoValue;
+		<span class="kw">let </span><span class="kw-2">mut </span>disposition = co::REG_DISPOSITION::default();
 
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
@@ -1366,11 +1370,11 @@
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
 					WString::from_opt_str(class).as_ptr(),
-					options.<span class="number">0</span>,
-					access_rights.<span class="number">0</span>,
+					options.raw(),
+					access_rights.raw(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					hkey.as_mut(),
-					<span class="kw-2">&amp;mut </span>disposition.<span class="number">0</span>,
+					disposition.as_mut(),
 					htransaction.as_ptr(),
 					std::ptr::null_mut(),
 				),
@@ -1413,7 +1417,7 @@
 				kernel::ffi::RegDeleteKeyExW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(sub_key).as_ptr(),
-					platform_view.<span class="number">0</span>,
+					platform_view.raw(),
 					<span class="number">0</span>,
 				)
 			},
@@ -1433,7 +1437,7 @@
 				kernel::ffi::RegDeleteKeyTransactedW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(sub_key).as_ptr(),
-					access_rights.<span class="number">0</span>,
+					access_rights.raw(),
 					<span class="number">0</span>,
 					htransaction.as_ptr(),
 					std::ptr::null_mut(),
@@ -1626,7 +1630,7 @@
 					<span class="self">self</span>.as_ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
-					(co::RRF::RT_ANY | co::RRF::NOEXPAND).<span class="number">0</span>,
+					(co::RRF::RT_ANY | co::RRF::NOEXPAND).raw(),
 					<span class="kw-2">&amp;mut </span>raw_data_type1,
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>data_len1,
@@ -1647,7 +1651,7 @@
 					<span class="self">self</span>.as_ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
-					(co::RRF::RT_ANY | co::RRF::NOEXPAND).<span class="number">0</span>,
+					(co::RRF::RT_ANY | co::RRF::NOEXPAND).raw(),
 					<span class="kw-2">&amp;mut </span>raw_data_type2,
 					buf.as_mut_ptr() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>data_len2,
@@ -1656,8 +1660,10 @@
 		)<span class="question-mark">?</span>;
 
 		validate_retrieved_reg_val(
-			co::REG(raw_data_type1), data_len1,
-			co::REG(raw_data_type2), data_len2, buf)
+			<span class="kw">unsafe </span>{ co::REG::from_raw(raw_data_type1) }, data_len1,
+			<span class="kw">unsafe </span>{ co::REG::from_raw(raw_data_type2) }, data_len2,
+			buf,
+		)
 	}
 
 	<span class="doccomment">/// [`RegLoadKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeyw)
@@ -1685,7 +1691,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegOpenCurrentUser(access_rights.<span class="number">0</span>, hkey.as_mut()),
+				kernel::ffi::RegOpenCurrentUser(access_rights.raw(), hkey.as_mut()),
 			).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
 		}
 	}
@@ -1719,8 +1725,8 @@
 				kernel::ffi::RegOpenKeyExW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
-					options.<span class="number">0</span>,
-					access_rights.<span class="number">0</span>,
+					options.raw(),
+					access_rights.raw(),
 					hkey.as_mut(),
 				),
 			).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
@@ -1743,8 +1749,8 @@
 				kernel::ffi::RegOpenKeyTransactedW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(sub_key).as_ptr(),
-					options.<span class="number">0</span>,
-					access_rights.<span class="number">0</span>,
+					options.raw(),
+					access_rights.raw(),
 					hkey.as_mut(),
 					htransaction.as_ptr(),
 					std::ptr::null_mut(),
@@ -1789,8 +1795,8 @@
 		<span class="kw">let </span>last_write_time = last_write_time.map_or(std::ptr::null_mut(), |re| re <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>);
 
 		<span class="kw">loop </span>{ <span class="comment">// until class is large enough
-			</span><span class="kw">match </span>co::ERROR(
-				<span class="kw">unsafe </span>{
+			</span><span class="kw">match unsafe </span>{
+				co::ERROR::from_raw(
 					kernel::ffi::RegQueryInfoKeyW(
 						<span class="self">self</span>.as_ptr(),
 						class_ptr,
@@ -1804,9 +1810,9 @@
 						max_value_len,
 						security_descr_len,
 						last_write_time,
-					)
-				} <span class="kw">as _</span>,
-			) {
+					) <span class="kw">as _</span>,
+				 )
+			} {
 				co::ERROR::MORE_DATA =&gt; <span class="kw">match </span><span class="kw-2">&amp;mut </span>class {
 					<span class="prelude-val">Some</span>(class) =&gt; {
 						<span class="kw-2">**</span>class = WString::new_alloc_buf(class.buf_len() + BLOCK_SZ);
@@ -1886,17 +1892,17 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>data_len1 = u32::default();
 
 		<span class="comment">// Query data types and lenghts.
-		</span><span class="kw">match </span>co::ERROR(
-			<span class="kw">unsafe </span>{
+		</span><span class="kw">match unsafe </span>{
+			co::ERROR::from_raw(
 				kernel::ffi::RegQueryMultipleValuesW(
 					<span class="self">self</span>.as_ptr(),
 					valents1.as_mut_ptr() <span class="kw">as _</span>,
 					value_names.len() <span class="kw">as _</span>,
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>data_len1,
-				)
-			} <span class="kw">as _</span>,
-		) {
+				) <span class="kw">as _</span>,
+			 )
+		} {
 			co::ERROR::MORE_DATA =&gt; {},
 			err =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
 		}
@@ -2047,8 +2053,10 @@
 		)<span class="question-mark">?</span>;
 
 		validate_retrieved_reg_val(
-			co::REG(raw_data_type1), data_len1,
-			co::REG(raw_data_type2), data_len2, buf)
+			<span class="kw">unsafe </span>{ co::REG::from_raw(raw_data_type1) }, data_len1,
+			<span class="kw">unsafe </span>{ co::REG::from_raw(raw_data_type2) }, data_len2,
+			buf,
+		)
 	}
 
 	<span class="doccomment">/// [`RegRenameKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regrenamekey)
@@ -2097,7 +2105,7 @@
 				kernel::ffi::RegRestoreKeyW(
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(file_path).as_ptr(),
-					flags.<span class="number">0</span>,
+					flags.raw(),
 				)
 			},
 		)
@@ -2135,7 +2143,7 @@
 					<span class="self">self</span>.as_ptr(),
 					WString::from_str(dest_file_path).as_ptr(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-					flags.<span class="number">0</span>,
+					flags.raw(),
 				)
 			},
 		)
@@ -2175,7 +2183,7 @@
 					<span class="self">self</span>.as_ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
-					data.reg_type().<span class="number">0</span>,
+					data.reg_type().raw(),
 					data_ptr,
 					data_len,
 				)
@@ -2219,7 +2227,7 @@
 					<span class="self">self</span>.as_ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 					<span class="number">0</span>,
-					data.reg_type().<span class="number">0</span>,
+					data.reg_type().raw(),
 					data_ptr <span class="kw">as _</span>,
 					data_len,
 				)
@@ -2316,8 +2324,8 @@
 		}
 
 		<span class="kw">let </span><span class="kw-2">mut </span>len_buffer = <span class="self">self</span>.name_buffer.buf_len() <span class="kw">as </span>u32;
-		<span class="kw">match </span>co::ERROR(
-			<span class="kw">unsafe </span>{
+		<span class="kw">match unsafe </span>{
+			co::ERROR::from_raw(
 				kernel::ffi::RegEnumKeyExW(
 					<span class="self">self</span>.hkey.as_ptr(),
 					<span class="self">self</span>.current,
@@ -2327,9 +2335,9 @@
 					std::ptr::null_mut(),
 					std::ptr::null_mut(),
 					std::ptr::null_mut(),
-				)
-			} <span class="kw">as _</span>,
-		) {
+				) <span class="kw">as _</span>,
+			)
+		} {
 			co::ERROR::SUCCESS =&gt; {
 				<span class="self">self</span>.current += <span class="number">1</span>;
 				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.name_buffer.to_string()))
@@ -2384,8 +2392,8 @@
 
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type = u32::default();
 		<span class="kw">let </span><span class="kw-2">mut </span>len_buffer = <span class="self">self</span>.name_buffer.buf_len() <span class="kw">as </span>u32;
-		<span class="kw">match </span>co::ERROR(
-			<span class="kw">unsafe </span>{
+		<span class="kw">match unsafe </span>{
+			co::ERROR::from_raw(
 				kernel::ffi::RegEnumValueW(
 					<span class="self">self</span>.hkey.as_ptr(),
 					<span class="self">self</span>.current,
@@ -2395,12 +2403,12 @@
 					<span class="kw-2">&amp;mut </span>raw_data_type,
 					std::ptr::null_mut(),
 					std::ptr::null_mut(),
-				)
-			} <span class="kw">as _</span>,
-		) {
+				) <span class="kw">as _</span>,
+			)
+		} {
 			co::ERROR::SUCCESS =&gt; {
 				<span class="self">self</span>.current += <span class="number">1</span>;
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="self">self</span>.name_buffer.to_string(), co::REG(raw_data_type))))
+				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="self">self</span>.name_buffer.to_string(), <span class="kw">unsafe </span>{ co::REG::from_raw(raw_data_type) })))
 			},
 			e =&gt; {
 				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made

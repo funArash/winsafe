@@ -1953,6 +1953,16 @@
 <a href="#1953" id="1953">1953</a>
 <a href="#1954" id="1954">1954</a>
 <a href="#1955" id="1955">1955</a>
+<a href="#1956" id="1956">1956</a>
+<a href="#1957" id="1957">1957</a>
+<a href="#1958" id="1958">1958</a>
+<a href="#1959" id="1959">1959</a>
+<a href="#1960" id="1960">1960</a>
+<a href="#1961" id="1961">1961</a>
+<a href="#1962" id="1962">1962</a>
+<a href="#1963" id="1963">1963</a>
+<a href="#1964" id="1964">1964</a>
+<a href="#1965" id="1965">1965</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LOWORD, MAKEDWORD};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
@@ -1985,7 +1995,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::ACTIVATE,
-			wparam: MAKEDWORD(<span class="self">self</span>.event.<span class="number">0</span>, <span class="self">self</span>.is_minimized <span class="kw">as _</span>) <span class="kw">as _</span>,
+			wparam: MAKEDWORD(<span class="self">self</span>.event.raw(), <span class="self">self</span>.is_minimized <span class="kw">as _</span>) <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hwnd.as_ptr() <span class="kw">as _</span>,
 		}
 	}
@@ -1994,7 +2004,7 @@
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>Activate {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			event: co::WA(LOWORD(p.wparam <span class="kw">as _</span>)),
+			event: <span class="kw">unsafe </span>{ co::WA::from_raw(LOWORD(p.wparam <span class="kw">as _</span>)) },
 			is_minimized: HIWORD(p.wparam <span class="kw">as _</span>) != <span class="number">0</span>,
 			hwnd: <span class="kw">unsafe </span>{ HWND::from_ptr(p.lparam <span class="kw">as _</span>) },
 		}
@@ -2057,18 +2067,20 @@
 		WndMsg {
 			msg_id: co::WM::APPCOMMAND,
 			wparam: <span class="self">self</span>.hwnd_owner.as_ptr() <span class="kw">as _</span>,
-			lparam: MAKEDWORD(<span class="self">self</span>.keys.into(), <span class="self">self</span>.app_command.<span class="number">0 </span>| <span class="self">self</span>.u_device.<span class="number">0</span>) <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.keys.into(), <span class="self">self</span>.app_command.raw() | <span class="self">self</span>.u_device.raw()) <span class="kw">as _</span>,
 		}
 	}
 }
 
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>AppCommand {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			hwnd_owner: <span class="kw">unsafe </span>{ HWND::from_ptr(p.wparam <span class="kw">as _</span>) },
-			app_command: co::APPCOMMAND(HIWORD(p.lparam <span class="kw">as _</span>) &amp; !FAPPCOMMAND_MASK),
-			u_device: co::FAPPCOMMAND(HIWORD(p.lparam <span class="kw">as _</span>) &amp; FAPPCOMMAND_MASK),
-			keys: co::MK(LOWORD(p.lparam <span class="kw">as _</span>)),
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				hwnd_owner: HWND::from_ptr(p.wparam <span class="kw">as _</span>),
+				app_command: co::APPCOMMAND::from_raw(HIWORD(p.lparam <span class="kw">as _</span>) &amp; !FAPPCOMMAND_MASK),
+				u_device: co::FAPPCOMMAND::from_raw(HIWORD(p.lparam <span class="kw">as _</span>) &amp; FAPPCOMMAND_MASK),
+				keys: co::MK::from_raw(LOWORD(p.lparam <span class="kw">as _</span>)),
+			}
 		}
 	}
 }
@@ -2142,11 +2154,11 @@
 			wparam: <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.event {
 				AccelMenuCtrl::Accel(id) =&gt; MAKEDWORD(<span class="kw-2">*</span>id, <span class="number">1</span>) <span class="kw">as _</span>,
 				AccelMenuCtrl::Menu(id) =&gt; MAKEDWORD(<span class="kw-2">*</span>id, <span class="number">0</span>) <span class="kw">as _</span>,
-				AccelMenuCtrl::Ctrl(data) =&gt; MAKEDWORD(data.ctrl_id, data.notif_code.<span class="number">0</span>) <span class="kw">as _</span>,
+				AccelMenuCtrl::Ctrl(data) =&gt; MAKEDWORD(data.ctrl_id, data.notif_code.raw()) <span class="kw">as _</span>,
 			},
 			lparam: <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.event {
-				AccelMenuCtrl::Accel(<span class="kw">_</span>) =&gt; co::CMD::Accelerator.<span class="number">0 </span><span class="kw">as _</span>,
-				AccelMenuCtrl::Menu(<span class="kw">_</span>) =&gt; co::CMD::Menu.<span class="number">0 </span><span class="kw">as _</span>,
+				AccelMenuCtrl::Accel(<span class="kw">_</span>) =&gt; co::CMD::Accelerator.raw() <span class="kw">as _</span>,
+				AccelMenuCtrl::Menu(<span class="kw">_</span>) =&gt; co::CMD::Menu.raw() <span class="kw">as _</span>,
 				AccelMenuCtrl::Ctrl(data) =&gt; data.ctrl_hwnd.as_ptr() <span class="kw">as _</span>,
 			},
 		}
@@ -2161,7 +2173,7 @@
 				<span class="number">0 </span>=&gt; AccelMenuCtrl::Menu(LOWORD(p.wparam <span class="kw">as _</span>)),
 				code =&gt; AccelMenuCtrl::Ctrl(
 					AccelMenuCtrlData {
-						notif_code: co::CMD(code),
+						notif_code: <span class="kw">unsafe </span>{ co::CMD::from_raw(code) },
 						ctrl_id: LOWORD(p.wparam <span class="kw">as _</span>),
 						ctrl_hwnd: <span class="kw">unsafe </span>{ HWND::from_ptr(p.lparam <span class="kw">as _</span>) },
 					},
@@ -2327,7 +2339,7 @@
 		WndMsg {
 			msg_id: co::WM::ENDSESSION,
 			wparam: <span class="self">self</span>.is_session_being_ended <span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.event.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.event.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -2336,7 +2348,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			is_session_being_ended: p.wparam != <span class="number">0</span>,
-			event: co::ENDSESSION(p.lparam <span class="kw">as _</span>),
+			event: <span class="kw">unsafe </span>{ co::ENDSESSION::from_raw(p.lparam <span class="kw">as _</span>) },
 		}
 	}
 }
@@ -2360,7 +2372,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::ENTERIDLE,
-			wparam: <span class="self">self</span>.reason.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.reason.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.handle.as_isize(),
 		}
 	}
@@ -2368,7 +2380,7 @@
 
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>EnterIdle {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>reason = co::MSGF(p.wparam <span class="kw">as _</span>);
+		<span class="kw">let </span>reason = <span class="kw">unsafe </span>{ co::MSGF::from_raw(p.wparam <span class="kw">as _</span>) };
 		<span class="self">Self </span>{
 			reason,
 			handle: <span class="kw">match </span>reason {
@@ -2496,13 +2508,13 @@
 	<span class="kw">type </span>RetType = co::DLGC;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::DLGC(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::DLGC::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::GETDLGCODE,
-			wparam: <span class="self">self</span>.vkey_code.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.vkey_code.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.msg.as_mut().map_or(<span class="number">0</span>, |m| m <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 		}
 	}
@@ -2511,7 +2523,7 @@
 <span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSendRecv <span class="kw">for </span>GetDlgCode&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			vkey_code: co::VK(p.wparam <span class="kw">as _</span>),
+			vkey_code: <span class="kw">unsafe </span>{ co::VK::from_raw(p.wparam <span class="kw">as _</span>) },
 			msg: <span class="kw">match </span>p.lparam {
 				<span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
 				ptr =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) })
@@ -2743,7 +2755,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::HSCROLL,
-			wparam: MAKEDWORD(<span class="self">self</span>.request.<span class="number">0</span>, <span class="self">self</span>.scroll_box_pos) <span class="kw">as _</span>,
+			wparam: MAKEDWORD(<span class="self">self</span>.request.raw(), <span class="self">self</span>.scroll_box_pos) <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hcontrol.as_ref().map_or(<span class="number">0</span>, |h| h.as_ptr() <span class="kw">as _</span>),
 		}
 	}
@@ -2753,7 +2765,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			scroll_box_pos: HIWORD(p.wparam <span class="kw">as _</span>),
-			request: co::SB_REQ(LOWORD(p.wparam <span class="kw">as _</span>)),
+			request: <span class="kw">unsafe </span>{ co::SB_REQ::from_raw(LOWORD(p.wparam <span class="kw">as _</span>)) },
 			hcontrol: <span class="kw">match </span>p.lparam {
 				<span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
 				ptr =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ HWND::from_ptr(ptr <span class="kw">as _</span>) }),
@@ -2946,7 +2958,7 @@
 	<span class="kw">type </span>RetType = co::MND;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::MND(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::MND::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -3089,7 +3101,7 @@
 	<span class="kw">type </span>RetType = co::WVR;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::WVR(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::WVR::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -3166,7 +3178,7 @@
 	<span class="kw">type </span>RetType = co::HT;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::HT(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::HT::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -3251,7 +3263,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::PARENTNOTIFY,
-			wparam: MAKEDWORD(<span class="self">self</span>.event.<span class="number">0</span>, <span class="self">self</span>.child_id) <span class="kw">as _</span>,
+			wparam: MAKEDWORD(<span class="self">self</span>.event.raw(), <span class="self">self</span>.child_id) <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.data.as_isize(),
 		}
 	}
@@ -3259,7 +3271,7 @@
 
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>ParentNotify {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>event = co::WMPN(LOWORD(p.wparam <span class="kw">as _</span>));
+		<span class="kw">let </span>event = <span class="kw">unsafe </span>{ co::WMPN::from_raw(LOWORD(p.wparam <span class="kw">as _</span>)) };
 		<span class="self">Self </span>{
 			event,
 			child_id: HIWORD(p.wparam <span class="kw">as _</span>),
@@ -3334,7 +3346,7 @@
 		WndMsg {
 			msg_id: co::WM::SETCURSOR,
 			wparam: <span class="self">self</span>.hwnd.as_ptr() <span class="kw">as _</span>,
-			lparam: MAKEDWORD(<span class="self">self</span>.hit_test.<span class="number">0</span>, <span class="self">self</span>.mouse_msg) <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.hit_test.raw(), <span class="self">self</span>.mouse_msg) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3343,7 +3355,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			hwnd: <span class="kw">unsafe </span>{ HWND::from_ptr(p.wparam <span class="kw">as _</span>) },
-			hit_test: co::HT(LOWORD(p.lparam <span class="kw">as _</span>)),
+			hit_test: <span class="kw">unsafe </span>{ co::HT::from_raw(LOWORD(p.lparam <span class="kw">as _</span>)) },
 			mouse_msg: HIWORD(p.lparam <span class="kw">as _</span>),
 		}
 	}
@@ -3400,7 +3412,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::SETICON,
-			wparam: <span class="self">self</span>.size.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.size.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hicon.as_ptr() <span class="kw">as _</span>,
 		}
 	}
@@ -3408,9 +3420,11 @@
 
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>SetIcon {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			size: co::ICON_SZ(p.wparam <span class="kw">as _</span>),
-			hicon: <span class="kw">unsafe </span>{ HICON::from_ptr(p.lparam <span class="kw">as _</span>) },
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				size: co::ICON_SZ::from_raw(p.wparam <span class="kw">as _</span>),
+				hicon: HICON::from_ptr(p.lparam <span class="kw">as _</span>),
+			}
 		}
 	}
 }
@@ -3486,7 +3500,7 @@
 		WndMsg {
 			msg_id: co::WM::SHOWWINDOW,
 			wparam: <span class="self">self</span>.being_shown <span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.status.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.status.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3495,7 +3509,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			being_shown: p.wparam != <span class="number">0</span>,
-			status: co::SW_S(p.lparam <span class="kw">as _</span>),
+			status: <span class="kw">unsafe </span>{ co::SW_S::from_raw(p.lparam <span class="kw">as _</span>) },
 		}
 	}
 }
@@ -3519,7 +3533,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::SIZE,
-			wparam: <span class="self">self</span>.request.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.request.raw() <span class="kw">as _</span>,
 			lparam: u32::from(<span class="self">self</span>.client_area) <span class="kw">as _</span>,
 		}
 	}
@@ -3528,7 +3542,7 @@
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>Size {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			request: co::SIZE_R(p.wparam <span class="kw">as _</span>),
+			request: <span class="kw">unsafe </span>{ co::SIZE_R::from_raw(p.wparam <span class="kw">as _</span>) },
 			client_area: SIZE::new(
 				LOWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>,
 				HIWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>,
@@ -3556,7 +3570,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::SIZING,
-			wparam: <span class="self">self</span>.window_edge.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.window_edge.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.coords <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
@@ -3564,9 +3578,11 @@
 
 <span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSendRecv <span class="kw">for </span>Sizing&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			window_edge: co::WMSZ(p.wparam <span class="kw">as _</span>),
-			coords: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(p.lparam <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) },
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				window_edge: co::WMSZ::from_raw(p.wparam <span class="kw">as _</span>),
+				coords: <span class="kw-2">&amp;mut *</span>(p.lparam <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>),
+			}
 		}
 	}
 }
@@ -3590,7 +3606,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::STYLECHANGED,
-			wparam: <span class="self">self</span>.change.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.change.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.stylestruct <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
@@ -3598,10 +3614,11 @@
 
 <span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSendRecv <span class="kw">for </span>StyleChanged&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>change = co::GWL_C(p.wparam <span class="kw">as _</span>);
-		<span class="self">Self </span>{
-			change,
-			stylestruct: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(p.lparam <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) },
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				change: co::GWL_C::from_raw(p.wparam <span class="kw">as _</span>),
+				stylestruct: <span class="kw-2">&amp;*</span>(p.lparam <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>),
+			}
 		}
 	}
 }
@@ -3625,7 +3642,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::STYLECHANGING,
-			wparam: <span class="self">self</span>.change.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.change.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.stylestruct <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
@@ -3633,10 +3650,11 @@
 
 <span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MsgSendRecv <span class="kw">for </span>StyleChanging&lt;<span class="lifetime">&#39;a</span>&gt; {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>change = co::GWL_C(p.wparam <span class="kw">as _</span>);
-		<span class="self">Self </span>{
-			change,
-			stylestruct: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(p.lparam <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) },
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				change: co::GWL_C::from_raw(p.wparam <span class="kw">as _</span>),
+				stylestruct: <span class="kw-2">&amp;*</span>(p.lparam <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>),
+			}
 		}
 	}
 }
@@ -3664,7 +3682,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::SYSCOMMAND,
-			wparam: <span class="self">self</span>.request.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.request.raw() <span class="kw">as _</span>,
 			lparam: u32::from(<span class="self">self</span>.position) <span class="kw">as _</span>,
 		}
 	}
@@ -3673,7 +3691,7 @@
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>SysCommand {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
-			request: co::SC(p.wparam <span class="kw">as _</span>),
+			request: <span class="kw">unsafe </span>{ co::SC::from_raw(p.wparam <span class="kw">as _</span>) },
 			position: POINT::from(p.lparam <span class="kw">as </span>u32),
 		}
 	}
@@ -3752,16 +3770,18 @@
 		WndMsg {
 			msg_id: co::WM::UNINITMENUPOPUP,
 			wparam: <span class="self">self</span>.hmenu.as_ptr() <span class="kw">as _</span>,
-			lparam: MAKEDWORD(<span class="number">0</span>, <span class="self">self</span>.which.<span class="number">0 </span><span class="kw">as _</span>) <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="number">0</span>, <span class="self">self</span>.which.raw() <span class="kw">as _</span>) <span class="kw">as _</span>,
 		}
 	}
 }
 
 <span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span>UninitMenuPopup {
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{
-			hmenu: <span class="kw">unsafe </span>{ HMENU::from_ptr(p.wparam <span class="kw">as _</span>) },
-			which: co::MF(LOWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>),
+		<span class="kw">unsafe </span>{
+			<span class="self">Self </span>{
+				hmenu: HMENU::from_ptr(p.wparam <span class="kw">as _</span>),
+				which: co::MF::from_raw(LOWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>),
+			}
 		}
 	}
 }
@@ -3814,7 +3834,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::WM::VSCROLL,
-			wparam: MAKEDWORD(<span class="self">self</span>.request.<span class="number">0</span>, <span class="self">self</span>.scroll_box_pos) <span class="kw">as _</span>,
+			wparam: MAKEDWORD(<span class="self">self</span>.request.raw(), <span class="self">self</span>.scroll_box_pos) <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hcontrol.as_ref().map_or(<span class="number">0</span>, |h| h.as_ptr() <span class="kw">as _</span>),
 		}
 	}
@@ -3824,7 +3844,7 @@
 	<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			scroll_box_pos: HIWORD(p.wparam <span class="kw">as _</span>),
-			request: co::SB_REQ(LOWORD(p.wparam <span class="kw">as _</span>)),
+			request: <span class="kw">unsafe </span>{ co::SB_REQ::from_raw(LOWORD(p.wparam <span class="kw">as _</span>)) },
 			hcontrol: <span class="kw">match </span>p.lparam {
 				<span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
 				ptr =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ HWND::from_ptr(ptr <span class="kw">as _</span>) }),

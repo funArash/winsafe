@@ -257,7 +257,7 @@
 	</span><span class="kw">pub fn </span>pszMainIcon(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IconIdTdicon {
 		<span class="kw">if </span>IS_INTRESOURCE(<span class="self">self</span>.pszMainIcon) {
 			<span class="kw">if </span><span class="self">self</span>.pszMainIcon <span class="kw">as </span>u16 &gt;= <span class="number">0xfffc </span>{
-				IconIdTdicon::Tdicon(co::TD_ICON(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>))
+				IconIdTdicon::Tdicon(<span class="kw">unsafe </span>{ co::TD_ICON::from_raw(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>) })
 			} <span class="kw">else </span>{
 				IconIdTdicon::Id(<span class="self">self</span>.pszMainIcon <span class="kw">as _</span>)
 			}
@@ -272,7 +272,7 @@
 			IconIdTdicon::None =&gt; <span class="self">self</span>.pszMainIcon = std::ptr::null_mut(),
 			IconIdTdicon::Icon(hicon) =&gt; <span class="self">self</span>.pszMainIcon = hicon.as_ptr() <span class="kw">as _</span>,
 			IconIdTdicon::Id(id) =&gt; <span class="self">self</span>.pszMainIcon = MAKEINTRESOURCE(id <span class="kw">as _</span>),
-			IconIdTdicon::Tdicon(tdi) =&gt; <span class="self">self</span>.pszMainIcon = MAKEINTRESOURCE(tdi.<span class="number">0 </span><span class="kw">as _</span>),
+			IconIdTdicon::Tdicon(tdi) =&gt; <span class="self">self</span>.pszMainIcon = MAKEINTRESOURCE(tdi.raw() <span class="kw">as _</span>),
 		}
 	}
 

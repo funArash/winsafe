@@ -493,7 +493,7 @@
 /// The `pv` type varies according to `uFlags`. If you set it wrong, you&#39;re
 /// likely to cause a buffer overrun.
 </span><span class="kw">pub unsafe fn </span>SHAddToRecentDocs&lt;T&gt;(flags: co::SHARD, pv: <span class="kw-2">&amp;</span>T) {
-	shell::ffi::SHAddToRecentDocs(flags.<span class="number">0</span>, pv <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>);
+	shell::ffi::SHAddToRecentDocs(flags.raw(), pv <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>);
 }
 
 <span class="doccomment">/// [`Shell_NotifyIcon`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyiconw)
@@ -502,7 +502,7 @@
 	message: co::NIM, data: <span class="kw-2">&amp;mut </span>NOTIFYICONDATA) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ shell::ffi::Shell_NotifyIconW(message.<span class="number">0</span>, data <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+		<span class="kw">unsafe </span>{ shell::ffi::Shell_NotifyIconW(message.raw(), data <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 	)
 }
 
@@ -590,10 +590,10 @@
 	<span class="kw">unsafe </span>{
 		<span class="kw">match </span>shell::ffi::SHGetFileInfoW(
 			WString::from_str(path).as_ptr(),
-			file_attrs.<span class="number">0</span>,
+			file_attrs.raw(),
 			<span class="kw-2">&amp;mut </span>shfi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			std::mem::size_of::&lt;SHFILEINFO&gt;() <span class="kw">as _</span>,
-			flags.<span class="number">0</span>,
+			flags.raw(),
 		) {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>((n <span class="kw">as _</span>, DestroyIconShfiGuard::new(shfi))),
@@ -633,7 +633,7 @@
 		<span class="kw">unsafe </span>{
 			shell::ffi::SHGetKnownFolderPath(
 				folder_id <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				flags.<span class="number">0</span>,
+				flags.raw(),
 				token.map_or(std::ptr::null_mut(), |t| t.as_ptr()),
 				<span class="kw-2">&amp;mut </span>pstr,
 			)
@@ -671,8 +671,8 @@
 	<span class="kw">unsafe </span>{
 		ok_to_hrresult(
 			shell::ffi::SHGetStockIconInfo(
-				siid.<span class="number">0</span>,
-				flags.<span class="number">0</span>,
+				siid.raw(),
+				flags.raw(),
 				<span class="kw-2">&amp;mut </span>sii <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			),
 		).map(|<span class="kw">_</span>| DestroyIconSiiGuard::new(sii))

@@ -25,7 +25,7 @@
 
 <span class="doccomment">/// If value is `S_OK` yields `Ok()`, othersize `Err(hresult)`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>ok_to_hrresult(hr: HRES) -&gt; HrResult&lt;()&gt; {
-	<span class="kw">match </span>co::HRESULT(hr) {
+	<span class="kw">match unsafe </span>{ co::HRESULT::from_raw(hr) } {
 		co::HRESULT::S_OK =&gt; <span class="prelude-val">Ok</span>(()),
 		hr =&gt; <span class="prelude-val">Err</span>(hr),
 	}
@@ -34,7 +34,7 @@
 <span class="doccomment">/// If value is `S_OK` yields `Ok(true)`, if `S_FALSE` yields `Ok(false)`
 /// othersize `Err(hresult)`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>okfalse_to_hrresult(hr: HRES) -&gt; HrResult&lt;bool&gt; {
-	<span class="kw">match </span>co::HRESULT(hr) {
+	<span class="kw">match unsafe </span>{ co::HRESULT::from_raw(hr) } {
 		co::HRESULT::S_OK =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 		co::HRESULT::S_FALSE =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
 		hr =&gt; <span class="prelude-val">Err</span>(hr),

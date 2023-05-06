@@ -1542,6 +1542,11 @@
 <a href="#1542" id="1542">1542</a>
 <a href="#1543" id="1543">1543</a>
 <a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1560,7 +1565,7 @@
 	bool_to_sysresult, INVALID_FILE_ATTRIBUTES, MAX_COMPUTERNAME_LENGTH,
 	MAX_PATH, parse_multi_z_str, ptr_to_sysresult, SECURITY_DESCRIPTOR_REVISION,
 };
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 
 <span class="doccomment">/// [`AllocateAndInitializeSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-allocateandinitializesid)
 /// function.
@@ -1618,14 +1623,14 @@
 			kernel::ffi::AllocateAndInitializeSid(
 				identifier_authority <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				sub_authorities.len() <span class="kw">as _</span>,
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">1 </span>{ sub_authorities[<span class="number">0</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">2 </span>{ sub_authorities[<span class="number">1</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">3 </span>{ sub_authorities[<span class="number">2</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">4 </span>{ sub_authorities[<span class="number">3</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">5 </span>{ sub_authorities[<span class="number">4</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">6 </span>{ sub_authorities[<span class="number">5</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">7 </span>{ sub_authorities[<span class="number">6</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">8 </span>{ sub_authorities[<span class="number">7</span>].<span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">1 </span>{ sub_authorities[<span class="number">0</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">2 </span>{ sub_authorities[<span class="number">1</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">3 </span>{ sub_authorities[<span class="number">2</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">4 </span>{ sub_authorities[<span class="number">3</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">5 </span>{ sub_authorities[<span class="number">4</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">6 </span>{ sub_authorities[<span class="number">5</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">7 </span>{ sub_authorities[<span class="number">6</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
+				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">8 </span>{ sub_authorities[<span class="number">7</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
 				<span class="kw-2">&amp;mut </span>psid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			),
 		).map(|<span class="kw">_</span>| FreeSidGuard::new(psid))
@@ -1723,7 +1728,7 @@
 
 	<span class="kw">unsafe </span>{
 		kernel::ffi::CreateWellKnownSid( <span class="comment">// retrieve needed buffer sizes
-			</span>well_known_sid.<span class="number">0</span>,
+			</span>well_known_sid.raw(),
 			domain_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 			std::ptr::null_mut(),
 			<span class="kw-2">&amp;mut </span>sid_sz,
@@ -1739,7 +1744,7 @@
 	<span class="kw">unsafe </span>{
 		bool_to_sysresult(
 			kernel::ffi::CreateWellKnownSid(
-				well_known_sid.<span class="number">0</span>,
+				well_known_sid.raw(),
 				domain_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				sid_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>sid_sz,
@@ -1927,7 +1932,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>ptr_buf = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u16;
 
 	<span class="kw">let </span>nchars = <span class="kw">match </span>kernel::ffi::FormatMessageW(
-		flags.<span class="number">0</span>,
+		flags.raw(),
 		source.unwrap_or(std::ptr::null_mut()),
 		message_id,
 		u16::from(lang_id) <span class="kw">as _</span>,
@@ -1954,7 +1959,7 @@
 		<span class="kw">unsafe </span>{
 			kernel::ffi::GetBinaryTypeW(
 				WString::from_str(application_name).as_ptr(),
-				<span class="kw-2">&amp;mut </span>binary_type.<span class="number">0</span>,
+				binary_type.as_mut(),
 			)
 		},
 	).map(|<span class="kw">_</span>| binary_type)
@@ -2015,13 +2020,13 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetDriveType(root_path_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; co::DRIVE {
-	co::DRIVE(
-		<span class="kw">unsafe </span>{
+	<span class="kw">unsafe </span>{
+		co::DRIVE::from_raw(
 			kernel::ffi::GetDriveTypeW(
 				WString::from_opt_str(root_path_name).as_ptr(),
-			)
-		},
-	)
+			),
+		)
+	}
 }
 
 <span class="doccomment">/// [`GetEnvironmentStrings`](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getenvironmentstringsw)
@@ -2069,7 +2074,7 @@
 </span><span class="kw">pub fn </span>GetFirmwareType() -&gt; SysResult&lt;co::FIRMWARE_TYPE&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>ft = u32::default();
 	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::GetFirmwareType(<span class="kw-2">&amp;mut </span>ft) })
-		.map(|<span class="kw">_</span>| co::FIRMWARE_TYPE(ft))
+		.map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::FIRMWARE_TYPE::from_raw(ft) })
 }
 
 <span class="doccomment">/// [`GetLargePageMinimum`](https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-getlargepageminimum)
@@ -2087,7 +2092,7 @@
 /// you ever need to call it.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLastError() -&gt; co::ERROR {
-	co::ERROR(<span class="kw">unsafe </span>{ kernel::ffi::GetLastError() })
+	<span class="kw">unsafe </span>{ co::ERROR::from_raw(kernel::ffi::GetLastError()) }
 }
 
 <span class="doccomment">/// [`GetLengthSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getlengthsid)
@@ -2160,7 +2165,7 @@
 		kernel::ffi::GetFileAttributesW(WString::from_str(file_name).as_ptr())
 	} {
 		INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-		flags =&gt; <span class="prelude-val">Ok</span>(co::FILE_ATTRIBUTE(flags)),
+		flags =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::FILE_ATTRIBUTE::from_raw(flags) }),
 	}
 }
 
@@ -2232,10 +2237,10 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSystemFileCacheSize() -&gt; SysResult&lt;(usize, usize, co::FILE_CACHE)&gt; {
 	<span class="kw">let </span>(<span class="kw-2">mut </span>min, <span class="kw-2">mut </span>max) = (usize::default(), usize::default());
-	<span class="kw">let </span><span class="kw-2">mut </span>flags = co::FILE_CACHE::NoValue;
+	<span class="kw">let </span><span class="kw-2">mut </span>flags = co::FILE_CACHE::default();
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetSystemFileCacheSize(<span class="kw-2">&amp;mut </span>min, <span class="kw-2">&amp;mut </span>max, <span class="kw-2">&amp;mut </span>flags.<span class="number">0</span>)
+			kernel::ffi::GetSystemFileCacheSize(<span class="kw-2">&amp;mut </span>min, <span class="kw-2">&amp;mut </span>max, flags.as_mut())
 		},
 	).map(|<span class="kw">_</span>| (min, max, flags))
 }
@@ -2400,7 +2405,7 @@
 				name_buf.<span class="number">1 </span><span class="kw">as </span>u32,
 				serial_number.map_or(std::ptr::null_mut(), |n| n),
 				max_component_len.map_or(std::ptr::null_mut(), |m| m),
-				file_system_flags.map_or(std::ptr::null_mut(), |f| <span class="kw-2">&amp;mut </span>f.<span class="number">0</span>),
+				file_system_flags.map_or(std::ptr::null_mut(), |f| f.as_mut()),
 				<span class="kw">match </span>file_system_name {
 					<span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; sys_name_buf.<span class="number">0</span>.as_mut_ptr(),
 					<span class="prelude-val">None </span>=&gt; std::ptr::null_mut(),
@@ -2541,7 +2546,8 @@
 	sid: <span class="kw-2">&amp;</span>SID, well_known_sid: co::WELL_KNOWN_SID_TYPE) -&gt; bool
 {
 	<span class="kw">unsafe </span>{
-		kernel::ffi::IsWellKnownSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, well_known_sid.<span class="number">0</span>) != <span class="number">0
+		kernel::ffi::IsWellKnownSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, well_known_sid.raw())
+			!= <span class="number">0
 	</span>}
 }
 
@@ -2550,8 +2556,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindows10OrGreater() -&gt; SysResult&lt;bool&gt; {
 	IsWindowsVersionOrGreater(
-		HIBYTE(co::WIN32::WINNT_WINTHRESHOLD.<span class="number">0</span>) <span class="kw">as _</span>,
-		LOBYTE(co::WIN32::WINNT_WINTHRESHOLD.<span class="number">0</span>) <span class="kw">as _</span>,
+		HIBYTE(co::WIN32::WINNT_WINTHRESHOLD.raw()) <span class="kw">as _</span>,
+		LOBYTE(co::WIN32::WINNT_WINTHRESHOLD.raw()) <span class="kw">as _</span>,
 		<span class="number">0</span>,
 	)
 }
@@ -2561,8 +2567,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindows7OrGreater() -&gt; SysResult&lt;bool&gt; {
 	IsWindowsVersionOrGreater(
-		HIBYTE(co::WIN32::WINNT_WIN7.<span class="number">0</span>) <span class="kw">as _</span>,
-		LOBYTE(co::WIN32::WINNT_WIN7.<span class="number">0</span>) <span class="kw">as _</span>,
+		HIBYTE(co::WIN32::WINNT_WIN7.raw()) <span class="kw">as _</span>,
+		LOBYTE(co::WIN32::WINNT_WIN7.raw()) <span class="kw">as _</span>,
 		<span class="number">0</span>,
 	)
 }
@@ -2572,8 +2578,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindows8OrGreater() -&gt; SysResult&lt;bool&gt; {
 	IsWindowsVersionOrGreater(
-		HIBYTE(co::WIN32::WINNT_WIN8.<span class="number">0</span>) <span class="kw">as _</span>,
-		LOBYTE(co::WIN32::WINNT_WIN8.<span class="number">0</span>) <span class="kw">as _</span>,
+		HIBYTE(co::WIN32::WINNT_WIN8.raw()) <span class="kw">as _</span>,
+		LOBYTE(co::WIN32::WINNT_WIN8.raw()) <span class="kw">as _</span>,
 		<span class="number">0</span>,
 	)
 }
@@ -2583,8 +2589,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindows8Point1OrGreater() -&gt; SysResult&lt;bool&gt; {
 	IsWindowsVersionOrGreater(
-		HIBYTE(co::WIN32::WINNT_WINBLUE.<span class="number">0</span>) <span class="kw">as _</span>,
-		LOBYTE(co::WIN32::WINNT_WINBLUE.<span class="number">0</span>) <span class="kw">as _</span>,
+		HIBYTE(co::WIN32::WINNT_WINBLUE.raw()) <span class="kw">as _</span>,
+		LOBYTE(co::WIN32::WINNT_WINBLUE.raw()) <span class="kw">as _</span>,
 		<span class="number">0</span>,
 	)
 }
@@ -2635,8 +2641,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWindowsVistaOrGreater() -&gt; SysResult&lt;bool&gt; {
 	IsWindowsVersionOrGreater(
-		HIBYTE(co::WIN32::WINNT_VISTA.<span class="number">0</span>) <span class="kw">as _</span>,
-		LOBYTE(co::WIN32::WINNT_VISTA.<span class="number">0</span>) <span class="kw">as _</span>,
+		HIBYTE(co::WIN32::WINNT_VISTA.raw()) <span class="kw">as _</span>,
+		LOBYTE(co::WIN32::WINNT_VISTA.raw()) <span class="kw">as _</span>,
 		<span class="number">0</span>,
 	)
 }
@@ -2677,7 +2683,7 @@
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_sz = u32::default();
 	<span class="kw">let </span><span class="kw-2">mut </span>domain_sz = u32::default();
-	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::User;
+	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::default();
 
 	<span class="kw">unsafe </span>{
 		kernel::ffi::LookupAccountNameW( <span class="comment">// retrieve needed buffer sizes
@@ -2687,7 +2693,7 @@
 			<span class="kw-2">&amp;mut </span>sid_sz,
 			std::ptr::null_mut(),
 			<span class="kw-2">&amp;mut </span>domain_sz,
-			<span class="kw-2">&amp;mut </span>sid_name_use.<span class="number">0</span>,
+			sid_name_use.as_mut(),
 		);
 	}
 	<span class="kw">let </span>get_size_err = GetLastError();
@@ -2707,7 +2713,7 @@
 				<span class="kw-2">&amp;mut </span>sid_sz,
 				domain_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>domain_sz,
-				<span class="kw-2">&amp;mut </span>sid_name_use.<span class="number">0</span>,
+				sid_name_use.as_mut(),
 			),
 		).map(|<span class="kw">_</span>| (domain_buf.to_string(), SidGuard::new(sid_buf), sid_name_use))
 	}
@@ -2725,7 +2731,7 @@
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>account_sz = u32::default();
 	<span class="kw">let </span><span class="kw-2">mut </span>domain_sz = u32::default();
-	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::User;
+	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::default();
 
 	<span class="kw">unsafe </span>{
 		kernel::ffi::LookupAccountSidW( <span class="comment">// retrieve needed buffer sizes
@@ -2735,7 +2741,7 @@
 			<span class="kw-2">&amp;mut </span>account_sz,
 			std::ptr::null_mut(),
 			<span class="kw-2">&amp;mut </span>domain_sz,
-			<span class="kw-2">&amp;mut </span>sid_name_use.<span class="number">0</span>,
+			sid_name_use.as_mut(),
 		);
 	}
 	<span class="kw">let </span>get_size_err = GetLastError();
@@ -2755,7 +2761,7 @@
 				<span class="kw-2">&amp;mut </span>account_sz,
 				domain_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>domain_sz,
-				<span class="kw-2">&amp;mut </span>sid_name_use.<span class="number">0</span>,
+				sid_name_use.as_mut(),
 			)
 		},
 	).map(|<span class="kw">_</span>| (account_buf.to_string(), domain_buf.to_string(), sid_name_use))
@@ -2825,8 +2831,8 @@
 {
 	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
 		kernel::ffi::MultiByteToWideChar(
-			code_page.<span class="number">0 </span><span class="kw">as _</span>,
-			flags.<span class="number">0</span>,
+			code_page.raw() <span class="kw">as _</span>,
+			flags.raw(),
 			multi_byte_str.as_ptr(),
 			multi_byte_str.len() <span class="kw">as _</span>,
 			std::ptr::null_mut(),
@@ -2842,8 +2848,8 @@
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
 			kernel::ffi::MultiByteToWideChar(
-				code_page.<span class="number">0 </span><span class="kw">as _</span>,
-				flags.<span class="number">0</span>,
+				code_page.raw() <span class="kw">as _</span>,
+				flags.raw(),
 				multi_byte_str.as_ptr(),
 				multi_byte_str.len() <span class="kw">as _</span>,
 				buf.as_mut_ptr(),
@@ -2917,7 +2923,7 @@
 				WString::from_str(replaced).as_ptr(),
 				WString::from_str(replacement).as_ptr(),
 				WString::from_opt_str(backup).as_ptr(),
-				flags.<span class="number">0</span>,
+				flags.raw(),
 				std::ptr::null_mut(),
 				std::ptr::null_mut(),
 			)
@@ -2938,7 +2944,7 @@
 <span class="doccomment">/// [`SetLastError`](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-setlasterror)
 /// function.
 </span><span class="kw">pub fn </span>SetLastError(err_code: co::ERROR) {
-	<span class="kw">unsafe </span>{ kernel::ffi::SetLastError(err_code.<span class="number">0</span>) }
+	<span class="kw">unsafe </span>{ kernel::ffi::SetLastError(err_code.raw()) }
 }
 
 <span class="doccomment">/// [`SetThreadStackGuarantee`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadstackguarantee)
@@ -3009,7 +3015,7 @@
 	<span class="kw">match unsafe </span>{
 		kernel::ffi::VerifyVersionInfoW(
 			osvix <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			type_mask.<span class="number">0</span>,
+			type_mask.raw(),
 			condition_mask,
 		)
 	} {
@@ -3028,7 +3034,11 @@
 	condition_mask: u64, type_mask: co::VER_MASK, condition: co::VER_COND) -&gt; u64
 {
 	<span class="kw">unsafe </span>{
-		kernel::ffi::VerSetConditionMask(condition_mask, type_mask.<span class="number">0</span>, condition.<span class="number">0</span>)
+		kernel::ffi::VerSetConditionMask(
+			condition_mask,
+			type_mask.raw(),
+			condition.raw(),
+		)
 	}
 }
 
@@ -3049,8 +3059,8 @@
 
 	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
 		kernel::ffi::WideCharToMultiByte(
-			code_page.<span class="number">0 </span><span class="kw">as _</span>,
-			flags.<span class="number">0</span>,
+			code_page.raw() <span class="kw">as _</span>,
+			flags.raw(),
 			wide_char_str.as_ptr(),
 			wide_char_str.len() <span class="kw">as _</span>,
 			std::ptr::null_mut(),
@@ -3069,8 +3079,8 @@
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
 			kernel::ffi::WideCharToMultiByte(
-				code_page.<span class="number">0 </span><span class="kw">as _</span>,
-				flags.<span class="number">0</span>,
+				code_page.raw() <span class="kw">as _</span>,
+				flags.raw(),
 				wide_char_str.as_ptr(),
 				wide_char_str.len() <span class="kw">as _</span>,
 				u8_buf.as_mut_ptr() <span class="kw">as _</span>,

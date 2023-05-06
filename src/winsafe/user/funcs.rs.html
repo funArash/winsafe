@@ -902,6 +902,10 @@
 <a href="#902" id="902">902</a>
 <a href="#903" id="903">903</a>
 <a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, user};
@@ -928,9 +932,9 @@
 		<span class="kw">unsafe </span>{
 			user::ffi::AdjustWindowRectEx(
 				rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-				style.<span class="number">0</span>,
+				style.raw(),
 				has_menu <span class="kw">as _</span>,
-				ex_style.<span class="number">0</span>,
+				ex_style.raw(),
 			)
 		},
 	)
@@ -981,9 +985,9 @@
 
 	<span class="kw">if unsafe </span>{
 		user::ffi::BroadcastSystemMessageW(
-			flags.<span class="number">0</span>,
-			<span class="kw-2">&amp;mut </span>info_ret.<span class="number">0 </span><span class="kw">as _</span>,
-			wm_any.msg_id.<span class="number">0</span>,
+			flags.raw(),
+			info_ret.as_mut(),
+			wm_any.msg_id.raw(),
 			wm_any.wparam,
 			wm_any.lparam,
 		)
@@ -1004,14 +1008,16 @@
 	<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
 		user::ffi::ChangeDisplaySettingsW(
 			dev_mode.map_or(std::ptr::null_mut(), |dm| dm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-			flags.<span class="number">0
-		</span>)
+			flags.raw(),
+		)
 	};
 
-	<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
-		<span class="prelude-val">Err</span>(co::DISP_CHANGE(ret))
-	} <span class="kw">else </span>{
-		<span class="prelude-val">Ok</span>(co::DISP_CHANGE(ret))
+	<span class="kw">unsafe </span>{
+		<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
+			<span class="prelude-val">Err</span>(co::DISP_CHANGE::from_raw(ret))
+		} <span class="kw">else </span>{
+			<span class="prelude-val">Ok</span>(co::DISP_CHANGE::from_raw(ret))
+		}
 	}
 }
 
@@ -1028,15 +1034,17 @@
 			WString::from_opt_str(device_name).as_ptr(),
 			dev_mode.map_or(std::ptr::null_mut(), |dm| dm <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			std::ptr::null_mut(),
-			flags.<span class="number">0</span>,
+			flags.raw(),
 			std::ptr::null_mut(),
 		)
 	};
 
-	<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
-		<span class="prelude-val">Err</span>(co::DISP_CHANGE(ret))
-	} <span class="kw">else </span>{
-		<span class="prelude-val">Ok</span>(co::DISP_CHANGE(ret))
+	<span class="kw">unsafe </span>{
+		<span class="kw">if </span>ret &lt; <span class="number">0 </span>{
+			<span class="prelude-val">Err</span>(co::DISP_CHANGE::from_raw(ret))
+		} <span class="kw">else </span>{
+			<span class="prelude-val">Ok</span>(co::DISP_CHANGE::from_raw(ret))
+		}
 	}
 }
 
@@ -1114,7 +1122,7 @@
 			WString::from_opt_str(device_name).as_ptr(),
 			device_num,
 			display_device <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			flags.<span class="number">0</span>,
+			flags.raw(),
 		)
 	} {
 		<span class="comment">// Empirical tests have shown that two different error codes can be
@@ -1215,7 +1223,7 @@
 			WString::from_opt_str(device_name).as_ptr(),
 			mode_num.into(),
 			dev_mode <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			flags.<span class="number">0</span>,
+			flags.raw(),
 		)
 	} {
 		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
@@ -1287,7 +1295,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetAsyncKeyState(virt_key: co::VK) -&gt; bool {
-	<span class="kw">unsafe </span>{ user::ffi::GetAsyncKeyState(virt_key.<span class="number">0 </span><span class="kw">as _</span>) != <span class="number">0 </span>}
+	<span class="kw">unsafe </span>{ user::ffi::GetAsyncKeyState(virt_key.raw() <span class="kw">as _</span>) != <span class="number">0 </span>}
 }
 
 <span class="doccomment">/// [`GetClipboardData`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboarddata)
@@ -1299,7 +1307,7 @@
 /// `format`.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub unsafe fn </span>GetClipboardData(format: co::CF) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt; {
-	ptr_to_sysresult(user::ffi::GetClipboardData(format.<span class="number">0</span>))
+	ptr_to_sysresult(user::ffi::GetClipboardData(format.raw()))
 		.map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 }
 
@@ -1412,28 +1420,28 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetQueueStatus(flags: co::QS) -&gt; u32 {
-	<span class="kw">unsafe </span>{ user::ffi::GetQueueStatus(flags.<span class="number">0</span>) }
+	<span class="kw">unsafe </span>{ user::ffi::GetQueueStatus(flags.raw()) }
 }
 
 <span class="doccomment">/// [`GetSysColor`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolor)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSysColor(index: co::COLOR) -&gt; COLORREF {
-	<span class="kw">unsafe </span>{ COLORREF::from_raw(user::ffi::GetSysColor(index.<span class="number">0</span>)) }
+	<span class="kw">unsafe </span>{ COLORREF::from_raw(user::ffi::GetSysColor(index.raw())) }
 }
 
 <span class="doccomment">/// [`GetSystemMetrics`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetrics)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSystemMetrics(index: co::SM) -&gt; i32 {
-	<span class="kw">unsafe </span>{ user::ffi::GetSystemMetrics(index.<span class="number">0</span>) }
+	<span class="kw">unsafe </span>{ user::ffi::GetSystemMetrics(index.raw()) }
 }
 
 <span class="doccomment">/// [`GetSystemMetricsForDpi`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsystemmetricsfordpi)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSystemMetricsForDpi(index: co::SM, dpi: u32) -&gt; SysResult&lt;i32&gt; {
-	<span class="kw">match unsafe </span>{ user::ffi::GetSystemMetricsForDpi(index.<span class="number">0</span>, dpi) } {
+	<span class="kw">match unsafe </span>{ user::ffi::GetSystemMetricsForDpi(index.raw(), dpi) } {
 		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual value is zero
 			</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -1464,7 +1472,7 @@
 </span><span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
 #[must_use]
 </span><span class="kw">pub fn </span>InSendMessageEx() -&gt; co::ISMEX {
-	co::ISMEX(<span class="kw">unsafe </span>{ user::ffi::InSendMessageEx()})
+	<span class="kw">unsafe </span>{ co::ISMEX::from_raw(user::ffi::InSendMessageEx()) }
 }
 
 <span class="doccomment">/// [`IntersectRect`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-intersectrect)
@@ -1491,7 +1499,7 @@
 		<span class="kw">match </span>r {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
 			<span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-			err =&gt; <span class="prelude-val">Err</span>(co::ERROR(err <span class="kw">as _</span>)),
+			err =&gt; <span class="prelude-val">Err</span>(<span class="kw">unsafe </span>{ co::ERROR::from_raw(err <span class="kw">as _</span>) }),
 		}
 	} <span class="kw">else </span>{
 		<span class="prelude-val">Ok</span>(r != <span class="number">0</span>)
@@ -1516,7 +1524,7 @@
 /// function.
 </span><span class="kw">pub fn </span>LockSetForegroundWindow(lock_code: co::LSFW) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ user::ffi::LockSetForegroundWindow(lock_code.<span class="number">0</span>) },
+		<span class="kw">unsafe </span>{ user::ffi::LockSetForegroundWindow(lock_code.raw()) },
 	)
 }
 
@@ -1544,7 +1552,7 @@
 			hwnd.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
 			msg_filter_min,
 			msg_filter_max,
-			remove_msg.<span class="number">0</span>,
+			remove_msg.raw(),
 		) != <span class="number">0
 	</span>}
 }
@@ -1565,7 +1573,7 @@
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
 			user::ffi::PostThreadMessageW(
-				thread_id, wm_any.msg_id.<span class="number">0</span>, wm_any.wparam, wm_any.lparam)
+				thread_id, wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam)
 		}
 	)
 }
@@ -1682,7 +1690,7 @@
 	format: co::CF, hmem: <span class="kw-2">*mut </span>u8) -&gt; SysResult&lt;<span class="kw-2">*mut </span>u8&gt;
 {
 	ptr_to_sysresult(
-		user::ffi::SetClipboardData(format.<span class="number">0</span>, hmem <span class="kw">as _</span>),
+		user::ffi::SetClipboardData(format.raw(), hmem <span class="kw">as _</span>),
 	).map(|hmem| hmem <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 }
 
@@ -1755,10 +1763,10 @@
 {
 	bool_to_sysresult(
 		user::ffi::SystemParametersInfoW(
-			action.<span class="number">0</span>,
+			action.raw(),
 			ui_param,
 			pv_param <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			win_ini.<span class="number">0</span>,
+			win_ini.raw(),
 		),
 	)
 }

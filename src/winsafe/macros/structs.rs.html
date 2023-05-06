@@ -268,6 +268,26 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_macros)]
 
 </span><span class="doccomment">/// Implements `Default` trait by zeroing all fields.
@@ -315,12 +335,32 @@
 		<span class="kw">impl </span><span class="kw">crate</span>::prelude::IntUnderlying <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">type </span>Raw = <span class="macro-nonterminal">$ntype</span>;
 
-			<span class="kw">unsafe fn </span>from_raw(v: <span class="self">Self</span>::Raw) -&gt; <span class="self">Self </span>{
+			<span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Raw {
+				<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+			</span>}
+		}
+
+		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
+			<span class="doccomment">/// Constructs a new `IntUnderlying` by wrapping the given integer
+			/// value.
+			///
+			/// # Safety
+			///
+			/// Be sure the given value is meaningful for the actual type.
+			</span><span class="attr">#[must_use]
+			</span><span class="kw">pub const unsafe fn </span>from_raw(v: <span class="macro-nonterminal">$ntype</span>) -&gt; <span class="self">Self </span>{
 				<span class="self">Self</span>(v)
 			}
 
-			<span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Raw {
-				<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+			<span class="doccomment">/// Returns the primitive integer underlying value.
+			///
+			/// This method is similar to
+			/// [`Into`](https://doc.rust-lang.org/std/convert/trait.Into.html),
+			/// but it is `const`, therefore it can be used in
+			/// [const contexts](https://doc.rust-lang.org/reference/const_eval.html).
+			</span><span class="attr">#[must_use]
+			</span><span class="kw">pub const fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$ntype </span>{
+				<span class="self">self</span>.<span class="number">0
 			</span>}
 		}
 	};

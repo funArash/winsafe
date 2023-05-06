@@ -244,7 +244,7 @@
 }
 
 <span class="kw">impl </span>Base {
-	<span class="kw">const </span>WM_UI_THREAD: co::WM = co::WM(co::WM::APP.<span class="number">0 </span>+ <span class="number">0x3fff</span>);
+	<span class="kw">const </span>WM_UI_THREAD: co::WM = <span class="kw">unsafe </span>{ co::WM::from_raw(co::WM::APP.raw() + <span class="number">0x3fff</span>) };
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">unsafe fn </span>from_guiparent&lt;<span class="lifetime">&#39;a</span>&gt;(
 		p: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self
@@ -350,7 +350,7 @@
 					.map(|hwnd| {
 						hwnd.SendMessage(WndMsg {
 							msg_id: <span class="self">Self</span>::WM_UI_THREAD,
-							wparam: <span class="self">Self</span>::WM_UI_THREAD.<span class="number">0 </span><span class="kw">as _</span>,
+							wparam: <span class="self">Self</span>::WM_UI_THREAD.raw() <span class="kw">as _</span>,
 							lparam: ptr_pack <span class="kw">as _</span>,
 						});
 					});
@@ -377,7 +377,7 @@
 			.map(|hwnd| {
 				hwnd.SendMessage(WndMsg {
 					msg_id: <span class="self">Self</span>::WM_UI_THREAD,
-					wparam: <span class="self">Self</span>::WM_UI_THREAD.<span class="number">0 </span><span class="kw">as _</span>,
+					wparam: <span class="self">Self</span>::WM_UI_THREAD.raw() <span class="kw">as _</span>,
 					lparam: ptr_pack <span class="kw">as _</span>,
 				});
 			});
@@ -394,7 +394,7 @@
 		</span>});
 
 		<span class="self">self</span>.privileged_events.wm(<span class="self">Self</span>::WM_UI_THREAD, |p| {
-			<span class="kw">if </span>co::WM(p.wparam <span class="kw">as _</span>) == <span class="self">Self</span>::WM_UI_THREAD { <span class="comment">// additional safety check
+			<span class="kw">if unsafe </span>{ co::WM::from_raw(p.wparam <span class="kw">as _</span>) } == <span class="self">Self</span>::WM_UI_THREAD { <span class="comment">// additional safety check
 				</span><span class="kw">let </span>ptr_pack = p.lparam <span class="kw">as </span><span class="kw-2">*mut </span>Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;;
 				<span class="kw">let </span>pack: Box&lt;Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;&gt; = <span class="kw">unsafe </span>{ Box::from_raw(ptr_pack) };
 				pack().unwrap_or_else(|err| post_quit_error(p, err));

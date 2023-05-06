@@ -420,7 +420,7 @@
 				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				iunk_outer.as_ref()
 					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| <span class="kw-2">&amp;mut </span>ppv_outer <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-				cls_context.<span class="number">0</span>,
+				cls_context.raw(),
 				<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			),
@@ -450,7 +450,7 @@
 				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				iunk_outer.as_ref()
 					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| <span class="kw-2">&amp;mut </span>ppv_outer <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-				cls_context.<span class="number">0</span>,
+				cls_context.raw(),
 				server_info.map_or(std::ptr::null(), |si| si <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				results.len() <span class="kw">as _</span>,
 				results.as_mut_ptr() <span class="kw">as _</span>,
@@ -495,8 +495,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CoInitializeEx(coinit: co::COINIT) -&gt; HrResult&lt;CoUninitializeGuard&gt; {
 	<span class="kw">unsafe </span>{
-		<span class="kw">let </span>hr = co::HRESULT(
-			ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.<span class="number">0</span>),
+		<span class="kw">let </span>hr = co::HRESULT::from_raw(
+			ole::ffi::CoInitializeEx(std::ptr::null_mut(), coinit.raw()),
 		);
 		<span class="kw">match </span>hr {
 			co::HRESULT::S_OK

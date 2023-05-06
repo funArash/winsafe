@@ -306,7 +306,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::GDT_ERROR;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SysResult, SYSTEMTIME, WString};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, SIZE};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::{minus1_as_badargs, zero_as_badargs};
 
@@ -380,7 +380,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::DTM::GETMCCOLOR.into(),
-			wparam: <span class="self">self</span>.color_index.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.color_index.raw() <span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
 		}
 	}
@@ -396,7 +396,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;co::MCS&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		zero_as_badargs(v).map(|v| co::MCS(v <span class="kw">as _</span>))
+		zero_as_badargs(v).map(|v| <span class="kw">unsafe </span>{ co::MCS::from_raw(v <span class="kw">as _</span>) })
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -442,7 +442,7 @@
 	<span class="kw">type </span>RetType = co::GDTR;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::GDTR(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::GDTR::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -466,7 +466,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;()&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		<span class="kw">const </span>GDT_NONE: i32 = co::GDT::NONE.<span class="number">0 </span><span class="kw">as _</span>;
+		<span class="kw">const </span>GDT_NONE: i32 = co::GDT::NONE.raw() <span class="kw">as _</span>;
 		<span class="kw">match </span>v <span class="kw">as </span>i32 {
 			GDT_ERROR =&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
 			GDT_NONE =&gt; <span class="prelude-val">Err</span>(co::ERROR::INVALID_DATA),
@@ -526,7 +526,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::DTM::SETMCCOLOR.into(),
-			wparam: <span class="self">self</span>.color_index.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.color_index.raw() <span class="kw">as _</span>,
 			lparam: u32::from(<span class="self">self</span>.color) <span class="kw">as _</span>,
 		}
 	}
@@ -544,14 +544,14 @@
 	<span class="kw">type </span>RetType = SysResult&lt;co::MCS&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		zero_as_badargs(v).map(|v| co::MCS(v <span class="kw">as _</span>))
+		zero_as_badargs(v).map(|v| <span class="kw">unsafe </span>{ co::MCS::from_raw(v <span class="kw">as _</span>) })
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::DTM::SETMCSTYLE.into(),
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.style.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.style.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -575,7 +575,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::DTM::SETRANGE.into(),
-			wparam: <span class="self">self</span>.valid.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.valid.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.system_times <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 		}
 	}
@@ -599,7 +599,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::DTM::SETSYSTEMTIME.into(),
-			wparam: <span class="self">self</span>.system_time.as_ref().map_or(co::GDT::NONE.<span class="number">0</span>, |<span class="kw">_</span>| co::GDT::VALID.<span class="number">0</span>) <span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.system_time.as_ref().map_or(co::GDT::NONE.raw(), |<span class="kw">_</span>| co::GDT::VALID.raw()) <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.system_time.as_ref().map_or(<span class="number">0</span>, |st| st <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 		}
 	}

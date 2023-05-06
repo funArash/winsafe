@@ -573,7 +573,7 @@
 			<span class="kw">unsafe </span>{
 				user::ffi::AppendMenuW(
 					<span class="self">self</span>.as_ptr(),
-					flags.<span class="number">0</span>,
+					flags.raw(),
 					new_item.as_usize(),
 					content.as_ptr(),
 				)
@@ -646,11 +646,11 @@
 					co::MF::CHECKED
 				} <span class="kw">else </span>{
 					co::MF::UNCHECKED
-				}).<span class="number">0</span>,
+				}).raw(),
 			)
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
-			ret =&gt; <span class="prelude-val">Ok</span>(co::MF(ret <span class="kw">as _</span>)),
+			ret =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::MF::from_raw(ret <span class="kw">as _</span>) }),
 		}
 	}
 
@@ -676,7 +676,7 @@
 					first.id_or_pos_u32(),
 					last.id_or_pos_u32(),
 					check.id_or_pos_u32(),
-					check.mf_flag().<span class="number">0</span>,
+					check.mf_flag().raw(),
 				)
 			},
 		)
@@ -712,7 +712,7 @@
 				user::ffi::DeleteMenu(
 					<span class="self">self</span>.as_ptr(),
 					id_or_pos.id_or_pos_u32(),
-					id_or_pos.mf_flag().<span class="number">0</span>,
+					id_or_pos.mf_flag().raw(),
 				)
 			},
 		)
@@ -790,11 +790,11 @@
 				<span class="self">self</span>.as_ptr(),
 				id_or_pos.id_or_pos_u32(),
 				(id_or_pos.mf_flag()
-					| <span class="kw">if </span>enable { co::MF::ENABLED } <span class="kw">else </span>{ co::MF::DISABLED }).<span class="number">0</span>,
+					| <span class="kw">if </span>enable { co::MF::ENABLED } <span class="kw">else </span>{ co::MF::DISABLED }).raw(),
 			)
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(co::ERROR::BAD_ARGUMENTS),
-			ret =&gt; <span class="prelude-val">Ok</span>(co::MF(ret <span class="kw">as _</span>)),
+			ret =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::MF::from_raw(ret <span class="kw">as _</span>) }),
 		}
 	}
 
@@ -805,7 +805,7 @@
 		by_pos: bool, flags: co::GMDI) -&gt; SysResult&lt;IdPos&gt;
 	{
 		<span class="kw">match unsafe </span>{
-			user::ffi::GetMenuDefaultItem(<span class="self">self</span>.as_ptr(), by_pos <span class="kw">as _</span>, flags.<span class="number">0</span>)
+			user::ffi::GetMenuDefaultItem(<span class="self">self</span>.as_ptr(), by_pos <span class="kw">as _</span>, flags.raw())
 				<span class="kw">as </span>i32
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -870,7 +870,7 @@
 			) <span class="kw">as </span>i32
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			mf =&gt; <span class="prelude-val">Ok</span>(co::MF(mf <span class="kw">as _</span>)),
+			mf =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::MF::from_raw(mf <span class="kw">as _</span>) }),
 		}
 	}
 
@@ -883,14 +883,14 @@
 
 		<span class="kw">loop </span>{
 			<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(buf_sz);
-			
+
 			<span class="kw">let </span>nchars = <span class="kw">match unsafe </span>{
 				user::ffi::GetMenuStringW(
 					<span class="self">self</span>.as_ptr(),
 					id_or_pos.id_or_pos_u32(),
 					buf.as_mut_ptr(),
 					buf.buf_len() <span class="kw">as _</span>,
-					id_or_pos.mf_flag().<span class="number">0</span>,
+					id_or_pos.mf_flag().raw(),
 				)
 			} {
 				<span class="number">0 </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(GetLastError()),
@@ -946,7 +946,7 @@
 				user::ffi::RemoveMenu(
 					<span class="self">self</span>.as_ptr(),
 					id_or_pos.id_or_pos_u32(),
-					id_or_pos.mf_flag().<span class="number">0</span>,
+					id_or_pos.mf_flag().raw(),
 				)
 			},
 		)
@@ -987,7 +987,7 @@
 				user::ffi::SetMenuItemBitmaps(
 					<span class="self">self</span>.as_ptr(),
 					id_or_pos.id_or_pos_u32(),
-					id_or_pos.mf_flag().<span class="number">0</span>,
+					id_or_pos.mf_flag().raw(),
 					hbmp_unchecked.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
 					hbmp_checked.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
 				)
@@ -1023,7 +1023,7 @@
 		<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
 			user::ffi::TrackPopupMenu(
 				<span class="self">self</span>.as_ptr(),
-				flags.<span class="number">0</span>,
+				flags.raw(),
 				location.x, location.y,
 				<span class="number">0</span>,
 				hwnd.as_ptr(),

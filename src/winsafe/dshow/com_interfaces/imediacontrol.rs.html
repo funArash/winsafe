@@ -155,7 +155,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::IDispatch;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::oleaut_IDispatch;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
 <span class="doccomment">/// [`IMediaControl`](crate::IMediaControl) virtual table.
@@ -231,14 +231,14 @@
 	</span><span class="kw">fn </span>GetState(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		ms_timeout: <span class="prelude-ty">Option</span>&lt;i32&gt;) -&gt; HrResult&lt;co::FILTER_STATE&gt;
 	{
-		<span class="kw">let </span><span class="kw-2">mut </span>state = co::FILTER_STATE::Stopped;
+		<span class="kw">let </span><span class="kw-2">mut </span>state = co::FILTER_STATE::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
 			ok_to_hrresult(
 				(vt.GetState)(
 					<span class="self">self</span>.ptr(),
 					ms_timeout.unwrap_or(INFINITE <span class="kw">as _</span>),
-					<span class="kw-2">&amp;mut </span>state.<span class="number">0</span>,
+					state.as_mut(),
 				),
 			)
 		}.map(|<span class="kw">_</span>| state)

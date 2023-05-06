@@ -134,7 +134,7 @@
 	CONSOLE_READCONSOLE_CONTROL, GetLastError, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 
 <span class="macro">impl_handle! </span>{ HSTD;
 	<span class="doccomment">/// Handle to a
@@ -165,9 +165,9 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetConsoleMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::CONSOLE&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>mode = co::CONSOLE::NoValue;
+		<span class="kw">let </span><span class="kw-2">mut </span>mode = co::CONSOLE::default();
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::GetConsoleMode(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>mode.<span class="number">0</span>) },
+			<span class="kw">unsafe </span>{ kernel::ffi::GetConsoleMode(<span class="self">self</span>.as_ptr(), mode.as_mut()) },
 		).map(|<span class="kw">_</span>| mode)
 	}
 
@@ -179,7 +179,7 @@
 	) -&gt; SysResult&lt;CloseHandleGuard&lt;HSTD&gt;&gt;
 	{
 		<span class="kw">unsafe </span>{
-			<span class="kw">match </span>HSTD::from_ptr(kernel::ffi::GetStdHandle(std_handle.<span class="number">0</span>)) {
+			<span class="kw">match </span>HSTD::from_ptr(kernel::ffi::GetStdHandle(std_handle.raw())) {
 				HSTD::INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 				handle =&gt; <span class="prelude-val">Ok</span>(CloseHandleGuard::new(handle)),
 			}
@@ -188,20 +188,20 @@
 
 	<span class="doccomment">/// [`ReadConsole`](https://learn.microsoft.com/en-us/windows/console/readconsole)
 	/// method.
-	/// 
+	///
 	/// Returns the number of chars actually written.
-	/// 
+	///
 	/// # Examples
-	/// 
+	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::{co, HSTD, WString};
-	/// 
+	///
 	/// let hstd = HSTD::GetStdHandle(co::STD_HANDLE::INPUT)?;
-	/// 
+	///
 	/// let mut buffer = WString::new_alloc_buf(2048);
 	/// hstd.ReadConsole(&amp;mut buffer, None)?;
-	/// 
+	///
 	/// let text = buffer.to_string();
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
@@ -229,13 +229,13 @@
 	/// method.
 	</span><span class="kw">fn </span>SetConsoleMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::CONSOLE) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::SetConsoleMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) },
+			<span class="kw">unsafe </span>{ kernel::ffi::SetConsoleMode(<span class="self">self</span>.as_ptr(), mode.raw()) },
 		)
 	}
 
 	<span class="doccomment">/// [`WriteConsole`](https://learn.microsoft.com/en-us/windows/console/writeconsole)
 	/// method.
-	/// 
+	///
 	/// Returns the number of chars actually written.
 	</span><span class="kw">fn </span>WriteConsole(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span>buf = WString::from_str(text);

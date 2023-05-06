@@ -410,7 +410,7 @@
 			<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::msg::WndMsg {
 				<span class="kw">crate</span>::msg::WndMsg {
 					msg_id: <span class="macro-nonterminal">$wmconst</span>,
-					wparam: <span class="self">self</span>.vkey_code.<span class="number">0 </span><span class="kw">as _</span>,
+					wparam: <span class="self">self</span>.vkey_code.raw() <span class="kw">as _</span>,
 					lparam: <span class="kw">crate</span>::kernel::decl::MAKEDWORD(
 						<span class="self">self</span>.repeat_count,
 						<span class="kw">crate</span>::kernel::decl::MAKEWORD(
@@ -429,7 +429,7 @@
 			<span class="kw">fn </span>from_generic_wm(p: <span class="kw">crate</span>::msg::WndMsg) -&gt; <span class="self">Self </span>{
 				<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIBYTE, HIWORD, LOBYTE, LOWORD};
 				<span class="self">Self </span>{
-					vkey_code: co::VK(p.wparam <span class="kw">as _</span>),
+					vkey_code: <span class="kw">unsafe </span>{ co::VK::from_raw(p.wparam <span class="kw">as _</span>) },
 					repeat_count: LOWORD(p.lparam <span class="kw">as _</span>),
 					scan_code: LOBYTE(HIWORD(p.lparam <span class="kw">as _</span>)),
 					is_extended_key: (HIBYTE(HIWORD(p.lparam <span class="kw">as _</span>)) &amp; <span class="number">0b0000_0001</span>) != <span class="number">0</span>,
@@ -513,7 +513,7 @@
 			<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 				WndMsg {
 					msg_id: <span class="macro-nonterminal">$wmconst</span>,
-					wparam: <span class="self">self</span>.vkey_code.<span class="number">0 </span><span class="kw">as _</span>,
+					wparam: <span class="self">self</span>.vkey_code.raw() <span class="kw">as _</span>,
 					lparam: u32::from(<span class="self">self</span>.coords) <span class="kw">as _</span>,
 				}
 			}
@@ -522,7 +522,7 @@
 		<span class="kw">unsafe impl </span>MsgSendRecv <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>from_generic_wm(p: WndMsg) -&gt; <span class="self">Self </span>{
 				<span class="self">Self </span>{
-					vkey_code: co::VK(p.wparam <span class="kw">as _</span>),
+					vkey_code: <span class="kw">unsafe </span>{ co::VK::from_raw(p.wparam <span class="kw">as _</span>) },
 					coords: POINT {
 						x: LOWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>,
 						y: HIWORD(p.lparam <span class="kw">as _</span>) <span class="kw">as _</span>,

@@ -1039,7 +1039,7 @@
 	<span class="kw">type </span>RetType = co::EIMES;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::EIMES(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::EIMES::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -1483,7 +1483,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::EM::SCROLL.into(),
-			wparam: <span class="self">self</span>.action.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.action.raw() <span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
 		}
 	}
@@ -1529,14 +1529,14 @@
 	<span class="kw">type </span>RetType = co::EIMES;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::EIMES(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::EIMES::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::EM::SETIMESTATUS.into(),
 			wparam: <span class="number">0x0001</span>, <span class="comment">// EMSIS_COMPOSITIONSTRING
-			</span>lparam: <span class="self">self</span>.status.<span class="number">0 </span><span class="kw">as _</span>,
+			</span>lparam: <span class="self">self</span>.status.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -1584,7 +1584,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::EM::SETMARGINS.into(),
-			wparam: <span class="self">self</span>.margins.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.margins.raw() <span class="kw">as _</span>,
 			lparam: u32::from(<span class="self">self</span>.size) <span class="kw">as _</span>,
 		}
 	}

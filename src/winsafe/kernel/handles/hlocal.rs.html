@@ -69,6 +69,7 @@
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -100,8 +101,9 @@
 		flags: co::LMEM, num_bytes: usize) -&gt; SysResult&lt;LocalFreeGuard&gt;
 	{
 		<span class="kw">unsafe </span>{
-			ptr_to_sysresult_handle(kernel::ffi::LocalAlloc(flags.<span class="number">0</span>, num_bytes))
-				.map(|h| LocalFreeGuard::new(h))
+			ptr_to_sysresult_handle(
+				kernel::ffi::LocalAlloc(flags.raw(), num_bytes),
+			).map(|h| LocalFreeGuard::new(h))
 		}
 	}
 
@@ -111,13 +113,13 @@
 	</span><span class="kw">fn </span>LocalFlags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::LMEM&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::LocalFlags(<span class="self">self</span>.as_ptr()) } {
 			LMEM_INVALID_HANDLE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			flags =&gt; <span class="prelude-val">Ok</span>(co::LMEM(flags)),
+			flags =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::LMEM::from_raw(flags) }),
 		}
 	}
 
 	<span class="doccomment">/// [`LocalReAlloc`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localrealloc)
 	/// method.
-	/// 
+	///
 	/// Originally this method returns the handle to the reallocated memory
 	/// object; here the original handle is automatically updated.
 	</span><span class="kw">fn </span>LocalReAlloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -125,7 +127,7 @@
 	{
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::LocalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.<span class="number">0</span>)
+				kernel::ffi::LocalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.raw())
 			},
 		).map(|h| { <span class="kw-2">*</span><span class="self">self </span>= h; })
 	}

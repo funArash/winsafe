@@ -1160,7 +1160,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::CLR_DEFAULT;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LOWORD, MAKEDWORD, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, RECT};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::{minus1_as_none, zero_as_badargs, zero_as_none};
 
@@ -1303,7 +1303,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::EXPAND.into(),
-			wparam: <span class="self">self</span>.action.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.action.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hitem.as_ptr() <span class="kw">as _</span>,
 		}
 	}
@@ -1385,7 +1385,7 @@
 	<span class="kw">type </span>RetType = co::TVS_EX;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::TVS_EX(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::TVS_EX::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -1415,7 +1415,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::GETIMAGELIST.into(),
-			wparam: <span class="self">self</span>.kind.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.kind.raw() <span class="kw">as _</span>,
 			lparam: <span class="number">0</span>,
 		}
 	}
@@ -1573,14 +1573,14 @@
 	<span class="kw">type </span>RetType = co::TVIS;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::TVIS(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::TVIS::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::GETITEMSTATE.into(),
 			wparam: <span class="self">self</span>.hitem.as_ptr() <span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.mask.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.mask.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -1629,7 +1629,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::GETNEXTITEM.into(),
-			wparam: <span class="self">self</span>.relationship.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.relationship.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hitem.map_or(<span class="number">0</span>, |h| h.as_ptr() <span class="kw">as _</span>),
 		}
 	}
@@ -1860,7 +1860,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::SELECTITEM.into(),
-			wparam: <span class="self">self</span>.action.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.action.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.hitem.as_ptr() <span class="kw">as _</span>,
 		}
 	}
@@ -1938,7 +1938,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::SETBORDER.into(),
-			wparam: <span class="self">self</span>.action.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.action.raw() <span class="kw">as _</span>,
 			lparam: MAKEDWORD(<span class="self">self</span>.left, <span class="self">self</span>.top) <span class="kw">as _</span>,
 		}
 	}
@@ -1987,7 +1987,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TVM::SETIMAGELIST.into(),
-			wparam: <span class="self">self</span>.kind.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.kind.raw() <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.himagelist.map_or(<span class="number">0</span>, |h| h.as_ptr() <span class="kw">as _</span>),
 		}
 	}

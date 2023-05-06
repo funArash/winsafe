@@ -132,6 +132,8 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, gdi};
@@ -162,7 +164,7 @@
 	/// will yield an invalid handle.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>from_sys_color(color: co::COLOR) -&gt; HBRUSH {
-		<span class="kw">unsafe </span>{ HBRUSH::from_ptr((color.<span class="number">0 </span>+ <span class="number">1</span>) <span class="kw">as _ </span>) }
+		<span class="kw">unsafe </span>{ HBRUSH::from_ptr((color.raw() + <span class="number">1</span>) <span class="kw">as _ </span>) }
 	}
 
 	<span class="doccomment">/// [`CreateBrushIndirect`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbrushindirect)
@@ -186,7 +188,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				gdi::ffi::CreateHatchBrush(hatch.<span class="number">0</span>, color.into()),
+				gdi::ffi::CreateHatchBrush(hatch.raw(), color.into()),
 			).map(|h| DeleteObjectGuard::new(h))
 		}
 	}
@@ -250,14 +252,16 @@
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetStockObject(sb: co::STOCK_BRUSH) -&gt; SysResult&lt;HBRUSH&gt; {
-		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ gdi::ffi::GetStockObject(sb.<span class="number">0</span>) })
+		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ gdi::ffi::GetStockObject(sb.raw()) })
 	}
 
 	<span class="doccomment">/// [`GetSysColorBrush`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolorbrush)
 	/// static method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetSysColorBrush(index: co::COLOR) -&gt; SysResult&lt;HBRUSH&gt; {
-		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ gdi::ffi::GetSysColorBrush(index.<span class="number">0</span>) })
+		ptr_to_sysresult_handle(
+			<span class="kw">unsafe </span>{ gdi::ffi::GetSysColorBrush(index.raw()) },
+		)
 	}
 
 	<span class="doccomment">/// [`UnrealizeObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-unrealizeobject)

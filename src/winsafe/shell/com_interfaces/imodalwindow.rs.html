@@ -50,8 +50,6 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -94,12 +92,10 @@
 	/// Returns false if user clicked Cancel.
 	</span><span class="kw">fn </span>Show(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_owner: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">const </span>CANCELLED: co::HRESULT = co::ERROR::CANCELLED.to_hresult();
-		<span class="kw">match </span>co::HRESULT(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IModalWindowVT&gt;();
-				(vt.Show)(<span class="self">self</span>.ptr(), hwnd_owner.as_ptr())
-			},
-		) {
+		<span class="kw">match unsafe </span>{
+			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IModalWindowVT&gt;();
+			co::HRESULT::from_raw((vt.Show)(<span class="self">self</span>.ptr(), hwnd_owner.as_ptr()))
+		} {
 			co::HRESULT::S_OK =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 			CANCELLED =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
 			e =&gt; <span class="prelude-val">Err</span>(e),

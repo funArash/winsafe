@@ -1011,6 +1011,8 @@
 <a href="#1011" id="1011">1011</a>
 <a href="#1012" id="1012">1012</a>
 <a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::any::TypeId;
@@ -1023,7 +1025,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, ptr_to_sysresult, ptr_to_sysresult_handle,
 };
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObjectSelect, Handle, IntUnderlying};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GdiObjectSelect, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
 	COLORREF, HBITMAP, HBRUSH, HDC, HRGN, POINT, RECT, SIZE,
 };
@@ -1125,7 +1127,7 @@
 					sz.cx, sz.cy,
 					hdc_src.as_ptr(),
 					src_src.x, src_src.y,
-					rop.<span class="number">0</span>,
+					rop.raw(),
 				)
 			},
 		)
@@ -1282,7 +1284,7 @@
 	</span><span class="kw">fn </span>GetBkMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::BKMODE&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetBkMode(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
+			v =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::BKMODE::from_raw(v) }),
 		}
 	}
 
@@ -1377,10 +1379,10 @@
 			num_scan_lines,
 			bmp_data_buf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr() <span class="kw">as _</span>),
 			bmi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-			usage.<span class="number">0</span>,
+			usage.raw(),
 		);
 
-		<span class="kw">if </span>co::ERROR(ret <span class="kw">as _</span>) == co::ERROR::INVALID_PARAMETER {
+		<span class="kw">if unsafe </span>{ co::ERROR::from_raw(ret <span class="kw">as _</span>) } == co::ERROR::INVALID_PARAMETER {
 			<span class="prelude-val">Err</span>(co::ERROR::INVALID_PARAMETER)
 		} <span class="kw">else if </span>ret == <span class="number">0 </span>{
 			<span class="prelude-val">Err</span>(GetLastError())
@@ -1393,7 +1395,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDeviceCaps(<span class="kw-2">&amp;</span><span class="self">self</span>, index: co::GDC) -&gt; i32 {
-		<span class="kw">unsafe </span>{ gdi::ffi::GetDeviceCaps(<span class="self">self</span>.as_ptr(), index.<span class="number">0</span>) }
+		<span class="kw">unsafe </span>{ gdi::ffi::GetDeviceCaps(<span class="self">self</span>.as_ptr(), index.raw()) }
 	}
 
 	<span class="doccomment">/// [`GetStretchBltMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getstretchbltmode)
@@ -1402,7 +1404,7 @@
 	</span><span class="kw">fn </span>GetStretchBltMode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::STRETCH_MODE&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::GetStretchBltMode(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			sm =&gt; <span class="prelude-val">Ok</span>(co::STRETCH_MODE(sm)),
+			sm =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::STRETCH_MODE::from_raw(sm) }),
 		}
 	}
 
@@ -1532,7 +1534,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				gdi::ffi::PatBlt(
-					<span class="self">self</span>.as_ptr(), top_left.x, top_left.y, sz.cx, sz.cy, rop.<span class="number">0</span>,
+					<span class="self">self</span>.as_ptr(), top_left.x, top_left.y, sz.cx, sz.cy, rop.raw(),
 				)
 			},
 		)
@@ -1675,7 +1677,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SelectClipPath(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::RGN) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ gdi::ffi::SelectClipPath(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) },
+			<span class="kw">unsafe </span>{ gdi::ffi::SelectClipPath(<span class="self">self</span>.as_ptr(), mode.raw()) },
 		)
 	}
 
@@ -1684,7 +1686,7 @@
 	</span><span class="kw">fn </span>SelectClipRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, rgn: <span class="kw-2">&amp;</span>HRGN) -&gt; SysResult&lt;co::REGION&gt; {
 		<span class="kw">match unsafe </span>{ gdi::ffi::SelectClipRgn(<span class="self">self</span>.as_ptr(), rgn.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			v =&gt; <span class="prelude-val">Ok</span>(co::REGION(v)),
+			v =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::REGION::from_raw(v) }),
 		}
 	}
 
@@ -1733,7 +1735,7 @@
 					SelectObjectGuard::new(
 						<span class="self">self</span>,
 						G::NULL, <span class="comment">// regions don&#39;t need cleanup
-						</span><span class="prelude-val">Some</span>(co::REGION(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)),
+						</span><span class="prelude-val">Some</span>(co::REGION::from_raw(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)),
 					)
 				} <span class="kw">else </span>{
 					SelectObjectGuard::new(
@@ -1772,9 +1774,9 @@
 	<span class="doccomment">/// [`SetArcDirection`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setarcdirection)
 	/// method.
 	</span><span class="kw">fn </span>SetArcDirection(<span class="kw-2">&amp;</span><span class="self">self</span>, dir: co::AD) -&gt; SysResult&lt;co::AD&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetArcDirection(<span class="self">self</span>.as_ptr(), dir.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetArcDirection(<span class="self">self</span>.as_ptr(), dir.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			v =&gt; <span class="prelude-val">Ok</span>(co::AD(v)),
+			v =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::AD::from_raw(v) }),
 		}
 	}
 
@@ -1790,9 +1792,9 @@
 	<span class="doccomment">/// [`SetBkMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setbkmode)
 	/// method.
 	</span><span class="kw">fn </span>SetBkMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::BKMODE) -&gt; SysResult&lt;co::BKMODE&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetBkMode(<span class="self">self</span>.as_ptr(), mode.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			v =&gt; <span class="prelude-val">Ok</span>(co::BKMODE(v)),
+			v =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::BKMODE::from_raw(v) }),
 		}
 	}
 
@@ -1848,7 +1850,7 @@
 				num_scan_lines,
 				dib_color_data.as_ptr() <span class="kw">as _</span>,
 				bmi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				color_use.<span class="number">0</span>,
+				color_use.raw(),
 			)
 		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
@@ -1862,9 +1864,9 @@
 	<span class="doccomment">/// [`SetGraphicsMode`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setgraphicsmode)
 	/// method.
 	</span><span class="kw">fn </span>SetGraphicsMode(<span class="kw-2">&amp;</span><span class="self">self</span>, mode: co::GM) -&gt; SysResult&lt;co::GM&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetGraphicsMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetGraphicsMode(<span class="self">self</span>.as_ptr(), mode.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			v =&gt; <span class="prelude-val">Ok</span>(co::GM(v))
+			v =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::GM::from_raw(v) })
 		}
 	}
 
@@ -1873,20 +1875,22 @@
 	</span><span class="kw">fn </span>SetStretchBltMode(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		mode: co::STRETCH_MODE) -&gt; SysResult&lt;co::STRETCH_MODE&gt;
 	{
-		<span class="kw">match </span>co::ERROR(
-			<span class="kw">unsafe </span>{ gdi::ffi::SetStretchBltMode(<span class="self">self</span>.as_ptr(), mode.<span class="number">0</span>) } <span class="kw">as _</span>,
-		) {
+		<span class="kw">match unsafe </span>{
+			co::ERROR::from_raw(
+				gdi::ffi::SetStretchBltMode(<span class="self">self</span>.as_ptr(), mode.raw()) <span class="kw">as _</span>,
+			)
+		} {
 			co::ERROR::INVALID_PARAMETER =&gt; <span class="prelude-val">Err</span>(co::ERROR::INVALID_PARAMETER),
-			err_val =&gt; <span class="prelude-val">Ok</span>(co::STRETCH_MODE(err_val.<span class="number">0 </span><span class="kw">as _</span>)),
+			err_val =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::STRETCH_MODE::from_raw(err_val.raw() <span class="kw">as _</span>) }),
 		}
 	}
 
 	<span class="doccomment">/// [`SetTextAlign`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-settextalign)
 	/// method.
 	</span><span class="kw">fn </span>SetTextAlign(<span class="kw-2">&amp;</span><span class="self">self</span>, align: co::TA) -&gt; SysResult&lt;co::TA&gt; {
-		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextAlign(<span class="self">self</span>.as_ptr(), align.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ gdi::ffi::SetTextAlign(<span class="self">self</span>.as_ptr(), align.raw()) } {
 			GDI_ERROR =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			ta =&gt; <span class="prelude-val">Ok</span>(co::TA(ta)),
+			ta =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::TA::from_raw(ta) }),
 		}
 	}
 
@@ -1979,7 +1983,7 @@
 					hdc_src.as_ptr(),
 					pt_src.x, pt_src.y,
 					sz_src.cx, sz_src.cy,
-					rop.<span class="number">0</span>,
+					rop.raw(),
 				)
 			},
 		)

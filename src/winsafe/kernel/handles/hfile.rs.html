@@ -279,6 +279,8 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -368,12 +370,12 @@
 			<span class="kw">match </span>HFILE(
 				kernel::ffi::CreateFileW(
 					WString::from_str(file_name).as_ptr(),
-					desired_access.<span class="number">0</span>,
-					share_mode.<span class="number">0</span>,
+					desired_access.raw(),
+					share_mode.raw(),
 					security_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-					creation_disposition.<span class="number">0</span>,
-					flags_and_attrs.<span class="number">0</span>,
-					hfile_template.map_or(std::ptr::null_mut(), |h| h.<span class="number">0</span>),
+					creation_disposition.raw(),
+					flags_and_attrs.raw(),
+					hfile_template.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
 				) <span class="kw">as _</span>,
 			) {
 				HFILE::NULL =&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -397,7 +399,7 @@
 				kernel::ffi::CreateFileMappingFromApp(
 					<span class="self">self</span>.as_ptr(),
 					mapping_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-					protect.<span class="number">0</span>,
+					protect.raw(),
 					max_size.unwrap_or_default(),
 					WString::from_opt_str(mapping_name).as_ptr(),
 				),
@@ -433,7 +435,9 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetFileType(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::FILE_TYPE&gt; {
-		<span class="kw">match </span>co::FILE_TYPE(<span class="kw">unsafe </span>{ kernel::ffi::GetFileType(<span class="self">self</span>.as_ptr()) }) {
+		<span class="kw">match unsafe </span>{
+			co::FILE_TYPE::from_raw(kernel::ffi::GetFileType(<span class="self">self</span>.as_ptr()))
+		} {
 			co::FILE_TYPE::UNKNOWN =&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(co::FILE_TYPE::UNKNOWN), <span class="comment">// actual unknown type
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -454,7 +458,7 @@
 	/// automatically calls `UnlockFile` when the guard goes out of scope. You
 	/// must, however, keep the guard alive, otherwise the cleanup will be
 	/// performed right away.
-	/// 
+	///
 	/// # Examples
 	///
 	/// ```rust,no_run
@@ -532,7 +536,7 @@
 					<span class="self">self</span>.as_ptr(),
 					distance_to_move,
 					<span class="kw-2">&amp;mut </span>new_offset,
-					move_method.<span class="number">0</span>,
+					move_method.raw(),
 				)
 			},
 		).map(|<span class="kw">_</span>| new_offset)

@@ -2428,7 +2428,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>nID(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BmpIdbRes {
 		<span class="kw">if </span><span class="self">self</span>.hInst.as_ptr() <span class="kw">as </span>isize == HINST_COMMCTRL {
-			BmpIdbRes::Idb(co::IDB(<span class="self">self</span>.nID))
+			BmpIdbRes::Idb(<span class="kw">unsafe </span>{ co::IDB::from_raw(<span class="self">self</span>.nID) })
 		} <span class="kw">else if </span><span class="self">self</span>.hInst == HINSTANCE::NULL {
 			BmpIdbRes::Bmp(<span class="kw">unsafe </span>{ HBITMAP::from_ptr(<span class="self">self</span>.nID <span class="kw">as _</span>) })
 		} <span class="kw">else </span>{
@@ -2444,7 +2444,7 @@
 		<span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>val {
 			BmpIdbRes::Idb(idb) =&gt; <span class="self">Self </span>{
 				hInst: <span class="kw">unsafe </span>{ HINSTANCE::from_ptr(HINST_COMMCTRL <span class="kw">as _</span>) },
-				nID: idb.<span class="number">0</span>,
+				nID: idb.raw(),
 			},
 			BmpIdbRes::Bmp(bmp) =&gt; <span class="self">Self </span>{
 				hInst: HINSTANCE::NULL,

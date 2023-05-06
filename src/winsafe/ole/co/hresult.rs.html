@@ -3334,6 +3334,12 @@
 <a href="#3334" id="3334">3334</a>
 <a href="#3335" id="3335">3335</a>
 <a href="#3336" id="3336">3336</a>
+<a href="#3337" id="3337">3337</a>
+<a href="#3338" id="3338">3338</a>
+<a href="#3339" id="3339">3339</a>
+<a href="#3340" id="3340">3340</a>
+<a href="#3341" id="3341">3341</a>
+<a href="#3342" id="3342">3342</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::FormattedError;
 
@@ -3418,10 +3424,16 @@
 	<span class="doccomment">/// [`HRESULT_FROM_WIN32`](https://learn.microsoft.com/en-us/windows/win32/api/winerror/nf-winerror-hresult_from_win32)
 	/// method. Originally a macro.
 	</span><span class="kw">pub const fn </span>to_hresult(<span class="self">self</span>) -&gt; co::HRESULT {
-		<span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>i32 &lt;= <span class="number">0 </span>{
-			co::HRESULT(<span class="self">self</span>.<span class="number">0</span>)
-		} <span class="kw">else </span>{
-			co::HRESULT((<span class="self">self</span>.<span class="number">0 </span>&amp; <span class="number">0x0000_ffff</span>) | co::FACILITY::WIN32.<span class="number">0 </span>&lt;&lt; <span class="number">16 </span>| <span class="number">0x8000_0000</span>)
+		<span class="kw">unsafe </span>{
+			<span class="kw">if </span><span class="self">self</span>.raw() <span class="kw">as </span>i32 &lt;= <span class="number">0 </span>{
+				co::HRESULT::from_raw(<span class="self">self</span>.raw())
+			} <span class="kw">else </span>{
+				co::HRESULT::from_raw(
+					(<span class="self">self</span>.raw() &amp; <span class="number">0x0000_ffff</span>) |
+					co::FACILITY::WIN32.raw() &lt;&lt; <span class="number">16 </span>|
+					<span class="number">0x8000_0000</span>,
+				)
+			}
 		}
 	}
 }
@@ -3436,13 +3448,13 @@
 	<span class="doccomment">/// [`HRESULT_FACILITY`](https://learn.microsoft.com/en-us/windows/win32/api/winerror/nf-winerror-hresult_facility)
 	/// method. Originally a macro.
 	</span><span class="kw">pub fn </span>facility(<span class="self">self</span>) -&gt; co::FACILITY {
-		co::FACILITY((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">0x1fff</span>)
+		<span class="kw">unsafe </span>{ co::FACILITY::from_raw((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">16</span>) &amp; <span class="number">0x1fff</span>) }
 	}
 
 	<span class="doccomment">/// [`HRESULT_SEVERITY`](https://learn.microsoft.com/en-us/windows/win32/api/winerror/nf-winerror-hresult_severity)
 	/// method. Originally a macro.
 	</span><span class="kw">pub fn </span>severity(<span class="self">self</span>) -&gt; co::SEVERITY {
-		co::SEVERITY(((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">31</span>) &amp; <span class="number">0x1</span>) <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::SEVERITY::from_raw(((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">31</span>) &amp; <span class="number">0x1</span>) <span class="kw">as _</span>) }
 	}
 }
 

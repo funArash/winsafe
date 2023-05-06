@@ -152,7 +152,7 @@
 		flags: co::GMEM, num_bytes: usize) -&gt; SysResult&lt;GlobalFreeGuard&gt;
 	{
 		<span class="kw">unsafe </span>{
-			ptr_to_sysresult_handle(kernel::ffi::GlobalAlloc(flags.<span class="number">0</span>, num_bytes))
+			ptr_to_sysresult_handle(kernel::ffi::GlobalAlloc(flags.raw(), num_bytes))
 				.map(|h| GlobalFreeGuard::new(h))
 		}
 	}
@@ -163,7 +163,7 @@
 	</span><span class="kw">fn </span>GlobalFlags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::GMEM&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GlobalFlags(<span class="self">self</span>.as_ptr()) } {
 			GMEM_INVALID_HANDLE =&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			flags =&gt; <span class="prelude-val">Ok</span>(co::GMEM(flags)),
+			flags =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::GMEM::from_raw(flags) }),
 		}
 	}
 
@@ -223,7 +223,7 @@
 	{
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::GlobalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.<span class="number">0</span>)
+				kernel::ffi::GlobalReAlloc(<span class="self">self</span>.as_ptr(), num_bytes, flags.raw())
 			},
 		).map(|h| { <span class="kw-2">*</span><span class="self">self </span>= h; })
 	}

@@ -2142,7 +2142,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::comctl::privs::HINST_COMMCTRL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HIWORD, LOWORD, MAKEDWORD, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying, MsgSend};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{COLORREF, HWND, POINT, RECT, SIZE};
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::{
 	minus1_as_badargs, minus1_as_none, zero_as_badargs, zero_as_none,
@@ -2460,7 +2460,7 @@
 	<span class="kw">type </span>RetType = co::TBBF;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::TBBF(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::TBBF::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -2625,7 +2625,7 @@
 	<span class="kw">type </span>RetType = co::TBSTYLE_EX;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::TBSTYLE_EX(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::TBSTYLE_EX::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -2997,7 +2997,7 @@
 	<span class="kw">type </span>RetType = SysResult&lt;co::TBSTATE&gt;;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		minus1_as_badargs(v).map(|v| co::TBSTATE(v <span class="kw">as _</span>))
+		minus1_as_badargs(v).map(|v| <span class="kw">unsafe </span>{ co::TBSTATE::from_raw(v <span class="kw">as _</span>) })
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -3044,7 +3044,7 @@
 	<span class="kw">type </span>RetType = co::BTNS;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::BTNS(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::BTNS::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
@@ -3408,7 +3408,7 @@
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TBM::LOADIMAGES.into(),
-			wparam: <span class="self">self</span>.img_list.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.img_list.raw() <span class="kw">as _</span>,
 			lparam: HINST_COMMCTRL,
 		}
 	}
@@ -3773,14 +3773,14 @@
 	<span class="kw">type </span>RetType = co::DT;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::DT(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::DT::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TBM::SETDRAWTEXTFLAGS.into(),
-			wparam: <span class="self">self</span>.mask.<span class="number">0 </span><span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.draw.<span class="number">0 </span><span class="kw">as _</span>,
+			wparam: <span class="self">self</span>.mask.raw() <span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.draw.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3797,14 +3797,14 @@
 	<span class="kw">type </span>RetType = co::TBSTYLE_EX;
 
 	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
-		co::TBSTYLE_EX(v <span class="kw">as _</span>)
+		<span class="kw">unsafe </span>{ co::TBSTYLE_EX::from_raw(v <span class="kw">as _</span>) }
 	}
 
 	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
 		WndMsg {
 			msg_id: co::TBM::SETEXTENDEDSTYLE.into(),
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.style.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.style.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -3877,7 +3877,7 @@
 		WndMsg {
 			msg_id: co::TBM::SETHOTITEM2.into(),
 			wparam: <span class="self">self</span>.index.map_or(-<span class="number">1</span>, |idx| idx <span class="kw">as </span>i32) <span class="kw">as _</span>,
-			lparam: <span class="self">self</span>.flags.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.flags.raw() <span class="kw">as _</span>,
 		}
 	}
 }
@@ -4170,7 +4170,7 @@
 		WndMsg {
 			msg_id: co::TBM::SETSTATE.into(),
 			wparam: <span class="self">self</span>.btn_cmd_id <span class="kw">as _</span>,
-			lparam: MAKEDWORD(<span class="self">self</span>.state.<span class="number">0 </span><span class="kw">as _</span>, <span class="number">0</span>) <span class="kw">as _</span>,
+			lparam: MAKEDWORD(<span class="self">self</span>.state.raw() <span class="kw">as _</span>, <span class="number">0</span>) <span class="kw">as _</span>,
 		}
 	}
 }
@@ -4194,7 +4194,7 @@
 		WndMsg {
 			msg_id: co::TBM::SETSTYLE.into(),
 			wparam: <span class="number">0</span>,
-			lparam: <span class="self">self</span>.style.<span class="number">0 </span><span class="kw">as _</span>,
+			lparam: <span class="self">self</span>.style.raw() <span class="kw">as _</span>,
 		}
 	}
 }

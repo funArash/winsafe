@@ -346,6 +346,8 @@
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -358,7 +360,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, INFINITE, MAX_PATH, ptr_to_sysresult_handle,
 };
-<span class="kw">use </span><span class="kw">crate</span>::prelude::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
 
 <span class="macro">impl_handle! </span>{ HPROCESS;
 	<span class="doccomment">/// Handle to a
@@ -415,7 +417,7 @@
 					process_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 					thread_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 					inherit_handles <span class="kw">as _</span>,
-					creation_flags.<span class="number">0</span>,
+					creation_flags.raw(),
 					environment.map_or(std::ptr::null_mut(), |environment| {
 						WString::from_str_vec(
 							<span class="kw-2">&amp;</span>environment.iter()
@@ -468,7 +470,9 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetGuiResources(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::GR) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetGuiResources(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::GetGuiResources(<span class="self">self</span>.as_ptr(), flags.raw())
+		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count),
 		}
@@ -480,7 +484,7 @@
 	</span><span class="kw">fn </span>GetPriorityClass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::PRIORITY_CLASS&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetPriorityClass(<span class="self">self</span>.as_ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
-			pc =&gt; <span class="prelude-val">Ok</span>(co::PRIORITY_CLASS(pc)),
+			pc =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::PRIORITY_CLASS::from_raw(pc) }),
 		}
 	}
 
@@ -567,7 +571,7 @@
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
 				kernel::ffi::OpenProcess(
-					desired_access.<span class="number">0</span>,
+					desired_access.raw(),
 					inherit_handle <span class="kw">as _</span>,
 					process_id,
 				),
@@ -586,7 +590,7 @@
 			bool_to_sysresult(
 				kernel::ffi::OpenProcessToken(
 					<span class="self">self</span>.as_ptr(),
-					desired_access.<span class="number">0</span>,
+					desired_access.raw(),
 					handle.as_mut(),
 				),
 			).map(|<span class="kw">_</span>| CloseHandleGuard::new(handle))
@@ -606,7 +610,7 @@
 			<span class="kw">unsafe </span>{
 				kernel::ffi::QueryFullProcessImageNameW(
 					<span class="self">self</span>.as_ptr(),
-					flags.<span class="number">0</span>,
+					flags.raw(),
 					buf.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>sz,
 				)
@@ -623,7 +627,7 @@
 			<span class="kw">unsafe </span>{
 				kernel::ffi::QueryProcessAffinityUpdateMode(
 					<span class="self">self</span>.as_ptr(),
-					<span class="kw-2">&amp;mut </span>affinity.<span class="number">0</span>,
+					affinity.as_mut(),
 				)
 			},
 		).map(|<span class="kw">_</span>| affinity)
@@ -636,7 +640,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetPriorityClass(<span class="self">self</span>.as_ptr(), prority_class.<span class="number">0</span>)
+				kernel::ffi::SetPriorityClass(<span class="self">self</span>.as_ptr(), prority_class.raw())
 			},
 		)
 	}
@@ -648,7 +652,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>)
+				kernel::ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.as_ptr(), flags.raw())
 			},
 		)
 	}
@@ -682,7 +686,7 @@
 		milliseconds: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;co::WAIT&gt;
 	{
 		<span class="kw">match unsafe </span>{
-			co::WAIT(
+			co::WAIT::from_raw(
 				kernel::ffi::WaitForSingleObject(
 					<span class="self">self</span>.as_ptr(),
 					milliseconds.unwrap_or(INFINITE),

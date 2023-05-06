@@ -335,7 +335,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
-	ole_IBindCtx, ole_IPersist, ole_IPersistStream, ole_IUnknown,
+	IntUnderlying, ole_IBindCtx, ole_IPersist, ole_IPersistStream, ole_IUnknown,
 };
 <span class="kw">use </span><span class="kw">crate</span>::vt::IPersistStreamVT;
 
@@ -578,10 +578,10 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsSystemMoniker(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(bool, co::MKSYS)&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>mksys = co::MKSYS::NONE;
+		<span class="kw">let </span><span class="kw-2">mut </span>mksys = co::MKSYS::default();
 		<span class="kw">unsafe </span>{
 			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			okfalse_to_hrresult((vt.IsSystemMoniker)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>mksys.<span class="number">0</span>))
+			okfalse_to_hrresult((vt.IsSystemMoniker)(<span class="self">self</span>.ptr(), mksys.as_mut()))
 				.map(|b| (b, mksys))
 		}
 	}
@@ -629,7 +629,7 @@
 				(vt.Reduce)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					reduce_how_far.<span class="number">0</span>,
+					reduce_how_far.raw(),
 					<span class="kw-2">&amp;mut </span>ppv_queried,
 					<span class="kw-2">&amp;mut </span>ppv_queried2,
 				),

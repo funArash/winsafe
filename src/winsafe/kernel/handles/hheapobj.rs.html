@@ -285,7 +285,7 @@
 	<span class="doccomment">/// Handle to a
 	/// [heap object](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcreate).
 	/// Originally just a `HANDLE`.
-	/// 
+	///
 	/// Not to be confused with [`HHEAPMEM`](crate::HHEAPMEM).
 </span>}
 
@@ -303,16 +303,16 @@
 	<span class="doccomment">/// Returns an iterator over the heap memory blocks with
 	/// [`PROCESS_HEAP_ENTRY`](crate::PROCESS_HEAP_ENTRY) structs. Calls
 	/// [`HHEAPOBJ::HeapWalk`](crate::prelude::kernel_Hheapobj::HeapWalk).
-	/// 
+	///
 	/// # Examples
-	/// 
+	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::{co, HHEAPOBJ};
-	/// 
+	///
 	/// let heap_obj = HHEAPOBJ::HeapCreate(co::HEAP_CREATE::NoValue, 0, 0)?;
 	/// let _lock = heap_obj.HeapLock()?;
-	/// 
+	///
 	/// for entry in heap_obj.iter_walk() {
 	///     let entry = entry?;
 	///     println!(&quot;Size: {}, overhead? {}&quot;,
@@ -370,7 +370,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::HeapCreate(options.<span class="number">0</span>, initial_size, maximum_size)
+				kernel::ffi::HeapCreate(options.raw(), initial_size, maximum_size)
 			).map(|h| HeapDestroyGuard::new(h))
 		}
 	}
@@ -384,7 +384,7 @@
 		SetLastError(co::ERROR::SUCCESS);
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::HeapAlloc(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>, bytes),
+				kernel::ffi::HeapAlloc(<span class="self">self</span>.as_ptr(), flags.raw(), bytes),
 			).map(|h| HeapFreeGuard::new(<span class="self">self</span>.raw_copy(), h))
 		}
 	}
@@ -392,7 +392,7 @@
 	<span class="doccomment">/// [`HeapCompact`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcompact)
 	/// method.
 	</span><span class="kw">fn </span>HeapCompact(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::HEAP_SIZE) -&gt; SysResult&lt;usize&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::HeapCompact(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::HeapCompact(<span class="self">self</span>.as_ptr(), flags.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>(n),
 		}
@@ -400,27 +400,27 @@
 
 	<span class="doccomment">/// [`HeapLock`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaplock)
 	/// method.
-	/// 
+	///
 	/// In the original C implementation, you must call
 	/// [`HeapUnlock`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapunlock)
 	/// as a cleanup operation.
-	/// 
+	///
 	/// Here, the cleanup is performed automatically, because `HeapLock` returns
 	/// a [`HeapUnlockGuard`](crate::guard::HeapUnlockGuard), which
 	/// automatically calls `HeapUnlock` when the guard goes out of scope. You
 	/// must, however, keep the guard alive, otherwise the cleanup will be
 	/// performed right away.
-	/// 
+	///
 	/// # Examples
-	/// 
+	///
 	/// ```rust,no_run
 	/// use winsafe::prelude::*;
 	/// use winsafe::{co, HHEAPOBJ};
-	/// 
+	///
 	/// let heap_obj = HHEAPOBJ::HeapCreate(co::HEAP_CREATE::NoValue, 0, 0)?;
-	/// 
+	///
 	/// let _lock = heap_obj.HeapLock()?;
-	/// 
+	///
 	/// // heap operations...
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
@@ -434,7 +434,7 @@
 
 	<span class="doccomment">/// [`HeapReAlloc`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc)
 	/// method.
-	/// 
+	///
 	/// Originally this method returns the handle to the reallocated memory
 	/// object; here the original handle is automatically updated.
 	</span><span class="kw">fn </span>HeapReAlloc(<span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -448,7 +448,7 @@
 			<span class="kw">unsafe </span>{
 				kernel::ffi::HeapReAlloc(
 					<span class="self">self</span>.as_ptr(),
-					flags.<span class="number">0</span>,
+					flags.raw(),
 					mem.as_ptr(),
 					bytes,
 				)
@@ -466,7 +466,7 @@
 		<span class="kw">const </span>FAILED: usize = -<span class="number">1isize </span><span class="kw">as </span>usize;
 
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::HeapSize(<span class="self">self</span>.as_ptr(), flags.<span class="number">0</span>, mem.as_ptr())
+			kernel::ffi::HeapSize(<span class="self">self</span>.as_ptr(), flags.raw(), mem.as_ptr())
 		} {
 			FAILED =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>(n),
@@ -475,7 +475,7 @@
 
 	<span class="doccomment">/// [`HeapWalk`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapwalk)
 	/// method.
-	/// 
+	///
 	/// Prefer using
 	/// [`HHEAPOBJ::iter_walk`](crate::prelude::kernel_Hheapobj::iter_walk),
 	/// which is simpler.
