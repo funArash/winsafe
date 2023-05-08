@@ -1547,6 +1547,22 @@
 <a href="#1547" id="1547">1547</a>
 <a href="#1548" id="1548">1548</a>
 <a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -2421,6 +2437,22 @@
 			<span class="kw-2">*</span>sys_name = sys_name_buf.<span class="number">0</span>.to_string();
 		}
 	})
+}
+
+<span class="doccomment">/// [`GetVolumePathName`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getvolumepathnamew)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetVolumePathName(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;String&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetVolumePathNameW(
+				WString::from_str(file_name).as_ptr(),
+				buf.as_mut_ptr(),
+				buf.buf_len() <span class="kw">as _</span>,
+			)
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`GetWindowsAccountDomainSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getwindowsaccountdomainsid)
