@@ -1563,15 +1563,38 @@
 <a href="#1563" id="1563">1563</a>
 <a href="#1564" id="1564">1564</a>
 <a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	FILETIME, HLOCAL, LANGID, MEMORYSTATUSEX, OSVERSIONINFOEX,
-	SECURITY_DESCRIPTOR, SID, SID_IDENTIFIER_AUTHORITY, STARTUPINFO, SysResult,
-	SYSTEM_INFO, SYSTEMTIME, TIME_ZONE_INFORMATION, WString,
+	DISK_SPACE_INFORMATION, FILETIME, HLOCAL, LANGID, MEMORYSTATUSEX,
+	OSVERSIONINFOEX, SECURITY_DESCRIPTOR, SID, SID_IDENTIFIER_AUTHORITY,
+	STARTUPINFO, SysResult, SYSTEM_INFO, SYSTEMTIME, TIME_ZONE_INFORMATION,
+	WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{
@@ -2042,6 +2065,27 @@
 				WString::from_opt_str(root_path_name).as_ptr(),
 			),
 		)
+	}
+}
+
+<span class="doccomment">/// [`GetDiskSpaceInformation`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdiskspaceinformationw)
+/// function.
+</span><span class="kw">pub fn </span>GetDiskSpaceInformation(
+	root_path: <span class="kw-2">&amp;</span>str,
+	disk_space_info: <span class="kw-2">&amp;mut </span>DISK_SPACE_INFORMATION,
+) -&gt; SysResult&lt;()&gt;
+{
+	<span class="kw">match unsafe </span>{
+		co::ERROR::from_raw(
+			kernel::ffi::GetDiskSpaceInformationW(
+				WString::from_str(root_path).as_ptr(),
+				disk_space_info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+			),
+		)
+	} {
+		co::ERROR::SUCCESS
+			| co::ERROR::MORE_DATA =&gt; <span class="prelude-val">Ok</span>(()),
+		err =&gt; <span class="prelude-val">Err</span>(err),
 	}
 }
 
