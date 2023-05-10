@@ -101,7 +101,7 @@
 	<span class="doccomment">/// [`DragAcceptFiles`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragacceptfiles)
 	/// method.
 	</span><span class="kw">fn </span>DragAcceptFiles(<span class="kw-2">&amp;</span><span class="self">self</span>, accept: bool) {
-		<span class="kw">unsafe </span>{ shell::ffi::DragAcceptFiles(<span class="self">self</span>.as_ptr(), accept <span class="kw">as _</span>); }
+		<span class="kw">unsafe </span>{ shell::ffi::DragAcceptFiles(<span class="self">self</span>.ptr(), accept <span class="kw">as _</span>); }
 	}
 
 	<span class="doccomment">/// [`ShellAbout`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellaboutw)
@@ -116,7 +116,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				shell::ffi::ShellAboutW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(
 						<span class="kw-2">&amp;</span><span class="kw">match </span>first_line {
 							<span class="prelude-val">Some</span>(line) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}#{}&quot;</span>, title_bar, line),
@@ -124,7 +124,7 @@
 						},
 					).as_ptr(),
 					WString::from_opt_str(other_stuff).as_ptr(),
-					hicon.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+					hicon.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				)
 			},
 		)
@@ -142,7 +142,7 @@
 	{
 		<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
 			shell::ffi::ShellExecuteW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				WString::from_str(operation).as_ptr(),
 				WString::from_str(file).as_ptr(),
 				parameters.map_or(std::ptr::null(), |lp| WString::from_str(lp).as_ptr()),

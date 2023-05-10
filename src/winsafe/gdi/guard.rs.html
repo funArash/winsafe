@@ -228,7 +228,7 @@
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.handle.as_opt() {
-			<span class="kw">unsafe </span>{ gdi::ffi::DeleteObject(h.as_ptr()); } <span class="comment">// ignore errors
+			<span class="kw">unsafe </span>{ gdi::ffi::DeleteObject(h.ptr()); } <span class="comment">// ignore errors
 		</span>}
 	}
 }
@@ -255,13 +255,13 @@
 	<span class="kw">where </span>T: GdiObject,
 {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
-	/// 
+	///
 	/// # Safety
-	/// 
+	///
 	/// Be sure the handle must be freed with
 	/// [`DeleteObject`](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject)
 	/// at the end of scope.
-	/// 
+	///
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
@@ -340,7 +340,7 @@
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hdc.as_opt() {
 			<span class="kw">if let </span><span class="prelude-val">Some</span>(g) = <span class="self">self</span>.prev_hgdi.as_opt() {
-				<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(h.as_ptr(), g.as_ptr()); } <span class="comment">// ignore errors
+				<span class="kw">unsafe </span>{ gdi::ffi::SelectObject(h.ptr(), g.ptr()); } <span class="comment">// ignore errors
 			</span>}
 		}
 	}
@@ -351,13 +351,13 @@
 		G: GdiObject,
 {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
-	/// 
+	///
 	/// # Safety
-	/// 
+	///
 	/// Be sure the handle must be again passed to
 	/// [`HDC::SelectObject`](crate::prelude::gdi_Hdc::SelectObject)
 	/// at the end of scope.
-	/// 
+	///
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]

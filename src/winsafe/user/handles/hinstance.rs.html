@@ -229,9 +229,9 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::CreateDialogParamW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					resource_id.as_ptr(),
-					hwnd_parent.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+					hwnd_parent.map_or(std::ptr::null_mut(), |h| h.ptr()),
 					dialog_proc <span class="kw">as _</span>,
 					init_param.unwrap_or_default(),
 				)
@@ -254,9 +254,9 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::DialogBoxParamW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				resource_id.as_ptr(),
-				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				dialog_proc <span class="kw">as _</span>,
 				init_param.unwrap_or_default(),
 			)
@@ -287,7 +287,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::GetClassInfoExW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				WString::from_str(class_name).as_ptr(),
 				wcx <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			)
@@ -303,7 +303,7 @@
 	</span><span class="kw">fn </span>LoadAccelerators(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: IdStr) -&gt; SysResult&lt;HACCEL&gt; {
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
-				user::ffi::LoadAcceleratorsW(<span class="self">self</span>.as_ptr(), table_name.as_ptr())
+				user::ffi::LoadAcceleratorsW(<span class="self">self</span>.ptr(), table_name.as_ptr())
 			},
 		)
 	}
@@ -329,7 +329,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				user::ffi::LoadCursorW(<span class="self">self</span>.as_ptr(), resource_id.as_ptr()),
+				user::ffi::LoadCursorW(<span class="self">self</span>.ptr(), resource_id.as_ptr()),
 			).map(|h| DestroyCursorGuard::new(h))
 		}
 	}
@@ -353,7 +353,7 @@
 	</span><span class="kw">fn </span>LoadIcon(<span class="kw-2">&amp;</span><span class="self">self</span>, icon_id: IdIdiStr) -&gt; SysResult&lt;DestroyIconGuard&gt; {
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				user::ffi::LoadIconW(<span class="self">self</span>.as_ptr(), icon_id.as_ptr()),
+				user::ffi::LoadIconW(<span class="self">self</span>.ptr(), icon_id.as_ptr()),
 			).map(|h| DestroyIconGuard::new(h))
 		}
 	}
@@ -363,7 +363,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LoadMenu(<span class="kw-2">&amp;</span><span class="self">self</span>, resource_id: IdStr) -&gt; SysResult&lt;HMENU&gt; {
 		ptr_to_sysresult_handle(
-			<span class="kw">unsafe </span>{ user::ffi::LoadMenuW(<span class="self">self</span>.as_ptr(), resource_id.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::LoadMenuW(<span class="self">self</span>.ptr(), resource_id.as_ptr()) },
 		)
 	}
 
@@ -374,7 +374,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>pdata: <span class="kw-2">*const </span>u16 = std::ptr::null_mut();
 		<span class="kw">match unsafe </span>{
 			user::ffi::LoadStringW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				id <span class="kw">as _</span>,
 				<span class="kw-2">&amp;mut </span>pdata <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as  _</span>, <span class="number">0</span>,
 			)

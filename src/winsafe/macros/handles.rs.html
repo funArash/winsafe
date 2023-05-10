@@ -176,7 +176,7 @@
 				<span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>)
 			}
 
-			<span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+			<span class="kw">fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
 				<span class="self">self</span>.<span class="number">0
 			</span>}
 		}
@@ -198,7 +198,7 @@
 		<span class="kw">impl </span>Drop <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 				<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.handle.as_opt() {
-					<span class="kw">unsafe </span>{ <span class="macro-nonterminal">$cleaner</span>(h.as_ptr()); } <span class="comment">// ignore errors
+					<span class="kw">unsafe </span>{ <span class="macro-nonterminal">$cleaner</span>(h.ptr()); } <span class="comment">// ignore errors
 				</span>}
 			}
 		}
@@ -219,12 +219,12 @@
 
 		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
 			<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
-			/// 
+			///
 			/// # Safety
-			/// 
+			///
 			/// Be sure the handle must be freed with the specified function at
 			/// the end of scope.
-			/// 
+			///
 			/// This method is used internally by the library, and not intended
 			/// to be used externally.
 			</span><span class="attr">#[must_use]

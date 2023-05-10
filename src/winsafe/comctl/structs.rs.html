@@ -2427,7 +2427,7 @@
 	<span class="doccomment">/// Returns the `hInst` and `nID` fields.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>nID(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BmpIdbRes {
-		<span class="kw">if </span><span class="self">self</span>.hInst.as_ptr() <span class="kw">as </span>isize == HINST_COMMCTRL {
+		<span class="kw">if </span><span class="self">self</span>.hInst.ptr() <span class="kw">as </span>isize == HINST_COMMCTRL {
 			BmpIdbRes::Idb(<span class="kw">unsafe </span>{ co::IDB::from_raw(<span class="self">self</span>.nID) })
 		} <span class="kw">else if </span><span class="self">self</span>.hInst == HINSTANCE::NULL {
 			BmpIdbRes::Bmp(<span class="kw">unsafe </span>{ HBITMAP::from_ptr(<span class="self">self</span>.nID <span class="kw">as _</span>) })
@@ -2448,7 +2448,7 @@
 			},
 			BmpIdbRes::Bmp(bmp) =&gt; <span class="self">Self </span>{
 				hInst: HINSTANCE::NULL,
-				nID: bmp.as_ptr() <span class="kw">as _
+				nID: bmp.ptr() <span class="kw">as _
 			</span>},
 			BmpIdbRes::Res(res, hInst) =&gt; <span class="self">Self </span>{
 				hInst: <span class="kw">unsafe </span>{ hInst.raw_copy() },
@@ -2576,7 +2576,7 @@
 		<span class="kw">match </span>val {
 			BmpInstId::Bmp(hbmp) =&gt; {
 				<span class="self">self</span>.hInstOld = HINSTANCE::NULL;
-				<span class="self">self</span>.nIDOld = hbmp.as_ptr() <span class="kw">as _</span>;
+				<span class="self">self</span>.nIDOld = hbmp.ptr() <span class="kw">as _</span>;
 			},
 			BmpInstId::InstId((hinst, id)) =&gt; {
 				<span class="self">self</span>.hInstOld = hinst;
@@ -2603,7 +2603,7 @@
 		<span class="kw">match </span>val {
 			BmpInstId::Bmp(hbmp) =&gt; {
 				<span class="self">self</span>.hInstNew = HINSTANCE::NULL;
-				<span class="self">self</span>.nIDNew = hbmp.as_ptr() <span class="kw">as _</span>;
+				<span class="self">self</span>.nIDNew = hbmp.ptr() <span class="kw">as _</span>;
 			},
 			BmpInstId::InstId((hinst, id)) =&gt; {
 				<span class="self">self</span>.hInstNew = hinst;

@@ -365,7 +365,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::EnumResourceLanguagesW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					resource_type.as_ptr(),
 					resource_id.as_ptr(),
 					enum_resource_languages_proc::&lt;F&gt; <span class="kw">as _</span>,
@@ -386,7 +386,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::EnumResourceNamesW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					resource_type.as_ptr(),
 					enum_resource_names_proc::&lt;F&gt; <span class="kw">as _</span>,
 					<span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -403,7 +403,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::EnumResourceTypesW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					enum_resource_types_proc::&lt;F&gt; <span class="kw">as _</span>,
 					<span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				)
@@ -423,7 +423,7 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::FindResourceW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					resource_id.as_ptr(),
 					resource_type.as_ptr(),
 				)
@@ -446,7 +446,7 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::FindResourceExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					resource_id.as_ptr(),
 					resource_type.as_ptr(),
 					language.unwrap_or(LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL)).into(),
@@ -477,7 +477,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetModuleFileNameW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					buf.as_mut_ptr(),
 					buf.len() <span class="kw">as _</span>,
 				)
@@ -519,7 +519,7 @@
 		ptr_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetProcAddress(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					str_to_iso88591(proc_name).as_ptr(),
 				) <span class="kw">as _
 			</span>},
@@ -546,7 +546,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>LoadResource(<span class="kw-2">&amp;</span><span class="self">self</span>, res_info: <span class="kw-2">&amp;</span>HRSRC) -&gt; SysResult&lt;HRSRCMEM&gt; {
 		ptr_to_sysresult_handle(
-			<span class="kw">unsafe </span>{ kernel::ffi::LoadResource(<span class="self">self</span>.as_ptr(), res_info.as_ptr()) },
+			<span class="kw">unsafe </span>{ kernel::ffi::LoadResource(<span class="self">self</span>.ptr(), res_info.ptr()) },
 		)
 	}
 
@@ -599,7 +599,7 @@
 		<span class="kw">let </span>sz = <span class="self">self</span>.SizeofResource(res_info)<span class="question-mark">?</span>;
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult(
-				kernel::ffi::LockResource(hres_loaded.as_ptr()),
+				kernel::ffi::LockResource(hres_loaded.ptr()),
 			).map(|ptr| std::slice::from_raw_parts(ptr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sz <span class="kw">as _</span>))
 		}
 	}
@@ -612,7 +612,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>SizeofResource(<span class="kw-2">&amp;</span><span class="self">self</span>, res_info: <span class="kw-2">&amp;</span>HRSRC) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::SizeofResource(<span class="self">self</span>.as_ptr(), res_info.as_ptr())
+			kernel::ffi::SizeofResource(<span class="self">self</span>.ptr(), res_info.ptr())
 		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			sz =&gt; <span class="prelude-val">Ok</span>(sz)

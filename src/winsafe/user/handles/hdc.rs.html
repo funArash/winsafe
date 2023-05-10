@@ -146,7 +146,7 @@
 		<span class="kw">let </span>wtext = WString::from_str(text);
 		<span class="kw">match unsafe </span>{
 			user::ffi::DrawText(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				wtext.as_ptr(),
 				wtext.str_len() <span class="kw">as _</span>,
 				bounds <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -188,7 +188,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::EnumDisplayMonitors(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					rc_clip.map_or(std::ptr::null_mut(), |rc| <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					enum_display_monitors_proc::&lt;F&gt; <span class="kw">as _</span>,
 					<span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -201,21 +201,21 @@
 	/// method.
 	</span><span class="kw">fn </span>InvertRect(<span class="kw-2">&amp;</span><span class="self">self</span>, rc: <span class="kw-2">&amp;</span>RECT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::InvertRect(<span class="self">self</span>.as_ptr(), rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::InvertRect(<span class="self">self</span>.ptr(), rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
 		)
 	}
 
 	<span class="doccomment">/// [`PaintDesktop`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-paintdesktop)
 	/// method.
 	</span><span class="kw">fn </span>PaintDesktop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::PaintDesktop(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::PaintDesktop(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`WindowFromDC`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-windowfromdc)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>WindowFromDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::WindowFromDC(<span class="self">self</span>.as_ptr()) })
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::WindowFromDC(<span class="self">self</span>.ptr()) })
 	}
 }
 

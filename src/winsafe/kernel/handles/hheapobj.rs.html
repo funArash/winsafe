@@ -384,7 +384,7 @@
 		SetLastError(co::ERROR::SUCCESS);
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::HeapAlloc(<span class="self">self</span>.as_ptr(), flags.raw(), bytes),
+				kernel::ffi::HeapAlloc(<span class="self">self</span>.ptr(), flags.raw(), bytes),
 			).map(|h| HeapFreeGuard::new(<span class="self">self</span>.raw_copy(), h))
 		}
 	}
@@ -392,7 +392,7 @@
 	<span class="doccomment">/// [`HeapCompact`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapcompact)
 	/// method.
 	</span><span class="kw">fn </span>HeapCompact(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::HEAP_SIZE) -&gt; SysResult&lt;usize&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::HeapCompact(<span class="self">self</span>.as_ptr(), flags.raw()) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::HeapCompact(<span class="self">self</span>.ptr(), flags.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>(n),
 		}
@@ -427,7 +427,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>HeapLock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HeapUnlockGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">unsafe </span>{
-			bool_to_sysresult(kernel::ffi::HeapLock(<span class="self">self</span>.as_ptr()))
+			bool_to_sysresult(kernel::ffi::HeapLock(<span class="self">self</span>.ptr()))
 				.map(|<span class="kw">_</span>| HeapUnlockGuard::new(<span class="self">self</span>))
 		}
 	}
@@ -447,9 +447,9 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::HeapReAlloc(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					flags.raw(),
-					mem.as_ptr(),
+					mem.ptr(),
 					bytes,
 				)
 			},
@@ -466,7 +466,7 @@
 		<span class="kw">const </span>FAILED: usize = -<span class="number">1isize </span><span class="kw">as </span>usize;
 
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::HeapSize(<span class="self">self</span>.as_ptr(), flags.raw(), mem.as_ptr())
+			kernel::ffi::HeapSize(<span class="self">self</span>.ptr(), flags.raw(), mem.ptr())
 		} {
 			FAILED =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>(n),
@@ -482,7 +482,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>HeapWalk(<span class="kw-2">&amp;</span><span class="self">self</span>, entry: <span class="kw-2">&amp;mut </span>PROCESS_HEAP_ENTRY) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::HeapWalk(<span class="self">self</span>.as_ptr(), entry <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			kernel::ffi::HeapWalk(<span class="self">self</span>.ptr(), entry <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::NO_MORE_ITEMS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),

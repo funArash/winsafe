@@ -253,7 +253,7 @@
 	/// Prefer using [`HDROP::iter`](crate::prelude::shell_Hdrop::iter), which
 	/// calls `DragFinish` automatically.
 	</span><span class="kw">fn </span>DragFinish(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">unsafe </span>{ shell::ffi::DragFinish(<span class="self">self</span>.as_ptr()); }
+		<span class="kw">unsafe </span>{ shell::ffi::DragFinish(<span class="self">self</span>.ptr()); }
 		<span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::INVALID;
 	}
 
@@ -273,7 +273,7 @@
 
 		<span class="kw">match unsafe </span>{
 			shell::ffi::DragQueryFileW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				ifile.unwrap_or(<span class="number">0xffff_ffff</span>),
 				buf.map_or(std::ptr::null_mut(), |buf| buf.as_mut_ptr()),
 				cch <span class="kw">as _</span>,
@@ -293,7 +293,7 @@
 	</span><span class="kw">fn </span>DragQueryPoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (POINT, bool) {
 		<span class="kw">let </span><span class="kw-2">mut </span>pt = POINT::default();
 		<span class="kw">let </span>client_area = <span class="kw">unsafe </span>{
-			shell::ffi::DragQueryPoint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			shell::ffi::DragQueryPoint(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		};
 		(pt, client_area != <span class="number">0</span>)
 	}

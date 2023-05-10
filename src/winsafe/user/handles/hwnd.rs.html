@@ -1826,7 +1826,7 @@
 	<span class="doccomment">/// [`ArrangeIconicWindows`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-arrangeiconicwindows)
 	/// method.
 	</span><span class="kw">fn </span>ArrangeIconicWindows(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::ArrangeIconicWindows(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::ArrangeIconicWindows(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			height =&gt; <span class="prelude-val">Ok</span>(height),
 		}
@@ -1882,7 +1882,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>ps = PAINTSTRUCT::default();
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				user::ffi::BeginPaint(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+				user::ffi::BeginPaint(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ps <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 			).map(|h| EndPaintGuard::new(<span class="self">self</span>, h, ps))
 		}
 	}
@@ -1890,7 +1890,7 @@
 	<span class="doccomment">/// [`BringWindowToTop`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-bringwindowtotop)
 	/// method.
 	</span><span class="kw">fn </span>BringWindowToTop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::BringWindowToTop(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::BringWindowToTop(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`ChildWindowFromPoint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-childwindowfrompoint)
@@ -1898,7 +1898,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>ChildWindowFromPoint(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: POINT) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
 		ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::ChildWindowFromPoint(<span class="self">self</span>.as_ptr(), pt.x, pt.y) },
+			<span class="kw">unsafe </span>{ user::ffi::ChildWindowFromPoint(<span class="self">self</span>.ptr(), pt.x, pt.y) },
 		)
 	}
 
@@ -1910,7 +1910,7 @@
 	/// method.
 	</span><span class="kw">fn </span>ClientToScreen(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: <span class="kw-2">&amp;mut </span>POINT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::ClientToScreen(<span class="self">self</span>.as_ptr(), pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::ClientToScreen(<span class="self">self</span>.ptr(), pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
 	}
 
@@ -1920,14 +1920,14 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::ClientToScreen(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>rc.left <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
 		).and_then(|<span class="kw">_</span>| bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::ClientToScreen(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>rc.right <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
@@ -1939,7 +1939,7 @@
 	///
 	/// Note that this method will actually minimize the window, not destroy it.
 	</span><span class="kw">fn </span>CloseWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::CloseWindow(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::CloseWindow(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`CreateWindowEx`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw)
@@ -1976,9 +1976,9 @@
 				style.raw(),
 				pos.x, pos.y,
 				size.cx, size.cy,
-				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+				hwnd_parent.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				hmenu.as_ptr(),
-				hinstance.as_ptr(),
+				hinstance.ptr(),
 				lparam.unwrap_or_default() <span class="kw">as _</span>,
 			),
 		)
@@ -1998,7 +1998,7 @@
 		msg.convert_ret(
 			<span class="kw">unsafe </span>{
 				user::ffi::DefWindowProcW(
-					<span class="self">self</span>.as_ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
+					<span class="self">self</span>.ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
 				)
 			},
 		)
@@ -2012,13 +2012,13 @@
 	/// to close a window is sending a [`wm::Close`](crate::msg::wm::Close)
 	/// message.
 	</span><span class="kw">fn </span>DestroyWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult( <span class="kw">unsafe </span>{ user::ffi::DestroyWindow(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult( <span class="kw">unsafe </span>{ user::ffi::DestroyWindow(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`DrawMenuBar`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-drawmenubar)
 	/// method.
 	</span><span class="kw">fn </span>DrawMenuBar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::DrawMenuBar(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::DrawMenuBar(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`EnableScrollBar`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enablescrollbar)
@@ -2029,7 +2029,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::EnableScrollBar(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					sb_flags.raw() <span class="kw">as _</span>,
 					arrows.raw(),
 				)
@@ -2040,13 +2040,13 @@
 	<span class="doccomment">/// [`EnableWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enablewindow)
 	/// method.
 	</span><span class="kw">fn </span>EnableWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, enable: bool) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::EnableWindow(<span class="self">self</span>.as_ptr(), enable <span class="kw">as _</span>) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::EnableWindow(<span class="self">self</span>.ptr(), enable <span class="kw">as _</span>) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`EndDialog`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enddialog)
 	/// method.
 	</span><span class="kw">fn </span>EndDialog(<span class="kw-2">&amp;</span><span class="self">self</span>, result: isize) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EndDialog(<span class="self">self</span>.as_ptr(), result) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::EndDialog(<span class="self">self</span>.ptr(), result) })
 	}
 
 	<span class="doccomment">/// [`EnumChildWindows`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumchildwindows)
@@ -2071,7 +2071,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			user::ffi::EnumChildWindows(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				enum_child_windows_proc::&lt;F&gt; <span class="kw">as _</span>, <span class="comment">// https://redd.it/npehj9
 				</span><span class="kw-2">&amp;</span>func <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 			);
@@ -2114,8 +2114,8 @@
 	{
 		<span class="kw">let </span>ptr = <span class="kw">unsafe </span>{
 			user::ffi::FindWindowExW(
-				<span class="self">self</span>.as_ptr(),
-				hwnd_child_after.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+				<span class="self">self</span>.ptr(),
+				hwnd_child_after.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				class_name.as_ptr(),
 				WString::from_opt_str(title).as_ptr(),
 			)
@@ -2162,7 +2162,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetAltTabInfoW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					item.map_or(-<span class="number">1</span>, |item| item <span class="kw">as </span>i32),
 					ati <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					item.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| buf.as_mut_ptr()),
@@ -2177,7 +2177,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetAncestor(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::GA) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
 		ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetAncestor(<span class="self">self</span>.as_ptr(), flags.raw()) },
+			<span class="kw">unsafe </span>{ user::ffi::GetAncestor(<span class="self">self</span>.ptr(), flags.raw()) },
 		)
 	}
 
@@ -2192,7 +2192,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetClassLongPtr(<span class="kw-2">&amp;</span><span class="self">self</span>, index: co::GCLP) -&gt; usize {
-		<span class="kw">unsafe </span>{ user::ffi::GetClassLongPtrW(<span class="self">self</span>.as_ptr(), index.raw()) }
+		<span class="kw">unsafe </span>{ user::ffi::GetClassLongPtrW(<span class="self">self</span>.ptr(), index.raw()) }
 	}
 
 	<span class="doccomment">/// [`GetClassName`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclassnamew)
@@ -2203,7 +2203,7 @@
 		</span>bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetClassNameW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					buf.as_mut_ptr(),
 					buf.buf_len() <span class="kw">as _</span>,
 				)
@@ -2218,7 +2218,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::GetClientRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+				user::ffi::GetClientRect(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		).map(|<span class="kw">_</span>| rc)
 	}
@@ -2231,7 +2231,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">unsafe </span>{
-			ptr_to_sysresult_handle(user::ffi::GetDC(<span class="self">self</span>.as_ptr()))
+			ptr_to_sysresult_handle(user::ffi::GetDC(<span class="self">self</span>.ptr()))
 				.map(|h| ReleaseDCGuard::new(<span class="self">self</span>, h))
 		}
 	}
@@ -2248,7 +2248,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDlgCtrlID(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u16&gt; {
 		SetLastError(co::ERROR::SUCCESS);
-		<span class="kw">match unsafe </span>{ user::ffi::GetDlgCtrlID(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetDlgCtrlID(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual ID is zero
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -2262,7 +2262,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDlgItem(<span class="kw-2">&amp;</span><span class="self">self</span>, ctrl_id: u16) -&gt; SysResult&lt;HWND&gt; {
 		ptr_to_sysresult_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetDlgItem(<span class="self">self</span>.as_ptr(), ctrl_id <span class="kw">as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::GetDlgItem(<span class="self">self</span>.ptr(), ctrl_id <span class="kw">as _</span>) },
 		)
 	}
 
@@ -2285,7 +2285,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetLastActivePopup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
 		ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetLastActivePopup(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::GetLastActivePopup(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -2293,7 +2293,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetMenu(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
-		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetMenu(<span class="self">self</span>.as_ptr()) })
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::GetMenu(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`GetMenuBarInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmenubarinfo)
@@ -2304,7 +2304,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetMenuBarInfo(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					obj_id.raw() <span class="kw">as _</span>,
 					item_id <span class="kw">as _</span>,
 					mbi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -2321,8 +2321,8 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetMenuItemRect(
-					<span class="self">self</span>.as_ptr(),
-					hmenu.as_ptr(),
+					<span class="self">self</span>.ptr(),
+					hmenu.ptr(),
 					item_pos,
 					rc_item <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
@@ -2339,8 +2339,8 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetNextDlgGroupItem(
-					<span class="self">self</span>.as_ptr(),
-					hwnd_ctrl.as_ptr(), previous <span class="kw">as _</span>,
+					<span class="self">self</span>.ptr(),
+					hwnd_ctrl.ptr(), previous <span class="kw">as _</span>,
 				)
 			},
 		)
@@ -2355,8 +2355,8 @@
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetNextDlgTabItem(
-					<span class="self">self</span>.as_ptr(),
-					hwnd_ctrl.as_ptr(),
+					<span class="self">self</span>.ptr(),
+					hwnd_ctrl.ptr(),
 					previous <span class="kw">as _</span>,
 				)
 			},
@@ -2367,7 +2367,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetParent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HWND&gt; {
-		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ user::ffi::GetParent(<span class="self">self</span>.as_ptr()) })
+		ptr_to_sysresult_handle(<span class="kw">unsafe </span>{ user::ffi::GetParent(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`GetScrollInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getscrollinfo)
@@ -2377,7 +2377,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::GetScrollInfo(<span class="self">self</span>.as_ptr(), bar.raw(), si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+				user::ffi::GetScrollInfo(<span class="self">self</span>.ptr(), bar.raw(), si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
@@ -2386,7 +2386,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetScrollPos(<span class="kw-2">&amp;</span><span class="self">self</span>, bar: co::SBB) -&gt; SysResult&lt;i32&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::GetScrollPos(<span class="self">self</span>.as_ptr(), bar.raw()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetScrollPos(<span class="self">self</span>.ptr(), bar.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual zero position
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -2407,7 +2407,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetSystemMenu(<span class="kw-2">&amp;</span><span class="self">self</span>, revert: bool) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
 		ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetSystemMenu(<span class="self">self</span>.as_ptr(), revert <span class="kw">as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::GetSystemMenu(<span class="self">self</span>.ptr(), revert <span class="kw">as _</span>) },
 		)
 	}
 
@@ -2416,7 +2416,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetTopWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;<span class="prelude-ty">Option</span>&lt;HWND&gt;&gt; {
 		<span class="kw">match </span>ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetTopWindow(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::GetTopWindow(<span class="self">self</span>.ptr()) },
 		) {
 			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no child window
@@ -2434,7 +2434,7 @@
 		zero_as_none(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetUpdateRect(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					erase <span class="kw">as _</span>,
 				)
@@ -2447,7 +2447,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetUpdateRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN, erase: bool) -&gt; SysResult&lt;co::REGION&gt; {
 		<span class="kw">match unsafe </span>{
-			user::ffi::GetUpdateRgn(<span class="self">self</span>.as_ptr(), hrgn.as_ptr(), erase <span class="kw">as _</span>) }
+			user::ffi::GetUpdateRgn(<span class="self">self</span>.ptr(), hrgn.ptr(), erase <span class="kw">as _</span>) }
 		{
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			ret =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::REGION::from_raw(ret) }),
@@ -2459,7 +2459,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: co::GW) -&gt; SysResult&lt;HWND&gt; {
 		ptr_to_sysresult_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetWindow(<span class="self">self</span>.as_ptr(), cmd.raw()) },
+			<span class="kw">unsafe </span>{ user::ffi::GetWindow(<span class="self">self</span>.ptr(), cmd.raw()) },
 		)
 	}
 
@@ -2468,7 +2468,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;ReleaseDCGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">unsafe </span>{
-			ptr_to_sysresult_handle(user::ffi::GetWindowDC(<span class="self">self</span>.as_ptr()))
+			ptr_to_sysresult_handle(user::ffi::GetWindowDC(<span class="self">self</span>.ptr()))
 				.map(|h| ReleaseDCGuard::new(<span class="self">self</span>, h))
 		}
 	}
@@ -2481,7 +2481,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetWindowDisplayAffinity(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>affinity <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
@@ -2492,7 +2492,7 @@
 	/// method.
 	</span><span class="kw">fn </span>GetWindowInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, wi: <span class="kw-2">&amp;mut </span>WINDOWINFO) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::GetWindowInfo(<span class="self">self</span>.as_ptr(), wi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::GetWindowInfo(<span class="self">self</span>.ptr(), wi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
 	}
 
@@ -2504,7 +2504,7 @@
 		</span><span class="kw">unsafe </span>{ user::ffi::GetWindowLongW(<span class="self">self</span>.as_ptr(), index.raw()) }
 
 		<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
-		</span><span class="kw">unsafe </span>{ user::ffi::GetWindowLongPtrW(<span class="self">self</span>.as_ptr(), index.raw()) }
+		</span><span class="kw">unsafe </span>{ user::ffi::GetWindowLongPtrW(<span class="self">self</span>.ptr(), index.raw()) }
 	}
 
 	<span class="doccomment">/// [`GetWindowModuleFileName`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowmodulefilenamew)
@@ -2514,7 +2514,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 		<span class="kw">unsafe </span>{
 			user::ffi::GetWindowModuleFileNameW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				buf.as_mut_ptr(),
 				buf.buf_len() <span class="kw">as </span>u32 - <span class="number">1</span>,
 			);
@@ -2527,7 +2527,7 @@
 	</span><span class="kw">fn </span>GetWindowPlacement(<span class="kw-2">&amp;</span><span class="self">self</span>, wp: <span class="kw-2">&amp;mut </span>WINDOWPLACEMENT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::GetWindowPlacement(<span class="self">self</span>.as_ptr(), wp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+				user::ffi::GetWindowPlacement(<span class="self">self</span>.ptr(), wp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
@@ -2539,7 +2539,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>rc = RECT::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::GetWindowRect(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+				user::ffi::GetWindowRect(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		).map(|<span class="kw">_</span>| rc)
 	}
@@ -2548,7 +2548,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN) -&gt; SysResult&lt;co::REGION&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::GetWindowRgn(<span class="self">self</span>.as_ptr(), hrgn.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetWindowRgn(<span class="self">self</span>.ptr(), hrgn.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			ret =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::REGION::from_raw(ret) }),
 		}
@@ -2559,7 +2559,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowRgnBox(<span class="kw-2">&amp;</span><span class="self">self</span>, rc: <span class="kw-2">&amp;mut </span>RECT) -&gt; SysResult&lt;co::REGION&gt; {
 		<span class="kw">match unsafe </span>{
-			user::ffi::GetWindowRgnBox(<span class="self">self</span>.as_ptr(), rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			user::ffi::GetWindowRgnBox(<span class="self">self</span>.ptr(), rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			ret =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::REGION::from_raw(ret) }),
@@ -2593,7 +2593,7 @@
 
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as </span>usize + <span class="number">1</span>); <span class="comment">// plus terminating null
 		</span><span class="kw">match unsafe </span>{
-			user::ffi::GetWindowTextW(<span class="self">self</span>.as_ptr(), buf.as_mut_ptr(), len + <span class="number">1</span>)
+			user::ffi::GetWindowTextW(<span class="self">self</span>.ptr(), buf.as_mut_ptr(), len + <span class="number">1</span>)
 		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(String::default()), <span class="comment">// no chars copied for some reason
@@ -2613,7 +2613,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowTextLength(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;i32&gt; {
 		SetLastError(co::ERROR::SUCCESS);
-		<span class="kw">match unsafe </span>{ user::ffi::GetWindowTextLengthW(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetWindowTextLengthW(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual zero length
 				</span>err =&gt; <span class="prelude-val">Err</span>(err),
@@ -2630,7 +2630,7 @@
 	</span><span class="kw">fn </span>GetWindowThreadProcessId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u32, u32) {
 		<span class="kw">let </span><span class="kw-2">mut </span>proc_id = u32::default();
 		<span class="kw">let </span>thread_id = <span class="kw">unsafe </span>{
-			user::ffi::GetWindowThreadProcessId(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>proc_id)
+			user::ffi::GetWindowThreadProcessId(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>proc_id)
 		};
 		(thread_id, proc_id)
 	}
@@ -2642,8 +2642,8 @@
 	{
 		<span class="kw">unsafe </span>{
 			user::ffi::HiliteMenuItem(
-				<span class="self">self</span>.as_ptr(),
-				hmenu.as_ptr(),
+				<span class="self">self</span>.ptr(),
+				hmenu.ptr(),
 				id_or_pos.id_or_pos_u32(),
 				hilite.raw(),
 			) != <span class="number">0
@@ -2671,7 +2671,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::InvalidateRect(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					rc.map_or(std::ptr::null(), |lp| lp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					erase <span class="kw">as _</span>,
 				)
@@ -2683,7 +2683,7 @@
 	/// method.
 	</span><span class="kw">fn </span>InvalidateRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN, erase: bool) {
 		<span class="kw">unsafe </span>{
-			user::ffi::InvalidateRgn(<span class="self">self</span>.as_ptr(), hrgn.as_ptr(), erase <span class="kw">as _</span>);
+			user::ffi::InvalidateRgn(<span class="self">self</span>.ptr(), hrgn.ptr(), erase <span class="kw">as _</span>);
 		}
 	}
 
@@ -2692,7 +2692,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsChild(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_possible_child: <span class="kw-2">&amp;</span>HWND) -&gt; bool {
 		<span class="kw">unsafe </span>{
-			user::ffi::IsChild(<span class="self">self</span>.as_ptr(), hwnd_possible_child.as_ptr()) != <span class="number">0
+			user::ffi::IsChild(<span class="self">self</span>.ptr(), hwnd_possible_child.ptr()) != <span class="number">0
 		</span>}
 	}
 
@@ -2701,7 +2701,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsDialogMessage(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;mut </span>MSG) -&gt; bool {
 		<span class="kw">unsafe </span>{
-			user::ffi::IsDialogMessageW(<span class="self">self</span>.as_ptr(), msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) != <span class="number">0
+			user::ffi::IsDialogMessageW(<span class="self">self</span>.ptr(), msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) != <span class="number">0
 		</span>}
 	}
 
@@ -2709,48 +2709,48 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsIconic(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsIconic(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsIconic(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindow)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsWindow(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsWindow(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsWindowEnabled`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindowenabled)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWindowEnabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsWindowEnabled(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsWindowEnabled(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsWindowUnicode`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindowunicode)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWindowUnicode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsWindowUnicode(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsWindowUnicode(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsWindowVisible`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindowvisible)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWindowVisible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsWindowVisible(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsWindowVisible(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`IsZoomed`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iszoomed)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsZoomed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsZoomed(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsZoomed(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`KillTimer`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-killtimer)
 	/// method.
 	</span><span class="kw">fn </span>KillTimer(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: usize) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::KillTimer(<span class="self">self</span>.as_ptr(), event_id) } {
+		<span class="kw">match unsafe </span>{ user::ffi::KillTimer(<span class="self">self</span>.ptr(), event_id) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(()),
 				e =&gt; <span class="prelude-val">Err</span>(e),
@@ -2779,14 +2779,14 @@
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>LockWindowUpdate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::LockWindowUpdate(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::LockWindowUpdate(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`LogicalToPhysicalPoint`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-logicaltophysicalpoint)
 	/// method.
 	</span><span class="kw">fn </span>LogicalToPhysicalPoint(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: <span class="kw-2">*mut </span>POINT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::LogicalToPhysicalPoint(<span class="self">self</span>.as_ptr(), pt <span class="kw">as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::LogicalToPhysicalPoint(<span class="self">self</span>.ptr(), pt <span class="kw">as _</span>) },
 		)
 	}
 
@@ -2794,7 +2794,7 @@
 	/// method.
 	</span><span class="kw">fn </span>MapDialogRect(<span class="kw-2">&amp;</span><span class="self">self</span>, rc: <span class="kw-2">&amp;mut </span>RECT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::MapDialogRect(<span class="self">self</span>.as_ptr(), rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::MapDialogRect(<span class="self">self</span>.ptr(), rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
 	}
 
@@ -2836,8 +2836,8 @@
 		SetLastError(co::ERROR::SUCCESS);
 		<span class="kw">match unsafe </span>{
 			user::ffi::MapWindowPoints(
-				<span class="self">self</span>.as_ptr(),
-				hdest.as_ptr(),
+				<span class="self">self</span>.ptr(),
+				hdest.ptr(),
 				forced_pts.as_mut_ptr() <span class="kw">as _</span>,
 				forced_pts.len() <span class="kw">as _</span>,
 			)
@@ -2886,7 +2886,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::MessageBoxW(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				WString::from_str(text).as_ptr(),
 				WString::from_str(caption).as_ptr(),
 				flags.raw(),
@@ -2903,7 +2903,7 @@
 	</span><span class="kw">fn </span>MonitorFromWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::MONITOR) -&gt; HMONITOR {
 		<span class="kw">unsafe </span>{
 			HMONITOR::from_ptr(
-				user::ffi::MonitorFromWindow(<span class="self">self</span>.as_ptr(), flags.raw()),
+				user::ffi::MonitorFromWindow(<span class="self">self</span>.ptr(), flags.raw()),
 			)
 		}
 	}
@@ -2916,7 +2916,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::MoveWindow(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					pos.x, pos.y,
 					size.cx, size.cy,
 					repaint <span class="kw">as _</span>,
@@ -2963,7 +2963,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenClipboard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;CloseClipboardGuard&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
 		<span class="kw">unsafe </span>{
-			bool_to_sysresult(user::ffi::OpenClipboard(<span class="self">self</span>.as_ptr()))
+			bool_to_sysresult(user::ffi::OpenClipboard(<span class="self">self</span>.ptr()))
 				.map(|<span class="kw">_</span>| CloseClipboardGuard::new(PhantomData))
 		}
 	}
@@ -2978,7 +2978,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::PostMessageW(
-					<span class="self">self</span>.as_ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
+					<span class="self">self</span>.ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
 				)
 			},
 		)
@@ -2993,7 +2993,7 @@
 		ptr_to_option_handle(
 			<span class="kw">unsafe </span>{
 				user::ffi::RealChildWindowFromPoint(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					pt_parent_client_coords.x,
 					pt_parent_client_coords.y,
 				)
@@ -3009,7 +3009,7 @@
 		</span>bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::RealGetWindowClassW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					buf.as_mut_ptr(),
 					buf.buf_len() <span class="kw">as _</span>,
 				)
@@ -3025,9 +3025,9 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::RedrawWindow(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					rc_update <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					hrgn_update.as_ptr(),
+					hrgn_update.ptr(),
 					flags.raw(),
 				)
 			},
@@ -3043,7 +3043,7 @@
 	</span><span class="kw">fn </span>ScreenToClient(<span class="kw-2">&amp;</span><span class="self">self</span>, pt: <span class="kw-2">&amp;mut </span>POINT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::ScreenToClient(<span class="self">self</span>.as_ptr(), pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+				user::ffi::ScreenToClient(<span class="self">self</span>.ptr(), pt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
@@ -3054,7 +3054,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::ScreenToClient(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>rc.left <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
@@ -3062,7 +3062,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::ScreenToClient(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>rc.right <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
@@ -3083,11 +3083,11 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::ScrollWindowEx(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				dx, dy,
 				client_area_portion.map_or(std::ptr::null(), |rc| rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				clipping_rect.map_or(std::ptr::null(), |rc| rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-				hrgn_update.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+				hrgn_update.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				updated_boundaries.map_or(std::ptr::null_mut(), |rc| rc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 				flags.raw(),
 			)
@@ -3147,7 +3147,7 @@
 		msg.convert_ret(
 			<span class="kw">unsafe </span>{
 				user::ffi::SendMessageW(
-					<span class="self">self</span>.as_ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
+					<span class="self">self</span>.ptr(), wm_any.msg_id.raw(), wm_any.wparam, wm_any.lparam,
 				)
 			},
 		)
@@ -3169,7 +3169,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SendMessageTimeoutW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					wm_any.msg_id.raw(),
 					wm_any.wparam,
 					wm_any.lparam,
@@ -3185,7 +3185,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetActiveWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HWND&gt; {
 		ptr_to_sysresult_handle(
-			<span class="kw">unsafe </span>{ user::ffi::SetActiveWindow(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::SetActiveWindow(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -3195,7 +3195,7 @@
 		<span class="kw">unsafe </span>{
 			ReleaseCaptureGuard::new(
 				<span class="self">self</span>,
-				user::ffi::SetCapture(<span class="self">self</span>.as_ptr())
+				user::ffi::SetCapture(<span class="self">self</span>.ptr())
 					.as_mut()
 					.map(|ptr| HWND::from_ptr(ptr)),
 			)
@@ -3205,20 +3205,20 @@
 	<span class="doccomment">/// [`SetFocus`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setfocus)
 	/// method.
 	</span><span class="kw">fn </span>SetFocus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;HWND&gt; {
-		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::SetFocus(<span class="self">self</span>.as_ptr()) })
+		ptr_to_option_handle(<span class="kw">unsafe </span>{ user::ffi::SetFocus(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`SetForegroundWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow)
 	/// method.
 	</span><span class="kw">fn </span>SetForegroundWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::SetForegroundWindow(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::SetForegroundWindow(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`SetMenu`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setmenu)
 	/// method.
 	</span><span class="kw">fn </span>SetMenu(<span class="kw-2">&amp;</span><span class="self">self</span>, hmenu: <span class="kw-2">&amp;</span>HMENU) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::SetMenu(<span class="self">self</span>.as_ptr(), hmenu.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::SetMenu(<span class="self">self</span>.ptr(), hmenu.ptr()) },
 		)
 	}
 
@@ -3227,7 +3227,7 @@
 	</span><span class="kw">fn </span>SetParent(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_new_parent: <span class="kw-2">&amp;</span>HWND) -&gt; SysResult&lt;<span class="prelude-ty">Option</span>&lt;HWND&gt;&gt; {
 		<span class="kw">match </span>ptr_to_option_handle(
 			<span class="kw">unsafe </span>{
-				user::ffi::SetParent(<span class="self">self</span>.as_ptr(), hwnd_new_parent.as_ptr())
+				user::ffi::SetParent(<span class="self">self</span>.ptr(), hwnd_new_parent.ptr())
 			},
 		) {
 			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>GetLastError() {
@@ -3243,7 +3243,7 @@
 	</span><span class="kw">fn </span>SetScrollInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, bar: co::SBB, si: <span class="kw-2">&amp;</span>SCROLLINFO, redraw: bool) -&gt; i32 {
 		<span class="kw">unsafe </span>{
 			user::ffi::SetScrollInfo(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				bar.raw(),
 				si <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				redraw <span class="kw">as _</span>,
@@ -3257,7 +3257,7 @@
 		b: co::SBB, pos: i32, redraw: bool) -&gt; SysResult&lt;i32&gt;
 	{
 		<span class="kw">match unsafe </span>{
-			user::ffi::SetScrollPos(<span class="self">self</span>.as_ptr(), b.raw(), pos, redraw <span class="kw">as _</span>)
+			user::ffi::SetScrollPos(<span class="self">self</span>.ptr(), b.raw(), pos, redraw <span class="kw">as _</span>)
 		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>), <span class="comment">// actual zero position
@@ -3275,7 +3275,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetScrollRange(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					bar.raw(),
 					min_pos,
 					max_pos,
@@ -3294,7 +3294,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::SetTimer(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				event_id,
 				elapse_ms,
 				timer_func.map_or(std::ptr::null(), |lp| lp <span class="kw">as _</span>),
@@ -3310,7 +3310,7 @@
 	</span><span class="kw">fn </span>SetWindowDisplayAffinity(<span class="kw-2">&amp;</span><span class="self">self</span>, affinity: co::WDA) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::SetWindowDisplayAffinity(<span class="self">self</span>.as_ptr(), affinity.raw())
+				user::ffi::SetWindowDisplayAffinity(<span class="self">self</span>.ptr(), affinity.raw())
 			},
 		)
 	}
@@ -3322,7 +3322,7 @@
 		</span><span class="kw">unsafe </span>{ user::ffi::SetWindowLongW(<span class="self">self</span>.as_ptr(), index.raw(), new_long) }
 
 		<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
-		</span><span class="kw">unsafe </span>{ user::ffi::SetWindowLongPtrW(<span class="self">self</span>.as_ptr(), index.raw(), new_long) }
+		</span><span class="kw">unsafe </span>{ user::ffi::SetWindowLongPtrW(<span class="self">self</span>.ptr(), index.raw(), new_long) }
 	}
 
 	<span class="doccomment">/// [`SetWindowPlacement`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowplacement)
@@ -3330,7 +3330,7 @@
 	</span><span class="kw">fn </span>SetWindowPlacement(<span class="kw-2">&amp;</span><span class="self">self</span>, wp: <span class="kw-2">&amp;</span>WINDOWPLACEMENT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::SetWindowPlacement(<span class="self">self</span>.as_ptr(), wp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
+				user::ffi::SetWindowPlacement(<span class="self">self</span>.ptr(), wp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
@@ -3365,7 +3365,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetWindowPos(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					hwnd_insert_after.as_ptr(),
 					pos.x, pos.y,
 					size.cx, size.cy,
@@ -3380,7 +3380,7 @@
 	</span><span class="kw">fn </span>SetWindowRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN, redraw: bool) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::SetWindowRgn(<span class="self">self</span>.as_ptr(), hrgn.as_ptr(), redraw <span class="kw">as _</span>)
+				user::ffi::SetWindowRgn(<span class="self">self</span>.ptr(), hrgn.ptr(), redraw <span class="kw">as _</span>)
 			},
 		)
 	}
@@ -3391,7 +3391,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetWindowTextW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(text).as_ptr(),
 				)
 			},
@@ -3401,28 +3401,28 @@
 	<span class="doccomment">/// [`ShowCaret`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showcaret)
 	/// method.
 	</span><span class="kw">fn </span>ShowCaret(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::ShowCaret(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::ShowCaret(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`ShowOwnedPopups`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showownedpopups)
 	/// method.
 	</span><span class="kw">fn </span>ShowOwnedPopups(<span class="kw-2">&amp;</span><span class="self">self</span>, show: bool) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::ShowOwnedPopups(<span class="self">self</span>.as_ptr(), show <span class="kw">as _</span>) }
+			<span class="kw">unsafe </span>{ user::ffi::ShowOwnedPopups(<span class="self">self</span>.ptr(), show <span class="kw">as _</span>) }
 		)
 	}
 
 	<span class="doccomment">/// [`ShowWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow)
 	/// method.
 	</span><span class="kw">fn </span>ShowWindow(<span class="kw-2">&amp;</span><span class="self">self</span>, show_cmd: co::SW) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::ShowWindow(<span class="self">self</span>.as_ptr(), show_cmd.raw()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::ShowWindow(<span class="self">self</span>.ptr(), show_cmd.raw()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`ShowWindowAsync`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindowasync)
 	/// method.
 	</span><span class="kw">fn </span>ShowWindowAsync(<span class="kw-2">&amp;</span><span class="self">self</span>, show_cmd: co::SW) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::ShowWindowAsync(<span class="self">self</span>.as_ptr(), show_cmd.raw()) }
+			<span class="kw">unsafe </span>{ user::ffi::ShowWindowAsync(<span class="self">self</span>.ptr(), show_cmd.raw()) }
 		)
 	}
 
@@ -3436,7 +3436,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::TileWindows(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				how.raw(),
 				rect.map_or(std::ptr::null(), |rc| <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				kids.map_or(<span class="number">0</span>, |s| s.len() <span class="kw">as _</span>),
@@ -3459,8 +3459,8 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::TranslateAcceleratorW(
-					<span class="self">self</span>.as_ptr(),
-					haccel_table.as_ptr(),
+					<span class="self">self</span>.ptr(),
+					haccel_table.ptr(),
 					msg <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
@@ -3470,7 +3470,7 @@
 	<span class="doccomment">/// [`UpdateWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-updatewindow)
 	/// method.
 	</span><span class="kw">fn </span>UpdateWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::UpdateWindow(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ user::ffi::UpdateWindow(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`ValidateRect`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-validaterect)
@@ -3478,7 +3478,7 @@
 	</span><span class="kw">fn </span>ValidateRect(<span class="kw-2">&amp;</span><span class="self">self</span>, rc: <span class="kw-2">&amp;</span>RECT) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				user::ffi::ValidateRect(<span class="self">self</span>.as_ptr(), rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
+				user::ffi::ValidateRect(<span class="self">self</span>.ptr(), rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
 			},
 		)
 	}
@@ -3487,7 +3487,7 @@
 	/// method.
 	</span><span class="kw">fn </span>ValidateRgn(<span class="kw-2">&amp;</span><span class="self">self</span>, hrgn: <span class="kw-2">&amp;</span>HRGN) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::ValidateRgn(<span class="self">self</span>.as_ptr(), hrgn.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::ValidateRgn(<span class="self">self</span>.ptr(), hrgn.ptr()) },
 		)
 	}
 
@@ -3515,7 +3515,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::WinHelpW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(help_file).as_ptr(),
 					cmd.raw(),
 					data,

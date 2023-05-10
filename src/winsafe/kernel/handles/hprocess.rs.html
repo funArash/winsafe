@@ -386,7 +386,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>present: BOOL = <span class="number">0</span>;
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::CheckRemoteDebuggerPresent(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>present)
+				kernel::ffi::CheckRemoteDebuggerPresent(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>present)
 			},
 		).map(|<span class="kw">_</span>| present != <span class="number">0</span>)
 	}
@@ -441,7 +441,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::FlushInstructionCache(
-					<span class="self">self</span>.as_ptr(), base_address, size,
+					<span class="self">self</span>.ptr(), base_address, size,
 				)
 			},
 		)
@@ -461,7 +461,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::GetExitCodeProcess(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>exit_code)
+				kernel::ffi::GetExitCodeProcess(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>exit_code)
 			},
 		).map(|<span class="kw">_</span>| exit_code)
 	}
@@ -471,7 +471,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetGuiResources(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::GR) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::GetGuiResources(<span class="self">self</span>.as_ptr(), flags.raw())
+			kernel::ffi::GetGuiResources(<span class="self">self</span>.ptr(), flags.raw())
 		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count),
@@ -482,7 +482,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetPriorityClass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::PRIORITY_CLASS&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetPriorityClass(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetPriorityClass(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			pc =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::PRIORITY_CLASS::from_raw(pc) }),
 		}
@@ -495,7 +495,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::GetProcessHandleCount(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>count)
+				kernel::ffi::GetProcessHandleCount(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count)
 			},
 		).map(|<span class="kw">_</span>| count)
 	}
@@ -504,7 +504,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetProcessId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessId(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessId(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
@@ -522,7 +522,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetProcessTimes(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					creation <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					exit <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					kernel <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -539,7 +539,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>critical: BOOL = <span class="number">0</span>;
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::IsProcessCritical(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>critical)
+				kernel::ffi::IsProcessCritical(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>critical)
 			},
 		).map(|<span class="kw">_</span>| critical != <span class="number">0</span>)
 	}
@@ -549,7 +549,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWow64Process(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>wow64: BOOL = <span class="number">0</span>;
-		<span class="kw">match unsafe </span>{ kernel::ffi::IsWow64Process(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>wow64) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::IsWow64Process(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>wow64) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(wow64 != <span class="number">0</span>),
 		}
@@ -589,7 +589,7 @@
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
 				kernel::ffi::OpenProcessToken(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					desired_access.raw(),
 					handle.as_mut(),
 				),
@@ -609,7 +609,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::QueryFullProcessImageNameW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					flags.raw(),
 					buf.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>sz,
@@ -626,7 +626,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::QueryProcessAffinityUpdateMode(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					affinity.as_mut(),
 				)
 			},
@@ -640,7 +640,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetPriorityClass(<span class="self">self</span>.as_ptr(), prority_class.raw())
+				kernel::ffi::SetPriorityClass(<span class="self">self</span>.ptr(), prority_class.raw())
 			},
 		)
 	}
@@ -652,7 +652,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.as_ptr(), flags.raw())
+				kernel::ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.ptr(), flags.raw())
 			},
 		)
 	}
@@ -665,7 +665,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::SetProcessPriorityBoost(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					disable_priority_boost <span class="kw">as _</span>,
 				)
 			},
@@ -676,7 +676,7 @@
 	/// method.
 	</span><span class="kw">fn </span>TerminateProcess(<span class="kw-2">&amp;</span><span class="self">self</span>, exit_code: u32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::TerminateProcess(<span class="self">self</span>.as_ptr(), exit_code) },
+			<span class="kw">unsafe </span>{ kernel::ffi::TerminateProcess(<span class="self">self</span>.ptr(), exit_code) },
 		)
 	}
 
@@ -688,7 +688,7 @@
 		<span class="kw">match unsafe </span>{
 			co::WAIT::from_raw(
 				kernel::ffi::WaitForSingleObject(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					milliseconds.unwrap_or(INFINITE),
 				),
 			)

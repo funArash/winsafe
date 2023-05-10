@@ -97,7 +97,7 @@
 		code: co::WH, wparam: usize, lparam: isize) -&gt; isize
 	{
 		<span class="kw">unsafe </span>{
-			user::ffi::CallNextHookEx(<span class="self">self</span>.as_ptr(), code.raw(), wparam, lparam)
+			user::ffi::CallNextHookEx(<span class="self">self</span>.ptr(), code.raw(), wparam, lparam)
 		}
 	}
 
@@ -115,7 +115,7 @@
 				user::ffi::SetWindowsHookExW(
 					hook_id.raw(),
 					proc <span class="kw">as _</span>,
-					module.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+					module.map_or(std::ptr::null_mut(), |h| h.ptr()),
 					thread_id.unwrap_or_default(),
 				)
 			},
@@ -130,7 +130,7 @@
 	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
 	</span><span class="kw">fn </span>UnhookWindowsHookEx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::UnhookWindowsHookEx(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::UnhookWindowsHookEx(<span class="self">self</span>.ptr()) },
 		);
 		<span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::INVALID;
 		ret

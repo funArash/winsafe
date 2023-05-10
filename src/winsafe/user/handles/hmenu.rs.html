@@ -572,7 +572,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::AppendMenuW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					flags.raw(),
 					new_item.as_usize(),
 					content.as_ptr(),
@@ -640,7 +640,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::CheckMenuItem(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				id_or_pos.id_or_pos_u32(),
 				(id_or_pos.mf_flag() | <span class="kw">if </span>check {
 					co::MF::CHECKED
@@ -672,7 +672,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::CheckMenuRadioItem(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					first.id_or_pos_u32(),
 					last.id_or_pos_u32(),
 					check.id_or_pos_u32(),
@@ -710,7 +710,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::DeleteMenu(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.mf_flag().raw(),
 				)
@@ -726,7 +726,7 @@
 	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
 	</span><span class="kw">fn </span>DestroyMenu(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::DestroyMenu(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ user::ffi::DestroyMenu(<span class="self">self</span>.ptr()) },
 		);
 		<span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::INVALID;
 		ret
@@ -787,7 +787,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			user::ffi::EnableMenuItem(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				id_or_pos.id_or_pos_u32(),
 				(id_or_pos.mf_flag()
 					| <span class="kw">if </span>enable { co::MF::ENABLED } <span class="kw">else </span>{ co::MF::DISABLED }).raw(),
@@ -805,7 +805,7 @@
 		by_pos: bool, flags: co::GMDI) -&gt; SysResult&lt;IdPos&gt;
 	{
 		<span class="kw">match unsafe </span>{
-			user::ffi::GetMenuDefaultItem(<span class="self">self</span>.as_ptr(), by_pos <span class="kw">as _</span>, flags.raw())
+			user::ffi::GetMenuDefaultItem(<span class="self">self</span>.ptr(), by_pos <span class="kw">as _</span>, flags.raw())
 				<span class="kw">as </span>i32
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -817,7 +817,7 @@
 	/// method.
 	</span><span class="kw">fn </span>GetMenuInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, mi: <span class="kw-2">&amp;mut </span>MENUINFO) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::GetMenuInfo(<span class="self">self</span>.as_ptr(), mi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::GetMenuInfo(<span class="self">self</span>.ptr(), mi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 		)
 	}
 
@@ -825,7 +825,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetMenuItemCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::GetMenuItemCount(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetMenuItemCount(<span class="self">self</span>.ptr()) } {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count <span class="kw">as _</span>),
 		}
@@ -835,7 +835,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetMenuItemID(<span class="kw-2">&amp;</span><span class="self">self</span>, nPos: i32) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
-		<span class="kw">match unsafe </span>{ user::ffi::GetMenuItemID(<span class="self">self</span>.as_ptr(), nPos) } {
+		<span class="kw">match unsafe </span>{ user::ffi::GetMenuItemID(<span class="self">self</span>.ptr(), nPos) } {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">None</span>,
 			id =&gt; <span class="prelude-val">Some</span>(id),
 		}
@@ -849,7 +849,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::GetMenuItemInfoW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.is_by_pos() <span class="kw">as _</span>,
 					mii <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -864,7 +864,7 @@
 	</span><span class="kw">fn </span>GetMenuState(<span class="kw-2">&amp;</span><span class="self">self</span>, id_or_pos: IdPos) -&gt; SysResult&lt;co::MF&gt; {
 		<span class="kw">match unsafe </span>{
 			user::ffi::GetMenuState(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				id_or_pos.id_or_pos_u32(),
 				id_or_pos.is_by_pos() <span class="kw">as _</span>,
 			) <span class="kw">as </span>i32
@@ -886,7 +886,7 @@
 
 			<span class="kw">let </span>nchars = <span class="kw">match unsafe </span>{
 				user::ffi::GetMenuStringW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					buf.as_mut_ptr(),
 					buf.buf_len() <span class="kw">as _</span>,
@@ -910,7 +910,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetSubMenu(<span class="kw-2">&amp;</span><span class="self">self</span>, pos: u32) -&gt; <span class="prelude-ty">Option</span>&lt;HMENU&gt; {
 		ptr_to_option_handle(
-			<span class="kw">unsafe </span>{ user::ffi::GetSubMenu(<span class="self">self</span>.as_ptr(), pos <span class="kw">as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::GetSubMenu(<span class="self">self</span>.ptr(), pos <span class="kw">as _</span>) },
 		)
 	}
 
@@ -922,7 +922,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::InsertMenuItemW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.is_by_pos() <span class="kw">as _</span>,
 					mii <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -935,7 +935,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsMenu(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-		<span class="kw">unsafe </span>{ user::ffi::IsMenu(<span class="self">self</span>.as_ptr()) != <span class="number">0 </span>}
+		<span class="kw">unsafe </span>{ user::ffi::IsMenu(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
 	}
 
 	<span class="doccomment">/// [`RemoveMenu`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-removemenu)
@@ -944,7 +944,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::RemoveMenu(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.mf_flag().raw(),
 				)
@@ -958,7 +958,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetMenuDefaultItem(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.is_by_pos() <span class="kw">as _</span>,
 				)
@@ -970,7 +970,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetMenuInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, mi: <span class="kw-2">&amp;</span>MENUINFO) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ user::ffi::SetMenuInfo(<span class="self">self</span>.as_ptr(), mi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
+			<span class="kw">unsafe </span>{ user::ffi::SetMenuInfo(<span class="self">self</span>.ptr(), mi <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) },
 		)
 	}
 
@@ -985,11 +985,11 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetMenuItemBitmaps(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.mf_flag().raw(),
-					hbmp_unchecked.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
-					hbmp_checked.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+					hbmp_unchecked.map_or(std::ptr::null_mut(), |h| h.ptr()),
+					hbmp_checked.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				)
 			},
 		)
@@ -1003,7 +1003,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				user::ffi::SetMenuItemInfoW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					id_or_pos.id_or_pos_u32(),
 					id_or_pos.is_by_pos() <span class="kw">as _</span>,
 					mii <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -1022,11 +1022,11 @@
 	{
 		<span class="kw">let </span>ret = <span class="kw">unsafe </span>{
 			user::ffi::TrackPopupMenu(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				flags.raw(),
 				location.x, location.y,
 				<span class="number">0</span>,
-				hwnd.as_ptr(),
+				hwnd.ptr(),
 				std::ptr::null(),
 			)
 		};

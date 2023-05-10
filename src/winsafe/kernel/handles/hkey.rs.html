@@ -1296,7 +1296,7 @@
 			error_to_sysresult(
 				kernel::ffi::RegConnectRegistryW(
 					WString::from_opt_str(machine_name).as_ptr(),
-					predef_hkey.as_ptr(),
+					predef_hkey.ptr(),
 					hkey.as_mut(),
 				),
 			).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
@@ -1309,9 +1309,9 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegCopyTreeW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
-					dest.as_ptr(),
+					dest.ptr(),
 				)
 			},
 		)
@@ -1334,7 +1334,7 @@
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
 				kernel::ffi::RegCreateKeyExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
 					WString::from_opt_str(class).as_ptr(),
@@ -1366,7 +1366,7 @@
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
 				kernel::ffi::RegCreateKeyTransactedW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
 					WString::from_opt_str(class).as_ptr(),
@@ -1375,7 +1375,7 @@
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					hkey.as_mut(),
 					disposition.as_mut(),
-					htransaction.as_ptr(),
+					htransaction.ptr(),
 					std::ptr::null_mut(),
 				),
 			).map(|<span class="kw">_</span>| (RegCloseKeyGuard::new(hkey), disposition))
@@ -1388,7 +1388,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegDeleteKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 				)
 			},
@@ -1415,7 +1415,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegDeleteKeyExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					platform_view.raw(),
 					<span class="number">0</span>,
@@ -1435,11 +1435,11 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegDeleteKeyTransactedW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					access_rights.raw(),
 					<span class="number">0</span>,
-					htransaction.as_ptr(),
+					htransaction.ptr(),
 					std::ptr::null_mut(),
 				)
 			},
@@ -1452,7 +1452,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegDeleteTreeW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 				)
 			},
@@ -1465,7 +1465,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegDeleteValueW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 				)
 			},
@@ -1488,7 +1488,7 @@
 	/// method.
 	</span><span class="kw">fn </span>RegDisableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::RegDisableReflectionKey(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ kernel::ffi::RegDisableReflectionKey(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -1496,7 +1496,7 @@
 	/// method.
 	</span><span class="kw">fn </span>RegEnableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::RegEnableReflectionKey(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ kernel::ffi::RegEnableReflectionKey(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -1566,7 +1566,7 @@
 	<span class="doccomment">/// [`RegFlushKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regflushkey)
 	/// method.
 	</span><span class="kw">fn </span>RegFlushKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::RegFlushKey(<span class="self">self</span>.as_ptr()) })
+		error_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::RegFlushKey(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`RegGetValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew)
@@ -1627,7 +1627,7 @@
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegGetValueW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
 					(co::RRF::RT_ANY | co::RRF::NOEXPAND).raw(),
@@ -1648,7 +1648,7 @@
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegGetValueW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
 					(co::RRF::RT_ANY | co::RRF::NOEXPAND).raw(),
@@ -1674,7 +1674,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegLoadKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_str(file_path).as_ptr(),
 				)
@@ -1723,7 +1723,7 @@
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
 				kernel::ffi::RegOpenKeyExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					options.raw(),
 					access_rights.raw(),
@@ -1747,12 +1747,12 @@
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
 				kernel::ffi::RegOpenKeyTransactedW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					options.raw(),
 					access_rights.raw(),
 					hkey.as_mut(),
-					htransaction.as_ptr(),
+					htransaction.ptr(),
 					std::ptr::null_mut(),
 				),
 			).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
@@ -1798,7 +1798,7 @@
 			</span><span class="kw">match unsafe </span>{
 				co::ERROR::from_raw(
 					kernel::ffi::RegQueryInfoKeyW(
-						<span class="self">self</span>.as_ptr(),
+						<span class="self">self</span>.ptr(),
 						class_ptr,
 						<span class="kw-2">&amp;mut </span>class_len,
 						std::ptr::null_mut(),
@@ -1895,7 +1895,7 @@
 		</span><span class="kw">match unsafe </span>{
 			co::ERROR::from_raw(
 				kernel::ffi::RegQueryMultipleValuesW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					valents1.as_mut_ptr() <span class="kw">as _</span>,
 					value_names.len() <span class="kw">as _</span>,
 					std::ptr::null_mut(),
@@ -1923,7 +1923,7 @@
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegQueryMultipleValuesW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					valents2.as_mut_ptr() <span class="kw">as _</span>,
 					value_names.len() <span class="kw">as _</span>,
 					buf.as_mut_ptr() <span class="kw">as _</span>,
@@ -1956,7 +1956,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>is_disabled: BOOL = <span class="number">0</span>;
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegQueryReflectionKey(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>is_disabled)
+				kernel::ffi::RegQueryReflectionKey(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>is_disabled)
 			},
 		).map(|<span class="kw">_</span>| is_disabled != <span class="number">0</span>)
 	}
@@ -2022,7 +2022,7 @@
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegQueryValueExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					value_name_w.as_ptr(),
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>raw_data_type1,
@@ -2042,7 +2042,7 @@
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegQueryValueExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					value_name_w.as_ptr(),
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>raw_data_type2,
@@ -2067,7 +2067,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegRenameKey(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key_name).as_ptr(),
 					WString::from_str(new_key_name).as_ptr(),
 				)
@@ -2086,7 +2086,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegReplaceKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_str(new_src_file).as_ptr(),
 					WString::from_str(old_file_backup).as_ptr(),
@@ -2103,7 +2103,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegRestoreKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(file_path).as_ptr(),
 					flags.raw(),
 				)
@@ -2121,7 +2121,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegSaveKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(dest_file_path).as_ptr(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				)
@@ -2140,7 +2140,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegSaveKeyExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_str(dest_file_path).as_ptr(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 					flags.raw(),
@@ -2180,7 +2180,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegSetKeyValueW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 					data.reg_type().raw(),
@@ -2224,7 +2224,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegSetValueExW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 					<span class="number">0</span>,
 					data.reg_type().raw(),
@@ -2241,7 +2241,7 @@
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::RegUnLoadKeyW(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 				)
 			},
@@ -2327,7 +2327,7 @@
 		<span class="kw">match unsafe </span>{
 			co::ERROR::from_raw(
 				kernel::ffi::RegEnumKeyExW(
-					<span class="self">self</span>.hkey.as_ptr(),
+					<span class="self">self</span>.hkey.ptr(),
 					<span class="self">self</span>.current,
 					<span class="self">self</span>.name_buffer.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>len_buffer,
@@ -2395,7 +2395,7 @@
 		<span class="kw">match unsafe </span>{
 			co::ERROR::from_raw(
 				kernel::ffi::RegEnumValueW(
-					<span class="self">self</span>.hkey.as_ptr(),
+					<span class="self">self</span>.hkey.ptr(),
 					<span class="self">self</span>.current,
 					<span class="self">self</span>.name_buffer.as_mut_ptr(),
 					<span class="kw-2">&amp;mut </span>len_buffer,

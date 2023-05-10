@@ -276,7 +276,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::GetExitCodeThread(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>exit_code)
+				kernel::ffi::GetExitCodeThread(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>exit_code)
 			},
 		).map(|<span class="kw">_</span>| exit_code)
 	}
@@ -285,7 +285,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetProcessIdOfThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessIdOfThread(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessIdOfThread(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
@@ -295,7 +295,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetThreadId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetThreadId(<span class="self">self</span>.as_ptr()) } {
+		<span class="kw">match unsafe </span>{ kernel::ffi::GetThreadId(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
@@ -313,7 +313,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetThreadTimes(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					creation <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					exit <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					kernel <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -335,7 +335,7 @@
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
 				kernel::ffi::OpenThreadToken(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					desired_access.raw(),
 					open_as_self <span class="kw">as _</span>,
 					handle.as_mut(),
@@ -347,7 +347,7 @@
 	<span class="doccomment">/// [`ResumeThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-resumethread)
 	/// method.
 	</span><span class="kw">fn </span>ResumeThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::ResumeThread(<span class="self">self</span>.as_ptr()) })
+		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::ResumeThread(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`SetThreadIdealProcessor`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadidealprocessor)
@@ -357,7 +357,7 @@
 	</span><span class="kw">fn </span>SetThreadIdealProcessor(<span class="kw-2">&amp;</span><span class="self">self</span>, ideal_processor: u32) -&gt; SysResult&lt;u32&gt; {
 		minus1_as_error(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetThreadIdealProcessor(<span class="self">self</span>.as_ptr(), ideal_processor)
+				kernel::ffi::SetThreadIdealProcessor(<span class="self">self</span>.ptr(), ideal_processor)
 			},
 		)
 	}
@@ -373,7 +373,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::SetThreadIdealProcessorEx(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>ideal_processor <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					<span class="kw-2">&amp;mut </span>prev <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
@@ -389,7 +389,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::SetThreadPriorityBoost(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					disable_priority_boost <span class="kw">as _</span>,
 				)
 			},
@@ -399,14 +399,14 @@
 	<span class="doccomment">/// [`SuspendThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-suspendthread)
 	/// method.
 	</span><span class="kw">fn </span>SuspendThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::SuspendThread(<span class="self">self</span>.as_ptr()) })
+		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::SuspendThread(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`TerminateThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminatethread)
 	/// method.
 	</span><span class="kw">fn </span>TerminateThread(<span class="kw-2">&amp;</span><span class="self">self</span>, exit_code: u32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::TerminateThread(<span class="self">self</span>.as_ptr(), exit_code) },
+			<span class="kw">unsafe </span>{ kernel::ffi::TerminateThread(<span class="self">self</span>.ptr(), exit_code) },
 		)
 	}
 }

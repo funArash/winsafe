@@ -275,9 +275,9 @@
 	{
 		<span class="kw">match unsafe </span>{
 			comctl::ffi::ImageList_Add(
-				<span class="self">self</span>.as_ptr(),
-				hbmp_image.as_ptr(),
-				hbmp_mask.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+				<span class="self">self</span>.ptr(),
+				hbmp_image.ptr(),
+				hbmp_mask.map_or(std::ptr::null_mut(), |h| h.ptr()),
 			)
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -304,7 +304,7 @@
 	{
 		<span class="kw">match unsafe </span>{
 			comctl::ffi::ImageList_AddMasked(
-				<span class="self">self</span>.as_ptr(), hbmp_image.as_ptr(), color_mask.into(),
+				<span class="self">self</span>.ptr(), hbmp_image.ptr(), color_mask.into(),
 			)
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -344,7 +344,7 @@
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
 				comctl::ffi::ImageList_BeginDrag(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					itrack <span class="kw">as _</span>,
 					hotspot.x, hotspot.y,
 				),
@@ -393,7 +393,7 @@
 	/// [`ERROR::INVALID_HANDLE`](crate::co::ERROR::INVALID_HANDLE) error code.
 	</span><span class="kw">fn </span>Destroy(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">let </span>ret = bool_to_sysresult(
-			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_Destroy(<span class="self">self</span>.as_ptr()) },
+			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_Destroy(<span class="self">self</span>.ptr()) },
 		);
 		<span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::INVALID;
 		ret
@@ -403,7 +403,7 @@
 	/// method.
 	</span><span class="kw">fn </span>DragMove(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i32, y: i32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_DragMove(<span class="self">self</span>.as_ptr(), x, y) },
+			<span class="kw">unsafe </span>{ comctl::ffi::ImageList_DragMove(<span class="self">self</span>.ptr(), x, y) },
 		)
 	}
 
@@ -423,7 +423,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				comctl::ffi::ImageList_GetIconSize(
-					<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz.cx, <span class="kw-2">&amp;mut </span>sz.cy,
+					<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>sz.cx, <span class="kw-2">&amp;mut </span>sz.cy,
 				)
 			}
 		).map(|<span class="kw">_</span>| sz)
@@ -433,7 +433,7 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetImageCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-		<span class="kw">unsafe </span>{ comctl::ffi::ImageList_GetImageCount(<span class="self">self</span>.as_ptr()) <span class="kw">as _ </span>}
+		<span class="kw">unsafe </span>{ comctl::ffi::ImageList_GetImageCount(<span class="self">self</span>.ptr()) <span class="kw">as _ </span>}
 	}
 
 	<span class="doccomment">/// [`ImageList_Remove`](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-imagelist_remove)
@@ -442,7 +442,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				comctl::ffi::ImageList_Remove(
-					<span class="self">self</span>.as_ptr(), index.map_or(-<span class="number">1</span>, |i| i <span class="kw">as _</span>),
+					<span class="self">self</span>.ptr(), index.map_or(-<span class="number">1</span>, |i| i <span class="kw">as _</span>),
 				)
 			},
 		)
@@ -458,9 +458,9 @@
 	{
 		<span class="kw">match unsafe </span>{
 			comctl::ffi::ImageList_ReplaceIcon(
-				<span class="self">self</span>.as_ptr(),
+				<span class="self">self</span>.ptr(),
 				index.map_or(-<span class="number">1</span>, |i| i <span class="kw">as _</span>),
-				hicon_new.as_ptr(),
+				hicon_new.ptr(),
 			)
 		} {
 			-<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -473,7 +473,7 @@
 	</span><span class="kw">fn </span>SetImageCount(<span class="kw-2">&amp;</span><span class="self">self</span>, new_count: u32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				comctl::ffi::ImageList_SetImageCount(<span class="self">self</span>.as_ptr(), new_count)
+				comctl::ffi::ImageList_SetImageCount(<span class="self">self</span>.ptr(), new_count)
 			},
 		)
 	}

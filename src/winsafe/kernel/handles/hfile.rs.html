@@ -375,7 +375,7 @@
 					security_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 					creation_disposition.raw(),
 					flags_and_attrs.raw(),
-					hfile_template.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
+					hfile_template.map_or(std::ptr::null_mut(), |h| h.ptr()),
 				) <span class="kw">as _</span>,
 			) {
 				HFILE::NULL =&gt; <span class="prelude-val">Err</span>(GetLastError()),
@@ -397,7 +397,7 @@
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
 				kernel::ffi::CreateFileMappingFromApp(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					mapping_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
 					protect.raw(),
 					max_size.unwrap_or_default(),
@@ -415,7 +415,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::GetFileInformationByHandle(
-					<span class="self">self</span>.as_ptr(), fi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+					<span class="self">self</span>.ptr(), fi <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				)
 			},
 		)
@@ -427,7 +427,7 @@
 	</span><span class="kw">fn </span>GetFileSizeEx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>sz_buf = i64::default();
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::GetFileSizeEx(<span class="self">self</span>.as_ptr(), <span class="kw-2">&amp;mut </span>sz_buf) },
+			<span class="kw">unsafe </span>{ kernel::ffi::GetFileSizeEx(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>sz_buf) },
 		).map(|<span class="kw">_</span>| sz_buf <span class="kw">as _</span>)
 	}
 
@@ -436,7 +436,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetFileType(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::FILE_TYPE&gt; {
 		<span class="kw">match unsafe </span>{
-			co::FILE_TYPE::from_raw(kernel::ffi::GetFileType(<span class="self">self</span>.as_ptr()))
+			co::FILE_TYPE::from_raw(kernel::ffi::GetFileType(<span class="self">self</span>.ptr()))
 		} {
 			co::FILE_TYPE::UNKNOWN =&gt; <span class="kw">match </span>GetLastError() {
 				co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(co::FILE_TYPE::UNKNOWN), <span class="comment">// actual unknown type
@@ -484,7 +484,7 @@
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
 				kernel::ffi::LockFile(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					LODWORD(offset),
 					HIDWORD(offset),
 					LODWORD(num_bytes_to_lock),
@@ -505,7 +505,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::ReadFile(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					buffer.as_mut_ptr() <span class="kw">as _</span>,
 					buffer.len() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>bytes_read,
@@ -518,7 +518,7 @@
 	<span class="doccomment">/// [`SetEndOfFile`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setendoffile)
 	/// method.
 	</span><span class="kw">fn </span>SetEndOfFile(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SetEndOfFile(<span class="self">self</span>.as_ptr()) })
+		bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SetEndOfFile(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`SetFilePointerEx`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfilepointerex)
@@ -533,7 +533,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::SetFilePointerEx(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					distance_to_move,
 					<span class="kw-2">&amp;mut </span>new_offset,
 					move_method.raw(),
@@ -554,7 +554,7 @@
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				kernel::ffi::WriteFile(
-					<span class="self">self</span>.as_ptr(),
+					<span class="self">self</span>.ptr(),
 					data.as_ptr() <span class="kw">as _</span>,
 					data.len() <span class="kw">as _</span>,
 					<span class="kw-2">&amp;mut </span>bytes_written,
