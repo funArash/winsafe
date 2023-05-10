@@ -231,12 +231,31 @@
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -244,23 +263,23 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IMediaSeekingVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>GetCapabilities: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>CheckCapabilities: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>IsFormatSupported: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>QueryPreferredFormat: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>GetTimeFormat: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>IsUsingTimeFormat: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>SetTimeFormat: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>GetDuration: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64) -&gt; HRES,
-	<span class="kw">pub </span>GetStopPosition: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64) -&gt; HRES,
-	<span class="kw">pub </span>GetCurrentPosition: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64) -&gt; HRES,
-	<span class="kw">pub </span>ConvertTimeFormat: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64, PCVOID, i64, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>SetPositions: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64, u32, <span class="kw-2">*mut </span>i64, u32) -&gt; HRES,
-	<span class="kw">pub </span>GetPositions: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64, <span class="kw-2">*mut </span>i64) -&gt; HRES,
-	<span class="kw">pub </span>GetAvailable: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64, <span class="kw-2">*mut </span>i64) -&gt; HRES,
-	<span class="kw">pub </span>SetRate: <span class="kw">fn</span>(ComPtr, f64) -&gt; HRES,
-	<span class="kw">pub </span>GetRate: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>f64) -&gt; HRES,
-	<span class="kw">pub </span>GetPreroll: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>GetCapabilities: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>CheckCapabilities: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>IsFormatSupported: <span class="kw">fn</span>(COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryPreferredFormat: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetTimeFormat: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>IsUsingTimeFormat: <span class="kw">fn</span>(COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetTimeFormat: <span class="kw">fn</span>(COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetDuration: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>GetStopPosition: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>GetCurrentPosition: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>ConvertTimeFormat: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64, PCVOID, i64, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetPositions: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64, u32, <span class="kw-2">*mut </span>i64, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetPositions: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>GetAvailable: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>SetRate: <span class="kw">fn</span>(COMPTR, f64) -&gt; HRES,
+	<span class="kw">pub </span>GetRate: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>f64) -&gt; HRES,
+	<span class="kw">pub </span>GetPreroll: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i64) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IMediaSeeking: <span class="string">&quot;36b73880-c2c8-11cf-8b46-00805f6cef60&quot;</span>;
@@ -279,7 +298,7 @@
 	/// use winsafe::{IGraphBuilder, IMediaSeeking};
 	///
 	/// let graph_builder: IGraphBuilder; // initialized somewhere
-	/// # let graph_builder = IGraphBuilder::from(unsafe { winsafe::ComPtr::null() });
+	/// # let graph_builder = unsafe { IGraphBuilder::null() };
 	///
 	/// let media_seeking = graph_builder
 	///     .QueryInterface::&lt;IMediaSeeking&gt;()?;
@@ -308,18 +327,17 @@
 	) -&gt; HrResult&lt;i64&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>target = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult(
-				(vt.ConvertTimeFormat)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).ConvertTimeFormat)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>target,
 					target_format <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					source,
 					source_format <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				),
-			)
-		}.map(|<span class="kw">_</span>| target)
+				)
+			},
+		).map(|<span class="kw">_</span>| target)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetAvailable`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getavailable)
@@ -329,10 +347,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetAvailable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
 		<span class="kw">let </span>(<span class="kw-2">mut </span>early, <span class="kw-2">mut </span>late) = (i64::default(), i64::default());
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetPositions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>early, <span class="kw-2">&amp;mut </span>late))
-		}.map(|<span class="kw">_</span>| (early, late))
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetPositions)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>early,
+					<span class="kw-2">&amp;mut </span>late,
+				)
+			},
+		).map(|<span class="kw">_</span>| (early, late))
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetCurrentPosition method`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getcurrentposition)
@@ -340,10 +363,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCurrentPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pos = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetCurrentPosition)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pos))
-		}.map(|<span class="kw">_</span>| pos)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetCurrentPosition)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>pos,
+				)
+			},
+		).map(|<span class="kw">_</span>| pos)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetDuration`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getduration)
@@ -351,10 +378,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetDuration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>duration = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetDuration)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>duration))
-		}.map(|<span class="kw">_</span>| duration)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetDuration)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>duration)
+			},
+		).map(|<span class="kw">_</span>| duration)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetPositions`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getpositions)
@@ -364,10 +392,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetPositions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(i64, i64)&gt; {
 		<span class="kw">let </span>(<span class="kw-2">mut </span>current, <span class="kw-2">mut </span>stop) = (i64::default(), i64::default());
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetPositions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>current, <span class="kw-2">&amp;mut </span>stop))
-		}.map(|<span class="kw">_</span>| (current, stop))
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetPositions)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>current,
+					<span class="kw-2">&amp;mut </span>stop,
+				)
+			},
+		).map(|<span class="kw">_</span>| (current, stop))
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetPreroll`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getpreroll)
@@ -375,10 +408,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetPreroll(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>preroll = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetPreroll)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>preroll))
-		}.map(|<span class="kw">_</span>| preroll)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetPreroll)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>preroll)
+			},
+		).map(|<span class="kw">_</span>| preroll)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetRate`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getrate)
@@ -386,10 +420,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetRate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;f64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rate = f64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetRate)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rate))
-		}.map(|<span class="kw">_</span>| rate)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetRate)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rate)
+			},
+		).map(|<span class="kw">_</span>| rate)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetStopPosition`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-getstopposition)
@@ -397,10 +432,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetStopPosition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pos = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.GetStopPosition)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pos))
-		}.map(|<span class="kw">_</span>| pos)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetStopPosition)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pos)
+			},
+		).map(|<span class="kw">_</span>| pos)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::GetTimeFormat`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-gettimeformat)
@@ -408,12 +444,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TIME_FORMAT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>time_guid = co::TIME_FORMAT::NONE;
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult(
-				(vt.GetStopPosition)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>time_guid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-			)
-		}.map(|<span class="kw">_</span>| time_guid)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).GetStopPosition)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>time_guid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| time_guid)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::SetPositions`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-setpositions)
@@ -427,9 +465,8 @@
 	{
 		<span class="kw">let </span>(<span class="kw-2">mut </span>current, <span class="kw-2">mut </span>stop) = (current, stop);
 		<span class="kw">match unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
 			co::HRESULT::from_raw(
-				(vt.SetPositions)(
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).SetPositions)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;mut </span>current,
 					current_flags.raw(),
@@ -447,21 +484,22 @@
 	<span class="doccomment">/// [`IMediaSeeking::SetRate`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-setrate)
 	/// method.
 	</span><span class="kw">fn </span>SetRate(<span class="kw-2">&amp;</span><span class="self">self</span>, rate: f64) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult((vt.SetRate)(<span class="self">self</span>.ptr(), rate))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).SetRate)(<span class="self">self</span>.ptr(), rate) },
+		)
 	}
 
 	<span class="doccomment">/// [`IMediaSeeking::SetTimeFormat`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediaseeking-settimeformat)
 	/// method.
 	</span><span class="kw">fn </span>SetTimeFormat(<span class="kw-2">&amp;</span><span class="self">self</span>, format: <span class="kw-2">&amp;</span>co::TIME_FORMAT) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaSeekingVT&gt;();
-			ok_to_hrresult(
-				(vt.SetTimeFormat)(<span class="self">self</span>.ptr(), format <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaSeekingVT&gt;(<span class="self">self</span>).SetTimeFormat)(
+					<span class="self">self</span>.ptr(),
+					format <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

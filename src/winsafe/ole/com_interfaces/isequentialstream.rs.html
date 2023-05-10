@@ -71,13 +71,11 @@
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -85,8 +83,8 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ISequentialStreamVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>Read: <span class="kw">fn</span>(ComPtr, PVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>Write: <span class="kw">fn</span>(ComPtr, PCVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Read: <span class="kw">fn</span>(COMPTR, PVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Write: <span class="kw">fn</span>(COMPTR, PCVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ISequentialStream: <span class="string">&quot;0c733a30-2a1c-11ce-ade5-00aa0044773d&quot;</span>;
@@ -118,8 +116,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>num_read = u32::default();
 		okfalse_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ISequentialStreamVT&gt;();
-				(vt.Read)(
+				(vt::&lt;ISequentialStreamVT&gt;(<span class="self">self</span>).Read)(
 					<span class="self">self</span>.ptr(),
 					buffer.as_mut_ptr() <span class="kw">as _</span>,
 					buffer.len() <span class="kw">as _</span>,
@@ -137,8 +134,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>num_written = u32::default();
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ISequentialStreamVT&gt;();
-				(vt.Read)(
+				(vt::&lt;ISequentialStreamVT&gt;(<span class="self">self</span>).Read)(
 					<span class="self">self</span>.ptr(),
 					data.as_ptr() <span class="kw">as _</span>,
 					data.len() <span class="kw">as _</span>,

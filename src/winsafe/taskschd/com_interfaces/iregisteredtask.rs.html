@@ -158,12 +158,33 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::VARIANT;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
 <span class="kw">use </span><span class="kw">crate</span>::taskschd::decl::ITaskDefinition;
@@ -173,24 +194,24 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IRegisteredTaskVT {
 	<span class="kw">pub </span>IDispatchVT: IDispatchVT,
-	<span class="kw">pub </span>get_Name: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_Path: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_State: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>get_Enabled: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i16) -&gt; HRES,
-	<span class="kw">pub </span>put_Enabled: <span class="kw">fn</span>(ComPtr, i16) -&gt; HRES,
-	<span class="kw">pub </span>Run: <span class="kw">fn</span>(ComPtr, VARIANT, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>RunEx: <span class="kw">fn</span>(ComPtr, VARIANT, i32, i32, PCSTR, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetInstances: <span class="kw">fn</span>(ComPtr, i32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>get_LastRunTime: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>f64) -&gt; HRES,
-	<span class="kw">pub </span>get_LastTaskResult: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i32) -&gt; HRES,
-	<span class="kw">pub </span>get_NumberOfMissedRuns: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i32) -&gt; HRES,
-	<span class="kw">pub </span>get_NextRunTime: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>f64) -&gt; HRES,
-	<span class="kw">pub </span>get_Definition: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>get_Xml: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>GetSecurityDescriptor: <span class="kw">fn</span>(ComPtr, i32, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetSecurityDescriptor: <span class="kw">fn</span>(ComPtr, PCSTR, i32) -&gt; HRES,
-	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(ComPtr, i32) -&gt; HRES,
-	<span class="kw">pub </span>GetRunTimes: <span class="kw">fn</span>(ComPtr, PCVOID, PCVOID, <span class="kw-2">*mut </span>u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>get_Name: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Path: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_State: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_Enabled: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i16) -&gt; HRES,
+	<span class="kw">pub </span>put_Enabled: <span class="kw">fn</span>(COMPTR, i16) -&gt; HRES,
+	<span class="kw">pub </span>Run: <span class="kw">fn</span>(COMPTR, VARIANT, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>RunEx: <span class="kw">fn</span>(COMPTR, VARIANT, i32, i32, PCSTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetInstances: <span class="kw">fn</span>(COMPTR, i32, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>get_LastRunTime: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>f64) -&gt; HRES,
+	<span class="kw">pub </span>get_LastTaskResult: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>get_NumberOfMissedRuns: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>get_NextRunTime: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>f64) -&gt; HRES,
+	<span class="kw">pub </span>get_Definition: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Xml: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetSecurityDescriptor: <span class="kw">fn</span>(COMPTR, i32, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetSecurityDescriptor: <span class="kw">fn</span>(COMPTR, PCSTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(COMPTR, i32) -&gt; HRES,
+	<span class="kw">pub </span>GetRunTimes: <span class="kw">fn</span>(COMPTR, PCVOID, PCVOID, <span class="kw-2">*mut </span>u32, PVOID) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IRegisteredTask: <span class="string">&quot;9c86f320-dee3-4dd1-b972-a303f26b061e&quot;</span>;
@@ -224,10 +245,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>enabled = i16::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_Enabled)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>enabled))
-		}.map(|<span class="kw">_</span>| enabled != <span class="number">0</span>)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_Enabled)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>enabled,
+				)
+			},
+		).map(|<span class="kw">_</span>| enabled != <span class="number">0</span>)
 	}
 
 	<span class="doccomment">/// [`IRegisteredTask::get_LastRunTime`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iregisteredtask-get_lastruntime)
@@ -235,10 +260,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_LastRunTime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;f64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rt = f64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_LastRunTime)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rt))
-		}.map(|<span class="kw">_</span>| rt)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_LastRunTime)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rt)
+			},
+		).map(|<span class="kw">_</span>| rt)
 	}
 
 	<span class="doccomment">/// [`IRegisteredTask::get_LastTaskResult`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iregisteredtask-get_lasttaskresult)
@@ -246,10 +272,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_LastTaskResult(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>r = i32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_LastTaskResult)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>r))
-		}.map(|<span class="kw">_</span>| r)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_LastTaskResult)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>r,
+				)
+			},
+		).map(|<span class="kw">_</span>| r)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_Name: IRegisteredTaskVT;
@@ -262,10 +292,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_NextRunTime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;f64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>rt = f64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_NextRunTime)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rt))
-		}.map(|<span class="kw">_</span>| rt)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_NextRunTime)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>rt)
+			},
+		).map(|<span class="kw">_</span>| rt)
 	}
 
 	<span class="doccomment">/// [`IRegisteredTask::get_NumberOfMissedRuns`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iregisteredtask-get_numberofmissedruns)
@@ -273,10 +304,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_NumberOfMissedRuns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>mr = i32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_NumberOfMissedRuns)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>mr))
-		}.map(|<span class="kw">_</span>| mr)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_NumberOfMissedRuns)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>mr,
+				)
+			},
+		).map(|<span class="kw">_</span>| mr)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_Path: IRegisteredTaskVT;
@@ -289,10 +324,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_State(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TASK_STATE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>state = co::TASK_STATE::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.get_State)(<span class="self">self</span>.ptr(), state.as_mut()))
-		}.map(|<span class="kw">_</span>| state)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).get_State)(
+					<span class="self">self</span>.ptr(),
+					state.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| state)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_Xml: IRegisteredTaskVT;
@@ -303,19 +342,22 @@
 	<span class="doccomment">/// [`IRegisteredTask::put_Enabled`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iregisteredtask-put_enabled)
 	/// method.
 	</span><span class="kw">fn </span>put_Enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, enabled: bool) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.put_Enabled)(<span class="self">self</span>.ptr(), enabled <span class="kw">as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).put_Enabled)(
+					<span class="self">self</span>.ptr(),
+					enabled <span class="kw">as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IRegisteredTask::Stop`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iregisteredtask-stop)
 	/// method.
 	</span><span class="kw">fn </span>Stop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IRegisteredTaskVT&gt;();
-			ok_to_hrresult((vt.Stop)(<span class="self">self</span>.ptr(), <span class="number">0</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IRegisteredTaskVT&gt;(<span class="self">self</span>).Stop)(<span class="self">self</span>.ptr(), <span class="number">0</span>) },
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

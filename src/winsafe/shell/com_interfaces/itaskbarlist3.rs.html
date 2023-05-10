@@ -200,13 +200,18 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HANDLE, HRES, PCSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HANDLE, HRES, PCSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, shell_ITaskbarList, shell_ITaskbarList2};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HICON, HWND, RECT};
 <span class="kw">use </span><span class="kw">crate</span>::vt::ITaskbarList2VT;
@@ -215,18 +220,18 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ITaskbarList3VT {
 	<span class="kw">pub </span>ITaskbarList2VT: ITaskbarList2VT,
-	<span class="kw">pub </span>SetProgressValue: <span class="kw">fn</span>(ComPtr, HANDLE, u64, u64) -&gt; HRES,
-	<span class="kw">pub </span>SetProgressState: <span class="kw">fn</span>(ComPtr, HANDLE, u32) -&gt; HRES,
-	<span class="kw">pub </span>RegisterTab: <span class="kw">fn</span>(ComPtr, HANDLE, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>UnregisterTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>SetTabOrder: <span class="kw">fn</span>(ComPtr, HANDLE, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>SetTabActive: <span class="kw">fn</span>(ComPtr, HANDLE, HANDLE, u32) -&gt; HRES,
-	<span class="kw">pub </span>ThumbBarAddButtons: <span class="kw">fn</span>(ComPtr, HANDLE, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>ThumbBarUpdateButtons: <span class="kw">fn</span>(ComPtr, HANDLE, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>ThumbBarSetImageList: <span class="kw">fn</span>(ComPtr, HANDLE, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>SetOverlayIcon: <span class="kw">fn</span>(ComPtr, HANDLE, HANDLE, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetThumbnailTooltip: <span class="kw">fn</span>(ComPtr, HANDLE, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetThumbnailClip: <span class="kw">fn</span>(ComPtr, HANDLE, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetProgressValue: <span class="kw">fn</span>(COMPTR, HANDLE, u64, u64) -&gt; HRES,
+	<span class="kw">pub </span>SetProgressState: <span class="kw">fn</span>(COMPTR, HANDLE, u32) -&gt; HRES,
+	<span class="kw">pub </span>RegisterTab: <span class="kw">fn</span>(COMPTR, HANDLE, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>UnregisterTab: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SetTabOrder: <span class="kw">fn</span>(COMPTR, HANDLE, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SetTabActive: <span class="kw">fn</span>(COMPTR, HANDLE, HANDLE, u32) -&gt; HRES,
+	<span class="kw">pub </span>ThumbBarAddButtons: <span class="kw">fn</span>(COMPTR, HANDLE, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>ThumbBarUpdateButtons: <span class="kw">fn</span>(COMPTR, HANDLE, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>ThumbBarSetImageList: <span class="kw">fn</span>(COMPTR, HANDLE, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SetOverlayIcon: <span class="kw">fn</span>(COMPTR, HANDLE, HANDLE, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetThumbnailTooltip: <span class="kw">fn</span>(COMPTR, HANDLE, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetThumbnailClip: <span class="kw">fn</span>(COMPTR, HANDLE, PVOID) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ITaskbarList3: <span class="string">&quot;ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf&quot;</span>;
@@ -268,12 +273,15 @@
 	<span class="doccomment">/// [`ITaskbarList3::RegisterTab`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-registertab)
 	/// method.
 	</span><span class="kw">fn </span>RegisterTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_tab: <span class="kw-2">&amp;</span>HWND, hwnd_mdi: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.RegisterTab)(<span class="self">self</span>.ptr(), hwnd_tab.as_ptr(), hwnd_mdi.as_ptr()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).RegisterTab)(
+					<span class="self">self</span>.ptr(),
+					hwnd_tab.as_ptr(),
+					hwnd_mdi.as_ptr(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetOverlayIcon`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-setoverlayicon)
@@ -281,17 +289,16 @@
 	</span><span class="kw">fn </span>SetOverlayIcon(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, hicon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>HICON&gt;, description: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetOverlayIcon)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetOverlayIcon)(
 					<span class="self">self</span>.ptr(),
 					hwnd.as_ptr(),
 					hicon.map_or(std::ptr::null_mut(), |h| h.as_ptr()),
 					WString::from_str(description).as_ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetProgressState`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-setprogressstate)
@@ -299,12 +306,15 @@
 	</span><span class="kw">fn </span>SetProgressState(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, tbpf_flags: co::TBPF) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetProgressState)(<span class="self">self</span>.ptr(), hwnd.as_ptr(), tbpf_flags.raw()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetProgressState)(
+					<span class="self">self</span>.ptr(),
+					hwnd.as_ptr(),
+					tbpf_flags.raw(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetProgressValue`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-setprogressvalue)
@@ -319,7 +329,7 @@
 	/// use winsafe::{HWND, ITaskbarList3};
 	///
 	/// let tbar: ITaskbarList3; // initialized somewhere
-	/// # let tbar = ITaskbarList3::from(unsafe { winsafe::ComPtr::null() });
+	/// # let tbar = unsafe { ITaskbarList3::null() };
 	/// let hwnd: HWND;
 	/// # let hwnd = HWND::NULL;
 	///
@@ -329,28 +339,31 @@
 	</span><span class="kw">fn </span>SetProgressValue(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, completed: u64, total: u64) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetProgressValue)(<span class="self">self</span>.ptr(), hwnd.as_ptr(), completed, total),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetProgressValue)(
+					<span class="self">self</span>.ptr(),
+					hwnd.as_ptr(),
+					completed,
+					total,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetTabActive`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-settabactive)
 	/// method.
 	</span><span class="kw">fn </span>SetTabActive(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_tab: <span class="kw-2">&amp;</span>HWND, hwnd_mdi: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetTabActive)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetTabActive)(
 					<span class="self">self</span>.ptr(),
 					hwnd_tab.as_ptr(),
 					hwnd_mdi.as_ptr(),
 					<span class="number">0</span>,
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetTabOrder`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-settaborder)
@@ -358,31 +371,29 @@
 	</span><span class="kw">fn </span>SetTabOrder(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd_tab: <span class="kw-2">&amp;</span>HWND, hwnd_insert_before: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetTabOrder)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetTabOrder)(
 					<span class="self">self</span>.ptr(),
 					hwnd_tab.as_ptr(),
 					hwnd_insert_before.as_ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetThumbnailClip`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-setthumbnailclip)
 	/// method.
 	</span><span class="kw">fn </span>SetThumbnailClip(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: <span class="kw-2">&amp;</span>HWND, clip: <span class="prelude-ty">Option</span>&lt;RECT&gt;) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetThumbnailClip)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetThumbnailClip)(
 					<span class="self">self</span>.ptr(),
 					hwnd.as_ptr(),
 					<span class="kw-2">&amp;</span>clip <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList3::SetThumbnailTooltip`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist3-setthumbnailtooltip)
@@ -390,16 +401,15 @@
 	</span><span class="kw">fn </span>SetThumbnailTooltip(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, tip: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList3VT&gt;();
-			ok_to_hrresult(
-				(vt.SetThumbnailTooltip)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList3VT&gt;(<span class="self">self</span>).SetThumbnailTooltip)(
 					<span class="self">self</span>.ptr(),
 					hwnd.as_ptr(),
 					tip.map_or(std::ptr::null_mut(), |s| WString::from_str(s).as_ptr()),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

@@ -184,15 +184,24 @@
 <a href="#184" id="184">184</a>
 <a href="#185" id="185">185</a>
 <a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::IDXGIAdapter;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::HINSTANCE;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HANDLE, HRES, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIObject, Handle};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HANDLE, HRES, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIObject, Handle, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDXGIObjectVT;
 
@@ -200,11 +209,11 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDXGIFactoryVT {
 	<span class="kw">pub </span>IDXGIObjectVT: IDXGIObjectVT,
-	<span class="kw">pub </span>EnumAdapters: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*const </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>MakeWindowAssociation: <span class="kw">fn</span>(ComPtr, HANDLE, u32) -&gt; HRES,
-	<span class="kw">pub </span>GetWindowAssociation: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>CreateSwapChain: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*const </span>ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>CreateSoftwareAdapter: <span class="kw">fn</span>(ComPtr, HANDLE, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>EnumAdapters: <span class="kw">fn</span>(COMPTR, u32, <span class="kw-2">*const </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>MakeWindowAssociation: <span class="kw">fn</span>(COMPTR, HANDLE, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetWindowAssociation: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>CreateSwapChain: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*const </span>COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>CreateSoftwareAdapter: <span class="kw">fn</span>(COMPTR, HANDLE, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDXGIFactory: <span class="string">&quot;7b7166ec-21c7-44ae-b21a-c9ae321ae369&quot;</span>;
@@ -252,7 +261,7 @@
 	/// use winsafe::IDXGIFactory;
 	///
 	/// let factory: IDXGIFactory; // initialized somewhere
-	/// # let factory = IDXGIFactory::from(unsafe { winsafe::ComPtr::null() });
+	/// # let factory = unsafe { IDXGIFactory::null() };
 	///
 	/// for adapter in factory.iter_adapters() {
 	///     let adapter = adapter?;
@@ -273,17 +282,16 @@
 	</span><span class="kw">fn </span>CreateSoftwareAdapter(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hmodule: <span class="kw-2">&amp;</span>HINSTANCE) -&gt; HrResult&lt;IDXGIAdapter&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIFactoryVT&gt;();
-			ok_to_hrresult(
-				(vt.CreateSoftwareAdapter)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDXGIAdapter::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIFactoryVT&gt;(<span class="self">self</span>).CreateSoftwareAdapter)(
 					<span class="self">self</span>.ptr(),
 					hmodule.as_ptr(),
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| IDXGIAdapter::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IDXGIFactory::EnumAdapters`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgifactory-enumadapters)
@@ -294,13 +302,16 @@
 	/// which is simpler.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>EnumAdapters(<span class="kw-2">&amp;</span><span class="self">self</span>, adapter: u32) -&gt; HrResult&lt;IDXGIAdapter&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIFactoryVT&gt;();
-			ok_to_hrresult(
-				(vt.EnumAdapters)(<span class="self">self</span>.ptr(), adapter, <span class="kw-2">&amp;mut </span>ppv_queried),
-			).map(|<span class="kw">_</span>| IDXGIAdapter::from(ppv_queried))
-		}
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDXGIAdapter::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIFactoryVT&gt;(<span class="self">self</span>).EnumAdapters)(
+					<span class="self">self</span>.ptr(),
+					adapter,
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IDXGIFactory::GetWindowAssociation`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgifactory-getwindowassociation)
@@ -308,10 +319,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetWindowAssociation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;HWND&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>hwnd = HWND::NULL;
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIFactoryVT&gt;();
-			ok_to_hrresult((vt.GetWindowAssociation)(<span class="self">self</span>.ptr(), hwnd.as_mut()))
-		}.map(|<span class="kw">_</span>| hwnd)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIFactoryVT&gt;(<span class="self">self</span>).GetWindowAssociation)(
+					<span class="self">self</span>.ptr(),
+					hwnd.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| hwnd)
 	}
 
 	<span class="doccomment">/// [`IDXGIFactory::MakeWindowAssociation`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgifactory-makewindowassociation)
@@ -319,12 +334,15 @@
 	</span><span class="kw">fn </span>MakeWindowAssociation(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, flags: co::DXGI_MWA) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIFactoryVT&gt;();
-			ok_to_hrresult(
-				(vt.MakeWindowAssociation)(<span class="self">self</span>.ptr(), hwnd.as_ptr(), flags.raw()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIFactoryVT&gt;(<span class="self">self</span>).MakeWindowAssociation)(
+					<span class="self">self</span>.ptr(),
+					hwnd.as_ptr(),
+					flags.raw(),
+				)
+			},
+		)
 	}
 }
 

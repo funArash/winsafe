@@ -106,19 +106,38 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 
 <span class="doccomment">/// [`IUnknown`](crate::IUnknown) virtual table, base to all COM virtual tables.
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IUnknownVT {
-	<span class="kw">pub </span>QueryInterface: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>AddRef: <span class="kw">fn</span>(ComPtr) -&gt; u32,
-	<span class="kw">pub </span>Release: <span class="kw">fn</span>(ComPtr) -&gt; u32,
+	<span class="kw">pub </span>QueryInterface: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>AddRef: <span class="kw">fn</span>(COMPTR) -&gt; u32,
+	<span class="kw">pub </span>Release: <span class="kw">fn</span>(COMPTR) -&gt; u32,
 }
 
 <span class="macro">com_interface! </span>{ IUnknown: <span class="string">&quot;00000000-0000-0000-c000-000000000046&quot;</span>;
@@ -154,9 +173,46 @@
 /// * `Release` – called automatically by the
 /// [`Drop`](https://doc.rust-lang.org/std/ops/trait.Drop.html) trait, so you
 /// don&#39;t need to worry about it.
-</span><span class="kw">pub trait </span>ole_IUnknown: Clone + From&lt;ComPtr&gt; {
+</span><span class="kw">pub trait </span>ole_IUnknown: Clone {
 	<span class="doccomment">/// The COM interface ID.
 	</span><span class="kw">const </span>IID: co::IID;
+
+	<span class="doccomment">/// Creates an object from a COM virtual table pointer.
+	///
+	/// # Safety
+	///
+	/// Be sure the pointer points to a properly allocated COM virtual table.
+	///
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>from_ptr(p: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>;
+
+	<span class="doccomment">/// Creates an object from a null COM virtual table pointer.
+	///
+	/// # Safety
+	///
+	/// The pointer must be initialized before any call. Do not call methods on
+	/// a null COM pointer.
+	///
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>null() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::from_ptr(std::ptr::null_mut())
+	}
+
+	<span class="doccomment">/// Returns a mutable reference do the underlying COM virtual table pointer.
+	///
+	/// # Safety
+	///
+	/// Be sure the pointer being set points to a properly allocated COM virtual
+	/// table.
+	///
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut *mut </span>std::ffi::c_void;
 
 	<span class="doccomment">/// Returns the pointer to the underlying COM virtual table and sets the
 	/// internal pointer to null, so that
@@ -169,31 +225,14 @@
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ComPtr;
+	</span><span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
 
 	<span class="doccomment">/// Returns the pointer to the underlying COM virtual table.
 	///
-	/// # Safety
-	///
-	/// The returned pointer is allocated and alive in the source COM interface,
-	/// and should not be released. Do not cast this pointer into anything else.
-	///
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">unsafe fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ComPtr;
-
-	<span class="doccomment">/// Returns a reference to the underlying COM virtual table.
-	///
-	/// # Safety
-	///
-	/// Be sure the pointer has the correct virtual table type (or inherits from
-	/// it), and is not null.
-	///
-	/// This method is used internally by the library, and not intended to be
-	/// used externally.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">unsafe fn </span>vt_ref&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T;
+	</span><span class="kw">fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
 
 	<span class="doccomment">/// [`IUnknown::QueryInterface`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-queryinterface(refiid_void))
 	/// method.
@@ -201,17 +240,16 @@
 	</span><span class="kw">fn </span>QueryInterface&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IUnknownVT&gt;();
-			ok_to_hrresult(
-				(vt.QueryInterface)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IUnknownVT&gt;(<span class="self">self</span>).QueryInterface)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| T::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 }
 </code></pre></div></section></main></body></html>

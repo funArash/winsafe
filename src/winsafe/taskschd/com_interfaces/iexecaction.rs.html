@@ -85,8 +85,8 @@
 <a href="#85" id="85">85</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{oleaut_IDispatch, taskschd_IAction};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IActionVT;
 
@@ -94,12 +94,12 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IExecActionVT {
 	<span class="kw">pub </span>IAction: IActionVT,
-	<span class="kw">pub </span>get_Path: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_Path: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_Arguments: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_Arguments: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_WorkingDirectory: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_WorkingDirectory: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Path: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Path: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Arguments: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Arguments: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_WorkingDirectory: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_WorkingDirectory: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IExecAction: <span class="string">&quot;4c3d624d-fd6b-49a3-b9b7-09cb3cd3f047&quot;</span>;
@@ -116,8 +116,8 @@
 	/// use winsafe::prelude::*;
 	/// use winsafe::{IAction, IExecAction};
 	///
-	/// let action: IExecAction; // initialized somewhere
-	/// # let action = IAction::from(unsafe { winsafe::ComPtr::null() });
+	/// let action: IAction; // initialized somewhere
+	/// # let action = unsafe { IAction::null() };
 	///
 	/// let exec_action = action
 	///     .QueryInterface::&lt;IExecAction&gt;()?;

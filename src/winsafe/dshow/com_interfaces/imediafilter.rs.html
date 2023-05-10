@@ -81,17 +81,13 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::INFINITE;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, ole_IPersist};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IPersistVT;
 
@@ -99,12 +95,12 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IMediaFilterVT {
 	<span class="kw">pub </span>IPersistVT: IPersistVT,
-	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Pause: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-   <span class="kw">pub </span>Run: <span class="kw">fn</span>(ComPtr, i64) -&gt; HRES,
-	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>SetSyncSource: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetSyncSource: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Pause: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+   <span class="kw">pub </span>Run: <span class="kw">fn</span>(COMPTR, i64) -&gt; HRES,
+	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(COMPTR, u32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>SetSyncSource: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetSyncSource: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IMediaFilter: <span class="string">&quot;56a86899-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
@@ -133,43 +129,39 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetState(<span class="kw-2">&amp;</span><span class="self">self</span>, ms_timeout: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; HrResult&lt;co::FILTER_STATE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>fs = co::FILTER_STATE::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaFilterVT&gt;();
-			ok_to_hrresult(
-				(vt.GetState)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaFilterVT&gt;(<span class="self">self</span>).GetState)(
 					<span class="self">self</span>.ptr(),
 					ms_timeout.unwrap_or(INFINITE),
 					fs.as_mut(),
-				),
-			).map(|<span class="kw">_</span>| fs)
-		}
+				)
+			},
+		).map(|<span class="kw">_</span>| fs)
 	}
 
 	<span class="doccomment">/// [`IMediaFilter::Pause`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediafilter-pause)
 	/// method.
 	</span><span class="kw">fn </span>Pause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaFilterVT&gt;();
-			okfalse_to_hrresult((vt.Pause)(<span class="self">self</span>.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaFilterVT&gt;(<span class="self">self</span>).Pause)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IMediaFilter::Run`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediafilter-run)
 	/// method.
 	</span><span class="kw">fn </span>Run(<span class="kw-2">&amp;</span><span class="self">self</span>, start: i64) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaFilterVT&gt;();
-			okfalse_to_hrresult((vt.Run)(<span class="self">self</span>.ptr(), start))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaFilterVT&gt;(<span class="self">self</span>).Run)(<span class="self">self</span>.ptr(), start) },
+		)
 	}
 
 	<span class="doccomment">/// [`IMediaFilter::Stop`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-imediafilter-stop)
 	/// method.
 	</span><span class="kw">fn </span>Stop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaFilterVT&gt;();
-			okfalse_to_hrresult((vt.Stop)(<span class="self">self</span>.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaFilterVT&gt;(<span class="self">self</span>).Stop)(<span class="self">self</span>.ptr()) },
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

@@ -97,11 +97,12 @@
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HANDLE, HRES};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HANDLE, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -110,11 +111,11 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ITaskbarListVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>HrInit: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>AddTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>DeleteTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>ActivateTab: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>SetActiveAlt: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>HrInit: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>AddTab: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>DeleteTab: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>ActivateTab: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SetActiveAlt: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ITaskbarList: <span class="string">&quot;56fdf342-fd6d-11d0-958a-006097c9a090&quot;</span>;
@@ -154,46 +155,47 @@
 	<span class="doccomment">/// [`ITaskbarList::ActivateTab`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-activatetab)
 	/// method.
 	</span><span class="kw">fn </span>ActivateTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarListVT&gt;();
-			ok_to_hrresult((vt.ActivateTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarListVT&gt;(<span class="self">self</span>).ActivateTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList::AddTab`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-addtab)
 	/// method.
 	</span><span class="kw">fn </span>AddTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarListVT&gt;();
-			ok_to_hrresult((vt.AddTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarListVT&gt;(<span class="self">self</span>).AddTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList::DeleteTab`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-deletetab)
 	/// method.
 	</span><span class="kw">fn </span>DeleteTab(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarListVT&gt;();
-			ok_to_hrresult((vt.DeleteTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarListVT&gt;(<span class="self">self</span>).DeleteTab)(<span class="self">self</span>.ptr(), hwnd.as_ptr())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`ITaskbarList::HrInit`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-hrinit)
 	/// method.
 	</span><span class="kw">fn </span>HrInit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarListVT&gt;();
-			ok_to_hrresult((vt.HrInit)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;ITaskbarListVT&gt;(<span class="self">self</span>).HrInit)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`ITaskbarList::SetActiveAlt`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-itaskbarlist-setactivealt)
 	/// method.
 	</span><span class="kw">fn </span>SetActiveAlt(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarListVT&gt;();
-			ok_to_hrresult((vt.SetActiveAlt)(<span class="self">self</span>.ptr(), hwnd.as_ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarListVT&gt;(<span class="self">self</span>).SetActiveAlt)(<span class="self">self</span>.ptr(), hwnd.as_ptr())
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

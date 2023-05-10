@@ -50,11 +50,17 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HANDLE;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HANDLE};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::vt;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -63,7 +69,7 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IModalWindowVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>Show: <span class="kw">fn</span>(ComPtr, HANDLE) -&gt; u32,
+	<span class="kw">pub </span>Show: <span class="kw">fn</span>(COMPTR, HANDLE) -&gt; u32,
 }
 
 <span class="macro">com_interface! </span>{ IModalWindow: <span class="string">&quot;b4db1657-70d7-485e-8e3e-6fcb5a5c1802&quot;</span>;
@@ -93,8 +99,12 @@
 	</span><span class="kw">fn </span>Show(<span class="kw-2">&amp;</span><span class="self">self</span>, hwnd_owner: <span class="kw-2">&amp;</span>HWND) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">const </span>CANCELLED: co::HRESULT = co::ERROR::CANCELLED.to_hresult();
 		<span class="kw">match unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IModalWindowVT&gt;();
-			co::HRESULT::from_raw((vt.Show)(<span class="self">self</span>.ptr(), hwnd_owner.as_ptr()))
+			co::HRESULT::from_raw(
+				(vt::&lt;IModalWindowVT&gt;(<span class="self">self</span>).Show)(
+					<span class="self">self</span>.ptr(),
+					hwnd_owner.as_ptr(),
+				),
+			)
 		} {
 			co::HRESULT::S_OK =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
 			CANCELLED =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),

@@ -52,12 +52,11 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIObject, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDXGIObjectVT;
 
@@ -65,7 +64,7 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDXGIDeviceSubObjectVT {
 	<span class="kw">pub </span>IDXGIObjectVT: IDXGIObjectVT,
-	<span class="kw">pub </span>GetDevice: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetDevice: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDXGIDeviceSubObject: <span class="string">&quot;3d3e0379-f9de-4d58-bb6c-18d62992f1a6&quot;</span>;
@@ -95,17 +94,16 @@
 	</span><span class="kw">fn </span>GetDevice&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIDeviceSubObjectVT&gt;();
-			ok_to_hrresult(
-				(vt.GetDevice)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIDeviceSubObjectVT&gt;(<span class="self">self</span>).GetDevice)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| T::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 }
 </code></pre></div></section></main></body></html>

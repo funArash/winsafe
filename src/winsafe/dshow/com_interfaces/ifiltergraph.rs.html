@@ -138,13 +138,17 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, IBaseFilter, IEnumFilters};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{dshow_IBaseFilter, dshow_IPin, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -152,14 +156,14 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IFilterGraphVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>AddFilter: <span class="kw">fn</span>(ComPtr, ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>RemoveFilter: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>EnumFilters: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>FindFilterByName: <span class="kw">fn</span>(ComPtr, PCSTR, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>ConnectDirect: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>Reconnect: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>SetDefaultSyncSource: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>AddFilter: <span class="kw">fn</span>(COMPTR, COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>RemoveFilter: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>EnumFilters: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>FindFilterByName: <span class="kw">fn</span>(COMPTR, PCSTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>ConnectDirect: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>Reconnect: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>SetDefaultSyncSource: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IFilterGraph: <span class="string">&quot;56a8689f-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
@@ -187,16 +191,15 @@
 	</span><span class="kw">fn </span>AddFilter(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		filter: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IBaseFilter, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult(
-				(vt.AddFilter)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).AddFilter)(
 					<span class="self">self</span>.ptr(),
 					filter.ptr(),
 					WString::from_str(name).as_ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFilterGraph::ConnectDirect`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-connectdirect)
@@ -207,26 +210,26 @@
 		mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;,
 	) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult(
-				(vt.ConnectDirect)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).ConnectDirect)(
 					<span class="self">self</span>.ptr(),
 					pin_out.ptr(),
 					pin_in.ptr(),
 					mt.map_or(std::ptr::null_mut(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFilterGraph::Disconnect`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-disconnect)
 	/// method.
 	</span><span class="kw">fn </span>Disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>, pin: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IPin) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult((vt.Disconnect)(<span class="self">self</span>.ptr(), pin.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).Disconnect)(<span class="self">self</span>.ptr(), pin.ptr())
+			},
+		)
 	}
 
 	<span class="macro">fn_com_get! </span>{ EnumFilters: IFilterGraphVT, IEnumFilters;
@@ -238,44 +241,49 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>FindFilterByName(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IBaseFilter&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult(
-				(vt.FindFilterByName)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IBaseFilter::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).FindFilterByName)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(name).as_ptr(),
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| IBaseFilter::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IFilterGraph::Reconnect`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-reconnect)
 	/// method.
 	</span><span class="kw">fn </span>Reconnect(<span class="kw-2">&amp;</span><span class="self">self</span>, pin: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IPin) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult((vt.Reconnect)(<span class="self">self</span>.ptr(), pin.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).Reconnect)(<span class="self">self</span>.ptr(), pin.ptr())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFilterGraph::RemoveFilter`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-removefilter)
 	/// method.
 	</span><span class="kw">fn </span>RemoveFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IBaseFilter) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult((vt.RemoveFilter)(<span class="self">self</span>.ptr(), filter.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).RemoveFilter)(
+					<span class="self">self</span>.ptr(),
+					filter.ptr(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFilterGraph::SetDefaultSyncSource`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ifiltergraph-setdefaultsyncsource)
 	/// method.
 	</span><span class="kw">fn </span>SetDefaultSyncSource(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFilterGraphVT&gt;();
-			ok_to_hrresult((vt.SetDefaultSyncSource)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFilterGraphVT&gt;(<span class="self">self</span>).SetDefaultSyncSource)(<span class="self">self</span>.ptr())
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

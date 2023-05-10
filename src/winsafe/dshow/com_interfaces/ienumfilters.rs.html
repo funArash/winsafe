@@ -134,13 +134,14 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dshow::decl::IBaseFilter;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -148,10 +149,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IEnumFiltersVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>Next: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>Skip: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>Reset: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Next: <span class="kw">fn</span>(COMPTR, u32, <span class="kw-2">*mut </span>COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Skip: <span class="kw">fn</span>(COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>Reset: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IEnumFilters: <span class="string">&quot;56a86893-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
@@ -186,7 +187,7 @@
 	/// use winsafe::IEnumFilters;
 	///
 	/// let filters: IEnumFilters; // initialized somewhere
-	/// # let filters = IEnumFilters::from(unsafe { winsafe::ComPtr::null() });
+	/// # let filters = unsafe { IEnumFilters::null() };
 	///
 	/// for filter in filters.iter() {
 	///     let filter = filter?;
@@ -207,38 +208,39 @@
 	/// is simpler.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>Next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="prelude-ty">Option</span>&lt;IBaseFilter&gt;&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IBaseFilter::null() };
 		<span class="kw">let </span><span class="kw-2">mut </span>fetched = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
-			<span class="kw">match </span>ok_to_hrresult(
-				(vt.Next)(<span class="self">self</span>.ptr(), <span class="number">1</span>, <span class="kw-2">&amp;mut </span>ppv_queried, <span class="kw-2">&amp;mut </span>fetched), <span class="comment">// retrieve only 1
-			</span>) {
-				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(IBaseFilter::from(ppv_queried))),
-				<span class="prelude-val">Err</span>(hr) =&gt; <span class="kw">match </span>hr {
-					co::HRESULT::S_FALSE =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no filter found
-					</span>hr =&gt; <span class="prelude-val">Err</span>(hr), <span class="comment">// actual error
-				</span>},
-			}
+
+		<span class="kw">match </span>ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IEnumFiltersVT&gt;(<span class="self">self</span>).Next)(
+					<span class="self">self</span>.ptr(),
+					<span class="number">1</span>, <span class="comment">// retrieve only 1
+					</span>queried.as_mut(),
+					<span class="kw-2">&amp;mut </span>fetched,
+				)
+			},
+		) {
+			<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(queried)),
+			<span class="prelude-val">Err</span>(hr) =&gt; <span class="kw">match </span>hr {
+				co::HRESULT::S_FALSE =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// no filter found
+				</span>hr =&gt; <span class="prelude-val">Err</span>(hr), <span class="comment">// actual error
+			</span>},
 		}
 	}
 
 	<span class="doccomment">/// [`IEnumFilters::Reset`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ienumfilters-reset)
 	/// method.
 	</span><span class="kw">fn </span>Reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
-			ok_to_hrresult((vt.Reset)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IEnumFiltersVT&gt;(<span class="self">self</span>).Reset)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IEnumFilters::Skip`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ienumfilters-skip)
 	/// method.
 	</span><span class="kw">fn </span>Skip(<span class="kw-2">&amp;</span><span class="self">self</span>, count: u32) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IEnumFiltersVT&gt;();
-			okfalse_to_hrresult((vt.Skip)(<span class="self">self</span>.ptr(), count))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IEnumFiltersVT&gt;(<span class="self">self</span>).Skip)(<span class="self">self</span>.ptr(), count) },
+		)
 	}
 }
 

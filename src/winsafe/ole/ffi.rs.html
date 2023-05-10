@@ -21,26 +21,26 @@
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE, HRES, PCSTR, PCVOID, PSTR, PVOID};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, COMPTR, HANDLE, HRES, PCSTR, PCVOID, PSTR, PVOID};
 
 <span class="macro">extern_sys! </span>{ <span class="string">&quot;ole32&quot;</span>;
 	CLSIDFromProgID(PCSTR, PVOID) -&gt; HRES
 	CLSIDFromProgIDEx(PCSTR, PVOID) -&gt; HRES
 	CLSIDFromString(PCSTR, PVOID) -&gt; HRES
-	CoCreateInstance(PCVOID, PVOID, u32, PCVOID, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	CoCreateInstanceEx(PCVOID, PVOID, u32, PCVOID, u32, PVOID) -&gt; HRES
+	CoCreateInstance(PCVOID, <span class="kw-2">*mut </span>COMPTR, u32, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	CoCreateInstanceEx(PCVOID, <span class="kw-2">*mut </span>COMPTR, u32, PCVOID, u32, PVOID) -&gt; HRES
 	CoInitializeEx(PVOID, u32) -&gt; HRES
-	CoLockObjectExternal(PVOID, BOOL, BOOL) -&gt; HRES
+	CoLockObjectExternal(COMPTR, BOOL, BOOL) -&gt; HRES
 	CoTaskMemAlloc(usize) -&gt; PVOID
 	CoTaskMemFree(PVOID)
 	CoTaskMemRealloc(PVOID, usize) -&gt; PVOID
 	CoUninitialize()
-	CreateClassMoniker(PCVOID, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	CreateFileMoniker(PCSTR, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	CreateItemMoniker(PCSTR, PCSTR, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	CreateObjrefMoniker(PVOID, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	CreatePointerMoniker(PVOID, <span class="kw-2">*mut </span>PVOID) -&gt; HRES
-	RegisterDragDrop(HANDLE, PVOID) -&gt; HRES
+	CreateClassMoniker(PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	CreateFileMoniker(PCSTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	CreateItemMoniker(PCSTR, PCSTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	CreateObjrefMoniker(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	CreatePointerMoniker(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES
+	RegisterDragDrop(HANDLE, COMPTR) -&gt; HRES
 	RevokeDragDrop(HANDLE) -&gt; HRES
 	StringFromCLSID(PCVOID, <span class="kw-2">*mut </span>PSTR) -&gt; HRES
 }

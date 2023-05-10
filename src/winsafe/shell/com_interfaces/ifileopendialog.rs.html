@@ -112,8 +112,8 @@
 <a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{shell_IFileDialog, shell_IModalWindow};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::IShellItemArray;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IFileDialogVT;
@@ -122,8 +122,8 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IFileOpenDialogVT {
 	<span class="kw">pub </span>IFileDialogVT: IFileDialogVT,
-	<span class="kw">pub </span>GetResults: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetSelectedItems: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetResults: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetSelectedItems: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IFileOpenDialog: <span class="string">&quot;d57c7288-d4ad-4768-be02-9d969532d960&quot;</span>;
@@ -204,7 +204,7 @@
 		/// use winsafe::{co, HrResult, IFileOpenDialog};
 		///
 		/// let fo: IFileOpenDialog; // initialized somewhere
-		/// # let fo = IFileOpenDialog::from(unsafe { winsafe::ComPtr::null() });
+		/// # let fo = unsafe { IFileOpenDialog::null() };
 		///
 		/// let paths = fo.GetResults()?.iter()?
 		///     .map(|shi|

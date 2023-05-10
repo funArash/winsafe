@@ -65,12 +65,11 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE, HRES};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, COMPTR, HANDLE, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, shell_ITaskbarList};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HWND;
 <span class="kw">use </span><span class="kw">crate</span>::vt::ITaskbarListVT;
@@ -79,7 +78,7 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ITaskbarList2VT {
 	<span class="kw">pub </span>ITaskbarListVT: ITaskbarListVT,
-	<span class="kw">pub </span>MarkFullscreenWindow: <span class="kw">fn</span>(ComPtr, HANDLE, BOOL) -&gt; HRES,
+	<span class="kw">pub </span>MarkFullscreenWindow: <span class="kw">fn</span>(COMPTR, HANDLE, BOOL) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ITaskbarList2: <span class="string">&quot;602d4995-b13a-429b-a66e-1935e44f4317&quot;</span>;
@@ -122,16 +121,15 @@
 	</span><span class="kw">fn </span>MarkFullscreenWindow(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		hwnd: <span class="kw-2">&amp;</span>HWND, full_screen: bool) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITaskbarList2VT&gt;();
-			ok_to_hrresult(
-				(vt.MarkFullscreenWindow)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITaskbarList2VT&gt;(<span class="self">self</span>).MarkFullscreenWindow)(
 					<span class="self">self</span>.ptr(),
 					hwnd.as_ptr(),
 					full_screen <span class="kw">as _</span>,
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

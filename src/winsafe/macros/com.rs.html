@@ -190,8 +190,6 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_macros)]
 
 </span><span class="doccomment">/// Declares an ordinary COM interface, and implements ole_IUnknown trait.
@@ -202,14 +200,15 @@
 	) =&gt; {
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		<span class="attr">#[repr(transparent)]
-		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(ComPtr);
+		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw">crate</span>::kernel::ffi_types::COMPTR);
 
 		<span class="kw">impl </span>Drop <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-				<span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.<span class="number">0</span>.as_opt() {
-					<span class="kw">use crate</span>::{prelude::ole_IUnknown, vt::IUnknownVT};
-					<span class="kw">let </span>vt = <span class="kw">unsafe </span>{ <span class="self">self</span>.vt_ref::&lt;IUnknownVT&gt;() };
-					(vt.Release)(<span class="kw-2">*</span>p);
+				<span class="kw">if </span>!<span class="self">self</span>.<span class="number">0</span>.is_null() {
+					<span class="kw">unsafe </span>{
+						<span class="kw">use crate</span>::{prelude::ole_IUnknown, vt::IUnknownVT};
+						(<span class="kw">crate</span>::ole::privs::vt::&lt;IUnknownVT&gt;(<span class="self">self</span>).Release)(<span class="self">self</span>.ptr());
+					}
 				}
 			}
 		}
@@ -217,34 +216,31 @@
 		<span class="kw">impl </span>Clone <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
 				<span class="kw">use crate</span>::{prelude::ole_IUnknown, vt::IUnknownVT};
-				<span class="kw">let </span>vt = <span class="kw">unsafe </span>{ <span class="self">self</span>.vt_ref::&lt;IUnknownVT&gt;() };
-				(vt.AddRef)(<span class="self">self</span>.<span class="number">0</span>);
-				<span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>)
-			}
-		}
-
-		<span class="kw">impl </span>From&lt;ComPtr&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-			<span class="kw">fn </span>from(com_ptr: ComPtr) -&gt; <span class="self">Self </span>{
-				<span class="self">Self</span>(com_ptr)
+				<span class="kw">unsafe </span>{ (<span class="kw">crate</span>::ole::privs::vt::&lt;IUnknownVT&gt;(<span class="self">self</span>).AddRef)(<span class="self">self</span>.ptr()); }
+				<span class="self">Self</span>(<span class="self">self</span>.ptr())
 			}
 		}
 
 		<span class="kw">impl </span><span class="kw">crate</span>::prelude::ole_IUnknown <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">const </span>IID: <span class="kw">crate</span>::co::IID = <span class="kw">crate</span>::co::IID::new(<span class="macro-nonterminal">$guid</span>);
 
-			<span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ComPtr {
+			<span class="kw">unsafe fn </span>from_ptr(p: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self </span>{
+				<span class="self">Self</span>(p)
+			}
+
+			<span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut *mut </span>std::ffi::c_void {
+				<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0
+			</span>}
+
+			<span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
 				<span class="kw">let </span>ptr = <span class="self">self</span>.<span class="number">0</span>;
-				<span class="self">self</span>.<span class="number">0 </span>= <span class="kw">unsafe </span>{ ComPtr::null() };
+				<span class="self">self</span>.<span class="number">0 </span>= std::ptr::null_mut();
 				ptr
 			}
 
-			<span class="kw">unsafe fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ComPtr {
+			<span class="kw">fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
 				<span class="self">self</span>.<span class="number">0
 			</span>}
-
-			<span class="kw">unsafe fn </span>vt_ref&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
-				<span class="kw-2">&amp;**</span><span class="self">self</span>.<span class="number">0</span>.into_ptr::&lt;T&gt;()
-			}
 		}
 	};
 }
@@ -334,13 +330,13 @@
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		<span class="attr">#[must_use]
 		</span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;<span class="macro-nonterminal">$iface</span>&gt; {
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = <span class="kw">crate</span>::ole::decl::ComPtr::null();
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;<span class="macro-nonterminal">$vt</span>&gt;();
-				<span class="kw">crate</span>::ole::privs::ok_to_hrresult(
-					(vt.<span class="macro-nonterminal">$method</span>)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried),
-				).map(|<span class="kw">_</span>| &lt;<span class="macro-nonterminal">$iface</span>&gt;::from(ppv_queried))
-			}
+			<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+			<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ &lt;<span class="macro-nonterminal">$iface</span>&gt;::null() };
+			<span class="kw">crate</span>::ole::privs::ok_to_hrresult(
+				<span class="kw">unsafe </span>{
+					(<span class="kw">crate</span>::ole::privs::vt::&lt;<span class="macro-nonterminal">$vt</span>&gt;(<span class="self">self</span>).<span class="macro-nonterminal">$method</span>)(<span class="self">self</span>.ptr(), queried.as_mut())
+				},
+			).map(|<span class="kw">_</span>| queried)
 		}
 	};
 }
@@ -355,10 +351,11 @@
 		<span class="attr">#[must_use]
 		</span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 			<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;<span class="macro-nonterminal">$vt</span>&gt;();
-				<span class="kw">crate</span>::ole::privs::ok_to_hrresult((vt.<span class="macro-nonterminal">$method</span>)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-			}.map(|<span class="kw">_</span>| {
+			<span class="kw">crate</span>::ole::privs::ok_to_hrresult(
+				<span class="kw">unsafe </span>{
+					(<span class="kw">crate</span>::ole::privs::vt::&lt;<span class="macro-nonterminal">$vt</span>&gt;(<span class="self">self</span>).<span class="macro-nonterminal">$method</span>)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr)
+				},
+			).map(|<span class="kw">_</span>| {
 				<span class="kw">let </span>bstr = <span class="kw">unsafe </span>{ <span class="kw">crate</span>::oleaut::decl::BSTR::from_ptr(pstr) };
 				bstr.to_string()
 			})
@@ -374,15 +371,14 @@
 	) =&gt; {
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		<span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="macro-nonterminal">$arg</span>: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;<span class="macro-nonterminal">$vt</span>&gt;();
-				<span class="kw">crate</span>::ole::privs::ok_to_hrresult(
-					(vt.<span class="macro-nonterminal">$method</span>)(
+			<span class="kw">crate</span>::ole::privs::ok_to_hrresult(
+				<span class="kw">unsafe </span>{
+					(<span class="kw">crate</span>::ole::privs::vt::&lt;<span class="macro-nonterminal">$vt</span>&gt;(<span class="self">self</span>).<span class="macro-nonterminal">$method</span>)(
 						<span class="self">self</span>.ptr(),
 						<span class="kw">crate</span>::oleaut::decl::BSTR::SysAllocString(<span class="macro-nonterminal">$arg</span>)<span class="question-mark">?</span>.as_ptr(),
-					),
-				)
-			}
+					)
+				},
+			)
 		}
 	};
 }

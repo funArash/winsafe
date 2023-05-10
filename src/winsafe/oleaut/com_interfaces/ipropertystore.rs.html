@@ -167,12 +167,14 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::{PROPERTYKEY, PROPVARIANT};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -181,11 +183,11 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IPropertyStoreVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>GetAt: <span class="kw">fn</span>(ComPtr, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>GetValue: <span class="kw">fn</span>(ComPtr, PCVOID, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>SetValue: <span class="kw">fn</span>(ComPtr, PCVOID, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>Commit: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetAt: <span class="kw">fn</span>(COMPTR, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetValue: <span class="kw">fn</span>(COMPTR, PCVOID, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetValue: <span class="kw">fn</span>(COMPTR, PCVOID, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>Commit: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IPropertyStore: <span class="string">&quot;886d8eeb-8cf2-4446-8d02-cdba1dbdcf99&quot;</span>;
@@ -225,7 +227,7 @@
 	/// use winsafe::IPropertyStore;
 	///
 	/// let pstore: IPropertyStore; // initialized somewhere
-	/// # let pstore = IPropertyStore::from(unsafe { winsafe::ComPtr::null() });
+	/// # let pstore = unsafe { IPropertyStore::null() };
 	///
 	/// for ppk in pstore.iter()? {
 	///     let ppk = ppk?;
@@ -243,10 +245,9 @@
 	<span class="doccomment">/// [`IPropertyStore::Commit`](https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-commit)
 	/// method.
 	</span><span class="kw">fn </span>Commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPropertyStoreVT&gt;();
-			ok_to_hrresult((vt.Commit)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IPropertyStoreVT&gt;(<span class="self">self</span>).Commit)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IPropertyStore::GetAt`](https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getat)
@@ -254,12 +255,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;PROPERTYKEY&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ppk = PROPERTYKEY::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPropertyStoreVT&gt;();
-			ok_to_hrresult(
-				(vt.GetAt)(<span class="self">self</span>.ptr(), index, <span class="kw-2">&amp;mut </span>ppk <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-			)
-		}.map(|<span class="kw">_</span>| ppk)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPropertyStoreVT&gt;(<span class="self">self</span>).GetAt)(
+					<span class="self">self</span>.ptr(),
+					index,
+					<span class="kw-2">&amp;mut </span>ppk <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| ppk)
 	}
 
 	<span class="doccomment">/// [`IPropertyStore::GetCount`](https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getcount)
@@ -267,10 +271,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPropertyStoreVT&gt;();
-			ok_to_hrresult((vt.GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
-		}.map(|<span class="kw">_</span>| count)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPropertyStoreVT&gt;(<span class="self">self</span>).GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count)
+			},
+		).map(|<span class="kw">_</span>| count)
 	}
 
 	<span class="doccomment">/// [`IPropertyStore::GetValue`](https://learn.microsoft.com/en-us/windows/win32/api/propsys/nf-propsys-ipropertystore-getvalue)
@@ -278,19 +283,18 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetValue(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>PROPERTYKEY) -&gt; HrResult&lt;PROPVARIANT&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>var = PROPVARIANT::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPropertyStoreVT&gt;();
-			<span class="kw">match </span>co::HRESULT::from_raw(
-				(vt.GetValue)(
+		<span class="kw">match unsafe </span>{
+			co::HRESULT::from_raw(
+				(vt::&lt;IPropertyStoreVT&gt;(<span class="self">self</span>).GetValue)(
 					<span class="self">self</span>.ptr(),
 					key <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					<span class="kw-2">&amp;mut </span>var <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				),
-			) {
-				co::HRESULT::S_OK
-					| co::HRESULT::INPLACE_S_TRUNCATED =&gt; <span class="prelude-val">Ok</span>(var),
-				hr =&gt; <span class="prelude-val">Err</span>(hr),
-			}
+			)
+		 } {
+			co::HRESULT::S_OK
+			| co::HRESULT::INPLACE_S_TRUNCATED =&gt; <span class="prelude-val">Ok</span>(var),
+			hr =&gt; <span class="prelude-val">Err</span>(hr),
 		}
 	}
 }

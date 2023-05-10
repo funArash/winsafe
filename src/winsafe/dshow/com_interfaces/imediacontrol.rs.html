@@ -129,48 +129,31 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::INFINITE;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::IDispatch;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
 <span class="doccomment">/// [`IMediaControl`](crate::IMediaControl) virtual table.
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IMediaControlVT {
 	<span class="kw">pub </span>IDispatchVT: IDispatchVT,
-	<span class="kw">pub </span>Run: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Pause: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(ComPtr, i32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>RenderFile: <span class="kw">fn</span>(ComPtr, PSTR) -&gt; HRES,
-	<span class="kw">pub </span>AddSourceFilter: <span class="kw">fn</span>(ComPtr, PSTR, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetFilterCollection: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetRegFilterCollection: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>StopWhenReady: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Run: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Pause: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Stop: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetState: <span class="kw">fn</span>(COMPTR, i32, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>RenderFile: <span class="kw">fn</span>(COMPTR, PSTR) -&gt; HRES,
+	<span class="kw">pub </span>AddSourceFilter: <span class="kw">fn</span>(COMPTR, PSTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetFilterCollection: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetRegFilterCollection: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>StopWhenReady: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IMediaControl: <span class="string">&quot;56a868b1-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
@@ -188,7 +171,7 @@
 	/// use winsafe::{IGraphBuilder, IMediaControl};
 	///
 	/// let graph_builder: IGraphBuilder; // initialized somewhere
-	/// # let graph_builder = IGraphBuilder::from(unsafe { winsafe::ComPtr::null() });
+	/// # let graph_builder = unsafe { IGraphBuilder::null() };
 	///
 	/// let media_control = graph_builder
 	///     .QueryInterface::&lt;IMediaControl&gt;()?;
@@ -212,17 +195,16 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>AddSourceFilter(<span class="kw-2">&amp;</span><span class="self">self</span>, file_name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IDispatch&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			ok_to_hrresult(
-				(vt.AddSourceFilter)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDispatch::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).AddSourceFilter)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(file_name).as_mut_ptr(), <span class="comment">// BSTR
-					</span><span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| IDispatch::from(ppv_queried))
-		}
+					</span>queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMediaControl::GetState`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-getstate)
@@ -232,66 +214,50 @@
 		ms_timeout: <span class="prelude-ty">Option</span>&lt;i32&gt;) -&gt; HrResult&lt;co::FILTER_STATE&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>state = co::FILTER_STATE::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			ok_to_hrresult(
-				(vt.GetState)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).GetState)(
 					<span class="self">self</span>.ptr(),
 					ms_timeout.unwrap_or(INFINITE <span class="kw">as _</span>),
 					state.as_mut(),
-				),
-			)
-		}.map(|<span class="kw">_</span>| state)
+				)
+			},
+		).map(|<span class="kw">_</span>| state)
 	}
 
 	<span class="doccomment">/// [`IMediaControl::Pause`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-pause)
 	/// method.
 	</span><span class="kw">fn </span>Pause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			okfalse_to_hrresult((vt.Pause)(<span class="self">self</span>.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).Pause)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
-	<span class="doccomment">/// [`IMediaControl::RenderFile`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-renderfile)
-	/// method.
-	</span><span class="kw">fn </span>RenderFile(<span class="kw-2">&amp;</span><span class="self">self</span>, file_name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			ok_to_hrresult(
-				(vt.RenderFile)(
-					<span class="self">self</span>.ptr(),
-					WString::from_str(file_name).as_mut_ptr(), <span class="comment">// BSTR
-				</span>),
-			)
-		}
-	}
+	<span class="macro">fn_bstr_set! </span>{ RenderFile: IMediaControlVT, file_name;
+		<span class="doccomment">/// [`IMediaControl::RenderFile`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-renderfile)
+		/// method.
+	</span>}
 
 	<span class="doccomment">/// [`IMediaControl::Run`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-run)
 	/// method.
 	</span><span class="kw">fn </span>Run(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			okfalse_to_hrresult((vt.Run)(<span class="self">self</span>.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).Run)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IMediaControl::Stop`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-stop)
 	/// method.
 	</span><span class="kw">fn </span>Stop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			ok_to_hrresult((vt.Stop)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).Stop)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IMediaControl::StopWhenReady`](https://learn.microsoft.com/en-us/windows/win32/api/control/nf-control-imediacontrol-stopwhenready)
 	/// method.
 	</span><span class="kw">fn </span>StopWhenReady(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMediaControlVT&gt;();
-			okfalse_to_hrresult((vt.StopWhenReady)(<span class="self">self</span>.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMediaControlVT&gt;(<span class="self">self</span>).StopWhenReady)(<span class="self">self</span>.ptr()) },
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

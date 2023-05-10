@@ -70,13 +70,11 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -84,10 +82,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDXGIObjectVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>SetPrivateData: <span class="kw">fn</span>(ComPtr, PCVOID, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>SetPrivateDataInterface: <span class="kw">fn</span>(ComPtr, PCVOID, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetPrivateData: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*mut </span>u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>GetParent: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>SetPrivateData: <span class="kw">fn</span>(COMPTR, PCVOID, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetPrivateDataInterface: <span class="kw">fn</span>(COMPTR, PCVOID, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetPrivateData: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*mut </span>u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetParent: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDXGIObject: <span class="string">&quot;aec22fb8-76f3-4639-9be0-28eb43a67a2e&quot;</span>;
@@ -116,17 +114,16 @@
 	</span><span class="kw">fn </span>GetParent&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IUnknownVT&gt;();
-			ok_to_hrresult(
-				(vt.QueryInterface)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IUnknownVT&gt;(<span class="self">self</span>).QueryInterface)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| T::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IDXGIObject::SetPrivateDataInterface`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiobject-setprivatedatainterface)
@@ -134,16 +131,15 @@
 	</span><span class="kw">fn </span>SetPrivateDataInterface&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, interface: <span class="kw-2">&amp;</span>T) -&gt; HrResult&lt;()&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIObjectVT&gt;();
-			ok_to_hrresult(
-				(vt.SetPrivateDataInterface)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIObjectVT&gt;(<span class="self">self</span>).SetPrivateDataInterface)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					interface.ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

@@ -300,13 +300,36 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GUID, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{shell_IModalWindow, shell_IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::{COMDLG_FILTERSPEC, IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IModalWindowVT;
@@ -315,29 +338,29 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IFileDialogVT {
 	<span class="kw">pub </span>IModalWindowVT: IModalWindowVT,
-	<span class="kw">pub </span>SetFileTypes: <span class="kw">fn</span>(ComPtr, u32, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>SetFileTypeIndex: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>GetFileTypeIndex: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>Advise: <span class="kw">fn</span>(ComPtr, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>Unadvise: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>SetOptions: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>GetOptions: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>SetDefaultFolder: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>SetFolder: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetFolder: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetCurrentSelection: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>SetFileName: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>GetFileName: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetTitle: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetOkButtonLabel: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>SetFileNameLabel: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>GetResult: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>AddPlace: <span class="kw">fn</span>(ComPtr, ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>SetDefaultExtension: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>Close: <span class="kw">fn</span>(ComPtr, HRES) -&gt; HRES,
-	<span class="kw">pub </span>SetClientGuid: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>ClearClientData: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>SetFilter: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetFileTypes: <span class="kw">fn</span>(COMPTR, u32, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>SetFileTypeIndex: <span class="kw">fn</span>(COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetFileTypeIndex: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Advise: <span class="kw">fn</span>(COMPTR, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>Unadvise: <span class="kw">fn</span>(COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>SetOptions: <span class="kw">fn</span>(COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>GetOptions: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>SetDefaultFolder: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>SetFolder: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetFolder: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetCurrentSelection: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>SetFileName: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetFileName: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetTitle: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetOkButtonLabel: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>SetFileNameLabel: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>GetResult: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>AddPlace: <span class="kw">fn</span>(COMPTR, COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>SetDefaultExtension: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>Close: <span class="kw">fn</span>(COMPTR, HRES) -&gt; HRES,
+	<span class="kw">pub </span>SetClientGuid: <span class="kw">fn</span>(COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>ClearClientData: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>SetFilter: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IFileDialog: <span class="string">&quot;42f85136-db7e-439c-85f1-e4075d135fc8&quot;</span>;
@@ -366,28 +389,33 @@
 	</span><span class="kw">fn </span>AddPlace(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem, fdap: co::FDAP) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.AddPlace)(<span class="self">self</span>.ptr(), si.ptr(), fdap.raw()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).AddPlace)(
+					<span class="self">self</span>.ptr(),
+					si.ptr(),
+					fdap.raw(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::ClearClientData`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-clearclientdata)
 	/// method.
 	</span><span class="kw">fn </span>ClearClientData(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.ClearClientData)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).ClearClientData)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::Close`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-close)
 	/// method.
 	</span><span class="kw">fn </span>Close(<span class="kw-2">&amp;</span><span class="self">self</span>, hr: co::ERROR) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.Close)(<span class="self">self</span>.ptr(), hr.raw() <span class="kw">as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).Close)(<span class="self">self</span>.ptr(), hr.raw() <span class="kw">as _</span>)
+			},
+		)
 	}
 
 	<span class="macro">fn_com_get! </span>{ GetCurrentSelection: IFileDialogVT, IShellItem;
@@ -400,10 +428,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.GetFileName)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-		}.map(|<span class="kw">_</span>| {
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).GetFileName)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr)
+			},
+		).map(|<span class="kw">_</span>| {
 			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
 			CoTaskMemFree(pstr <span class="kw">as _</span>);
 			name.to_string()
@@ -415,10 +444,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>index = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.GetFileTypeIndex)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>index))
-		}.map(|<span class="kw">_</span>| index)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).GetFileTypeIndex)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>index,
+				)
+			},
+		).map(|<span class="kw">_</span>| index)
 	}
 
 	<span class="macro">fn_com_get! </span>{ GetFolder: IFileDialogVT, IShellItem;
@@ -431,10 +464,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::FOS&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>opts = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.GetOptions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>opts))
-		}.map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::FOS::from_raw(opts) })
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).GetOptions)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>opts)
+			},
+		).map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::FOS::from_raw(opts) })
 	}
 
 	<span class="macro">fn_com_get! </span>{ GetResult: IFileDialogVT, IShellItem;
@@ -447,58 +481,66 @@
 	<span class="doccomment">/// [`IFileDialog::SetClientGuid`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setclientguid)
 	/// method.
 	</span><span class="kw">fn </span>SetClientGuid(<span class="kw-2">&amp;</span><span class="self">self</span>, guid: <span class="kw-2">&amp;</span>GUID) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetClientGuid)(<span class="self">self</span>.ptr(), guid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetClientGuid)(
+					<span class="self">self</span>.ptr(),
+					guid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetDefaultExtension`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setdefaultextension)
 	/// method.
 	</span><span class="kw">fn </span>SetDefaultExtension(<span class="kw-2">&amp;</span><span class="self">self</span>, default_extension: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetDefaultExtension)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetDefaultExtension)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(default_extension).as_ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetDefaultFolder`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setdefaultfolder)
 	/// method.
 	</span><span class="kw">fn </span>SetDefaultFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetDefaultFolder)(<span class="self">self</span>.ptr(), si.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetDefaultFolder)(
+					<span class="self">self</span>.ptr(),
+					si.ptr(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetFileName`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfilename)
 	/// method.
 	</span><span class="kw">fn </span>SetFileName(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetFileName)(<span class="self">self</span>.ptr(), WString::from_str(name).as_ptr()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetFileName)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(name).as_ptr(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetFileNameLabel`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfilenamelabel)
 	/// method.
 	</span><span class="kw">fn </span>SetFileNameLabel(<span class="kw-2">&amp;</span><span class="self">self</span>, label: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetFileNameLabel)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetFileNameLabel)(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(label).as_ptr(),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetFileTypeIndex`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfiletypeindex)
@@ -506,10 +548,11 @@
 	///
 	/// **Note:** The index is one-based.
 	</span><span class="kw">fn </span>SetFileTypeIndex(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetFileTypeIndex)(<span class="self">self</span>.ptr(), index))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetFileTypeIndex)(<span class="self">self</span>.ptr(), index)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetFileTypes`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfiletypes)
@@ -522,7 +565,7 @@
 	/// use winsafe::IFileDialog;
 	///
 	/// let file_dlg: IFileDialog; // initialized somewhere
-	/// # let file_dlg = IFileDialog::from(unsafe { winsafe::ComPtr::null() });
+	/// # let file_dlg = unsafe { IFileDialog::null() };
 	///
 	/// file_dlg.SetFileTypes(&amp;[
 	///     (&quot;Documents&quot;, &quot;*.docx;*.txt&quot;),
@@ -550,56 +593,59 @@
 		specs_buf.iter_mut().enumerate()
 			.for_each(|(i, el)| com_dlgs[i].set_pszSpec(<span class="prelude-val">Some</span>(el)));
 
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetFileTypes)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetFileTypes)(
 					<span class="self">self</span>.ptr(),
 					filter_spec.len() <span class="kw">as _</span>,
 					com_dlgs.as_ptr() <span class="kw">as _</span>,
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetFolder`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setfolder)
 	/// method.
 	</span><span class="kw">fn </span>SetFolder(<span class="kw-2">&amp;</span><span class="self">self</span>, si: <span class="kw-2">&amp;</span><span class="kw">impl </span>shell_IShellItem) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetFolder)(<span class="self">self</span>.ptr(), si.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetFolder)(<span class="self">self</span>.ptr(), si.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetOkButtonLabel`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setokbuttonlabel)
 	/// method.
 	</span><span class="kw">fn </span>SetOkButtonLabel(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetOkButtonLabel)(<span class="self">self</span>.ptr(), WString::from_str(text).as_ptr()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetOkButtonLabel)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(text).as_ptr(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetOptions`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-setoptions)
 	/// method.
 	</span><span class="kw">fn </span>SetOptions(<span class="kw-2">&amp;</span><span class="self">self</span>, opts: co::FOS) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult((vt.SetOptions)(<span class="self">self</span>.ptr(), opts.raw()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetOptions)(<span class="self">self</span>.ptr(), opts.raw())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IFileDialog::SetTitle`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ifiledialog-settitle)
 	/// method.
 	</span><span class="kw">fn </span>SetTitle(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IFileDialogVT&gt;();
-			ok_to_hrresult(
-				(vt.SetTitle)(<span class="self">self</span>.ptr(), WString::from_str(text).as_ptr()),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IFileDialogVT&gt;(<span class="self">self</span>).SetTitle)(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(text).as_ptr(),
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

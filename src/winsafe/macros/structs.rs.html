@@ -287,6 +287,13 @@
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_macros)]
 
 </span><span class="doccomment">/// Implements `Default` trait by zeroing all fields.
@@ -541,20 +548,24 @@
 		</span><span class="kw">pub fn </span><span class="macro-nonterminal">$field</span>&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
 			<span class="kw">where </span>T: <span class="macro-nonterminal">$</span><span class="kw">trait</span>,
 		{
-			<span class="macro-nonterminal">self</span>.<span class="macro-nonterminal">$field</span>.as_opt().map(|ptr| {
-				<span class="kw">let </span>obj = std::mem::ManuallyDrop::new(T::from(<span class="kw-2">*</span>ptr)); <span class="comment">// won&#39;t release the stored pointer
-				</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
-				cloned
-			})
+			<span class="kw">if </span><span class="macro-nonterminal">self</span>.<span class="macro-nonterminal">$field</span>.is_null() {
+				<span class="prelude-val">None
+			</span>} <span class="kw">else </span>{
+				<span class="kw">let </span>obj = std::mem::ManuallyDrop::new( <span class="comment">// won&#39;t release the stored pointer
+					</span><span class="kw">unsafe </span>{ T::from_ptr(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>) },
+				);
+				<span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
+				<span class="prelude-val">Some</span>(cloned)
+			}
 		}
 
 		<span class="doccomment">/// Sets the COM object field, by cloning the underlying COM pointer.
 		</span><span class="kw">pub fn </span><span class="macro-nonterminal">$setter</span>&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, obj: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;)
 			<span class="kw">where </span>T: <span class="macro-nonterminal">$</span><span class="kw">trait</span>,
 		{
-			<span class="kw">let _ </span>= <span class="macro-nonterminal">T::from</span>(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>); <span class="comment">// if already set, call Release() immediately
+			<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ <span class="macro-nonterminal">T::from_ptr</span>(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>) }; <span class="comment">// if already set, call Release() immediately
 			</span><span class="self">self</span>.<span class="macro-nonterminal">$field </span>= obj.map_or_else(
-				|| <span class="kw">unsafe </span>{ <span class="kw">crate</span>::ComPtr::null() },
+				|| std::ptr::null_mut(),
 				|obj| {
 					<span class="kw">let </span><span class="kw-2">mut </span>cloned = T::clone(obj);
 					cloned.leak()
@@ -569,9 +580,12 @@
 	(<span class="macro-nonterminal">$field</span>:ident, <span class="macro-nonterminal">$name</span>:ident $(, <span class="macro-nonterminal">$life</span>:lifetime)<span class="kw-2">*</span>) =&gt; {
 		<span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$life</span>),<span class="kw-2">*</span>&gt; Drop <span class="kw">for </span><span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$life</span>),<span class="kw-2">*</span>&gt; {
 			<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-				<span class="kw">if let </span><span class="prelude-val">Some</span>(p) = <span class="self">self</span>.<span class="macro-nonterminal">$field</span>.as_opt() {
-					<span class="kw">let _ </span>= <span class="kw">crate</span>::IUnknown::from(<span class="kw-2">*</span>p); <span class="comment">// if a pointer is present, call Release() on it
-				</span>}
+				<span class="kw">if </span>!<span class="self">self</span>.<span class="macro-nonterminal">$field</span>.is_null() {
+					<span class="kw">let _ </span>= <span class="kw">unsafe </span>{
+						&lt;<span class="kw">crate</span>::IUnknown <span class="kw">as </span><span class="kw">crate</span>::prelude::ole_IUnknown&gt;
+							::from_ptr(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>) <span class="comment">// if pointer is present, call Release() on it
+					</span>};
+				}
 			}
 		}
 	};

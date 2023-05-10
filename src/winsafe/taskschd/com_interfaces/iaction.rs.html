@@ -57,13 +57,12 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
@@ -71,9 +70,9 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IActionVT {
 	<span class="kw">pub </span>IDispatchVT: IDispatchVT,
-	<span class="kw">pub </span>get_Id: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_Id: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_Id: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Id: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IAction: <span class="string">&quot;bae54997-48b1-4cbe-9965-d6be263ebea4&quot;</span>;
@@ -107,10 +106,9 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TASK_ACTION_TYPE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>at = co::TASK_ACTION_TYPE::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IActionVT&gt;();
-			ok_to_hrresult((vt.get_Type)(<span class="self">self</span>.ptr(), at.as_mut()))
-		}.map(|<span class="kw">_</span>| at)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IActionVT&gt;(<span class="self">self</span>).get_Type)(<span class="self">self</span>.ptr(), at.as_mut()) },
+		).map(|<span class="kw">_</span>| at)
 	}
 
 	<span class="macro">fn_bstr_set! </span>{ put_Id: IActionVT, id;

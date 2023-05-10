@@ -328,13 +328,13 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, ole};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{
-	ComPtr, COSERVERINFO, HrResult, IMoniker, IUnknown, MULTI_QI,
-};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{COSERVERINFO, HrResult, IMoniker, IUnknown, MULTI_QI};
 <span class="kw">use </span><span class="kw">crate</span>::ole::guard::CoUninitializeGuard;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
@@ -412,25 +412,28 @@
 ) -&gt; HrResult&lt;T&gt;
 	<span class="kw">where </span>T: ole_IUnknown,
 {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv_outer = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span>(<span class="kw-2">mut </span>queried, <span class="kw-2">mut </span>queried_outer) = <span class="kw">unsafe </span>{(
+		T::null(),
+		IUnknown::null(),
+	)};
+
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CoCreateInstance(
 				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				iunk_outer.as_ref()
-					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| <span class="kw-2">&amp;mut </span>ppv_outer <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| queried_outer.as_mut()),
 				cls_context.raw(),
 				<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| {
-			<span class="kw">if let </span><span class="prelude-val">Some</span>(iunk_outer) = iunk_outer {
-				<span class="kw-2">*</span>iunk_outer = IUnknown::from(ppv_outer); <span class="comment">// create outer Unknown if due
-			</span>}
-			T::from(ppv) <span class="comment">// return new Unknown-derived object
-		</span>})
-	}
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(iunk_outer) = iunk_outer {
+			<span class="kw-2">*</span>iunk_outer = queried_outer; <span class="comment">// create outer IUnknown if due
+		</span>}
+		queried <span class="comment">// return new IUnknown-derived object
+	</span>})
 }
 
 <span class="doccomment">/// [`CoCreateInstanceEx`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateinstanceex)
@@ -443,24 +446,25 @@
 	results: <span class="kw-2">&amp;mut </span>[MULTI_QI],
 ) -&gt; HrResult&lt;()&gt;
 {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv_outer = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried_outer = <span class="kw">unsafe </span>{ IUnknown::null() };
+
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CoCreateInstanceEx(
 				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				iunk_outer.as_ref()
-					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| <span class="kw-2">&amp;mut </span>ppv_outer <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
+					.map_or(std::ptr::null_mut(), |<span class="kw">_</span>| queried_outer.as_mut()),
 				cls_context.raw(),
 				server_info.map_or(std::ptr::null(), |si| si <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				results.len() <span class="kw">as _</span>,
 				results.as_mut_ptr() <span class="kw">as _</span>,
-			),
-		).map(|<span class="kw">_</span>| {
-			<span class="kw">if let </span><span class="prelude-val">Some</span>(iunk_outer) = iunk_outer {
-				<span class="kw-2">*</span>iunk_outer = IUnknown::from(ppv_outer); <span class="comment">// create outer Unknown if due
-			</span>}
-		})
-	}
+			)
+		},
+	).map(|<span class="kw">_</span>| {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(iunk_outer) = iunk_outer {
+			<span class="kw-2">*</span>iunk_outer = queried_outer; <span class="comment">// create outer IUnknown if due
+		</span>}
+	})
 }
 
 <span class="doccomment">/// [`CoInitializeEx`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-coinitializeex)
@@ -521,7 +525,7 @@
 	ok_to_hrresult(
 		<span class="kw">unsafe </span>{
 			ole::ffi::CoLockObjectExternal(
-				obj.ptr().<span class="number">0 </span><span class="kw">as _</span>,
+				obj.ptr(),
 				lock <span class="kw">as _</span>,
 				last_unlock_releases <span class="kw">as _</span>,
 			)
@@ -573,76 +577,76 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CreateClassMoniker(clsid: <span class="kw-2">&amp;</span>co::CLSID) -&gt; HrResult&lt;IMoniker&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CreateClassMoniker(
 				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| IMoniker::from(ppv))
-	}
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`CreateFileMoniker`](https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createfilemoniker)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CreateFileMoniker(path_name: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IMoniker&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CreateFileMoniker(
 				WString::from_str(path_name).as_ptr(),
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| IMoniker::from(ppv))
-	}
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`CreateItemMoniker`](https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createitemmoniker)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CreateItemMoniker(delim: <span class="kw-2">&amp;</span>str, item: <span class="kw-2">&amp;</span>str) -&gt; HrResult&lt;IMoniker&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CreateItemMoniker(
 				WString::from_str(delim).as_ptr(),
 				WString::from_str(item).as_ptr(),
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| IMoniker::from(ppv))
-	}
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`CreateObjrefMoniker`](https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createobjrefmoniker)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CreateObjrefMoniker(unk: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; HrResult&lt;IMoniker&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CreateObjrefMoniker(
-				unk.ptr().<span class="number">0 </span><span class="kw">as _</span>,
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| IMoniker::from(ppv))
-	}
+				unk.ptr(),
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`CreatePointerMoniker`](https://learn.microsoft.com/en-us/windows/win32/api/objbase/nf-objbase-createpointermoniker)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CreatePointerMoniker(unk: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; HrResult&lt;IMoniker&gt; {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			ole::ffi::CreatePointerMoniker(
-				unk.ptr().<span class="number">0 </span><span class="kw">as _</span>,
-				<span class="kw-2">&amp;mut </span>ppv <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| IMoniker::from(ppv))
-	}
+				unk.ptr(),
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`StringFromCLSID`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-stringfromclsid)

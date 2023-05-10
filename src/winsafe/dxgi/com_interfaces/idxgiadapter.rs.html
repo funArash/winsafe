@@ -166,24 +166,30 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::{DXGI_ADAPTER_DESC, IDXGIOutput};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::GUID;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::dxgi_IDXGIObject;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIObject, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDXGIObjectVT;
 
 <span class="doccomment">/// [`IDXGIAdapter`](crate::IDXGIAdapter) virtual table.
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDXGIAdapterVT {
 	<span class="kw">pub </span>IDXGIObjectVT: IDXGIObjectVT,
-	<span class="kw">pub </span>EnumOutputs: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetDesc: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>CheckInterfaceSupport: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*mut </span>i64) -&gt; HRES,
+	<span class="kw">pub </span>EnumOutputs: <span class="kw">fn</span>(COMPTR, u32, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetDesc: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>CheckInterfaceSupport: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*mut </span>i64) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDXGIAdapter: <span class="string">&quot;2411e7e1-12ac-4ccf-bd14-9798e8534dc0&quot;</span>;
@@ -219,7 +225,7 @@
 	/// use winsafe::IDXGIAdapter;
 	///
 	/// let adapter: IDXGIAdapter; // initialized somewhere
-	/// # let adapter = IDXGIAdapter::from(unsafe { winsafe::ComPtr::null() });
+	/// # let adapter = unsafe { IDXGIAdapter::null() };
 	///
 	/// for output in adapter.iter_outputs() {
 	///     let output = output?;
@@ -239,16 +245,15 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CheckInterfaceSupport(<span class="kw-2">&amp;</span><span class="self">self</span>, interface_name: <span class="kw-2">&amp;</span>GUID) -&gt; HrResult&lt;i64&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>umd_ver = i64::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIAdapterVT&gt;();
-			ok_to_hrresult(
-				(vt.CheckInterfaceSupport)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIAdapterVT&gt;(<span class="self">self</span>).CheckInterfaceSupport)(
 					<span class="self">self</span>.ptr(),
 					interface_name <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					<span class="kw-2">&amp;mut </span>umd_ver,
-				),
-			)
-		}.map(|<span class="kw">_</span>| umd_ver)
+				)
+			},
+		).map(|<span class="kw">_</span>| umd_ver)
 	}
 
 	<span class="doccomment">/// [`IDXGIAdapter::EnumOutputs`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-enumoutputs)
@@ -259,13 +264,16 @@
 	/// which is simpler.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>EnumOutputs(<span class="kw-2">&amp;</span><span class="self">self</span>, output: u32) -&gt; HrResult&lt;IDXGIOutput&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIAdapterVT&gt;();
-			ok_to_hrresult(
-				(vt.EnumOutputs)(<span class="self">self</span>.ptr(), output, <span class="kw-2">&amp;mut </span>ppv_queried),
-			).map(|<span class="kw">_</span>| IDXGIOutput::from(ppv_queried))
-		}
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDXGIOutput::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIAdapterVT&gt;(<span class="self">self</span>).EnumOutputs)(
+					<span class="self">self</span>.ptr(),
+					output,
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IDXGIAdapter::GetDesc`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-getdesc)
@@ -278,17 +286,21 @@
 	/// use winsafe::{IDXGIAdapter, DXGI_ADAPTER_DESC};
 	///
 	/// let adapter: IDXGIAdapter; // initialized somewhere
-	/// # let adapter = IDXGIAdapter::from(unsafe { winsafe::ComPtr::null() });
+	/// # let adapter = unsafe { IDXGIAdapter::null() };
 	/// let mut desc = DXGI_ADAPTER_DESC::default();
 	///
 	/// adapter.GetDesc(&amp;mut desc)?;
 	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>GetDesc(<span class="kw-2">&amp;</span><span class="self">self</span>, desc: <span class="kw-2">&amp;mut </span>DXGI_ADAPTER_DESC) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDXGIAdapterVT&gt;();
-			ok_to_hrresult((vt.GetDesc)(<span class="self">self</span>.ptr(), desc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDXGIAdapterVT&gt;(<span class="self">self</span>).GetDesc)(
+					<span class="self">self</span>.ptr(),
+					desc <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 }
 

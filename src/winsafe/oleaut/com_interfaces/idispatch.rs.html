@@ -96,14 +96,13 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{LCID, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::ITypeInfo;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -112,10 +111,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDispatchVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>GetTypeInfoCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>GetTypeInfo: <span class="kw">fn</span>(ComPtr, u32, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetIDsOfNames: <span class="kw">fn</span>(ComPtr, PCVOID, <span class="kw-2">*const </span>PCSTR, u32, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>Invoke: <span class="kw">fn</span>(ComPtr, i32, PCVOID, u32, u16, PVOID, PVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetTypeInfoCount: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetTypeInfo: <span class="kw">fn</span>(COMPTR, u32, u32, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetIDsOfNames: <span class="kw">fn</span>(COMPTR, PCVOID, <span class="kw-2">*const </span>PCSTR, u32, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>Invoke: <span class="kw">fn</span>(COMPTR, i32, PCVOID, u32, u16, PVOID, PVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDispatch: <span class="string">&quot;00020400-0000-0000-c000-000000000046&quot;</span>;
@@ -152,19 +151,18 @@
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 		<span class="kw">let </span><span class="kw-2">mut </span>ids = <span class="macro">vec!</span>[i32::default(); names.len()];
 
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
-			ok_to_hrresult(
-				(vt.GetIDsOfNames)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDispatchVT&gt;(<span class="self">self</span>).GetIDsOfNames)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>co::IID::default() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 					wptrs.as_ptr(),
 					names.len() <span class="kw">as _</span>,
 					lcid.into(),
 					ids.as_mut_ptr() <span class="kw">as _</span>,
-				),
-			)
-		}.map(|<span class="kw">_</span>| ids)
+				)
+			},
+		).map(|<span class="kw">_</span>| ids)
 	}
 
 	<span class="doccomment">/// [`IDispatch::GetTypeInfoCount`](https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfocount)
@@ -172,28 +170,28 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetTypeInfoCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
-			ok_to_hrresult((vt.GetTypeInfoCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
-		}.map(|<span class="kw">_</span>| count)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDispatchVT&gt;(<span class="self">self</span>).GetTypeInfoCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count)
+			},
+		).map(|<span class="kw">_</span>| count)
 	}
 
 	<span class="doccomment">/// [`IDispatch::GetTypeInfo`](https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-gettypeinfo)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetTypeInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info_type: u32, lcid: LCID) -&gt; HrResult&lt;ITypeInfo&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDispatchVT&gt;();
-			ok_to_hrresult(
-				(vt.GetTypeInfo)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ ITypeInfo::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDispatchVT&gt;(<span class="self">self</span>).GetTypeInfo)(
 					<span class="self">self</span>.ptr(),
 					info_type,
 					lcid.into(),
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| ITypeInfo::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 }
 </code></pre></div></section></main></body></html>

@@ -82,11 +82,16 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{oleaut_IDispatch, taskschd_ITrigger};
 <span class="kw">use </span><span class="kw">crate</span>::vt::ITriggerVT;
 
@@ -94,10 +99,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDailyTriggerVT {
 	<span class="kw">pub </span>ITriggerVT: ITriggerVT,
-	<span class="kw">pub </span>get_DaysInterval: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i16) -&gt; HRES,
-	<span class="kw">pub </span>put_DaysInterval: <span class="kw">fn</span>(ComPtr, i16) -&gt; HRES,
-	<span class="kw">pub </span>get_RandomDelay: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_RandomDelay: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_DaysInterval: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i16) -&gt; HRES,
+	<span class="kw">pub </span>put_DaysInterval: <span class="kw">fn</span>(COMPTR, i16) -&gt; HRES,
+	<span class="kw">pub </span>get_RandomDelay: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_RandomDelay: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDailyTrigger: <span class="string">&quot;126c5cd8-b288-41d5-8dbf-e491446adc5c&quot;</span>;
@@ -114,8 +119,8 @@
 	/// use winsafe::prelude::*;
 	/// use winsafe::{IDailyTrigger, ITrigger};
 	///
-	/// let trigger: IDailyTrigger; // initialized somewhere
-	/// # let trigger = ITrigger::from(unsafe { winsafe::ComPtr::null() });
+	/// let trigger: ITrigger; // initialized somewhere
+	/// # let trigger = unsafe { ITrigger::null() };
 	///
 	/// let daily_trigger = trigger
 	///     .QueryInterface::&lt;IDailyTrigger&gt;()?;
@@ -141,10 +146,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_DaysInterval(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i16&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>days = i16::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDailyTriggerVT&gt;();
-			ok_to_hrresult((vt.get_DaysInterval)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>days))
-		}.map(|<span class="kw">_</span>| days)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDailyTriggerVT&gt;(<span class="self">self</span>).get_DaysInterval)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>days,
+				)
+			},
+		).map(|<span class="kw">_</span>| days)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_RandomDelay: IDailyTriggerVT;
@@ -155,10 +164,11 @@
 	<span class="doccomment">/// [`IDailyTrigger::put_DaysInterval`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-idailytrigger-put_daysinterval)
 	/// method.
 	</span><span class="kw">fn </span>put_DaysInterval(<span class="kw-2">&amp;</span><span class="self">self</span>, days: i16) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDailyTriggerVT&gt;();
-			ok_to_hrresult((vt.put_DaysInterval)(<span class="self">self</span>.ptr(), days))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IDailyTriggerVT&gt;(<span class="self">self</span>).put_DaysInterval)(<span class="self">self</span>.ptr(), days)
+			},
+		)
 	}
 
 	<span class="macro">fn_bstr_set! </span>{ put_RandomDelay: IDailyTriggerVT, random_delay;

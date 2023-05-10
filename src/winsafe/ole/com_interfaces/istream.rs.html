@@ -140,9 +140,9 @@
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_ISequentialStream;
 <span class="kw">use </span><span class="kw">crate</span>::vt::ISequentialStreamVT;
 
@@ -150,15 +150,15 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IStreamVT {
 	<span class="kw">pub </span>ISequentialStreamVT: ISequentialStreamVT,
-	<span class="kw">pub </span>Seek: <span class="kw">fn</span>(ComPtr, i64, u32, <span class="kw-2">*mut </span>u64) -&gt; HRES,
-	<span class="kw">pub </span>SetSize: <span class="kw">fn</span>(ComPtr, u64) -&gt; HRES,
-	<span class="kw">pub </span>CopyTo: <span class="kw">fn</span>(ComPtr, ComPtr, u64, <span class="kw-2">*mut </span>u64, <span class="kw-2">*mut </span>u64) -&gt; HRES,
-	<span class="kw">pub </span>Commit: <span class="kw">fn</span>(ComPtr, u32)-&gt; HRES,
-	<span class="kw">pub </span>Revert: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>LockRegion: <span class="kw">fn</span>(ComPtr, u64, u64, u32) -&gt; HRES,
-	<span class="kw">pub </span>UnlockRegion: <span class="kw">fn</span>(ComPtr, u64, u64, u32) -&gt; HRES,
-	<span class="kw">pub </span>Stat: <span class="kw">fn</span>(ComPtr, PVOID, u32) -&gt; HRES,
-	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
+	<span class="kw">pub </span>Seek: <span class="kw">fn</span>(COMPTR, i64, u32, <span class="kw-2">*mut </span>u64) -&gt; HRES,
+	<span class="kw">pub </span>SetSize: <span class="kw">fn</span>(COMPTR, u64) -&gt; HRES,
+	<span class="kw">pub </span>CopyTo: <span class="kw">fn</span>(COMPTR, COMPTR, u64, <span class="kw-2">*mut </span>u64, <span class="kw-2">*mut </span>u64) -&gt; HRES,
+	<span class="kw">pub </span>Commit: <span class="kw">fn</span>(COMPTR, u32)-&gt; HRES,
+	<span class="kw">pub </span>Revert: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>LockRegion: <span class="kw">fn</span>(COMPTR, u64, u64, u32) -&gt; HRES,
+	<span class="kw">pub </span>UnlockRegion: <span class="kw">fn</span>(COMPTR, u64, u64, u32) -&gt; HRES,
+	<span class="kw">pub </span>Stat: <span class="kw">fn</span>(COMPTR, PVOID, u32) -&gt; HRES,
+	<span class="kw">pub </span>Clone: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IStream: <span class="string">&quot;0000000c-0000-0000-c000-000000000046&quot;</span>;
@@ -179,10 +179,7 @@
 	/// method.
 	</span><span class="kw">fn </span>Commit(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::STGC) -&gt; HrResult&lt;()&gt; {
 		ok_to_hrresult(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.Commit)(<span class="self">self</span>.ptr(), flags.raw())
-			},
+			<span class="kw">unsafe </span>{ (vt::&lt;IStreamVT&gt;(<span class="self">self</span>).Commit)(<span class="self">self</span>.ptr(), flags.raw()) },
 		)
 	}
 
@@ -196,8 +193,7 @@
 		<span class="kw">let </span>(<span class="kw-2">mut </span>read, <span class="kw-2">mut </span>written) = (u64::default(), u64::default());
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.CopyTo)(
+				(vt::&lt;IStreamVT&gt;(<span class="self">self</span>).CopyTo)(
 					<span class="self">self</span>.ptr(),
 					dest.ptr(),
 					num_bytes,
@@ -219,8 +215,12 @@
 	{
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.LockRegion)(<span class="self">self</span>.ptr(), offset, length, lock_type.raw())
+				(vt::&lt;IStreamVT&gt;(<span class="self">self</span>).LockRegion)(
+					<span class="self">self</span>.ptr(),
+					offset,
+					length,
+					lock_type.raw(),
+				)
 			},
 		)
 	}
@@ -228,12 +228,7 @@
 	<span class="doccomment">/// [`IStream::Revert`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-revert)
 	/// method.
 	</span><span class="kw">fn </span>Revert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		ok_to_hrresult(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.Revert)(<span class="self">self</span>.ptr())
-			},
-		)
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IStreamVT&gt;(<span class="self">self</span>).Revert)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IStream::Seek`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-istream-seek)
@@ -246,8 +241,12 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>new_off = u64::default();
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.Seek)(<span class="self">self</span>.ptr(), displacement, origin.raw(), <span class="kw-2">&amp;mut </span>new_off)
+				(vt::&lt;IStreamVT&gt;(<span class="self">self</span>).Seek)(
+					<span class="self">self</span>.ptr(),
+					displacement,
+					origin.raw(),
+					<span class="kw-2">&amp;mut </span>new_off,
+				)
 			},
 		).map(|<span class="kw">_</span>| new_off)
 	}
@@ -256,10 +255,7 @@
 	/// method.
 	</span><span class="kw">fn </span>SetSize(<span class="kw-2">&amp;</span><span class="self">self</span>, new_size: u64) -&gt; HrResult&lt;()&gt; {
 		ok_to_hrresult(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.SetSize)(<span class="self">self</span>.ptr(), new_size)
-			},
+			<span class="kw">unsafe </span>{ (vt::&lt;IStreamVT&gt;(<span class="self">self</span>).SetSize)(<span class="self">self</span>.ptr(), new_size) },
 		)
 	}
 
@@ -270,8 +266,12 @@
 	{
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IStreamVT&gt;();
-				(vt.UnlockRegion)(<span class="self">self</span>.ptr(), offset, length, lock_type.raw())
+				(vt::&lt;IStreamVT&gt;(<span class="self">self</span>).UnlockRegion)(
+					<span class="self">self</span>.ptr(),
+					offset,
+					length,
+					lock_type.raw(),
+				)
 			},
 		)
 	}

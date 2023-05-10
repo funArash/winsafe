@@ -160,11 +160,16 @@
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::IShellItem;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -173,13 +178,13 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IShellItemArrayVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>BindToHandler: <span class="kw">fn</span>(ComPtr, PVOID, PCVOID, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetPropertyStore: <span class="kw">fn</span>(ComPtr, u32, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetPropertyDescriptionList: <span class="kw">fn</span>(ComPtr, PVOID, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetAttributes: <span class="kw">fn</span>(ComPtr, u32, u32, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>GetItemAt: <span class="kw">fn</span>(ComPtr, u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>EnumItems: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PVOID) -&gt; HRES,
+	<span class="kw">pub </span>BindToHandler: <span class="kw">fn</span>(COMPTR, PVOID, PCVOID, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetPropertyStore: <span class="kw">fn</span>(COMPTR, u32, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetPropertyDescriptionList: <span class="kw">fn</span>(COMPTR, PVOID, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetAttributes: <span class="kw">fn</span>(COMPTR, u32, u32, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>GetCount: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>GetItemAt: <span class="kw">fn</span>(COMPTR, u32, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>EnumItems: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PVOID) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IShellItemArray: <span class="string">&quot;b63ea76d-1f85-456f-a19c-48159efa858b&quot;</span>;
@@ -218,7 +223,7 @@
 	/// use winsafe::{co, IShellItemArray};
 	///
 	/// let ish_arr: IShellItemArray; // initialized somewhere
-	/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });
+	/// # let ish_arr = unsafe { IShellItemArray::null() };
 	///
 	/// for ish_item in ish_arr.iter()? {
 	///     let ish_item = ish_item?;
@@ -236,7 +241,7 @@
 	/// use winsafe::{co, HrResult, IShellItemArray};
 	///
 	/// let ish_arr: IShellItemArray; // initialized somewhere
-	/// # let ish_arr = IShellItemArray::from(unsafe { winsafe::ComPtr::null() });
+	/// # let ish_arr = unsafe { IShellItemArray::null() };
 	///
 	/// let paths = ish_arr.iter()?
 	///     .map(|shi|
@@ -259,10 +264,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IShellItemArrayVT&gt;();
-			ok_to_hrresult((vt.GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count))
-		}.map(|<span class="kw">_</span>| count)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IShellItemArrayVT&gt;(<span class="self">self</span>).GetCount)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count)
+			},
+		).map(|<span class="kw">_</span>| count)
 	}
 
 	<span class="doccomment">/// [`IShellItemArray::GetItemAt`](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemarray-getitemat)
@@ -272,12 +278,16 @@
 	/// [`IShellItemArrayT::iter`](crate::prelude::shell_IShellItemArray::iter).
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetItemAt(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; HrResult&lt;IShellItem&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IShellItemArrayVT&gt;();
-			ok_to_hrresult((vt.GetItemAt)(<span class="self">self</span>.ptr(), index, <span class="kw-2">&amp;mut </span>ppv_queried))
-				.map(|<span class="kw">_</span>| IShellItem::from(ppv_queried))
-		}
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IShellItem::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IShellItemArrayVT&gt;(<span class="self">self</span>).GetItemAt)(
+					<span class="self">self</span>.ptr(),
+					index,
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 }
 

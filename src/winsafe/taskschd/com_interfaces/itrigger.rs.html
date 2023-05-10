@@ -118,12 +118,13 @@
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{IntUnderlying, oleaut_IDispatch};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
@@ -131,19 +132,19 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ITriggerVT {
 	<span class="kw">pub </span>IDispatchVT: IDispatchVT,
-	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>get_Id: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_Id: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_Repetition: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>put_Repetition: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>get_ExecutionTimeLimit: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_ExecutionTimeLimit: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_StartBoundary: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_StartBoundary: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_EndBoundary: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_EndBoundary: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_Enabled: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i16) -&gt; HRES,
-	<span class="kw">pub </span>put_Enabled: <span class="kw">fn</span>(ComPtr, i16) -&gt; HRES,
+	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_Id: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Id: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Repetition: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Repetition: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>get_ExecutionTimeLimit: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_ExecutionTimeLimit: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_StartBoundary: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_StartBoundary: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_EndBoundary: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_EndBoundary: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Enabled: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i16) -&gt; HRES,
+	<span class="kw">pub </span>put_Enabled: <span class="kw">fn</span>(COMPTR, i16) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ITrigger: <span class="string">&quot;09941815-ea89-4b5b-89e0-2a773801fac3&quot;</span>;
@@ -172,10 +173,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>enabled = i16::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITriggerVT&gt;();
-			ok_to_hrresult((vt.get_Enabled)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>enabled))
-		}.map(|<span class="kw">_</span>| enabled != <span class="number">0</span>)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITriggerVT&gt;(<span class="self">self</span>).get_Enabled)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>enabled)
+			},
+		).map(|<span class="kw">_</span>| enabled != <span class="number">0</span>)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_EndBoundary: ITriggerVT;
@@ -203,19 +205,19 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::TASK_TRIGGER_TYPE2&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ty = co::TASK_TRIGGER_TYPE2::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITriggerVT&gt;();
-			ok_to_hrresult((vt.get_Type)(<span class="self">self</span>.ptr(), ty.as_mut()))
-		}.map(|<span class="kw">_</span>| ty)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;ITriggerVT&gt;(<span class="self">self</span>).get_Type)(<span class="self">self</span>.ptr(), ty.as_mut()) },
+		).map(|<span class="kw">_</span>| ty)
 	}
 
 	<span class="doccomment">/// [`ITrigger::put_Enabled`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-itrigger-put_enabled)
 	/// method.
 	</span><span class="kw">fn </span>put_Enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, enabled: bool) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;ITriggerVT&gt;();
-			ok_to_hrresult((vt.put_Enabled)(<span class="self">self</span>.ptr(), enabled <span class="kw">as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;ITriggerVT&gt;(<span class="self">self</span>).put_Enabled)(<span class="self">self</span>.ptr(), enabled <span class="kw">as _</span>)
+			},
+		)
 	}
 
 	<span class="macro">fn_bstr_set! </span>{ put_EndBoundary: ITriggerVT, end;

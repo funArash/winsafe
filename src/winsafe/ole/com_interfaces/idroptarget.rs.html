@@ -114,19 +114,13 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::MAKEQWORD;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IDataObject, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::POINT;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -135,10 +129,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IDropTargetVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>DragEnter: <span class="kw">fn</span>(ComPtr, ComPtr, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>DragOver: <span class="kw">fn</span>(ComPtr, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>DragLeave: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Drop: <span class="kw">fn</span>(ComPtr, ComPtr, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>DragEnter: <span class="kw">fn</span>(COMPTR, COMPTR, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>DragOver: <span class="kw">fn</span>(COMPTR, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>DragLeave: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Drop: <span class="kw">fn</span>(COMPTR, COMPTR, u32, u64, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IDropTarget: <span class="string">&quot;00000122-0000-0000-c000-000000000046&quot;</span>;
@@ -173,8 +167,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>effect_buf = effect;
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDropTargetVT&gt;();
-				(vt.DragEnter)(
+				(vt::&lt;IDropTargetVT&gt;(<span class="self">self</span>).DragEnter)(
 					<span class="self">self</span>.ptr(),
 					data_obj.ptr(),
 					key_state.raw() <span class="kw">as _</span>,
@@ -189,10 +182,7 @@
 	/// method.
 	</span><span class="kw">fn </span>DragLeave(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
 		ok_to_hrresult(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDropTargetVT&gt;();
-				(vt.DragLeave)(<span class="self">self</span>.ptr())
-			},
+			<span class="kw">unsafe </span>{ (vt::&lt;IDropTargetVT&gt;(<span class="self">self</span>).DragLeave)(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -207,8 +197,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>effect_buf = effect;
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDropTargetVT&gt;();
-				(vt.DragOver)(
+				(vt::&lt;IDropTargetVT&gt;(<span class="self">self</span>).DragOver)(
 					<span class="self">self</span>.ptr(),
 					key_state.raw() <span class="kw">as _</span>,
 					MAKEQWORD(pt.x <span class="kw">as _</span>, pt.y <span class="kw">as _</span>),
@@ -230,8 +219,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>effect_buf = effect;
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IDropTargetVT&gt;();
-				(vt.Drop)(
+				(vt::&lt;IDropTargetVT&gt;(<span class="self">self</span>).Drop)(
 					<span class="self">self</span>.ptr(),
 					data_obj.ptr(),
 					key_state.raw() <span class="kw">as _</span>,

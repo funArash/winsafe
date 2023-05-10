@@ -19,9 +19,23 @@
 <a href="#19" id="19">19</a>
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::HRES;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
+
+<span class="doccomment">/// Returns a reference to the virtual table of the COM object.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>vt&lt;T&gt;(obj: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; <span class="kw-2">&amp;</span>T {
+	<span class="kw">let </span>ppvt = obj.ptr() <span class="kw">as </span><span class="kw-2">*mut *mut </span>T;
+	<span class="kw-2">&amp;**</span>ppvt
+}
 
 <span class="doccomment">/// If value is `S_OK` yields `Ok()`, othersize `Err(hresult)`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>ok_to_hrresult(hr: HRES) -&gt; HrResult&lt;()&gt; {

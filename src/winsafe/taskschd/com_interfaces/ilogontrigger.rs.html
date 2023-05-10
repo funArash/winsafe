@@ -73,8 +73,8 @@
 <a href="#73" id="73">73</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCSTR, PSTR};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{oleaut_IDispatch, taskschd_ITrigger};
 <span class="kw">use </span><span class="kw">crate</span>::vt::ITriggerVT;
 
@@ -82,10 +82,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>ILogonTriggerVT {
 	<span class="kw">pub </span>ITriggerVT: ITriggerVT,
-	<span class="kw">pub </span>get_Delay: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_Delay: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
-	<span class="kw">pub </span>get_UserId: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>put_UserId: <span class="kw">fn</span>(ComPtr, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_Delay: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_Delay: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
+	<span class="kw">pub </span>get_UserId: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>put_UserId: <span class="kw">fn</span>(COMPTR, PCSTR) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ ILogonTrigger: <span class="string">&quot;72dade38-fae4-4b3e-baf4-5d009af02b1c&quot;</span>;
@@ -102,10 +102,10 @@
 	/// use winsafe::prelude::*;
 	/// use winsafe::{ILogonTrigger, ITrigger};
 	///
-	/// let trigger: ILogonTrigger; // initialized somewhere
-	/// # let trigger = ITrigger::from(unsafe { winsafe::ComPtr::null() });
+	/// let trigger: ITrigger; // initialized somewhere
+	/// # let trigger = unsafe { ITrigger::null() };
 	///
-	/// let Logon_trigger = trigger
+	/// let logon_trigger = trigger
 	///     .QueryInterface::&lt;ILogonTrigger&gt;()?;
 	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 	/// ```

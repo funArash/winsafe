@@ -212,25 +212,14 @@
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dshow::decl::{AM_MEDIA_TYPE, IEnumMediaTypes, PIN_INFO};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{HRES, PCVOID, PSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
 
@@ -238,21 +227,21 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IPinVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(ComPtr, ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>ReceiveConnection: <span class="kw">fn</span>(ComPtr, ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>ConnectedTo: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>ConnectionMediaType: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>QueryPinInfo: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>QueryDirection: <span class="kw">fn</span>(ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>QueryId: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>QueryAccept: <span class="kw">fn</span>(ComPtr, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>EnumMediaTypes: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>QueryInternalConnections: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>EndOfStream: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>BeginFlush: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>EndFlush: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>NewSegment: <span class="kw">fn</span>(ComPtr, i64, i64, f64) -&gt; HRES,
+	<span class="kw">pub </span>Connect: <span class="kw">fn</span>(COMPTR, COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>ReceiveConnection: <span class="kw">fn</span>(COMPTR, COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>Disconnect: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>ConnectedTo: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>ConnectionMediaType: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryPinInfo: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryDirection: <span class="kw">fn</span>(COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>QueryId: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>QueryAccept: <span class="kw">fn</span>(COMPTR, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>EnumMediaTypes: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>QueryInternalConnections: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>EndOfStream: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>BeginFlush: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>EndFlush: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>NewSegment: <span class="kw">fn</span>(COMPTR, i64, i64, f64) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IPin: <span class="string">&quot;56a86891-0ad4-11ce-b03a-0020af0ba770&quot;</span>;
@@ -272,10 +261,7 @@
 	<span class="doccomment">/// [`IPin::BeginFlush`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-beginflush)
 	/// method.
 	</span><span class="kw">fn </span>BeginFlush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.BeginFlush)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IPinVT&gt;(<span class="self">self</span>).BeginFlush)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IPin::Connect`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connect)
@@ -283,16 +269,15 @@
 	</span><span class="kw">fn </span>Connect(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		receive_pin: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IPin, mt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AM_MEDIA_TYPE&gt;) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult(
-				(vt.Connect)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).Connect)(
 					<span class="self">self</span>.ptr(),
 					receive_pin.ptr(),
 					mt.map_or(std::ptr::null(), |amt| amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="macro">fn_com_get! </span>{ ConnectedTo: IPinVT, IPin;
@@ -303,39 +288,32 @@
 	<span class="doccomment">/// [`IPin::ConnectionMediaType`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-connectionmediatype)
 	/// method.
 	</span><span class="kw">fn </span>ConnectionMediaType(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: <span class="kw-2">&amp;mut </span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult(
-				(vt.ConnectionMediaType)(<span class="self">self</span>.ptr(), amt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-			)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).ConnectionMediaType)(
+					<span class="self">self</span>.ptr(),
+					amt <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPin::Disconnect`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-disconnect)
 	/// method.
 	</span><span class="kw">fn </span>Disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.Disconnect)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IPinVT&gt;(<span class="self">self</span>).Disconnect)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IPin::EndFlush`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endflush)
 	/// method.
 	</span><span class="kw">fn </span>EndFlush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.EndFlush)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IPinVT&gt;(<span class="self">self</span>).EndFlush)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`IPin::EndOfStream`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-endofstream)
 	/// method.
 	</span><span class="kw">fn </span>EndOfStream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.EndOfStream)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(<span class="kw">unsafe </span>{ (vt::&lt;IPinVT&gt;(<span class="self">self</span>).EndOfStream)(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="macro">fn_com_get! </span>{ EnumMediaTypes: IPinVT, IEnumMediaTypes;
@@ -346,20 +324,22 @@
 	<span class="doccomment">/// [`IPin::NewSegment`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-newsegment)
 	/// method.
 	</span><span class="kw">fn </span>NewSegment(<span class="kw-2">&amp;</span><span class="self">self</span>, start: i64, stop: i64, rate: f64) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.NewSegment)(<span class="self">self</span>.ptr(), start, stop, rate))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).NewSegment)(<span class="self">self</span>.ptr(), start, stop, rate)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPin::QueryAccept`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryaccept)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>QueryAccept(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			okfalse_to_hrresult((vt.QueryAccept)(<span class="self">self</span>.ptr(), amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryAccept)(<span class="self">self</span>.ptr(), amt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPin::QueryDirection`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-querydirection)
@@ -367,12 +347,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>QueryDirection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::PIN_DIRECTION&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pin_dir = co::PIN_DIRECTION::INPUT;
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult(
-				(vt.QueryDirection)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pin_dir <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
-			).map(|<span class="kw">_</span>| pin_dir)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryDirection)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;mut </span>pin_dir <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| pin_dir)
 	}
 
 	<span class="doccomment">/// [`IPin::QueryId`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-queryid)
@@ -380,10 +362,9 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>QueryId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;String&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.QueryId)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr))
-		}.map(|<span class="kw">_</span>| {
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryId)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>pstr) },
+		).map(|<span class="kw">_</span>| {
 			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
 			CoTaskMemFree(pstr <span class="kw">as _</span>);
 			name.to_string()
@@ -395,40 +376,38 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>QueryInternalConnections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;Vec&lt;IPin&gt;&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			<span class="kw">if let </span><span class="prelude-val">Err</span>(e) = ok_to_hrresult(
-				(vt.QueryInternalConnections)(
+		<span class="kw">if let </span><span class="prelude-val">Err</span>(e) = ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryInternalConnections)(
 					<span class="self">self</span>.ptr(),
 					std::ptr::null_mut(),
 					<span class="kw-2">&amp;mut </span>count <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-				),
-			) {
-				<span class="kw">return </span><span class="prelude-val">Err</span>(e);
-			}
-
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = <span class="macro">vec!</span>[ComPtr::null(); count <span class="kw">as _</span>];
-			ok_to_hrresult(
-				(vt.QueryInternalConnections)(
-					<span class="self">self</span>.ptr(),
-					ppv_queried.as_mut_ptr(),
-					<span class="kw-2">&amp;mut </span>count <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-				),
-			).map(|<span class="kw">_</span>| {
-				ppv_queried.into_iter()
-					.map(|ppv| IPin::from(ppv))
-					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-			})
+				)
+			},
+		) {
+			<span class="kw">return </span><span class="prelude-val">Err</span>(e);
 		}
+
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="macro">vec!</span>[<span class="kw">unsafe </span>{ IPin::null() }];
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryInternalConnections)(
+					<span class="self">self</span>.ptr(),
+					queried.as_mut_ptr() <span class="kw">as _</span>,
+					<span class="kw-2">&amp;mut </span>count <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IPin::QueryPinInfo`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-querypininfo)
 	/// method.
 	</span><span class="kw">fn </span>QueryPinInfo(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;mut </span>PIN_INFO) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult((vt.QueryPinInfo)(<span class="self">self</span>.ptr(), info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).QueryPinInfo)(<span class="self">self</span>.ptr(), info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPin::ReceiveConnection`](https://learn.microsoft.com/en-us/windows/win32/api/strmif/nf-strmif-ipin-receiveconnection)
@@ -436,16 +415,15 @@
 	</span><span class="kw">fn </span>ReceiveConnection(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		connector: <span class="kw-2">&amp;</span><span class="kw">impl </span>dshow_IPin, mt: <span class="kw-2">&amp;</span>AM_MEDIA_TYPE) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPinVT&gt;();
-			ok_to_hrresult(
-				(vt.ReceiveConnection)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPinVT&gt;(<span class="self">self</span>).ReceiveConnection)(
 					<span class="self">self</span>.ptr(),
 					connector.ptr(),
 					mt <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 }
 </code></pre></div></section></main></body></html>

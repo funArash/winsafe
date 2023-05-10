@@ -201,12 +201,13 @@
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
 <a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE, HRES, PCVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, COMPTR, HANDLE, HRES, PCVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{HBITMAP, HDC, POINT, RECT, SIZE};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IUnknownVT;
@@ -215,20 +216,20 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IPictureVT {
 	<span class="kw">pub </span>IUnknownVT: IUnknownVT,
-	<span class="kw">pub </span>get_Handle: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>get_hPal: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i16) -&gt; HRES,
-	<span class="kw">pub </span>get_Width: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i32) -&gt; HRES,
-	<span class="kw">pub </span>get_Height: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>i32) -&gt; HRES,
-	<span class="kw">pub </span>Render: <span class="kw">fn</span>(ComPtr, HANDLE, i32, i32, i32, i32, i32, i32, i32, i32, PCVOID) -&gt; HRES,
-	<span class="kw">pub </span>set_hPal: <span class="kw">fn</span>(ComPtr, u32) -&gt; HRES,
-	<span class="kw">pub </span>get_CurDC: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>SelectPicture: <span class="kw">fn</span>(ComPtr, HANDLE, <span class="kw-2">*mut </span>HANDLE, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
-	<span class="kw">pub </span>get_KeepOriginalFormat: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>BOOL) -&gt; HRES,
-	<span class="kw">pub </span>put_KeepOriginalFormat: <span class="kw">fn</span>(ComPtr, BOOL) -&gt; HRES,
-	<span class="kw">pub </span>PictureChanged: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>SaveAsFile: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr, BOOL, <span class="kw-2">*mut </span>i32) -&gt; HRES,
-	<span class="kw">pub </span>get_Attributes: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_Handle: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_hPal: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>get_Type: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i16) -&gt; HRES,
+	<span class="kw">pub </span>get_Width: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>get_Height: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>Render: <span class="kw">fn</span>(COMPTR, HANDLE, i32, i32, i32, i32, i32, i32, i32, i32, PCVOID) -&gt; HRES,
+	<span class="kw">pub </span>set_hPal: <span class="kw">fn</span>(COMPTR, u32) -&gt; HRES,
+	<span class="kw">pub </span>get_CurDC: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>SelectPicture: <span class="kw">fn</span>(COMPTR, HANDLE, <span class="kw-2">*mut </span>HANDLE, <span class="kw-2">*mut </span>HANDLE) -&gt; HRES,
+	<span class="kw">pub </span>get_KeepOriginalFormat: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>BOOL) -&gt; HRES,
+	<span class="kw">pub </span>put_KeepOriginalFormat: <span class="kw">fn</span>(COMPTR, BOOL) -&gt; HRES,
+	<span class="kw">pub </span>PictureChanged: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>SaveAsFile: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR, BOOL, <span class="kw-2">*mut </span>i32) -&gt; HRES,
+	<span class="kw">pub </span>get_Attributes: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IPicture: <span class="string">&quot;7bf80980-bf32-101a-8bbb-00aa00300cab&quot;</span>;
@@ -256,10 +257,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_CurDC(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;HDC&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>hdc = HDC::NULL;
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.get_CurDC)(<span class="self">self</span>.ptr(), hdc.as_mut()))
-		}.map(|<span class="kw">_</span>| hdc)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPictureVT&gt;(<span class="self">self</span>).get_CurDC)(<span class="self">self</span>.ptr(), hdc.as_mut())
+			},
+		).map(|<span class="kw">_</span>| hdc)
 	}
 
 	<span class="doccomment">/// [`IPicture::get_Height`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-get_height)
@@ -289,10 +291,11 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>h = i32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.get_Height)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>h))
-		}.map(|<span class="kw">_</span>| h)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPictureVT&gt;(<span class="self">self</span>).get_Height)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>h)
+			},
+		).map(|<span class="kw">_</span>| h)
 	}
 
 	<span class="doccomment">/// [`IPicture::get_Type`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-get_type)
@@ -300,10 +303,9 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;co::PICTYPE&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>ty = i16::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.get_Type)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ty))
-		}.map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::PICTYPE::from_raw(ty) })
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IPictureVT&gt;(<span class="self">self</span>).get_Type)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>ty) },
+		).map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::PICTYPE::from_raw(ty) })
 	}
 
 	<span class="doccomment">/// [`IPicture::get_Width`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-get_width)
@@ -333,28 +335,30 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>get_Width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;i32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>w = i32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.get_Width)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>w))
-		}.map(|<span class="kw">_</span>| w)
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IPictureVT&gt;(<span class="self">self</span>).get_Width)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>w) },
+		).map(|<span class="kw">_</span>| w)
 	}
 
 	<span class="doccomment">/// [`IPicture::PictureChanged`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-picturechanged)
 	/// method.
 	</span><span class="kw">fn </span>PictureChanged(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.PictureChanged)(<span class="self">self</span>.ptr()))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IPictureVT&gt;(<span class="self">self</span>).PictureChanged)(<span class="self">self</span>.ptr()) },
+		)
 	}
 
 	<span class="doccomment">/// [`IPicture::put_KeepOriginalFormat`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-put_keeporiginalformat)
 	/// method.
 	</span><span class="kw">fn </span>put_KeepOriginalFormat(<span class="kw-2">&amp;</span><span class="self">self</span>, keep: bool) -&gt; HrResult&lt;()&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult((vt.put_KeepOriginalFormat)(<span class="self">self</span>.ptr(), keep <span class="kw">as _</span>))
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPictureVT&gt;(<span class="self">self</span>).put_KeepOriginalFormat)(
+					<span class="self">self</span>.ptr(),
+					keep <span class="kw">as _</span>,
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPicture::Render`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-render)
@@ -368,10 +372,9 @@
 		metafile_bounds: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RECT&gt;,
 	) -&gt; HrResult&lt;()&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult(
-				(vt.Render)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPictureVT&gt;(<span class="self">self</span>).Render)(
 					<span class="self">self</span>.ptr(),
 					hdc.as_ptr(),
 					dest_pt.x, dest_pt.y,
@@ -380,9 +383,9 @@
 					src_offset.map_or(<span class="number">0</span>, |off| off.y),
 					src_extent.cx, src_extent.cy,
 					metafile_bounds.map_or(std::ptr::null_mut(), |rc| rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-				),
-			)
-		}
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IPicture::SelectPicture`](https://learn.microsoft.com/en-us/windows/win32/api/ocidl/nf-ocidl-ipicture-selectpicture)
@@ -391,17 +394,16 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hdc_out = HDC::NULL;
 		<span class="kw">let </span><span class="kw-2">mut </span>hbmp = HBITMAP::NULL;
 
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPictureVT&gt;();
-			ok_to_hrresult(
-				(vt.SelectPicture)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IPictureVT&gt;(<span class="self">self</span>).SelectPicture)(
 					<span class="self">self</span>.ptr(),
 					hdc.as_ptr(),
 					hdc_out.as_mut(),
 					hbmp.as_mut(),
-				),
-			)
-		}.map(|<span class="kw">_</span>| (hdc_out, hbmp))
+				)
+			},
+		).map(|<span class="kw">_</span>| (hdc_out, hbmp))
 	}
 }
 </code></pre></div></section></main></body></html>

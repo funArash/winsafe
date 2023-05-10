@@ -336,8 +336,6 @@
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, shell};
@@ -345,12 +343,10 @@
 	GetLastError, HACCESSTOKEN, HLOCAL, SysResult, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::LocalFreeGuard;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, MAX_PATH, ptr_to_sysresult,
-};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult, IStream};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{bool_to_sysresult, MAX_PATH, ptr_to_sysresult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{CoTaskMemFree, HrResult, IStream};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IBindCtx, shell_IShellItem};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, ole_IBindCtx, ole_IUnknown, shell_IShellItem};
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::{
 	NOTIFYICONDATA, SHFILEINFO, SHFILEOPSTRUCT, SHSTOCKICONINFO,
 };
@@ -528,17 +524,17 @@
 ) -&gt; HrResult&lt;T&gt;
 	<span class="kw">where </span>T: shell_IShellItem,
 {
-	<span class="kw">unsafe </span>{
-		<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-		ok_to_hrresult(
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+	ok_to_hrresult(
+		<span class="kw">unsafe </span>{
 			shell::ffi::SHCreateItemFromParsingName(
 				WString::from_str(file_or_folder_path).as_ptr(),
-				bind_ctx.map_or(std::ptr::null_mut(), |i| i.ptr().<span class="number">0 </span><span class="kw">as _</span>),
+				bind_ctx.map_or(std::ptr::null_mut(), |i| i.ptr() <span class="kw">as _</span>),
 				<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				<span class="kw-2">&amp;mut </span>ppv_queried <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			),
-		).map(|<span class="kw">_</span>| T::from(ppv_queried))
-	}
+				queried.as_mut(),
+			)
+		},
+	).map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`SHCreateMemStream`](https://learn.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-shcreatememstream)
@@ -566,7 +562,7 @@
 	<span class="kw">if </span>p.is_null() {
 		<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
 	} <span class="kw">else </span>{
-		<span class="prelude-val">Ok</span>(IStream::from(ComPtr(p <span class="kw">as _</span>)))
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ IStream::from_ptr(p) })
 	}
 }
 

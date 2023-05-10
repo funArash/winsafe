@@ -327,13 +327,18 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{FILETIME, WString};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HRES, PCSTR, PCVOID, PSTR, PVOID};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, CoTaskMemFree, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, COMPTR, HRES, PCSTR, PCVOID, PSTR, PVOID};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{CoTaskMemFree, HrResult};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	IntUnderlying, ole_IBindCtx, ole_IPersist, ole_IPersistStream, ole_IUnknown,
 };
@@ -343,21 +348,21 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IMonikerVT {
 	<span class="kw">pub </span>IPersistStreamVT: IPersistStreamVT,
-	<span class="kw">pub </span>BindToObject: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>BindToStorage: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCVOID, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Reduce: <span class="kw">fn</span>(ComPtr, ComPtr, u32, <span class="kw-2">*mut </span>ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>ComposeWith: <span class="kw">fn</span>(ComPtr, ComPtr, BOOL, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Enum: <span class="kw">fn</span>(ComPtr, BOOL, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>IsEqual: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Hash: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
-	<span class="kw">pub </span>IsRunning: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetTimeOfLastChange: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PVOID) -&gt; HRES,
-	<span class="kw">pub </span>Inverse: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>CommonPrefixWith: <span class="kw">fn</span>(ComPtr, ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>RelativePathTo: <span class="kw">fn</span>(ComPtr, ComPtr, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>GetDisplayName: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
-	<span class="kw">pub </span>ParseDisplayName: <span class="kw">fn</span>(ComPtr, ComPtr, ComPtr, PCSTR, <span class="kw-2">*mut </span>u32, <span class="kw-2">*mut </span>ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>IsSystemMoniker: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>BindToObject: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>BindToStorage: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, PCVOID, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Reduce: <span class="kw">fn</span>(COMPTR, COMPTR, u32, <span class="kw-2">*mut </span>COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>ComposeWith: <span class="kw">fn</span>(COMPTR, COMPTR, BOOL, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Enum: <span class="kw">fn</span>(COMPTR, BOOL, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>IsEqual: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Hash: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
+	<span class="kw">pub </span>IsRunning: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetTimeOfLastChange: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, PVOID) -&gt; HRES,
+	<span class="kw">pub </span>Inverse: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>CommonPrefixWith: <span class="kw">fn</span>(COMPTR, COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>RelativePathTo: <span class="kw">fn</span>(COMPTR, COMPTR, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>GetDisplayName: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, <span class="kw-2">*mut </span>PSTR) -&gt; HRES,
+	<span class="kw">pub </span>ParseDisplayName: <span class="kw">fn</span>(COMPTR, COMPTR, COMPTR, PCSTR, <span class="kw-2">*mut </span>u32, <span class="kw-2">*mut </span>COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>IsSystemMoniker: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u32) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IMoniker: <span class="string">&quot;0000000f-0000-0000-c000-000000000046&quot;</span>;
@@ -391,19 +396,18 @@
 	) -&gt; HrResult&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.BindToObject)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).BindToObject)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					moniker_to_left.map_or(ComPtr::null(), |m| m.ptr()),
+					moniker_to_left.map_or(std::ptr::null_mut(), |m| m.ptr()),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| T::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMoniker::BindToStorage`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-bindtostorage)
@@ -415,32 +419,34 @@
 	) -&gt; HrResult&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.BindToStorage)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ T::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).BindToStorage)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					moniker_to_left.map_or(ComPtr::null(), |m| m.ptr()),
+					moniker_to_left.map_or(std::ptr::null_mut(), |m| m.ptr()),
 					<span class="kw-2">&amp;</span>T::IID <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| T::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMoniker::CommonPrefixWith`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-commonprefixwith)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>CommonPrefixWith(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IMoniker) -&gt; HrResult&lt;IMoniker&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.CommonPrefixWith)(<span class="self">self</span>.ptr(), other.ptr(), <span class="kw-2">&amp;mut </span>ppv_queried),
-			).map(|<span class="kw">_</span>| IMoniker::from(ppv_queried))
-		}
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).CommonPrefixWith)(
+					<span class="self">self</span>.ptr(),
+					other.ptr(),
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMoniker::ComposeWith`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-composewith)
@@ -451,30 +457,33 @@
 		only_if_not_generic: bool,
 	) -&gt; HrResult&lt;IMoniker&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.ComposeWith)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).ComposeWith)(
 					<span class="self">self</span>.ptr(),
 					moniker_to_right.ptr(),
 					only_if_not_generic <span class="kw">as _</span>,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| IMoniker::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMoniker::Enum`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-enum)
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>Enum(<span class="kw-2">&amp;</span><span class="self">self</span>, forward: bool) -&gt; HrResult&lt;IMoniker&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult((vt.Enum)(<span class="self">self</span>.ptr(), forward <span class="kw">as _</span>, <span class="kw-2">&amp;mut </span>ppv_queried))
-				.map(|<span class="kw">_</span>| IMoniker::from(ppv_queried))
-		}
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).Enum)(
+					<span class="self">self</span>.ptr(),
+					forward <span class="kw">as _</span>,
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="doccomment">/// [`IMoniker::GetDisplayName`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-getdisplayname)
@@ -486,21 +495,20 @@
 	) -&gt; HrResult&lt;String&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut::&lt;u16&gt;();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.GetDisplayName)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).GetDisplayName)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					moniker_to_left.map_or(ComPtr::null(), |m| m.ptr()),
+					moniker_to_left.map_or(std::ptr::null_mut(), |m| m.ptr()),
 					<span class="kw-2">&amp;mut </span>pstr,
-				),
-			).map(|<span class="kw">_</span>| {
-				<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
-				CoTaskMemFree(pstr <span class="kw">as _</span>); <span class="comment">// https://stackoverflow.com/q/3079508/6923555
-				</span>name.to_string()
-			})
-		}
+				)
+			},
+		).map(|<span class="kw">_</span>| {
+			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
+			CoTaskMemFree(pstr <span class="kw">as _</span>); <span class="comment">// https://stackoverflow.com/q/3079508/6923555
+			</span>name.to_string()
+		})
 	}
 
 	<span class="doccomment">/// [`IMoniker::GetTimeOfLastChange`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-gettimeoflastchange)
@@ -512,17 +520,16 @@
 	) -&gt; HrResult&lt;FILETIME&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>ft = FILETIME::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.GetTimeOfLastChange)(
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).GetTimeOfLastChange)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					moniker_to_left.map_or(ComPtr::null(), |m| m.ptr()),
+					moniker_to_left.map_or(std::ptr::null_mut(), |m| m.ptr()),
 					<span class="kw-2">&amp;mut </span>ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-				),
-			).map(|<span class="kw">_</span>| ft)
-		}
+				)
+			},
+		).map(|<span class="kw">_</span>| ft)
 	}
 
 	<span class="doccomment">/// [`IMoniker::Hash`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-hash)
@@ -530,11 +537,9 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>Hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>hash = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult((vt.Hash)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>hash))
-				.map(|<span class="kw">_</span>| hash)
-		}
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{ (vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).Hash)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>hash) },
+		).map(|<span class="kw">_</span>| hash)
 	}
 
 	<span class="macro">fn_com_get! </span>{ Inverse: IMonikerVT, IMoniker;
@@ -546,10 +551,11 @@
 	/// method.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsEqual(<span class="kw-2">&amp;</span><span class="self">self</span>, other_moniker: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IMoniker) -&gt; HrResult&lt;bool&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			okfalse_to_hrresult((vt.IsEqual)(<span class="self">self</span>.ptr(), other_moniker.ptr()))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).IsEqual)(<span class="self">self</span>.ptr(), other_moniker.ptr())
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IMoniker::IsRunning`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-isrunning)
@@ -561,17 +567,16 @@
 		moniker_newly_running: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IMoniker&gt;,
 	) -&gt; HrResult&lt;bool&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			okfalse_to_hrresult(
-				(vt.IsRunning)(
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).IsRunning)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
-					moniker_to_left.map_or(ComPtr::null(), |m| m.ptr()),
-					moniker_newly_running.map_or(ComPtr::null(), |m| m.ptr()),
-				),
-			)
-		}
+					moniker_to_left.map_or(std::ptr::null_mut(), |m| m.ptr()),
+					moniker_newly_running.map_or(std::ptr::null_mut(), |m| m.ptr()),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`IMoniker::IsSystemMoniker](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-issystemmoniker)
@@ -579,11 +584,14 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsSystemMoniker(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;(bool, co::MKSYS)&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>mksys = co::MKSYS::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			okfalse_to_hrresult((vt.IsSystemMoniker)(<span class="self">self</span>.ptr(), mksys.as_mut()))
-				.map(|b| (b, mksys))
-		}
+		okfalse_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).IsSystemMoniker)(
+					<span class="self">self</span>.ptr(),
+					mksys.as_mut(),
+				)
+			},
+		).map(|b| (b, mksys))
 	}
 
 	<span class="doccomment">/// [`IMoniker::ParseDisplayName`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-parsedisplayname)
@@ -596,20 +604,20 @@
 	) -&gt; HrResult&lt;(u32, IMoniker)&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>ch_eaten = u32::default();
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.ParseDisplayName)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).ParseDisplayName)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
 					moniker_to_left.ptr(),
 					WString::from_str(display_name).as_ptr(),
 					<span class="kw-2">&amp;mut </span>ch_eaten,
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| (ch_eaten, IMoniker::from(ppv_queried)))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| (ch_eaten, queried))
 	}
 
 	<span class="doccomment">/// [`IMoniker::Reduce`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-reduce)
@@ -620,21 +628,24 @@
 	</span><span class="kw">fn </span>Reduce(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		bind_ctx: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IBindCtx,
 		reduce_how_far: co::MKRREDUCE,
-	) -&gt; HrResult&lt;(IMoniker, IMoniker)&gt; {
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried2 = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.Reduce)(
+	) -&gt; HrResult&lt;(IMoniker, IMoniker)&gt;
+	{
+		<span class="kw">let </span>(<span class="kw-2">mut </span>queried, <span class="kw-2">mut </span>queried2) = <span class="kw">unsafe </span>{(
+			IMoniker::null(),
+			IMoniker::null(),
+		)};
+
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).Reduce)(
 					<span class="self">self</span>.ptr(),
 					bind_ctx.ptr(),
 					reduce_how_far.raw(),
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-					<span class="kw-2">&amp;mut </span>ppv_queried2,
-				),
-			).map(|<span class="kw">_</span>| (IMoniker::from(ppv_queried), IMoniker::from(ppv_queried2)))
-		}
+					queried.as_mut(),
+					queried2.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| (queried, queried2))
 	}
 
 	<span class="doccomment">/// [`IMoniker::RelativePathTo`](https://learn.microsoft.com/en-us/windows/win32/api/objidl/nf-objidl-imoniker-relativepathto)
@@ -643,17 +654,16 @@
 	</span><span class="kw">fn </span>RelativePathTo(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		other_moniker: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IMoniker) -&gt; HrResult&lt;IMoniker&gt;
 	{
-		<span class="kw">unsafe </span>{
-			<span class="kw">let </span><span class="kw-2">mut </span>ppv_queried = ComPtr::null();
-			<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IMonikerVT&gt;();
-			ok_to_hrresult(
-				(vt.RelativePathTo)(
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMonikerVT&gt;(<span class="self">self</span>).RelativePathTo)(
 					<span class="self">self</span>.ptr(),
 					other_moniker.ptr(),
-					<span class="kw-2">&amp;mut </span>ppv_queried,
-				),
-			).map(|<span class="kw">_</span>| IMoniker::from(ppv_queried))
-		}
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 }
 </code></pre></div></section></main></body></html>

@@ -84,13 +84,11 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HRES};
-<span class="kw">use </span><span class="kw">crate</span>::ole::decl::{ComPtr, HrResult};
-<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, COMPTR, HRES};
+<span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, okfalse_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IPersist, ole_IStream};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IPersistVT;
 
@@ -98,10 +96,10 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>IPersistStreamVT {
 	<span class="kw">pub </span>IPersistVT: IPersistVT,
-	<span class="kw">pub </span>IsDirty: <span class="kw">fn</span>(ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Load: <span class="kw">fn</span>(ComPtr, ComPtr) -&gt; HRES,
-	<span class="kw">pub </span>Save: <span class="kw">fn</span>(ComPtr, ComPtr, BOOL) -&gt; HRES,
-	<span class="kw">pub </span>GetSizeMax: <span class="kw">fn</span>(ComPtr, <span class="kw-2">*mut </span>u64) -&gt; HRES,
+	<span class="kw">pub </span>IsDirty: <span class="kw">fn</span>(COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Load: <span class="kw">fn</span>(COMPTR, COMPTR) -&gt; HRES,
+	<span class="kw">pub </span>Save: <span class="kw">fn</span>(COMPTR, COMPTR, BOOL) -&gt; HRES,
+	<span class="kw">pub </span>GetSizeMax: <span class="kw">fn</span>(COMPTR, <span class="kw-2">*mut </span>u64) -&gt; HRES,
 }
 
 <span class="macro">com_interface! </span>{ IPersistStream: <span class="string">&quot;00000109-0000-0000-c000-000000000046&quot;</span>;
@@ -132,8 +130,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>max = u64::default();
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPersistStreamVT&gt;();
-				(vt.GetSizeMax)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>max)
+				(vt::&lt;IPersistStreamVT&gt;(<span class="self">self</span>).GetSizeMax)(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>max)
 			},
 		).map(|<span class="kw">_</span>| max)
 	}
@@ -143,10 +140,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsDirty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HrResult&lt;bool&gt; {
 		okfalse_to_hrresult(
-			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPersistStreamVT&gt;();
-				(vt.IsDirty)(<span class="self">self</span>.ptr())
-			},
+			<span class="kw">unsafe </span>{ (vt::&lt;IPersistStreamVT&gt;(<span class="self">self</span>).IsDirty)(<span class="self">self</span>.ptr()) },
 		)
 	}
 
@@ -155,8 +149,7 @@
 	</span><span class="kw">fn </span>Load(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IStream) -&gt; HrResult&lt;()&gt; {
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPersistStreamVT&gt;();
-				(vt.Load)(<span class="self">self</span>.ptr(), stream.ptr())
+				(vt::&lt;IPersistStreamVT&gt;(<span class="self">self</span>).Load)(<span class="self">self</span>.ptr(), stream.ptr())
 			},
 		)
 	}
@@ -168,8 +161,11 @@
 	{
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{
-				<span class="kw">let </span>vt = <span class="self">self</span>.vt_ref::&lt;IPersistStreamVT&gt;();
-				(vt.Save)(<span class="self">self</span>.ptr(), stream.ptr(), clear_dirty <span class="kw">as _</span>)
+				(vt::&lt;IPersistStreamVT&gt;(<span class="self">self</span>).Save)(
+					<span class="self">self</span>.ptr(),
+					stream.ptr(),
+					clear_dirty <span class="kw">as _</span>,
+				)
 			},
 		)
 	}
