@@ -125,6 +125,10 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -188,6 +192,25 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">unsafe fn </span>from_ptr(p: <span class="kw-2">*mut </span>std::ffi::c_void) -&gt; <span class="self">Self</span>;
 
+	<span class="doccomment">/// Returns the pointer to the underlying COM virtual table.
+	///
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
+
+	<span class="doccomment">/// Returns a mutable reference do the underlying COM virtual table pointer.
+	///
+	/// # Safety
+	///
+	/// Be sure the pointer being set points to a properly allocated COM virtual
+	/// table.
+	///
+	/// This method is used internally by the library, and not intended to be
+	/// used externally.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut *mut </span>std::ffi::c_void;
+
 	<span class="doccomment">/// Creates an object from a null COM virtual table pointer.
 	///
 	/// # Safety
@@ -202,18 +225,6 @@
 		<span class="self">Self</span>::from_ptr(std::ptr::null_mut())
 	}
 
-	<span class="doccomment">/// Returns a mutable reference do the underlying COM virtual table pointer.
-	///
-	/// # Safety
-	///
-	/// Be sure the pointer being set points to a properly allocated COM virtual
-	/// table.
-	///
-	/// This method is used internally by the library, and not intended to be
-	/// used externally.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">unsafe fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut *mut </span>std::ffi::c_void;
-
 	<span class="doccomment">/// Returns the pointer to the underlying COM virtual table and sets the
 	/// internal pointer to null, so that
 	/// [`Release`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-release)
@@ -225,14 +236,11 @@
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
-
-	<span class="doccomment">/// Returns the pointer to the underlying COM virtual table.
-	///
-	/// This method is used internally by the library, and not intended to be
-	/// used externally.
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void;
+	</span><span class="kw">fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>std::ffi::c_void {
+		<span class="kw">let </span>p = <span class="self">self</span>.ptr();
+		<span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.as_mut() = std::ptr::null_mut(); }
+		p
+	}
 
 	<span class="doccomment">/// [`IUnknown::QueryInterface`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-queryinterface(refiid_void))
 	/// method.
