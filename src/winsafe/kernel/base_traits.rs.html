@@ -153,12 +153,12 @@
 	</span><span class="kw">fn </span>has(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool;
 }
 
-<span class="doccomment">/// A native typed constant, with a `&amp;&#39;static str` as its underlying type.
-</span><span class="kw">pub trait </span>NativeStrConst {
-	<span class="doccomment">/// Returns the underlying `&amp;&#39;static str` converted to
-	/// [`WString`](crate::WString).
-	</span><span class="kw">fn </span>wstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; WString;
-}
+<span class="doccomment">/// A native typed constant mapped to a string.
+</span><span class="kw">pub trait </span>NativeStrConst: PartialEq + Eq
+	+ <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Error = co::ERROR&gt;
+	+ Into&lt;WString&gt;
+	+ fmt::Debug + fmt::Display
+{}
 
 <span class="doccomment">/// A system error which can be formatted with
 /// [`FormatMessage`](crate::FormatMessage).
