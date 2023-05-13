@@ -474,7 +474,6 @@
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
 <a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused_macros)]
 
 </span><span class="doccomment">/// Writes `pub(crate)` and `pub` values of the given constant type.
@@ -897,7 +896,8 @@
 	};
 }
 
-<span class="doccomment">/// Declares the type of a constant for a static string.
+<span class="doccomment">/// Declares the type of a constant with a literal string as its underlying
+/// type.
 </span><span class="macro">macro_rules! </span>const_str {
 	(
 		<span class="macro-nonterminal">$name</span>:ident;
@@ -905,17 +905,12 @@
 		=&gt;
 		$(
 			$( <span class="attr">#[<span class="macro-nonterminal">$pubvaldoc</span>:meta] </span>)*
-			<span class="macro-nonterminal">$pubvalname</span>:ident <span class="macro-nonterminal">$pubval</span>:expr
+			<span class="macro-nonterminal">$pubvalname</span>:ident <span class="macro-nonterminal">$pubval</span>:literal
 		)*
 	) =&gt; {
 		$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		<span class="attr">#[derive(Clone, Copy, PartialEq, Eq)]
-		</span><span class="kw">pub enum </span><span class="macro-nonterminal">$name </span>{
-			$(
-				$( <span class="attr">#[<span class="macro-nonterminal">$pubvaldoc</span>] </span>)*
-				<span class="macro-nonterminal">$pubvalname</span>,
-			)*
-		}
+		</span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
 
 		<span class="kw">impl </span><span class="kw">crate</span>::prelude::NativeStrConst <span class="kw">for </span><span class="macro-nonterminal">$name </span>{}
 
@@ -932,11 +927,7 @@
 
 		<span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$name</span>&gt; <span class="kw">for </span><span class="kw">crate</span>::kernel::decl::WString {
 			<span class="kw">fn </span>from(value: <span class="macro-nonterminal">$name</span>) -&gt; <span class="self">Self </span>{
-				<span class="kw">crate</span>::kernel::decl::WString::from_str(
-					<span class="kw">match </span>value {
-						$( <span class="macro-nonterminal">$name</span>::<span class="macro-nonterminal">$pubvalname </span>=&gt; <span class="macro-nonterminal">$pubval</span>, )*
-					},
-				)
+				<span class="kw">crate</span>::kernel::decl::WString::from_str(value.<span class="number">0</span>)
 			}
 		}
 
@@ -949,6 +940,13 @@
 			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
 				&lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="self">self</span>, f) <span class="comment">// delegate to Debug trait
 			</span>}
+		}
+
+		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
+			$(
+				$( <span class="attr">#[<span class="macro-nonterminal">$pubvaldoc</span>] </span>)*
+				<span class="kw">pub const </span><span class="macro-nonterminal">$pubvalname</span>: <span class="self">Self </span>= <span class="self">Self</span>(<span class="macro-nonterminal">$pubval</span>);
+			)*
 		}
 	};
 }
