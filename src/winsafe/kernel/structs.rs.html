@@ -791,6 +791,49 @@
 <a href="#791" id="791">791</a>
 <a href="#792" id="792">792</a>
 <a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -800,8 +843,9 @@
 	ConvertSidToStringSid, HEVENT, HINSTANCE, HPIPE, HPROCESS, HTHREAD,
 	InitializeSecurityDescriptor, MAKEQWORD, WString,
 };
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::TokenPrivilegesGuard;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{MAX_MODULE_NAME32, MAX_PATH};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::NativeBitflag;
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{NativeBitflag, VariableSized};
 
 <span class="doccomment">/// [`ACL`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-acl)
 /// struct.
@@ -1080,6 +1124,12 @@
 	HighPart: i32,
 }
 
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>LUID {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		<span class="macro">write!</span>(f, <span class="string">&quot;LUID lo: {:#04x}, hi: {:#04x}&quot;</span>, <span class="self">self</span>.low_part(), <span class="self">self</span>.high_part())
+	}
+}
+
 <span class="kw">impl </span>LUID {
 	<span class="kw">pub const </span>SYSTEM: <span class="self">Self </span>= <span class="self">Self</span>::new(<span class="number">0x3e7</span>, <span class="number">0x0</span>);
 	<span class="kw">pub const </span>ANONYMOUS_LOGON: <span class="self">Self </span>= <span class="self">Self</span>::new(<span class="number">0x3e6</span>, <span class="number">0x0</span>);
@@ -1110,6 +1160,7 @@
 <span class="doccomment">/// [`LUID_AND_ATTRIBUTES`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-luid_and_attributes)
 /// struct.
 </span><span class="attr">#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>LUID_AND_ATTRIBUTES {
 	<span class="kw">pub </span>Luid: LUID,
 	<span class="kw">pub </span>Attributes: u32,
@@ -1344,10 +1395,12 @@
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>SID {
 	<span class="kw">pub </span>Revision: u8,
-	SubAuthorityCount: u8,
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) SubAuthorityCount: u8,
 	<span class="kw">pub </span>IdentifierAuthority: SID_IDENTIFIER_AUTHORITY,
 	SubAuthority: [co::RID; <span class="number">1</span>],
 }
+
+<span class="kw">impl </span>VariableSized <span class="kw">for </span>SID {}
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>SID {
 	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
@@ -1529,8 +1582,41 @@
 /// struct.
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>TOKEN_PRIVILEGES {
-	PrivilegeCount: u32,
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) PrivilegeCount: u32,
 	Privileges: [LUID_AND_ATTRIBUTES; <span class="number">1</span>],
+}
+
+<span class="kw">impl </span>VariableSized <span class="kw">for </span>TOKEN_PRIVILEGES {}
+
+<span class="kw">impl </span>TOKEN_PRIVILEGES {
+	<span class="doccomment">/// Returns a dynamically allocated
+	/// [`TokenPrivilegesGuard`](crate::guard::TokenPrivilegesGuard).
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>new(privileges: <span class="kw-2">&amp;</span>[LUID_AND_ATTRIBUTES]) -&gt; TokenPrivilegesGuard {
+		TokenPrivilegesGuard::new(privileges)
+	}
+
+	<span class="doccomment">/// Returns a constant slice over the `Privileges` entries.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>Privileges(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[LUID_AND_ATTRIBUTES] {
+		<span class="kw">unsafe </span>{
+			std::slice::from_raw_parts(
+				<span class="self">self</span>.Privileges.as_ptr(),
+				<span class="self">self</span>.PrivilegeCount <span class="kw">as _</span>,
+			)
+		}
+	}
+
+	<span class="doccomment">/// Returns a mutable slice over the `Privileges` entries.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>Privileges_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[LUID_AND_ATTRIBUTES] {
+		<span class="kw">unsafe </span>{
+			std::slice::from_raw_parts_mut(
+				<span class="self">self</span>.Privileges.as_mut_ptr(),
+				<span class="self">self</span>.PrivilegeCount <span class="kw">as _</span>,
+			)
+		}
+	}
 }
 
 <span class="doccomment">/// [`VALENT`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/ns-winreg-valentw)
