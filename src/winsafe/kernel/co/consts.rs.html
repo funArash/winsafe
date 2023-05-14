@@ -2073,6 +2073,18 @@
 <a href="#2073" id="2073">2073</a>
 <a href="#2074" id="2074">2074</a>
 <a href="#2075" id="2075">2075</a>
+<a href="#2076" id="2076">2076</a>
+<a href="#2077" id="2077">2077</a>
+<a href="#2078" id="2078">2078</a>
+<a href="#2079" id="2079">2079</a>
+<a href="#2080" id="2080">2080</a>
+<a href="#2081" id="2081">2081</a>
+<a href="#2082" id="2082">2082</a>
+<a href="#2083" id="2083">2083</a>
+<a href="#2084" id="2084">2084</a>
+<a href="#2085" id="2085">2085</a>
+<a href="#2086" id="2086">2086</a>
+<a href="#2087" id="2087">2087</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_upper_case_globals)]
 
 </span><span class="macro">const_bitflag! </span>{ ACCESS_RIGHTS: u32;
@@ -2481,10 +2493,21 @@
 	/// `flags` (`u32`).
 	</span>=&gt;
 	=&gt;
-	FIXED <span class="number">0x0000
+	<span class="doccomment">/// Allocates fixed memory. The return value is a pointer to the memory
+	/// object.
+	</span>FIXED <span class="number">0x0000
+	</span><span class="doccomment">/// Allocates movable memory. Memory blocks are never moved in physical
+	/// memory, but they can be moved within the default heap.
+	///
+	/// The return value is a handle to the memory object. To translate the
+	/// handle to a pointer, use the
+	/// [`LocalLock`](crate::prelude::kernel_Hlocal::LocalLock) function.
 	</span>MOVEABLE <span class="number">0x0002
+	</span><span class="doccomment">/// Initializes memory contents to zero.
 	</span>ZEROINIT <span class="number">0x0040
+	</span><span class="doccomment">/// Combines `MOVEABLE` and `ZEROINIT`.
 	</span>GHND <span class="self">Self</span>::MOVEABLE.<span class="number">0 </span>| <span class="self">Self</span>::ZEROINIT.<span class="number">0
+	</span><span class="doccomment">/// Combines `FIXED` and `ZEROINIT`.
 	</span>GPTR <span class="self">Self</span>::FIXED.<span class="number">0 </span>| <span class="self">Self</span>::ZEROINIT.<span class="number">0
 </span>}
 
@@ -2500,60 +2523,51 @@
 </span>}
 
 <span class="macro">const_bitflag! </span>{ HEAP_ALLOC: u32;
-	<span class="doccomment">/// [`HHEAPOBJ::HeapAlloc`](crate::prelude::kernel_Hheapobj::HeapAlloc)
-	/// `flags` (`u32`).
+	<span class="doccomment">/// [`HHEAP::HeapAlloc`](crate::prelude::kernel_Hheap::HeapAlloc) `flags`
+	/// (`u32`).
 	///
 	/// Originally has `HEAP` prefix.
 	</span>=&gt;
 	=&gt;
-	<span class="doccomment">/// None of the actual values (zero).
-	</span>NoValue <span class="number">0
-	</span>GENERATE_EXCEPTIONS <span class="number">0x0000_0004
+	GENERATE_EXCEPTIONS <span class="number">0x0000_0004
 	</span>NO_SERIALIZE <span class="number">0x0000_0001
 	</span>ZERO_MEMORY <span class="number">0x0000_0008
 </span>}
 
 <span class="macro">const_bitflag! </span>{ HEAP_CREATE: u32;
-	<span class="doccomment">/// [`HHEAPOBJ::HeapCreate`](crate::prelude::kernel_Hheapobj::HeapCreate)
+	<span class="doccomment">/// [`HHEAP::HeapCreate`](crate::prelude::kernel_Hheap::HeapCreate)
 	/// `options` (`u32`).
 	///
 	/// Originally has `HEAP` prefix.
 	</span>=&gt;
 	=&gt;
-	<span class="doccomment">/// None of the actual values (zero).
-	</span>NoValue <span class="number">0
-	</span>ENABLE_EXECUTE <span class="number">0x0004_0000
+	ENABLE_EXECUTE <span class="number">0x0004_0000
 	</span>GENERATE_EXCEPTIONS <span class="number">0x0000_0004
 	</span>NO_SERIALIZE <span class="number">0x0000_0001
 </span>}
 
 <span class="macro">const_bitflag! </span>{ HEAP_REALLOC: u32;
-	<span class="doccomment">/// [`HHEAPOBJ::HeapReAlloc`](crate::prelude::kernel_Hheapobj::HeapReAlloc)
+	<span class="doccomment">/// [`HHEAP::HeapReAlloc`](crate::prelude::kernel_Hheap::HeapReAlloc)
 	/// `options` (`u32`).
 	///
 	/// Originally has `HEAP` prefix.
 	</span>=&gt;
 	=&gt;
-	<span class="doccomment">/// None of the actual values (zero).
-	</span>NoValue <span class="number">0
-	</span>GENERATE_EXCEPTIONS <span class="number">0x0000_0004
+	GENERATE_EXCEPTIONS <span class="number">0x0000_0004
 	</span>NO_SERIALIZE <span class="number">0x0000_0001
 	</span>REALLOC_IN_PLACE_ONLY <span class="number">0x0000_0010
 	</span>ZERO_MEMORY <span class="number">0x0000_0008
 </span>}
 
 <span class="macro">const_bitflag! </span>{ HEAP_SIZE: u32;
-	<span class="doccomment">/// [`HHEAPOBJ::HeapSize`](crate::prelude::kernel_Hheapobj::HeapSize)
-	/// and
-	/// [`HHEAPOBJ::HeapCompact`](crate::prelude::kernel_Hheapobj::HeapCompact)
+	<span class="doccomment">/// [`HHEAP::HeapSize`](crate::prelude::kernel_Hheap::HeapSize) and
+	/// [`HHEAP::HeapCompact`](crate::prelude::kernel_Hheap::HeapCompact)
 	/// `options` (`u32`).
 	///
 	/// Originally has `HEAP` prefix.
 	</span>=&gt;
 	=&gt;
-	<span class="doccomment">/// None of the actual values (zero).
-	</span>NoValue <span class="number">0
-	</span>NO_SERIALIZE <span class="number">0x0000_0001
+	NO_SERIALIZE <span class="number">0x0000_0001
 </span>}
 
 <span class="macro">const_ordinary! </span>{ HF32: u32;
@@ -2740,11 +2754,21 @@
 	/// `flags` (`u32`).
 	</span>=&gt;
 	=&gt;
-	FIXED <span class="number">0x0000
+	<span class="doccomment">/// Allocates fixed memory. The return value is a pointer to the memory
+	/// object.
+	</span>FIXED <span class="number">0x0000
+	</span><span class="doccomment">/// Allocates movable memory. Memory blocks are never moved in physical
+	/// memory, but they can be moved within the default heap.
+	///
+	/// The return value is a handle to the memory object. To translate the
+	/// handle to a pointer, use the
+	/// [`LocalLock`](crate::prelude::kernel_Hlocal::LocalLock) function.
 	</span>MOVEABLE <span class="number">0x0002
+	</span><span class="doccomment">/// Initializes memory contents to zero.
 	</span>ZEROINIT <span class="number">0x0040
-	</span>MODIFY <span class="number">0x0080
+	</span><span class="doccomment">/// Combines `MOVEABLE` and `ZEROINIT`.
 	</span>LHND <span class="self">Self</span>::MOVEABLE.<span class="number">0 </span>| <span class="self">Self</span>::ZEROINIT.<span class="number">0
+	</span><span class="doccomment">/// Combines `FIXED` and `ZEROINIT`.
 	</span>LPTR <span class="self">Self</span>::FIXED.<span class="number">0 </span>| <span class="self">Self</span>::ZEROINIT.<span class="number">0
 </span>}
 

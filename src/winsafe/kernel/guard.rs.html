@@ -756,16 +756,17 @@
 <a href="#756" id="756">756</a>
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ops::{Deref, DerefMut};
 
-<span class="kw">use crate</span>::{co, kernel};
+<span class="kw">use </span><span class="kw">crate</span>::kernel;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	HFILEMAPVIEW, HFINDFILE, HGLOBAL, HHEAPMEM, HHEAPOBJ, HIDWORD, HINSTANCE,
-	HKEY, HLOCAL, HUPDATERSRC, LODWORD, LUID_AND_ATTRIBUTES,
-	PROCESS_INFORMATION, SID, TOKEN_PRIVILEGES,
+	HFILEMAPVIEW, HFINDFILE, HGLOBAL, HHEAP, HIDWORD, HINSTANCE, HKEY, HLOCAL,
+	HUPDATERSRC, LODWORD, LUID_AND_ATTRIBUTES, PROCESS_INFORMATION, SID,
+	TOKEN_PRIVILEGES,
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
-	Handle, kernel_Hfile, kernel_Hglobal, kernel_Hheapobj, kernel_Hlocal,
+	Handle, kernel_Hfile, kernel_Hglobal, kernel_Hheap, kernel_Hlocal,
 };
 
 <span class="doccomment">/// RAII implementation for a [`Handle`](crate::prelude::Handle) which
@@ -990,8 +991,8 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>FreeSidGuard {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 		<span class="kw">if </span>!<span class="self">self</span>.psid.is_null() {
-			<span class="kw">unsafe </span>{ kernel::ffi::FreeSid(<span class="self">self</span>.psid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>); }
-		}
+			<span class="kw">unsafe </span>{ kernel::ffi::FreeSid(<span class="self">self</span>.psid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>); } <span class="comment">// ignore errors
+		</span>}
 	}
 }
 
@@ -1088,9 +1089,9 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="macro">handle_guard! </span>{ HeapDestroyGuard: HHEAPOBJ;
+</span><span class="macro">handle_guard! </span>{ HeapDestroyGuard: HHEAP;
 	kernel::ffi::HeapDestroy;
-	<span class="doccomment">/// RAII implementation for [`HHEAPOBJ`](crate::HHEAPOBJ) which automatically
+	<span class="doccomment">/// RAII implementation for [`HHEAP`](crate::HHEAP) which automatically
 	/// calls
 	/// [`HeapDestroy`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapdestroy)
 	/// when the object goes out of scope.
@@ -1098,55 +1099,51 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="doccomment">/// RAII implementation for [`HHEAPMEM`](crate::HHEAPMEM) which automatically
-/// calls
+</span><span class="doccomment">/// RAII implementation for the memory allocated by
+/// [`HHEAP::HeapAlloc`](crate::prelude::kernel_Hheap::HeapAlloc) which
+/// automatically calls
 /// [`HeapFree`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree)
 /// when the object goes out of scope.
-</span><span class="kw">pub struct </span>HeapFreeGuard&lt;H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+</span><span class="kw">pub struct </span>HeapFreeGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: kernel_Hheap,
 {
-	hheapobj: H,
-	hheapmem: HHEAPMEM,
+	hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
+	pmem: <span class="kw-2">*mut </span>std::ffi::c_void,
+	sz: usize,
 }
 
-<span class="kw">impl</span>&lt;H&gt; Drop <span class="kw">for </span>HeapFreeGuard&lt;H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Drop <span class="kw">for </span>HeapFreeGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">if let </span><span class="prelude-val">Some</span>(ho) = <span class="self">self</span>.hheapobj.as_opt() {
-			<span class="kw">if let </span><span class="prelude-val">Some</span>(hm) = <span class="self">self</span>.hheapmem.as_opt() {
-				<span class="kw">unsafe </span>{
-					kernel::ffi::HeapFree( <span class="comment">// ignore errors
-						</span>ho.ptr(),
-						co::HEAP_ALLOC::NoValue.raw(),
-						hm.ptr(),
-					);
-				}
-			}
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hheap.as_opt() {
+			<span class="kw">if </span>!<span class="self">self</span>.pmem.is_null() {
+				<span class="kw">unsafe </span>{ kernel::ffi::HeapFree(h.ptr(), <span class="number">0</span>, <span class="self">self</span>.pmem); } <span class="comment">// ignore errors
+			</span>}
 		}
 	}
 }
 
-<span class="kw">impl</span>&lt;H&gt; Deref <span class="kw">for </span>HeapFreeGuard&lt;H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Deref <span class="kw">for </span>HeapFreeGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: kernel_Hheap,
 {
-	<span class="kw">type </span>Target = HHEAPMEM;
+	<span class="kw">type </span>Target = [u8];
 
 	<span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.hheapmem
+		<span class="kw">unsafe </span>{ std::slice::from_raw_parts(<span class="self">self</span>.pmem <span class="kw">as _</span>, <span class="self">self</span>.sz) }
 	}
 }
 
-<span class="kw">impl</span>&lt;H&gt; DerefMut <span class="kw">for </span>HeapFreeGuard&lt;H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; DerefMut <span class="kw">for </span>HeapFreeGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
-		<span class="kw-2">&amp;mut </span><span class="self">self</span>.hheapmem
+		<span class="kw">unsafe </span>{ std::slice::from_raw_parts_mut(<span class="self">self</span>.pmem <span class="kw">as _</span>, <span class="self">self</span>.sz) }
 	}
 }
 
-<span class="kw">impl</span>&lt;H&gt; HeapFreeGuard&lt;H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; HeapFreeGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
+	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="doccomment">/// Constructs the guard by taking ownership of the handle.
 	///
@@ -1159,45 +1156,50 @@
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const unsafe fn </span>new(hheapobj: H, hheapmem: HHEAPMEM) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ hheapobj, hheapmem }
+	</span><span class="kw">pub const unsafe fn </span>new(
+		hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H, pmem: <span class="kw-2">*mut </span>std::ffi::c_void, sz: usize) -&gt; <span class="self">Self
+	</span>{
+		<span class="self">Self </span>{ hheap, pmem, sz }
 	}
 
-	<span class="doccomment">/// Ejects the underlying handle, leaving
-	/// [`Handle::INVALID`](crate::prelude::Handle::INVALID) in its place.
+	<span class="doccomment">/// Ejects the underlying memory pointer and size, leaving null and zero in
+	/// their places.
 	///
-	/// Since the internal handle will be invalidated, the destructor will not
-	/// run. It&#39;s your responsibility to run it, otherwise you&#39;ll cause a
-	/// resource leak.
+	/// Since the internal memory pointer will be invalidated, the destructor
+	/// will not run. It&#39;s your responsibility to run it, otherwise you&#39;ll cause
+	/// a memory leak.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; HHEAPMEM {
-		std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.hheapmem, HHEAPMEM::INVALID)
+	</span><span class="kw">pub fn </span>leak(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (<span class="kw-2">*mut </span>std::ffi::c_void, usize) {
+		(
+			std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.pmem, std::ptr::null_mut()),
+			std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.sz, <span class="number">0</span>),
+		)
 	}
 }
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="doccomment">/// RAII implementation for [`HHEAPOBJ`](crate::HHEAPOBJ) which automatically calls
+</span><span class="doccomment">/// RAII implementation for [`HHEAP`](crate::HHEAP) which automatically calls
 /// [`HeapUnlock`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapunlock)
 /// when the object goes out of scope.
 </span><span class="kw">pub struct </span>HeapUnlockGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+	<span class="kw">where </span>H: kernel_Hheap,
 {
-	hheapobj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
+	hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Drop <span class="kw">for </span>HeapUnlockGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hheapobj.as_opt() {
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hheap.as_opt() {
 			<span class="kw">unsafe </span>{ kernel::ffi::HeapUnlock(h.ptr()); } <span class="comment">// ignore errors
 		</span>}
 	}
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; HeapUnlockGuard&lt;<span class="lifetime">&#39;a</span>, H&gt;
-	<span class="kw">where </span>H: kernel_Hheapobj,
+	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="doccomment">/// Constructs the guard.
 	///
@@ -1210,8 +1212,8 @@
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const unsafe fn </span>new(hheapobj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; <span class="self">Self </span>{
-		<span class="self">Self </span>{ hheapobj }
+	</span><span class="kw">pub const unsafe fn </span>new(hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ hheap }
 	}
 }
 
@@ -1266,7 +1268,7 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="doccomment">/// RAII implementation for [`LOCAL`](crate::LOCAL) lock which automatically
+</span><span class="doccomment">/// RAII implementation for [`HLOCAL`](crate::HLOCAL) lock which automatically
 /// calls
 /// [`LocalUnlock`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localunlock)
 /// when the object goes out of scope.
