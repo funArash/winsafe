@@ -198,10 +198,12 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ops::{Deref, DerefMut};
 
 <span class="kw">use crate</span>::{co, gdi};
 <span class="kw">use </span><span class="kw">crate</span>::gdi::decl::{LOGPALETTE, PALETTEENTRY};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::HeapBlock;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{gdi_Hdc, GdiObject, Handle};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::HDC;
 
@@ -287,7 +289,7 @@
 </span><span class="doccomment">/// RAII implementation for [`LOGPALETTE`](crate::LOGPALETTE) which manages the
 /// allocated memory.
 </span><span class="kw">pub struct </span>LogpaletteGuard {
-	raw: Vec&lt;u8&gt;,
+	raw: HeapBlock,
 }
 
 <span class="kw">impl </span>Deref <span class="kw">for </span>LogpaletteGuard {
@@ -311,8 +313,8 @@
 		<span class="kw">let </span>sz = std::mem::size_of::&lt;LOGPALETTE&gt;() <span class="comment">// size in bytes of the allocated struct
 			</span>- std::mem::size_of::&lt;PALETTEENTRY&gt;()
 			+ (entries.len() * std::mem::size_of::&lt;PALETTEENTRY&gt;());
-		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{ raw: <span class="macro">vec!</span>[<span class="number">0u8</span>; sz] };
-		new_self.palVersion = pal_version;
+		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{ raw: HeapBlock::alloc(sz).unwrap() }; <span class="comment">// assume no allocation errors
+		</span>new_self.palVersion = pal_version;
 		new_self.palNumEntries = entries.len() <span class="kw">as _</span>;
 		entries.iter()
 			.zip(new_self.palPalEntry_mut())

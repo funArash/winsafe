@@ -1642,10 +1642,10 @@
 
 <span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	DISK_SPACE_INFORMATION, FILETIME, HLOCAL, LANGID, LUID, MEMORYSTATUSEX,
-	OSVERSIONINFOEX, SECURITY_DESCRIPTOR, SID, SID_IDENTIFIER_AUTHORITY,
-	STARTUPINFO, SysResult, SYSTEM_INFO, SYSTEMTIME, TIME_ZONE_INFORMATION,
-	WString,
+	DISK_SPACE_INFORMATION, FILETIME, HeapBlock, HLOCAL, LANGID, LUID,
+	MEMORYSTATUSEX, OSVERSIONINFOEX, SECURITY_DESCRIPTOR, SID,
+	SID_IDENTIFIER_AUTHORITY, STARTUPINFO, SysResult, SYSTEM_INFO, SYSTEMTIME,
+	TIME_ZONE_INFORMATION, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{
@@ -1783,9 +1783,9 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>CopySid(src: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;SidGuard&gt; {
 	<span class="kw">let </span>sid_sz = GetLengthSid(<span class="kw-2">&amp;</span>src);
-	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
+	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = HeapBlock::alloc(sid_sz <span class="kw">as _</span>).unwrap(); <span class="comment">// assume no allocation errors
 
-	<span class="kw">unsafe </span>{
+	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
 			kernel::ffi::CopySid(
 				sid_sz,
@@ -1829,9 +1829,9 @@
 		<span class="kw">return </span><span class="prelude-val">Err</span>(get_size_err);
 	}
 
-	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
+	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = HeapBlock::alloc(sid_sz <span class="kw">as _</span>).unwrap(); <span class="comment">// assume no allocation errors
 
-	<span class="kw">unsafe </span>{
+	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
 			kernel::ffi::CreateWellKnownSid(
 				well_known_sid.raw(),
@@ -2568,9 +2568,9 @@
 		<span class="kw">return </span><span class="prelude-val">Err</span>(get_size_err);
 	}
 
-	<span class="kw">let </span><span class="kw-2">mut </span>ad_sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; ad_sid_sz <span class="kw">as _</span>];
+	<span class="kw">let </span><span class="kw-2">mut </span>ad_sid_buf = HeapBlock::alloc(ad_sid_sz <span class="kw">as _</span>).unwrap(); <span class="comment">// assume no allocation errors
 
-	<span class="kw">unsafe </span>{
+	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
 			kernel::ffi::GetWindowsAccountDomainSid(
 				sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -2828,8 +2828,8 @@
 		<span class="kw">return </span><span class="prelude-val">Err</span>(get_size_err);
 	}
 
-	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; sid_sz <span class="kw">as _</span>];
-	<span class="kw">let </span><span class="kw-2">mut </span>domain_buf = WString::new_alloc_buf(domain_sz <span class="kw">as _</span>);
+	<span class="kw">let </span><span class="kw-2">mut </span>sid_buf = HeapBlock::alloc(sid_sz <span class="kw">as _</span>).unwrap(); <span class="comment">// assume no allocation errors
+	</span><span class="kw">let </span><span class="kw-2">mut </span>domain_buf = WString::new_alloc_buf(domain_sz <span class="kw">as _</span>);
 
 	<span class="kw">unsafe </span>{
 		bool_to_sysresult(

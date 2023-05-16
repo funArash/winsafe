@@ -93,19 +93,19 @@
 <a href="#93" id="93">93</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
+</span><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, HeapBlock, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::bool_to_sysresult;
 <span class="kw">use </span><span class="kw">crate</span>::version;
 
 <span class="doccomment">/// [`GetFileVersionInfo`](https://learn.microsoft.com/en-us/windows/win32/api/winver/nf-winver-getfileversioninfow)
 /// function.
 ///
-/// The buffer will be automatically allocated with
+/// The returned buffer will be automatically allocated with
 /// [`GetFileVersionInfoSize`](crate::GetFileVersionInfoSize).
 </span><span class="attr">#[must_use]
-</span><span class="kw">pub fn </span>GetFileVersionInfo(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;Vec&lt;u8&gt;&gt; {
+</span><span class="kw">pub fn </span>GetFileVersionInfo(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;HeapBlock&gt; {
 	<span class="kw">let </span>block_sz = GetFileVersionInfoSize(file_name)<span class="question-mark">?</span>;
-	<span class="kw">let </span><span class="kw-2">mut </span>buf: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0x00</span>; block_sz <span class="kw">as _</span>];
+	<span class="kw">let </span><span class="kw-2">mut </span>buf = HeapBlock::alloc(block_sz <span class="kw">as _</span>)<span class="question-mark">?</span>;
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
@@ -160,7 +160,7 @@
 /// let res_buf = GetFileVersionInfo(&amp;exe_name)?;
 ///
 /// let (pvsf, sz_data) = unsafe {
-///     VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(&amp;res_buf, &quot;\\&quot;)?
+///     VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(res_buf.as_slice(), &quot;\\&quot;)?
 /// };
 ///
 /// let ver = unsafe { &amp;*pvsf }.dwFileVersion();

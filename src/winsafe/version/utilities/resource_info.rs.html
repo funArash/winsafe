@@ -135,8 +135,10 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{LANGID, SysResult, WString};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{HeapBlock, LANGID, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::version::decl::{GetFileVersionInfo, VarQueryValue, VS_FIXEDFILEINFO};
 
 <span class="doccomment">/// Retrieves data from an embedded resource, which can be read from an
@@ -183,7 +185,7 @@
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
 </span><span class="kw">pub struct </span>ResourceInfo {
-	res_buf: Vec&lt;u8&gt;,
+	res_buf: HeapBlock,
 }
 
 <span class="kw">impl </span>ResourceInfo {
@@ -201,8 +203,10 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>blocks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ResourceInfoBlock&gt; + <span class="lifetime">&#39;_ </span>{
 		<span class="kw">unsafe </span>{
-			VarQueryValue::&lt;(LANGID, co::CP)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\VarFileInfo\\Translation&quot;</span>)
-				.ok()
+			VarQueryValue::&lt;(LANGID, co::CP)&gt;(
+				<span class="self">self</span>.res_buf.as_slice(),
+				<span class="string">&quot;\\VarFileInfo\\Translation&quot;</span>,
+			).ok()
 				.map(|(plangs, sz)|
 					std::slice::from_raw_parts(
 						plangs,
@@ -225,7 +229,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>version_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>VS_FIXEDFILEINFO&gt; {
 		<span class="kw">unsafe </span>{
-			VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.res_buf, <span class="string">&quot;\\&quot;</span>)
+			VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(<span class="self">self</span>.res_buf.as_slice(), <span class="string">&quot;\\&quot;</span>)
 				.ok()
 				.map(|(pvsf, <span class="kw">_</span>)| <span class="kw-2">&amp;*</span>pvsf)
 		}
@@ -260,7 +264,7 @@
 	<span class="kw">fn </span>generic_string_info(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
 		<span class="kw">unsafe </span>{
 			VarQueryValue::&lt;u16&gt;(
-				<span class="kw-2">&amp;</span><span class="self">self</span>.res_info.res_buf,
+				<span class="self">self</span>.res_info.res_buf.as_slice(),
 				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\StringFileInfo\\{:04x}{:04x}\\{}&quot;</span>,
 					u16::from(<span class="self">self</span>.lang_id), u16::from(<span class="self">self</span>.code_page), info),
 			).ok()

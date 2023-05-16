@@ -756,14 +756,13 @@
 <a href="#756" id="756">756</a>
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ops::{Deref, DerefMut};
 
 <span class="kw">use </span><span class="kw">crate</span>::kernel;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	HFILEMAPVIEW, HFINDFILE, HGLOBAL, HHEAP, HIDWORD, HINSTANCE, HKEY, HLOCAL,
-	HUPDATERSRC, LODWORD, LUID_AND_ATTRIBUTES, PROCESS_INFORMATION, SID,
-	TOKEN_PRIVILEGES,
+	HeapBlock, HFILEMAPVIEW, HFINDFILE, HGLOBAL, HHEAP, HIDWORD, HINSTANCE,
+	HKEY, HLOCAL, HUPDATERSRC, LODWORD, LUID_AND_ATTRIBUTES,
+	PROCESS_INFORMATION, SID, TOKEN_PRIVILEGES,
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
 	Handle, kernel_Hfile, kernel_Hglobal, kernel_Hheap, kernel_Hlocal,
@@ -1371,10 +1370,9 @@
 <span class="comment">//------------------------------------------------------------------------------
 
 </span><span class="doccomment">/// RAII implementation for [`SID`](crate::SID) which automatically frees the
-/// underlying [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html) when
-/// the object goes out of scope.
+/// underlying memory block when the object goes out of scope.
 </span><span class="kw">pub struct </span>SidGuard {
-	raw: Vec&lt;u8&gt;,
+	raw: HeapBlock,
 }
 
 <span class="kw">impl </span>Deref <span class="kw">for </span>SidGuard {
@@ -1401,7 +1399,7 @@
 	/// This method is used internally by the library, and not intended to be
 	/// used externally.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub const unsafe fn </span>new(raw: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+	</span><span class="kw">pub const unsafe fn </span>new(raw: HeapBlock) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ raw }
 	}
 }
@@ -1411,7 +1409,7 @@
 </span><span class="doccomment">/// RAII implementation for [`TOKEN_PRIVILEGES`](crate::TOKEN_PRIVILEGES) which
 /// manages the allocated memory.
 </span><span class="kw">pub struct </span>TokenPrivilegesGuard {
-	raw: Vec&lt;u8&gt;,
+	raw: HeapBlock,
 }
 
 <span class="kw">impl </span>Deref <span class="kw">for </span>TokenPrivilegesGuard {
@@ -1433,8 +1431,8 @@
 		<span class="kw">let </span>sz = std::mem::size_of::&lt;TOKEN_PRIVILEGES&gt;() <span class="comment">// size in bytes of the allocated struct
 			</span>- std::mem::size_of::&lt;LUID_AND_ATTRIBUTES&gt;()
 			+ (privileges.len() * std::mem::size_of::&lt;LUID_AND_ATTRIBUTES&gt;());
-		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{ raw: <span class="macro">vec!</span>[<span class="number">0u8</span>; sz] };
-		new_self.PrivilegeCount = privileges.len() <span class="kw">as _</span>;
+		<span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self </span>{ raw: HeapBlock::alloc(sz).unwrap() }; <span class="comment">// assume no allocation errors
+		</span>new_self.PrivilegeCount = privileges.len() <span class="kw">as _</span>;
 		privileges.iter()
 			.zip(new_self.Privileges_mut())
 			.for_each(|(src, dest)| <span class="kw-2">*</span>dest = <span class="kw-2">*</span>src); <span class="comment">// copy all LUID_AND_ATTRIBUTES into struct room

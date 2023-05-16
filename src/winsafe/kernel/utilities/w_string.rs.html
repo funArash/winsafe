@@ -451,16 +451,8 @@
 <a href="#451" id="451">451</a>
 <a href="#452" id="452">452</a>
 <a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{co, kernel};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{Encoding, HLOCAL, MultiByteToWideChar, SysResult};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::LocalFreeGuard;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, kernel_Hlocal};
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{Encoding, HeapBlock, MultiByteToWideChar, SysResult};
 
 <span class="kw">pub const </span>SSO_LEN: usize = <span class="number">20</span>;
 
@@ -487,7 +479,7 @@
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>WString {
 	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-		&lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Display&gt;::fmt(<span class="self">self</span>, f) <span class="comment">// simply delegate
+		&lt;Buffer <span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.buf, f) <span class="comment">// simply delegate
 	</span>}
 }
 
@@ -734,8 +726,8 @@
 
 </span><span class="kw">enum </span>Buffer {
 	Stack([u16; SSO_LEN]),
-	Heap((LocalFreeGuard, usize)), <span class="comment">// pointer, char count
-	</span>Unallocated,
+	Heap(HeapBlock),
+	Unallocated,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Buffer {
@@ -765,8 +757,9 @@
 		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt;
 				<span class="macro">format!</span>(<span class="string">&quot;STACK({}) \&quot;{}\&quot;&quot;</span>, arr.len(), <span class="self">self</span>.to_string_checked().unwrap()),
-			<span class="self">Self</span>::Heap((<span class="kw">_</span>, num_chars)) =&gt;
-				<span class="macro">format!</span>(<span class="string">&quot;HEAP({}) \&quot;{}\&quot;&quot;</span>, num_chars, <span class="self">self</span>.to_string_checked().unwrap()),
+			<span class="self">Self</span>::Heap(block) =&gt;
+				<span class="macro">format!</span>(<span class="string">&quot;HEAP({}) \&quot;{}\&quot;&quot;</span>,
+					block.len() / std::mem::size_of::&lt;u16&gt;(), <span class="self">self</span>.to_string_checked().unwrap()),
 			<span class="self">Self</span>::Unallocated =&gt;
 				<span class="string">&quot;(UNALLOCATED)&quot;</span>.to_owned(),
 		})
@@ -851,20 +844,17 @@
 		} <span class="kw">else if </span>num_chars &lt;= SSO_LEN {
 			<span class="self">Self</span>::Stack([<span class="number">0x0000</span>; SSO_LEN])
 		} <span class="kw">else </span>{
-			<span class="self">Self</span>::Heap((
-				HLOCAL::LocalAlloc(
-					<span class="prelude-val">Some</span>(co::LMEM::FIXED | co::LMEM::ZEROINIT), <span class="comment">// with FIXED the handle is the memory pointer itself
-					</span>num_chars * std::mem::size_of::&lt;u16&gt;(),
-				).unwrap(),
-				num_chars,
-			))
+			<span class="self">Self</span>::Heap(
+				HeapBlock::alloc(num_chars * std::mem::size_of::&lt;u16&gt;())
+					.unwrap(), <span class="comment">// assume no allocation errors
+			</span>)
 		}
 	}
 
 	<span class="kw">unsafe fn </span>as_mut_ptr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt; arr.as_mut_ptr(),
-			<span class="self">Self</span>::Heap((hlocal, <span class="kw">_</span>)) =&gt; hlocal.ptr() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Heap(block) =&gt; block.as_mut_ptr() <span class="kw">as _</span>,
 			<span class="self">Self</span>::Unallocated =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Trying to use an unallocated WString buffer.&quot;</span>),
 		}
 	}
@@ -872,8 +862,7 @@
 	<span class="kw">fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u16] {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt; arr,
-			<span class="self">Self</span>::Heap((hlocal, num_chars)) =&gt;
-				<span class="kw">unsafe </span>{ std::slice::from_raw_parts_mut(hlocal.ptr() <span class="kw">as _</span>, <span class="kw-2">*</span>num_chars) },
+			<span class="self">Self</span>::Heap(block) =&gt; <span class="kw">unsafe </span>{ block.as_mut_slice_aligned::&lt;<span class="kw">_</span>&gt;() },
 			<span class="self">Self</span>::Unallocated =&gt; <span class="kw-2">&amp;mut </span>[],
 		}
 	}
@@ -881,7 +870,7 @@
 	<span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u16 {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt; arr.as_ptr(),
-			<span class="self">Self</span>::Heap((hlocal, <span class="kw">_</span>)) =&gt; hlocal.ptr() <span class="kw">as _</span>,
+			<span class="self">Self</span>::Heap(block) =&gt; block.as_ptr() <span class="kw">as _</span>,
 			<span class="self">Self</span>::Unallocated =&gt; std::ptr::null(),
 		}
 	}
@@ -889,8 +878,7 @@
 	<span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt; arr,
-			<span class="self">Self</span>::Heap((hlocal, num_chars)) =&gt;
-				<span class="kw">unsafe </span>{ std::slice::from_raw_parts(hlocal.ptr() <span class="kw">as _</span>, <span class="kw-2">*</span>num_chars) },
+			<span class="self">Self</span>::Heap(block) =&gt; <span class="kw">unsafe </span>{ block.as_slice_aligned::&lt;<span class="kw">_</span>&gt;() },
 			<span class="self">Self</span>::Unallocated =&gt; <span class="kw-2">&amp;</span>[],
 		}
 	}
@@ -898,7 +886,7 @@
 	<span class="kw">const fn </span>buf_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
 		<span class="kw">match </span><span class="self">self </span>{
 			<span class="self">Self</span>::Stack(arr) =&gt; arr.len(),
-			<span class="self">Self</span>::Heap((<span class="kw">_</span>, num_chars)) =&gt; <span class="kw-2">*</span>num_chars,
+			<span class="self">Self</span>::Heap(block) =&gt; block.len() / std::mem::size_of::&lt;u16&gt;(),
 			<span class="self">Self</span>::Unallocated =&gt; <span class="number">0</span>,
 		}
 	}
