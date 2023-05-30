@@ -85,13 +85,32 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
+</span><span class="kw">use </span><span class="kw">crate</span>::co::TASK_ACTION_TYPE;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCSTR, PSTR};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
 <span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::VARIANT;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{oleaut_IDispatch, oleaut_Variant};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{ole_IUnknown, oleaut_IDispatch, oleaut_Variant};
+<span class="kw">use </span><span class="kw">crate</span>::taskschd::decl::IAction;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDispatchVT;
 
 <span class="doccomment">/// [`IActionCollection`](crate::IActionCollection) virtual table.
@@ -137,6 +156,21 @@
 		ok_to_hrresult(
 			<span class="kw">unsafe </span>{ (vt::&lt;IActionCollectionVT&gt;(<span class="self">self</span>).Clear)(<span class="self">self</span>.ptr()) },
 		)
+	}
+
+	<span class="doccomment">/// [`IActionCollection::Create`](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/nf-taskschd-iactioncollection-create)
+	/// method.
+	</span><span class="kw">fn </span>Create(<span class="kw-2">&amp;</span><span class="self">self</span>, action_type: TASK_ACTION_TYPE) -&gt; HrResult&lt;IAction&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IAction::null() };
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IActionCollectionVT&gt;(<span class="self">self</span>).Create)(
+					<span class="self">self</span>.ptr(),
+					action_type.raw(),
+					queried.as_mut(),
+				)
+			},
+		).map(|<span class="kw">_</span>| queried)
 	}
 
 	<span class="macro">fn_bstr_get! </span>{ get_Context: IActionCollectionVT;
