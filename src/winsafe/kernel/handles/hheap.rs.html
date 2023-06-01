@@ -478,7 +478,7 @@
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
 				kernel::ffi::HeapCreate(
-					options.map_or(<span class="number">0</span>, |f| f.raw()),
+					options.unwrap_or_default().raw(),
 					initial_size,
 					maximum_size,
 				),
@@ -525,7 +525,7 @@
 			ptr_to_sysresult(
 				kernel::ffi::HeapAlloc(
 					<span class="self">self</span>.ptr(),
-					flags.map_or(<span class="number">0</span>, |f| f.raw()),
+					flags.unwrap_or_default().raw(),
 					num_bytes,
 				),
 			).map(|p| HeapFreeGuard::new(<span class="self">self</span>, p, num_bytes))
@@ -536,7 +536,7 @@
 	/// method.
 	</span><span class="kw">fn </span>HeapCompact(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: <span class="prelude-ty">Option</span>&lt;co::HEAP_SIZE&gt;) -&gt; SysResult&lt;usize&gt; {
 		<span class="kw">match unsafe </span>{
-			kernel::ffi::HeapCompact(<span class="self">self</span>.ptr(), flags.map_or(<span class="number">0</span>, |f| f.raw()))
+			kernel::ffi::HeapCompact(<span class="self">self</span>.ptr(), flags.unwrap_or_default().raw())
 		} {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			n =&gt; <span class="prelude-val">Ok</span>(n),
@@ -613,7 +613,7 @@
 			<span class="kw">unsafe </span>{
 				kernel::ffi::HeapReAlloc(
 					<span class="self">self</span>.ptr(),
-					flags.map_or(<span class="number">0</span>, |f| f.raw()),
+					flags.unwrap_or_default().raw(),
 					mem.as_ptr() <span class="kw">as _</span>,
 					num_bytes,
 				)
@@ -638,7 +638,7 @@
 		<span class="kw">match unsafe </span>{
 			kernel::ffi::HeapSize(
 				<span class="self">self</span>.ptr(),
-				flags.map_or(<span class="number">0</span>, |f| f.raw()),
+				flags.unwrap_or_default().raw(),
 				mem.as_ptr() <span class="kw">as _</span>,
 			)
 		} {
@@ -671,7 +671,7 @@
 		<span class="kw">unsafe </span>{
 			kernel::ffi::HeapValidate(
 				<span class="self">self</span>.ptr(),
-				flags.map_or(<span class="number">0</span>, |f| f.raw()),
+				flags.unwrap_or_default().raw(),
 				mem.map_or(std::ptr::null_mut(), |mem| mem.as_ptr() <span class="kw">as _</span>),
 			) != <span class="number">0
 		</span>}

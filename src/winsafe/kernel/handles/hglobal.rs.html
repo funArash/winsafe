@@ -165,7 +165,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::GlobalAlloc(flags.map_or(<span class="number">0</span>, |f| f.raw()), num_bytes),
+				kernel::ffi::GlobalAlloc(flags.unwrap_or_default().raw(), num_bytes),
 			).map(|h| GlobalFreeGuard::new(h))
 		}
 	}
@@ -240,7 +240,7 @@
 				kernel::ffi::GlobalReAlloc(
 					<span class="self">self</span>.ptr(),
 					num_bytes,
-					flags.map_or(<span class="number">0</span>, |f| f.raw()),
+					flags.unwrap_or_default().raw(),
 				)
 			},
 		).map(|h| { <span class="kw-2">*</span><span class="self">self </span>= h; })

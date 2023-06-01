@@ -163,7 +163,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::LocalAlloc(flags.map_or(<span class="number">0</span>, |f| f.raw()), num_bytes),
+				kernel::ffi::LocalAlloc(flags.unwrap_or_default().raw(), num_bytes),
 			).map(|h| LocalFreeGuard::new(h))
 		}
 	}
@@ -238,7 +238,7 @@
 				kernel::ffi::LocalReAlloc(
 					<span class="self">self</span>.ptr(),
 					num_bytes,
-					flags.map_or(<span class="number">0</span>, |f| f.raw()),
+					flags.unwrap_or_default().raw(),
 				)
 			},
 		).map(|h| { <span class="kw-2">*</span><span class="self">self </span>= h; })
