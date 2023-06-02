@@ -109,6 +109,8 @@
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{File, FileAccess, HFILEMAP, HFILEMAPVIEW, SysResult};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{CloseHandleGuard, UnmapViewOfFileGuard};
@@ -162,7 +164,8 @@
 			<span class="kw">match </span>access {
 				FileAccess::ExistingReadOnly =&gt; co::PAGE::READONLY,
 				FileAccess::ExistingRW
-					| FileAccess::OpenOrCreateRW =&gt; co::PAGE::READWRITE,
+					| FileAccess::OpenOrCreateRW
+					| FileAccess::CreateRW =&gt; co::PAGE::READWRITE,
 			},
 			<span class="prelude-val">None</span>,
 			<span class="prelude-val">None</span>,
@@ -172,7 +175,8 @@
 			<span class="kw">match </span>access {
 				FileAccess::ExistingReadOnly =&gt; co::FILE_MAP::READ,
 				FileAccess::ExistingRW
-					| FileAccess::OpenOrCreateRW =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
+					| FileAccess::OpenOrCreateRW
+					| FileAccess::CreateRW =&gt; co::FILE_MAP::READ | co::FILE_MAP::WRITE,
 			},
 			<span class="number">0</span>,
 			<span class="prelude-val">None</span>,
