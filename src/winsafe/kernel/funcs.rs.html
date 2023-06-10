@@ -1748,6 +1748,27 @@
 <a href="#1748" id="1748">1748</a>
 <a href="#1749" id="1749">1749</a>
 <a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -2246,6 +2267,27 @@
 			),
 		)
 	}
+}
+
+<span class="doccomment">/// [`GetDiskFreeSpaceEx`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdiskfreespaceexw)
+/// function.
+</span><span class="kw">pub fn </span>GetDiskFreeSpaceEx(
+	directory_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	free_bytes_available_to_caller: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u64&gt;,
+	total_number_of_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u64&gt;,
+	total_number_of_free_bytes: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>u64&gt;,
+) -&gt; SysResult&lt;()&gt;
+{
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetDiskFreeSpaceExW(
+				WString::from_opt_str(directory_name).as_ptr(),
+				free_bytes_available_to_caller.map_or(std::ptr::null_mut(), |n| n),
+				total_number_of_bytes.map_or(std::ptr::null_mut(), |n| n),
+				total_number_of_free_bytes.map_or(std::ptr::null_mut(), |n| n),
+			)
+		},
+	)
 }
 
 <span class="doccomment">/// [`GetDiskSpaceInformation`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdiskspaceinformationw)
