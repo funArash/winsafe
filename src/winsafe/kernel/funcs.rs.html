@@ -1729,6 +1729,25 @@
 <a href="#1729" id="1729">1729</a>
 <a href="#1730" id="1730">1730</a>
 <a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -2530,6 +2549,25 @@
 			)
 		},
 	)
+}
+
+<span class="doccomment">/// [`GetTempFileName`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettempfilenamew)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>GetTempFileName(
+	path_name: <span class="kw-2">&amp;</span>str, prefix: <span class="kw-2">&amp;</span>str, unique: u32) -&gt; SysResult&lt;String&gt;
+{
+	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
+	bool_to_sysresult(
+		<span class="kw">unsafe </span>{
+			kernel::ffi::GetTempFileNameW(
+				WString::from_str(path_name).as_ptr(),
+				WString::from_str(prefix).as_ptr(),
+				unique,
+				buf.as_mut_ptr(),
+			)
+		} <span class="kw">as _</span>,
+	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
 <span class="doccomment">/// [`GetTempPath`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppathw)
