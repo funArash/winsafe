@@ -237,8 +237,8 @@
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>Base {
 	hwnd: HWND,
 	is_dialog: bool,
-	parent_ptr: <span class="prelude-ty">Option</span>&lt;NonNull&lt;<span class="self">Self</span>&gt;&gt;,
-	user_events: WindowEventsAll, <span class="comment">// ordinary window events, inserted by user: only last added is executed (overwrite previous)
+	parent_ptr: <span class="prelude-ty">Option</span>&lt;NonNull&lt;<span class="self">Self</span>&gt;&gt;, <span class="comment">// used only during creation stuff
+	</span>user_events: WindowEventsAll, <span class="comment">// ordinary window events, inserted by user: only last added is executed (overwrite previous)
 	</span>privileged_events: WindowEventsAll, <span class="comment">// inserted internally to automate tasks: all will be executed
 	</span>layout_arranger: LayoutArranger,
 }
@@ -280,12 +280,12 @@
 		<span class="self">self</span>.is_dialog
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>creation_msg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WM {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>wm_create_or_initdialog(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; co::WM {
 		<span class="kw">if </span><span class="self">self</span>.is_dialog { co::WM::INITDIALOG } <span class="kw">else </span>{ co::WM::CREATE }
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Base&gt; {
-		<span class="self">self</span>.parent_ptr.map(<span class="kw">move </span>|parent| <span class="kw">unsafe </span>{ parent.as_ref() })
+		<span class="self">self</span>.parent_ptr.map(|parent| <span class="kw">unsafe </span>{ parent.as_ref() })
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent_hinstance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HINSTANCE&gt; {
@@ -327,8 +327,8 @@
 
 	<span class="doccomment">/// Removes all user and privileged events.
 	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>clear_events(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-		<span class="self">self</span>.user_events.clear();
-		<span class="self">self</span>.privileged_events.clear();
+		<span class="self">self</span>.user_events.clear_events();
+		<span class="self">self</span>.privileged_events.clear_events();
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>add_to_layout_arranger(<span class="kw-2">&amp;</span><span class="self">self</span>,

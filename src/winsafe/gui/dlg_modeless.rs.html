@@ -85,7 +85,6 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -157,13 +156,12 @@
 
 	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Base) {
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
-		<span class="self">self</span>.<span class="number">0</span>.dlg_base.parent().unwrap().privileged_on().wm(parent.creation_msg(), <span class="kw">move </span>|<span class="kw">_</span>| {
-			<span class="kw">let </span>hparent = self2.<span class="number">0</span>.dlg_base.parent().unwrap().hwnd();
+		parent.privileged_on().wm(parent.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.<span class="number">0</span>.dlg_base.create_dialog_param()<span class="question-mark">?</span>;
-			self2.<span class="number">0</span>.dlg_base.hwnd().ShowWindow(co::SW::SHOW);
+			self2.hwnd().ShowWindow(co::SW::SHOW);
 
 			<span class="kw">let </span>dlg_pos = adjust_modeless_pos(
-				self2.<span class="number">0</span>.dlg_base.parent().unwrap(), hparent, self2.<span class="number">0</span>.position)<span class="question-mark">?</span>;
+				self2.<span class="number">0</span>.dlg_base.parent().unwrap(), self2.<span class="number">0</span>.position)<span class="question-mark">?</span>;
 
 			self2.hwnd().SetWindowPos(
 				HwndPlace::None,

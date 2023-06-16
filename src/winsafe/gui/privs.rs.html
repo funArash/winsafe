@@ -250,6 +250,7 @@
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Global objects used within `gui` module.
 
 </span><span class="kw">use </span>std::error::Error;
@@ -453,10 +454,11 @@
 
 </span><span class="doccomment">/// Adjusts the position of a modeless window on parent.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>adjust_modeless_pos(
-	modeless_base: <span class="kw-2">&amp;</span>Base, hparent: <span class="kw-2">&amp;</span>HWND, <span class="kw-2">mut </span>user_pos: POINT) -&gt; SysResult&lt;POINT&gt;
+	parent_base: <span class="kw-2">&amp;</span>Base, <span class="kw-2">mut </span>user_pos: POINT) -&gt; SysResult&lt;POINT&gt;
 {
 	<span class="comment">// For a modeless (0,0) is the left/topmost point in parent&#39;s client area.
-	</span>multiply_dpi_or_dtu(modeless_base, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>user_pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+	</span>multiply_dpi_or_dtu(parent_base, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>user_pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+	<span class="kw">let </span>hparent = parent_base.hwnd();
 	<span class="kw">let </span><span class="kw-2">mut </span>parent_rc = hparent.GetClientRect()<span class="question-mark">?</span>;
 	hparent.ClientToScreenRc(<span class="kw-2">&amp;mut </span>parent_rc)<span class="question-mark">?</span>;
 	user_pos.x += parent_rc.left;

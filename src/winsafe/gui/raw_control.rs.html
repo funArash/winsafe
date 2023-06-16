@@ -216,7 +216,6 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -292,7 +291,8 @@
 
 	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Base, horz: Horz, vert: Vert) {
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
-		<span class="self">self</span>.<span class="number">0</span>.raw_base.parent().unwrap().privileged_on().wm(parent.creation_msg(), <span class="kw">move </span>|<span class="kw">_</span>| {
+		parent.privileged_on().wm(parent.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
+			<span class="kw">let </span>parent_ref = self2.<span class="number">0</span>.raw_base.parent().unwrap();
 			<span class="kw">let </span>opts = <span class="kw-2">&amp;</span>self2.<span class="number">0</span>.opts;
 
 			<span class="kw">let </span>parent_hinst = self2.<span class="number">0</span>.raw_base.parent_hinstance()<span class="question-mark">?</span>;
@@ -307,8 +307,7 @@
 
 			<span class="kw">let </span><span class="kw-2">mut </span>wnd_pos = POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>);
 			<span class="kw">let </span><span class="kw-2">mut </span>wnd_sz = SIZE::new(opts.size.<span class="number">0 </span><span class="kw">as _</span>, opts.size.<span class="number">1 </span><span class="kw">as _</span>);
-			multiply_dpi_or_dtu(self2.<span class="number">0</span>.raw_base.parent().unwrap(),
-				<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_pos), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_sz))<span class="question-mark">?</span>;
+			multiply_dpi_or_dtu(parent_ref, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_pos), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_sz))<span class="question-mark">?</span>;
 
 			self2.<span class="number">0</span>.raw_base.create_window(
 				atom,
@@ -318,8 +317,7 @@
 				opts.ex_style, opts.style,
 			)<span class="question-mark">?</span>;
 
-			self2.<span class="number">0</span>.raw_base.parent().unwrap()
-				.add_to_layout_arranger(self2.hwnd(), horz, vert)<span class="question-mark">?</span>;
+			parent_ref.add_to_layout_arranger(self2.hwnd(), horz, vert)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
 

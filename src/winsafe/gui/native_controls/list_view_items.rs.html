@@ -288,13 +288,20 @@
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::comctl::decl::{LVFINDINFO, LVHITTESTINFO, LVITEM};
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::list_view_item::ListViewItem;
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::list_view::ListView;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::msg::lvm;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, user_Hwnd};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{GuiWindow, NativeBitflag, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::POINT;
 
 <span class="doccomment">/// Exposes item methods of a [`ListView`](crate::gui::ListView) control.
@@ -525,6 +532,13 @@
 	<span class="doccomment">/// Sets or remove the selection for all items by sending an
 	/// [`lvm::SetItemState`](crate::msg::lvm::SetItemState) message.
 	</span><span class="kw">pub fn </span>select_all(<span class="kw-2">&amp;</span><span class="self">self</span>, set: bool) {
+		<span class="kw">let </span>styles = <span class="kw">unsafe </span>{
+			co::LVS::from_raw(<span class="self">self</span>.owner.hwnd().GetWindowLongPtr(co::GWLP::STYLE) <span class="kw">as _</span>)
+		};
+		<span class="kw">if </span>styles.has(co::LVS::SINGLESEL) {
+			<span class="kw">return</span>; <span class="comment">// LVM_SETITEMSTATE fails for all items in single-sel list views
+		</span>}
+
 		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
 		lvi.stateMask = co::LVIS::SELECTED;
 		<span class="kw">if </span>set { lvi.state = co::LVIS::SELECTED; }
