@@ -220,6 +220,16 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ptr::NonNull;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -233,7 +243,14 @@
 	DispatchMessage, GetMessage, HACCEL, HWND, MSG, TranslateMessage,
 };
 
-<span class="doccomment">/// Base to `RawBase` and `DlgBase`, which means all container windows.
+<span class="doccomment">/// Allocated on the heap and passed through WM_UI_THREAD.
+</span><span class="kw">struct </span>ThreadPack {
+	func: Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;,
+}
+
+<span class="comment">//------------------------------------------------------------------------------
+
+</span><span class="doccomment">/// Base to `RawBase` and `DlgBase`, which means all container windows.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>Base {
 	hwnd: HWND,
 	is_dialog: bool,
@@ -344,15 +361,17 @@
 		<span class="kw">let </span>hwnd = <span class="kw">unsafe </span>{ <span class="self">self</span>.hwnd.raw_copy() };
 		std::thread::spawn(<span class="kw">move </span>|| {
 			func().unwrap_or_else(|err| {
-				<span class="kw">let </span>pack: Box&lt;Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;&gt; = Box::new(Box::new(|| <span class="prelude-val">Err</span>(err)));
+				<span class="comment">// If the user func returned an error, create another function
+				// which just returns it, then forward it to WM_UI_THREAD.
+				</span><span class="kw">let </span>pack = Box::new(ThreadPack { func: Box::new(|| <span class="prelude-val">Err</span>(err)) });
 				<span class="kw">let </span>ptr_pack = Box::into_raw(pack);
 				hwnd.GetAncestor(co::GA::ROOTOWNER)
 					.map(|hwnd| {
 						hwnd.SendMessage(WndMsg {
 							msg_id: <span class="self">Self</span>::WM_UI_THREAD,
 							wparam: <span class="self">Self</span>::WM_UI_THREAD.raw() <span class="kw">as _</span>,
-							lparam: ptr_pack <span class="kw">as _</span>,
-						});
+							lparam: ptr_pack <span class="kw">as _</span>, <span class="comment">// send pointer
+						</span>});
 					});
 			});
 		});
@@ -368,7 +387,7 @@
 		// WM_ message.
 
 		// https://users.rust-lang.org/t/sending-a-boxed-trait-over-ffi/21708/2
-		</span><span class="kw">let </span>pack: Box&lt;Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;&gt; = Box::new(Box::new(func));
+		</span><span class="kw">let </span>pack = Box::new(ThreadPack { func: Box::new(func) });
 		<span class="kw">let </span>ptr_pack = Box::into_raw(pack);
 
 		<span class="comment">// Bypass any modals and send straight to main window. This avoids any
@@ -378,8 +397,8 @@
 				hwnd.SendMessage(WndMsg {
 					msg_id: <span class="self">Self</span>::WM_UI_THREAD,
 					wparam: <span class="self">Self</span>::WM_UI_THREAD.raw() <span class="kw">as _</span>,
-					lparam: ptr_pack <span class="kw">as _</span>,
-				});
+					lparam: ptr_pack <span class="kw">as _</span>, <span class="comment">// send pointer
+				</span>});
 			});
 	}
 
@@ -395,9 +414,10 @@
 
 		<span class="self">self</span>.privileged_events.wm(<span class="self">Self</span>::WM_UI_THREAD, |p| {
 			<span class="kw">if unsafe </span>{ co::WM::from_raw(p.wparam <span class="kw">as _</span>) } == <span class="self">Self</span>::WM_UI_THREAD { <span class="comment">// additional safety check
-				</span><span class="kw">let </span>ptr_pack = p.lparam <span class="kw">as </span><span class="kw-2">*mut </span>Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;;
-				<span class="kw">let </span>pack: Box&lt;Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; AnyResult&lt;()&gt;&gt;&gt; = <span class="kw">unsafe </span>{ Box::from_raw(ptr_pack) };
-				pack().unwrap_or_else(|err| post_quit_error(p, err));
+				</span><span class="kw">let </span>ptr_pack = p.lparam <span class="kw">as </span><span class="kw-2">*mut </span>ThreadPack; <span class="comment">// retrieve pointer
+				</span><span class="kw">let </span>pack = <span class="kw">unsafe </span>{ Box::from_raw(ptr_pack) };
+				<span class="kw">let </span>func = pack.func;
+				func().unwrap_or_else(|err| post_quit_error(p, err));
 			}
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});

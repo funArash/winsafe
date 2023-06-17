@@ -1796,6 +1796,40 @@
 <a href="#1796" id="1796">1796</a>
 <a href="#1797" id="1797">1797</a>
 <a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -2807,6 +2841,11 @@
 
 	<span class="doccomment">/// [`KillTimer`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-killtimer)
 	/// method.
+	///
+	/// This function ends the timer calls for the given timer ID. If you don&#39;t
+	/// call this function, the timer calls will continue until the window is
+	/// destroyed – at this point, any remaining timers will be automatically
+	/// cleared.
 	</span><span class="kw">fn </span>KillTimer(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: usize) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">match unsafe </span>{ user::ffi::KillTimer(<span class="self">self</span>.ptr(), event_id) } {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
@@ -3344,8 +3383,37 @@
 		)
 	}
 
-	<span class="doccomment">/// [`SetTimer`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-settimer)
-	/// method.
+	<span class="doccomment">/// This method returns the timer ID, to be passed to
+	/// [`HWND::KillTimer`](crate::prelude::user_Hwnd::KillTimer).
+	///
+	/// The timer calls – either [`wm::Timer`](crate::msg::wm::Timer) message or
+	/// callback function – will continuously be executed until you call
+	/// `KillTimer`. If you don&#39;t call `KillTimer`, the timer calls will
+	/// continue until the window is destroyed – at this point, any remaining
+	/// timers will be automatically cleared.
+	///
+	/// # Why not closures?
+	///
+	/// A common C++ technique to use closures with `SetTimer` is allocating a
+	/// closure on the heap and using its pointer as the timer ID. When the
+	/// callback function is called, the pointer is dereferenced and the closure
+	/// is then executed.
+	///
+	/// The problem with this approach is that the closure must be freed after
+	/// [`KillTimer`](crate::prelude::user_Hwnd::KillTimer), which can be called
+	/// from anywhere, include from the closure itself – that means you must
+	/// keep the pointer outside the closure and free it somehow after the
+	/// closure finishes.
+	///
+	/// Such approach is, obviously, incredibly unsafe, and only possible within
+	/// Rust&#39;s rigid ownership rules if we use some sort of garbage-collection,
+	/// which will free the allocated closures some time after `KillTimer` is
+	/// called and the closure it self finishes. Since it would incur in a
+	/// performance penalty, the current implementation of `SetTimer` will only
+	/// accept ordinary function pointers, not closures.
+	///
+	/// Handling the `wm::Timer` is simply more practical and efficient, so the
+	/// use of a callback is discouraged here.
 	</span><span class="kw">fn </span>SetTimer(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		event_id: usize,
 		elapse_ms: u32,
