@@ -1829,7 +1829,6 @@
 <a href="#1829" id="1829">1829</a>
 <a href="#1830" id="1830">1830</a>
 <a href="#1831" id="1831">1831</a>
-<a href="#1832" id="1832">1832</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -3400,20 +3399,19 @@
 	/// is then executed.
 	///
 	/// The problem with this approach is that the closure must be freed after
-	/// [`KillTimer`](crate::prelude::user_Hwnd::KillTimer), which can be called
-	/// from anywhere, include from the closure itself – that means you must
-	/// keep the pointer outside the closure and free it somehow after the
-	/// closure finishes.
+	/// `KillTimer`, which can be called from anywhere, including from the
+	/// closure itself – that means you must keep the pointer outside the
+	/// closure and free it somehow after the closure finishes.
 	///
 	/// Such approach is, obviously, incredibly unsafe, and only possible within
 	/// Rust&#39;s rigid ownership rules if we use some sort of garbage-collection,
-	/// which will free the allocated closures some time after `KillTimer` is
-	/// called and the closure itself finishes. Since it would incur in a
+	/// which will free the allocated closure some time after `KillTimer` is
+	/// called and the closure itself finishes. Since that would incur in a
 	/// performance penalty, the current implementation of `SetTimer` will only
 	/// accept ordinary function pointers, not closures.
 	///
-	/// Handling the `wm::Timer` is simply more practical and efficient, so the
-	/// use of a callback is discouraged here.
+	/// Handling the `wm::Timer` message is simply more practical and efficient,
+	/// so the use of a callback is discouraged here.
 	</span><span class="kw">fn </span>SetTimer(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		event_id: usize,
 		elapse_ms: u32,
