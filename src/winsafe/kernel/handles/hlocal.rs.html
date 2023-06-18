@@ -114,17 +114,6 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -180,15 +169,8 @@
 	<span class="doccomment">/// [`LocalLock`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-locallock)
 	/// method.
 	///
-	/// Calls
-	/// [`HLOCAL::LocalSize`](crate::prelude::kernel_Hlocal::LocalSize) to
+	/// Calls [`LocalSize`](crate::prelude::kernel_Hlocal::LocalSize) to
 	/// retrieve the size of the memory block.
-	///
-	/// Note that this method returns two objects: a reference to the memory
-	/// block, and a guard which will call
-	/// [`LocalUnlock`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-localunlock)
-	/// automatically when the object goes out of scope, so keep the guard
-	/// alive.
 	///
 	/// # Examples
 	///
@@ -201,9 +183,9 @@
 	///     120,
 	/// )?;
 	///
-	/// let (block, _guard) = hlocal.LocalLock()?;
+	/// let mut block = hlocal.LocalLock()?;
 	///
-	/// block[0] = 40;
+	/// block.as_mut_slice()[0] = 40;
 	///
 	/// // LocalUnlock() called automatically
 	///
@@ -211,15 +193,11 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>LocalLock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;(<span class="kw-2">&amp;mut </span>[u8], LocalUnlockGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;)&gt; {
+	</span><span class="kw">fn </span>LocalLock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;LocalUnlockGuard&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt; {
 		<span class="kw">let </span>mem_sz = <span class="self">self</span>.LocalSize()<span class="question-mark">?</span>;
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult(kernel::ffi::LocalLock(<span class="self">self</span>.ptr()))
-				.map(|ptr| (
-					std::slice::from_raw_parts_mut(ptr.cast(), mem_sz <span class="kw">as _</span>),
-					LocalUnlockGuard::new(<span class="self">self</span>),
-				),
-			)
+				.map(|ptr| LocalUnlockGuard::new(<span class="self">self</span>, ptr, mem_sz))
 		}
 	}
 
