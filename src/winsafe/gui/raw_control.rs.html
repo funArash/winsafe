@@ -214,8 +214,6 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -246,7 +244,7 @@
 
 <span class="kw">impl </span>RawControl {
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent: <span class="kw-2">&amp;</span>Base, opts: WindowControlOpts) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>(horz, vert) = (opts.horz_resize, opts.vert_resize);
+		<span class="kw">let </span>resize_behavior = opts.resize_behavior;
 		<span class="kw">let </span>opts = WindowControlOpts::define_ctrl_id(opts);
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
@@ -257,7 +255,7 @@
 				},
 			),
 		);
-		new_self.default_message_handlers(parent, horz, vert);
+		new_self.default_message_handlers(parent, resize_behavior);
 		new_self
 	}
 
@@ -289,7 +287,9 @@
 		<span class="self">self</span>.<span class="number">0</span>.raw_base.run_ui_thread(func);
 	}
 
-	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Base, horz: Horz, vert: Vert) {
+	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		parent: <span class="kw-2">&amp;</span>Base, resize_behavior: (Horz, Vert))
+	{
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
 		parent.privileged_on().wm(parent.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
 			<span class="kw">let </span>parent_ref = self2.<span class="number">0</span>.raw_base.parent().unwrap();
@@ -317,7 +317,7 @@
 				opts.ex_style, opts.style,
 			)<span class="question-mark">?</span>;
 
-			parent_ref.add_to_layout_arranger(self2.hwnd(), horz, vert)<span class="question-mark">?</span>;
+			parent_ref.add_to_layout_arranger(self2.hwnd(), resize_behavior)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
 
@@ -397,14 +397,11 @@
 	///
 	/// Defaults to an auto-generated ID.
 	</span><span class="kw">pub </span>ctrl_id: u16,
-	<span class="doccomment">/// Horizontal behavior when the parent is resized.
+	<span class="doccomment">/// Horizontal and vertical behavior of the control when the parent window
+	/// is resized.
 	///
-	/// Defaults to `Horz::None`.
-	</span><span class="kw">pub </span>horz_resize: Horz,
-	<span class="doccomment">/// Vertical behavior when the parent is resized.
-	///
-	/// Defaults to `Vert::None`.
-	</span><span class="kw">pub </span>vert_resize: Vert,
+	/// Defaults to `(Horz::None, Vert::None)`.
+	</span><span class="kw">pub </span>resize_behavior: (Horz, Vert),
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>WindowControlOpts {
@@ -420,8 +417,7 @@
 			style: co::WS::CHILD | co::WS::TABSTOP | co::WS::GROUP | co::WS::VISIBLE | co::WS::CLIPCHILDREN | co::WS::CLIPSIBLINGS,
 			ex_style: co::WS_EX::LEFT,
 			ctrl_id: <span class="number">0</span>,
-			horz_resize: Horz::None,
-			vert_resize: Vert::None,
+			resize_behavior: (Horz::None, Vert::None),
 		}
 	}
 }
