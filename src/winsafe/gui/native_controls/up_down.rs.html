@@ -313,15 +313,6 @@
 <a href="#313" id="313">313</a>
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -330,9 +321,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{UpDownEvents, WindowEvents};
-<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::{
-	BaseNativeControl, OptsId,
-};
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::BaseNativeControl;
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{auto_ctrl_id, multiply_dpi_or_dtu};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::msg::udm;
@@ -344,7 +333,6 @@
 
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of UpDown
 	</span>base: BaseNativeControl,
-	opts_id: OptsId&lt;UpDownOpts&gt;,
 	events: UpDownEvents,
 	_pin: PhantomPinned,
 }
@@ -377,10 +365,7 @@
 
 <span class="kw">impl </span>GuiChild <span class="kw">for </span>UpDown {
 	<span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; opts.ctrl_id,
-			OptsId::Dlg(ctrl_id) =&gt; <span class="kw-2">*</span>ctrl_id,
-		}
+		<span class="self">self</span>.<span class="number">0</span>.base.ctrl_id()
 	}
 }
 
@@ -451,8 +436,7 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref),
-					opts_id: OptsId::Wnd(opts),
+					base: BaseNativeControl::new(parent_ref, ctrl_id),
 					events: UpDownEvents::new(parent_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
@@ -461,7 +445,7 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create()<span class="question-mark">?</span>;
+			self2.create(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>opts))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
 
@@ -483,8 +467,7 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref),
-					opts_id: OptsId::Dlg(ctrl_id),
+					base: BaseNativeControl::new(parent_ref, ctrl_id),
 					events: UpDownEvents::new(parent_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
@@ -493,16 +476,16 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create()<span class="question-mark">?</span>;
+			self2.create(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});
 
 		new_self
 	}
 
-	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; {
+	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>, opts: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>UpDownOpts&gt;) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">match </span>opts {
+			<span class="prelude-val">Some</span>(opts) =&gt; {
 				<span class="kw">let </span><span class="kw-2">mut </span>pos = POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>);
 				<span class="kw">let </span><span class="kw-2">mut </span>sz = SIZE::new(<span class="number">0</span>, opts.height <span class="kw">as _</span>);
 				multiply_dpi_or_dtu(
@@ -510,7 +493,6 @@
 
 				<span class="self">self</span>.<span class="number">0</span>.base.create_window( <span class="comment">// may panic
 					</span><span class="string">&quot;msctls_updown32&quot;</span>, <span class="prelude-val">None</span>, pos, SIZE::new(<span class="number">0</span>, opts.height <span class="kw">as _</span>),
-					opts.ctrl_id,
 					opts.window_ex_style,
 					opts.window_style | opts.up_down_style.into(),
 				)<span class="question-mark">?</span>;
@@ -523,7 +505,7 @@
 					}
 				}
 			},
-			OptsId::Dlg(ctrl_id) =&gt; <span class="self">self</span>.<span class="number">0</span>.base.create_dlg(<span class="kw-2">*</span>ctrl_id)<span class="question-mark">?</span>,
+			<span class="prelude-val">None </span>=&gt; <span class="self">self</span>.<span class="number">0</span>.base.create_dlg()<span class="question-mark">?</span>,
 		}
 
 		<span class="prelude-val">Ok</span>(())

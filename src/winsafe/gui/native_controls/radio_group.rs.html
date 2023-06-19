@@ -213,6 +213,11 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::ops::Index;
 <span class="kw">use </span>std::pin::Pin;
@@ -223,6 +228,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::RadioGroupEvents;
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
+<span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::OptsResz;
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::radio_button::{RadioButton, RadioButtonOpts};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{
@@ -299,8 +305,8 @@
 			.map(|r| r.ctrl_id()) <span class="comment">// when the radio is created, the ctrl ID is defined
 			</span>.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-		<span class="kw">let </span>resize_behaviors = opts.iter()
-			.map(|opt| opt.resize_behavior)
+		<span class="kw">let </span>opts_resz_s = opts.into_iter()
+			.map(|opt| OptsResz::Wnd(opt.clone()))
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
@@ -316,9 +322,10 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create(resize_behaviors.clone())<span class="question-mark">?</span>;
+			self2.create(<span class="kw-2">&amp;</span>opts_resz_s)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
+
 		new_self
 	}
 
@@ -350,8 +357,8 @@
 			.map(|(ctrl_id, <span class="kw">_</span>, <span class="kw">_</span>)| <span class="kw-2">*</span>ctrl_id)
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-		<span class="kw">let </span>resize_behaviors = ctrls.iter()
-			.map(|(<span class="kw">_</span>, horz, vert)| (<span class="kw-2">*</span>horz, <span class="kw-2">*</span>vert))
+		<span class="kw">let </span>opts_resz_s = ctrls.iter()
+			.map(|(<span class="kw">_</span>, horz, vert)| OptsResz::Dlg((<span class="kw-2">*</span>horz, <span class="kw-2">*</span>vert)))
 			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
@@ -367,17 +374,20 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create(resize_behaviors.clone())<span class="question-mark">?</span>;
+			self2.create(<span class="kw-2">&amp;</span>opts_resz_s)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});
+
 		new_self
 	}
 
-	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>, resize_behaviors: Vec&lt;(Horz, Vert)&gt;) -&gt; SysResult&lt;()&gt; {
+	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		opts_resz_s: <span class="kw-2">&amp;</span>Vec&lt;OptsResz&lt;RadioButtonOpts&gt;&gt;) -&gt; SysResult&lt;()&gt;
+	{
 		<span class="self">self</span>.<span class="number">0</span>.radios.iter()
-			.zip(resize_behaviors.iter())
-			.try_for_each(|(radio, resize_behavior)|
-				radio.create(<span class="kw-2">*</span>resize_behavior) <span class="comment">// create each RadioButton sequentially
+			.zip(opts_resz_s.iter())
+			.try_for_each(|(radio, opts_resz)|
+				radio.create(opts_resz) <span class="comment">// create each RadioButton sequentially
 			</span>)
 	}
 

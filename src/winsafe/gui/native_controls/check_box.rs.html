@@ -356,7 +356,6 @@
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -367,7 +366,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ButtonEvents, WindowEvents};
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::{
-	BaseNativeControl, OptsId,
+	BaseNativeControl, OptsResz,
 };
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{
 	auto_ctrl_id, calc_text_bound_box_check, multiply_dpi_or_dtu, ui_font,
@@ -398,7 +397,6 @@
 
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of CheckBox
 	</span>base: BaseNativeControl,
-	opts_id: OptsId&lt;CheckBoxOpts&gt;,
 	events: ButtonEvents,
 	_pin: PhantomPinned,
 }
@@ -428,10 +426,7 @@
 
 <span class="kw">impl </span>GuiChild <span class="kw">for </span>CheckBox {
 	<span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; opts.ctrl_id,
-			OptsId::Dlg(ctrl_id) =&gt; <span class="kw-2">*</span>ctrl_id,
-		}
+		<span class="self">self</span>.<span class="number">0</span>.base.ctrl_id()
 	}
 }
 
@@ -467,12 +462,12 @@
 	</span><span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: CheckBoxOpts) -&gt; <span class="self">Self </span>{
 		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 		<span class="kw">let </span>opts = CheckBoxOpts::define_ctrl_id(opts);
-		<span class="kw">let </span>(ctrl_id, resize_behavior) = (opts.ctrl_id, opts.resize_behavior);
+		<span class="kw">let </span>ctrl_id = opts.ctrl_id;
+
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref),
-					opts_id: OptsId::Wnd(opts),
+					base: BaseNativeControl::new(parent_ref, ctrl_id),
 					events: ButtonEvents::new(parent_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
@@ -481,7 +476,7 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create(resize_behavior)<span class="question-mark">?</span>;
+			self2.create(OptsResz::Wnd(<span class="kw-2">&amp;</span>opts))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
 
@@ -508,8 +503,7 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref),
-					opts_id: OptsId::Dlg(ctrl_id),
+					base: BaseNativeControl::new(parent_ref, ctrl_id),
 					events: ButtonEvents::new(parent_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
@@ -518,16 +512,21 @@
 
 		<span class="kw">let </span>self2 = new_self.clone();
 		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
-			self2.create(resize_behavior)<span class="question-mark">?</span>;
+			self2.create(OptsResz::Dlg(resize_behavior))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});
 
 		new_self
 	}
 
-	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>, resize_behavior: (Horz, Vert)) -&gt; SysResult&lt;()&gt; {
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; {
+	<span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>, opts_resz: OptsResz&lt;<span class="kw-2">&amp;</span>CheckBoxOpts&gt;) -&gt; SysResult&lt;()&gt; {
+		<span class="kw">let </span>resize_behavior = <span class="kw">match </span>opts_resz {
+			OptsResz::Wnd(opts) =&gt; opts.resize_behavior,
+			OptsResz::Dlg(resize_behavior) =&gt; resize_behavior,
+		};
+
+		<span class="kw">match </span>opts_resz {
+			OptsResz::Wnd(opts) =&gt; {
 				<span class="kw">let </span><span class="kw-2">mut </span>pos = POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>);
 				multiply_dpi_or_dtu(
 					<span class="self">self</span>.<span class="number">0</span>.base.parent(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
@@ -542,7 +541,6 @@
 
 				<span class="self">self</span>.<span class="number">0</span>.base.create_window(
 					<span class="string">&quot;BUTTON&quot;</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>opts.text), pos, sz,
-					opts.ctrl_id,
 					opts.window_ex_style,
 					opts.window_style | opts.button_style.into(),
 				)<span class="question-mark">?</span>;
@@ -555,7 +553,7 @@
 					<span class="self">self</span>.set_check_state(opts.check_state);
 				}
 			},
-			OptsId::Dlg(ctrl_id) =&gt; <span class="self">self</span>.<span class="number">0</span>.base.create_dlg(<span class="kw-2">*</span>ctrl_id)<span class="question-mark">?</span>,
+			OptsResz::Dlg(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="number">0</span>.base.create_dlg()<span class="question-mark">?</span>,
 		}
 
 		<span class="self">self</span>.<span class="number">0</span>.base.parent().add_to_layout_arranger(<span class="self">self</span>.hwnd(), resize_behavior)

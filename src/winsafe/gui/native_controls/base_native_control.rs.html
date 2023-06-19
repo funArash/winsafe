@@ -181,6 +181,8 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::UnsafeCell;
 <span class="kw">use </span>std::ptr::NonNull;
 
@@ -189,22 +191,19 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEvents};
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::post_quit_error;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{AnyResult, SysResult};
+<span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
 <span class="kw">use </span><span class="kw">crate</span>::msg::WndMsg;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{comctl_Hwnd, Handle, user_Hwnd};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{AtomStr, HWND, IdMenu, POINT, SIZE};
 
 <span class="kw">static </span><span class="kw-2">mut </span>BASE_SUBCLASS_ID: usize = <span class="number">0</span>;
 
-<span class="doccomment">/// Variant field for child controls: creation options or just a control ID.
-</span><span class="kw">pub enum </span>OptsId&lt;P&gt; {
-	<span class="doccomment">/// The control will be created with
-	/// [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx). We
-	/// keep a lot of options for manual creation.
-	</span>Wnd(P),
-	<span class="doccomment">/// The control belongs to a dialog and will be attached with
-	/// [`HWND::GetDlgItem`](crate::prelude::user_Hwnd::GetDlgItem). We keep
-	/// just the control ID from the dialog resource.
-	</span>Dlg(u16),
+<span class="doccomment">/// Variant field for creating child controls.
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">enum </span>OptsResz&lt;T&gt; {
+	<span class="doccomment">/// Options for a raw control creation.
+	</span>Wnd(T),
+	<span class="doccomment">/// Resize behavior for a dialog control creation.
+	</span>Dlg((Horz, Vert)),
 }
 
 <span class="comment">//------------------------------------------------------------------------------
@@ -213,22 +212,28 @@
 ///
 /// Owns the window procedure for all subclassed native child controls.
 </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">struct </span>BaseNativeControl {
+	ctrl_id: u16,
 	hwnd: UnsafeCell&lt;HWND&gt;,
 	parent_ptr: NonNull&lt;Base&gt;, <span class="comment">// base of WindowControl, WindowMain or WindowModal
 	</span>subclass_events: WindowEvents, <span class="comment">// for control subclassing
 </span>}
 
 <span class="kw">impl </span>BaseNativeControl {
-	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent: <span class="kw-2">&amp;</span>Base) -&gt; <span class="self">Self </span>{
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(parent: <span class="kw-2">&amp;</span>Base, ctrl_id: u16) -&gt; <span class="self">Self </span>{
 		<span class="kw">if </span><span class="kw-2">*</span>parent.hwnd() != HWND::NULL {
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create a child control after the parent window is created.&quot;</span>);
 		}
 
 		<span class="self">Self </span>{
+			ctrl_id,
 			hwnd: UnsafeCell::new(HWND::NULL),
 			parent_ptr: NonNull::from(parent),
 			subclass_events: WindowEvents::new(),
 		}
+	}
+
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">const fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+		<span class="self">self</span>.ctrl_id
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>hwnd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HWND {
@@ -253,7 +258,6 @@
 		title: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
 		pos: POINT,
 		sz: SIZE,
-		ctrl_id: u16,
 		ex_styles: co::WS_EX,
 		styles: co::WS,
 	) -&gt; SysResult&lt;()&gt;
@@ -273,7 +277,7 @@
 				title, styles,
 				pos, sz,
 				<span class="prelude-val">Some</span>(hparent),
-				IdMenu::Id(ctrl_id),
+				IdMenu::Id(<span class="self">self</span>.ctrl_id),
 				<span class="kw-2">&amp;</span>hparent.hinstance(),
 				<span class="prelude-val">None</span>,
 			)<span class="question-mark">?</span>;
@@ -283,7 +287,7 @@
 		<span class="prelude-val">Ok</span>(())
 	}
 
-	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create_dlg(<span class="kw-2">&amp;</span><span class="self">self</span>, ctrl_id: u16) -&gt; SysResult&lt;()&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create_dlg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
 		<span class="kw">if </span>!<span class="self">self</span>.parent().is_dialog() {
 			<span class="macro">panic!</span>(<span class="string">&quot;Parent window is not a dialog, cannot create control.&quot;</span>);
 		}
@@ -296,7 +300,7 @@
 			<span class="macro">panic!</span>(<span class="string">&quot;Cannot create control before parent window creation.&quot;</span>);
 		}
 
-		<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.hwnd.get() } = hparent.GetDlgItem(ctrl_id)<span class="question-mark">?</span>;
+		<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.hwnd.get() } = hparent.GetDlgItem(<span class="self">self</span>.ctrl_id)<span class="question-mark">?</span>;
 		<span class="self">self</span>.install_subclass_if_needed()<span class="question-mark">?</span>;
 		<span class="prelude-val">Ok</span>(())
 	}

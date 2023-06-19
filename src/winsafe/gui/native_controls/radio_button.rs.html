@@ -289,9 +289,6 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -299,7 +296,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ButtonEvents, WindowEvents};
 <span class="kw">use </span><span class="kw">crate</span>::gui::layout_arranger::{Horz, Vert};
 <span class="kw">use </span><span class="kw">crate</span>::gui::native_controls::base_native_control::{
-	BaseNativeControl, OptsId,
+	BaseNativeControl, OptsResz,
 };
 <span class="kw">use </span><span class="kw">crate</span>::gui::privs::{
 	auto_ctrl_id, calc_text_bound_box_check, multiply_dpi_or_dtu, ui_font,
@@ -322,7 +319,6 @@
 /// [`RadioGroup`](crate::gui::RadioGroup).
 </span><span class="kw">pub struct </span>RadioButton {
 	base: BaseNativeControl,
-	opts_id: OptsId&lt;RadioButtonOpts&gt;,
 	events: ButtonEvents,
 }
 
@@ -340,10 +336,7 @@
 
 <span class="kw">impl </span>GuiChild <span class="kw">for </span>RadioButton {
 	<span class="kw">fn </span>ctrl_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; opts.ctrl_id,
-			OptsId::Dlg(ctrl_id) =&gt; <span class="kw-2">*</span>ctrl_id,
-		}
+		<span class="self">self</span>.base.ctrl_id()
 	}
 }
 
@@ -375,8 +368,7 @@
 		<span class="kw">let </span>ctrl_id = opts.ctrl_id;
 
 		<span class="self">Self </span>{
-			base: BaseNativeControl::new(parent_ref),
-			opts_id: OptsId::Wnd(opts),
+			base: BaseNativeControl::new(parent_ref, ctrl_id),
 			events: ButtonEvents::new(parent_ref, ctrl_id),
 		}
 	}
@@ -387,17 +379,21 @@
 		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
 		<span class="self">Self </span>{
-			base: BaseNativeControl::new(parent_ref),
-			opts_id: OptsId::Dlg(ctrl_id),
+			base: BaseNativeControl::new(parent_ref, ctrl_id),
 			events: ButtonEvents::new(parent_ref, ctrl_id),
 		}
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		resize_behavior: (Horz, Vert)) -&gt; SysResult&lt;()&gt;
+		opts_resz: <span class="kw-2">&amp;</span>OptsResz&lt;RadioButtonOpts&gt;) -&gt; SysResult&lt;()&gt;
 	{
-		<span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.opts_id {
-			OptsId::Wnd(opts) =&gt; {
+		<span class="kw">let </span>resize_behavior = <span class="kw">match </span>opts_resz {
+			OptsResz::Wnd(opts) =&gt; opts.resize_behavior,
+			OptsResz::Dlg(resize_behavior) =&gt; <span class="kw-2">*</span>resize_behavior,
+		};
+
+		<span class="kw">match </span>opts_resz {
+			OptsResz::Wnd(opts) =&gt; {
 				<span class="kw">let </span><span class="kw-2">mut </span>pos = POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>);
 				multiply_dpi_or_dtu(
 					<span class="self">self</span>.base.parent(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>pos), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
@@ -412,7 +408,6 @@
 
 				<span class="self">self</span>.base.create_window( <span class="comment">// may panic
 					</span><span class="string">&quot;BUTTON&quot;</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>opts.text), pos, sz,
-					opts.ctrl_id,
 					opts.window_ex_style,
 					opts.window_style | opts.button_style.into(),
 				)<span class="question-mark">?</span>;
@@ -423,9 +418,7 @@
 				});
 				<span class="kw">if </span>opts.selected { <span class="self">self</span>.select(<span class="bool-val">true</span>); }
 			},
-			OptsId::Dlg(ctrl_id) =&gt; {
-				<span class="self">self</span>.base.create_dlg(<span class="kw-2">*</span>ctrl_id)<span class="question-mark">?</span>; <span class="comment">// may panic
-			</span>},
+			OptsResz::Dlg(<span class="kw">_</span>) =&gt; <span class="self">self</span>.base.create_dlg()<span class="question-mark">?</span>,
 		}
 
 		<span class="self">self</span>.base.parent().add_to_layout_arranger(<span class="self">self</span>.hwnd(), resize_behavior)<span class="question-mark">?</span>;
@@ -487,6 +480,7 @@
 
 </span><span class="doccomment">/// Options to create a [`RadioButton`](crate::gui::RadioButton)
 /// programmatically with [`RadioGroup::new`](crate::gui::RadioGroup::new).
+</span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>RadioButtonOpts {
 	<span class="doccomment">/// Text of the control to be
 	/// [created](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw).
