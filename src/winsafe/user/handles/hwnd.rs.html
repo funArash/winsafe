@@ -1833,6 +1833,26 @@
 <a href="#1833" id="1833">1833</a>
 <a href="#1834" id="1834">1834</a>
 <a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1847,9 +1867,9 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, MsgSend};
 <span class="kw">use </span><span class="kw">crate</span>::user::decl::{
-	ALTTABINFO, AtomStr, HACCEL, HDC, HMENU, HMONITOR, HRGN, HwndPlace, IdMenu,
-	IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, PtsRc, RECT, SCROLLINFO, SIZE,
-	TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
+	ALTTABINFO, AtomStr, COLORREF, HACCEL, HDC, HMENU, HMONITOR, HRGN,
+	HwndPlace, IdMenu, IdPos, MENUBARINFO, MSG, PAINTSTRUCT, POINT, PtsRc, RECT,
+	SCROLLINFO, SIZE, TIMERPROC, WINDOWINFO, WINDOWPLACEMENT,
 };
 <span class="kw">use </span><span class="kw">crate</span>::user::guard::{
 	CloseClipboardGuard, EndPaintGuard, ReleaseCaptureGuard, ReleaseDCGuard,
@@ -3317,6 +3337,26 @@
 	/// method.
 	</span><span class="kw">fn </span>SetForegroundWindow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 		<span class="kw">unsafe </span>{ user::ffi::SetForegroundWindow(<span class="self">self</span>.ptr()) != <span class="number">0 </span>}
+	}
+
+	<span class="doccomment">/// [`SetLayeredWindowAttributes`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setlayeredwindowattributes)
+	/// method.
+	</span><span class="kw">fn </span>SetLayeredWindowAttributes(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		transparency_color_key: COLORREF,
+		alpha: u8,
+		flags: co::LWA,
+	) -&gt; SysResult&lt;()&gt;
+	{
+		bool_to_sysresult(
+			<span class="kw">unsafe </span>{
+				user::ffi::SetLayeredWindowAttributes(
+					<span class="self">self</span>.ptr(),
+					transparency_color_key.raw(),
+					alpha,
+					flags.raw(),
+				)
+			},
+		)
 	}
 
 	<span class="doccomment">/// [`SetMenu`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setmenu)
