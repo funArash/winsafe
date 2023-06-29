@@ -107,6 +107,10 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -175,6 +179,10 @@
 		<span class="self">self</span>.<span class="number">0</span>.dlg_base.on()
 	}
 
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>privileged_on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.<span class="number">0</span>.dlg_base.privileged_on()
+	}
+
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>spawn_new_thread&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F)
 		<span class="kw">where </span>F: FnOnce() -&gt; AnyResult&lt;()&gt; + Send + <span class="lifetime">&#39;static</span>,
 	{
@@ -210,7 +218,7 @@
 		</span>});
 
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
-		<span class="self">self</span>.on().wm_nc_paint(<span class="kw">move </span>|p| {
+		<span class="self">self</span>.privileged_on().wm_nc_paint(<span class="kw">move </span>|p| {
 			paint_control_borders(self2.hwnd(), p)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(())
 		});

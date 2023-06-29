@@ -165,6 +165,17 @@
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::UnsafeCell;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -301,15 +312,20 @@
 
 	<span class="doccomment">/// Searches for all user functions for the given message, and runs all of
 	/// them, discarding the results.
+	///
+	/// Returns `true` if at least one message was processed.
 	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>process_all_messages(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		wm_any: WndMsg) -&gt; AnyResult&lt;()&gt;
+		wm_any: WndMsg) -&gt; AnyResult&lt;bool&gt;
 	{
-		<span class="prelude-val">Ok</span>(<span class="kw">match </span>wm_any.msg_id {
+		<span class="kw">let </span><span class="kw-2">mut </span>at_least_one = <span class="bool-val">false</span>;
+
+		<span class="kw">match </span>wm_any.msg_id {
 			co::WM::NOTIFY =&gt; {
 				<span class="kw">let </span>wm_nfy = wm::Notify::from_generic_wm(wm_any);
 				<span class="kw">let </span>key = (wm_nfy.nmhdr.idFrom(), wm_nfy.nmhdr.code);
 				<span class="kw">let </span>nfys = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.nfys.get() };
 				<span class="kw">for </span>func <span class="kw">in </span>nfys.find_all(key) {
+					at_least_one = <span class="bool-val">true</span>;
 					func(wm_nfy)<span class="question-mark">?</span>; <span class="comment">// execute stored function
 				</span>}
 			},
@@ -318,6 +334,7 @@
 				<span class="kw">let </span>key = wm_cmd.event.code_id();
 				<span class="kw">let </span>cmds = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.cmds.get() };
 				<span class="kw">for </span>func <span class="kw">in </span>cmds.find_all(key) {
+					at_least_one = <span class="bool-val">true</span>;
 					func()<span class="question-mark">?</span>; <span class="comment">// execute stored function
 				</span>}
 			},
@@ -325,11 +342,16 @@
 				<span class="kw">let </span>wm_tmr = wm::Timer::from_generic_wm(wm_any);
 				<span class="kw">let </span>tmrs = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.tmrs.get() };
 				<span class="kw">for </span>func <span class="kw">in </span>tmrs.find_all(wm_tmr.timer_id) {
+					at_least_one = <span class="bool-val">true</span>;
 					func()<span class="question-mark">?</span>; <span class="comment">// execute stored function
 				</span>}
 			},
-			<span class="kw">_ </span>=&gt; <span class="self">self</span>.window_events.process_all_messages(wm_any)<span class="question-mark">?</span>,
-		})
+			<span class="kw">_ </span>=&gt; {
+				at_least_one = <span class="self">self</span>.window_events.process_all_messages(wm_any)<span class="question-mark">?</span>;
+			},
+		}
+
+		<span class="prelude-val">Ok</span>(at_least_one)
 	}
 }
 </code></pre></div></section></main></body></html>

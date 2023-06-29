@@ -169,6 +169,10 @@
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
@@ -306,7 +310,7 @@
 
 		<span class="comment">// Execute privileged closures.
 		</span><span class="kw">let </span>ref_self = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr_self };
-		ref_self.base.process_privileged_messages(wm_any)<span class="question-mark">?</span>;
+		<span class="kw">let </span>at_least_one_privileged = ref_self.base.process_privileged_messages(wm_any)<span class="question-mark">?</span>;
 
 		<span class="kw">if </span>wm_any.msg_id == co::WM::INITDIALOG {
 			<span class="comment">// Child controls are created in privileged closures, so we set the
@@ -336,8 +340,12 @@
 		<span class="prelude-val">Ok</span>(<span class="kw">match </span>process_result {
 			ProcessResult::HandledWithRet(res) =&gt; res,
 			ProcessResult::HandledWithoutRet =&gt; <span class="number">1</span>, <span class="comment">// TRUE
-			</span>ProcessResult::NotHandled =&gt; <span class="number">0</span>, <span class="comment">// FALSE
-		</span>})
+			</span>ProcessResult::NotHandled =&gt; <span class="kw">if </span>at_least_one_privileged {
+				<span class="number">1 </span><span class="comment">// TRUE
+			</span>} <span class="kw">else </span>{
+				<span class="number">0 </span><span class="comment">// FALSE
+			</span>},
+		})
 	}
 }
 </code></pre></div></section></main></body></html>

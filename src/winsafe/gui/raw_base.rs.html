@@ -306,6 +306,10 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::gui::base::Base;
 <span class="kw">use </span><span class="kw">crate</span>::gui::events::{ProcessResult, WindowEventsAll};
@@ -439,11 +443,11 @@
 		<span class="self">self</span>.base.on()
 	}
 
-	<span class="comment">// pub(in crate::gui) fn privileged_on(&amp;self) -&gt; &amp;WindowEventsAll {
-	// 	self.base.privileged_on()
-	// }
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>privileged_on(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WindowEventsAll {
+		<span class="self">self</span>.base.privileged_on()
+	}
 
-	</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Base&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Base&gt; {
 		<span class="self">self</span>.base.parent()
 	}
 
@@ -515,7 +519,7 @@
 					</span><span class="kw">let </span>hinst = <span class="kw">unsafe </span>{ wcx.hInstance.raw_copy() };
 					<span class="prelude-val">Ok</span>(hinst.GetClassInfoEx(<span class="kw-2">&amp;</span>wcx.lpszClassName().unwrap(), wcx)<span class="question-mark">?</span>)
 				},
-				<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
+				err =&gt; <span class="prelude-val">Err</span>(err),
 			},
 		}
 	}
@@ -596,7 +600,7 @@
 
 		<span class="comment">// Execute privileged closures, discard results.
 		</span><span class="kw">let </span>ref_self = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr_self };
-		ref_self.base.process_privileged_messages(wm_any)<span class="question-mark">?</span>;
+		<span class="kw">let </span>at_least_one_privileged = ref_self.base.process_privileged_messages(wm_any)<span class="question-mark">?</span>;
 
 		<span class="comment">// Execute user closure, if any.
 		</span><span class="kw">let </span>process_result = ref_self.base.process_user_message(wm_any)<span class="question-mark">?</span>;
@@ -610,7 +614,11 @@
 		<span class="prelude-val">Ok</span>(<span class="kw">match </span>process_result {
 			ProcessResult::HandledWithRet(res) =&gt; res,
 			ProcessResult::HandledWithoutRet =&gt; <span class="number">0</span>,
-			ProcessResult::NotHandled =&gt; hwnd.DefWindowProc(wm_any).into(),
+			ProcessResult::NotHandled =&gt; <span class="kw">if </span>at_least_one_privileged {
+				<span class="number">0
+			</span>} <span class="kw">else </span>{
+				hwnd.DefWindowProc(wm_any).into()
+			},
 		})
 	}
 }
