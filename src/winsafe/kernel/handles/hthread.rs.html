@@ -235,7 +235,7 @@
 /// ```
 </span><span class="kw">pub trait </span>kernel_Hthread: Handle {
 	<span class="doccomment">/// [`CreateThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createthread)
-	/// static method.
+	/// function.
 	///
 	/// Returns the thread handle and its ID.
 	</span><span class="attr">#[must_use]
@@ -263,14 +263,14 @@
 	}
 
 	<span class="doccomment">/// [`GetCurrentThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthread)
-	/// static method.
+	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCurrentThread() -&gt; HTHREAD {
 		HTHREAD(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThread() })
 	}
 
 	<span class="doccomment">/// [`GetExitCodeThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodethread)
-	/// method.
+	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetExitCodeThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
@@ -282,7 +282,7 @@
 	}
 
 	<span class="doccomment">/// [`GetProcessIdOfThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getprocessidofthread)
-	/// method.
+	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetProcessIdOfThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessIdOfThread(<span class="self">self</span>.ptr()) } {
@@ -292,7 +292,7 @@
 	}
 
 	<span class="doccomment">/// [`GetThreadId`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadid)
-	/// method.
+	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetThreadId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">match unsafe </span>{ kernel::ffi::GetThreadId(<span class="self">self</span>.ptr()) } {
@@ -302,7 +302,7 @@
 	}
 
 	<span class="doccomment">/// [`GetThreadTimes`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes)
-	/// method.
+	/// function.
 	</span><span class="kw">fn </span>GetThreadTimes(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		creation: <span class="kw-2">&amp;mut </span>FILETIME,
 		exit: <span class="kw-2">&amp;mut </span>FILETIME,
@@ -324,7 +324,7 @@
 	}
 
 	<span class="doccomment">/// [`OpenThreadToken`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openthreadtoken)
-	/// method.
+	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenThreadToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		desired_access: co::TOKEN,
@@ -345,13 +345,13 @@
 	}
 
 	<span class="doccomment">/// [`ResumeThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-resumethread)
-	/// method.
+	/// function.
 	</span><span class="kw">fn </span>ResumeThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::ResumeThread(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`SetThreadIdealProcessor`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadidealprocessor)
-	/// method.
+	/// function.
 	///
 	/// Returns the previous ideal processor.
 	</span><span class="kw">fn </span>SetThreadIdealProcessor(<span class="kw-2">&amp;</span><span class="self">self</span>, ideal_processor: u32) -&gt; SysResult&lt;u32&gt; {
@@ -363,7 +363,7 @@
 	}
 
 	<span class="doccomment">/// [`SetThreadIdealProcessorEx`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadidealprocessorex)
-	/// method.
+	/// function.
 	///
 	/// Returns the previous ideal processor.
 	</span><span class="kw">fn </span>SetThreadIdealProcessorEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -382,7 +382,7 @@
 	}
 
 	<span class="doccomment">/// [`SetThreadPriorityBoost`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadpriorityboost)
-	/// method.
+	/// function.
 	</span><span class="kw">fn </span>SetThreadPriorityBoost(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		disable_priority_boost: bool) -&gt; SysResult&lt;()&gt;
 	{
@@ -397,13 +397,13 @@
 	}
 
 	<span class="doccomment">/// [`SuspendThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-suspendthread)
-	/// method.
+	/// function.
 	</span><span class="kw">fn </span>SuspendThread(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		minus1_as_error(<span class="kw">unsafe </span>{ kernel::ffi::SuspendThread(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`TerminateThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminatethread)
-	/// method.
+	/// function.
 	</span><span class="kw">fn </span>TerminateThread(<span class="kw-2">&amp;</span><span class="self">self</span>, exit_code: u32) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{ kernel::ffi::TerminateThread(<span class="self">self</span>.ptr(), exit_code) },
