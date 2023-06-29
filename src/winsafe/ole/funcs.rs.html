@@ -325,17 +325,12 @@
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, ole};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::WString;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::{COSERVERINFO, HrResult, IMoniker, IUnknown, MULTI_QI};
-<span class="kw">use </span><span class="kw">crate</span>::ole::guard::CoUninitializeGuard;
+<span class="kw">use </span><span class="kw">crate</span>::ole::guard::{CoLockObjectExternalGuard, CoUninitializeGuard};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::ole_IUnknown;
 
@@ -514,23 +509,18 @@
 <span class="doccomment">/// [`CoLockObjectExternal`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-colockobjectexternal)
 /// function.
 ///
-/// **Note:** If you lock a COM pointer, `CoLockObjectExternal` must be called
-/// again to unlock it, or you&#39;ll have a resource leak.
-</span><span class="kw">pub fn </span>CoLockObjectExternal(
-	obj: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown,
-	lock: bool,
-	last_unlock_releases: bool,
-) -&gt; HrResult&lt;()&gt;
+/// Note that this function will lock the COM object, returning a
+/// [`CoLockObjectExternalGuard`](crate::guard::CoLockObjectExternalGuard). The
+/// unlocking is automatically performed by the guard when it goes out of scope.
+</span><span class="kw">pub fn </span>CoLockObjectExternal&lt;T&gt;(
+	obj: <span class="kw-2">&amp;</span>T
+) -&gt; HrResult&lt;CoLockObjectExternalGuard&lt;T&gt;&gt;
+	<span class="kw">where </span>T: ole_IUnknown,
 {
-	ok_to_hrresult(
-		<span class="kw">unsafe </span>{
-			ole::ffi::CoLockObjectExternal(
-				obj.ptr(),
-				lock <span class="kw">as _</span>,
-				last_unlock_releases <span class="kw">as _</span>,
-			)
-		},
-	)
+	<span class="kw">unsafe </span>{
+		ok_to_hrresult(ole::ffi::CoLockObjectExternal(obj.ptr(), <span class="number">1</span>, <span class="number">0</span>))
+			.map(|<span class="kw">_</span>| CoLockObjectExternalGuard::new(obj))
+	}
 }
 
 <span class="doccomment">/// [`CoTaskMemAlloc`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemalloc)
