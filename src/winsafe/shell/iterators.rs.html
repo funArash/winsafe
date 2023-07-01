@@ -130,7 +130,22 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{SysResult, WString};
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::shell;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{GetLastError, SysResult, WString};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::MAX_PATH;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{shell_Hdrop, shell_IEnumShellItems, shell_IShellItemArray};
@@ -149,7 +164,7 @@
 	<span class="kw">where </span>H: shell_Hdrop,
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="self">self</span>.hdrop.DragFinish();
+		<span class="kw">unsafe </span>{ shell::ffi::DragFinish(<span class="self">self</span>.hdrop.ptr()); }
 	}
 }
 
@@ -164,13 +179,18 @@
 		}
 
 		<span class="kw">match unsafe </span>{
-			<span class="self">self</span>.hdrop.DragQueryFile(<span class="prelude-val">Some</span>(<span class="self">self</span>.current), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer))
+			shell::ffi::DragQueryFileW(
+				<span class="self">self</span>.hdrop.ptr(),
+				<span class="self">self</span>.current,
+				<span class="self">self</span>.buffer.as_mut_ptr(),
+				<span class="self">self</span>.buffer.buf_len() <span class="kw">as _</span>,
+			)
 		} {
-			<span class="prelude-val">Err</span>(e) =&gt; {
+			<span class="number">0 </span>=&gt; {
 				<span class="self">self</span>.current = <span class="self">self</span>.count; <span class="comment">// no further iterations will be made
-				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
+				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(GetLastError()))
 			},
-			<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+			<span class="kw">_ </span>=&gt; {
 				<span class="self">self</span>.current += <span class="number">1</span>;
 				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.buffer.to_string()))
 			},
@@ -182,7 +202,15 @@
 	<span class="kw">where </span>H: shell_Hdrop,
 {
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::shell) <span class="kw">fn </span>new(hdrop: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>H) -&gt; SysResult&lt;<span class="self">Self</span>&gt; {
-		<span class="kw">let </span>count = <span class="kw">unsafe </span>{ hdrop.DragQueryFile(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">? </span>};
+		<span class="kw">let </span>count = <span class="kw">unsafe </span>{
+			shell::ffi::DragQueryFileW( <span class="comment">// preliminar call to retrieve the file count
+				</span>hdrop.ptr(),
+				<span class="number">0xffff_ffff</span>,
+				std::ptr::null_mut(),
+				<span class="number">0</span>,
+			)
+		};
+
 		<span class="prelude-val">Ok</span>(<span class="self">Self </span>{
 			hdrop,
 			buffer: WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>), <span class="comment">// so we alloc just once

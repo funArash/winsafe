@@ -306,23 +306,6 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -330,7 +313,7 @@
 	GetLastError, PROCESS_HEAP_ENTRY, SetLastError, SysResult,
 };
 <span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{HeapDestroyGuard, HeapFreeGuard, HeapUnlockGuard};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::iterators::HheapIter;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::iterators::HheapHeapwalkIter;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
 	bool_to_sysresult, ptr_to_sysresult, ptr_to_sysresult_handle,
 };
@@ -359,32 +342,6 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>kernel_Hheap: Handle {
-	<span class="doccomment">/// Returns an iterator over the heap memory block entries, exposing
-	/// [`PROCESS_HEAP_ENTRY`](crate::PROCESS_HEAP_ENTRY) structs by calling
-	/// [`HeapWalk`](crate::prelude::kernel_Hheap::HeapWalk).
-	///
-	/// # Examples
-	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
-	///
-	/// let heap = HHEAP::GetProcessHeap()?;
-	///
-	/// for entry in heap.iter_entries() {
-	///     let entry = entry?;
-	///     println!(&quot;Size: {}, overhead? {}&quot;,
-	///         entry.cbData, entry.cbOverhead);
-	/// }
-	/// # Ok::&lt;_, co::ERROR&gt;(())
-	/// ```
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>iter_entries(<span class="kw-2">&amp;</span><span class="self">self
-	</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;<span class="kw-2">&amp;</span>PROCESS_HEAP_ENTRY&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;
-	{
-		Box::new(HheapIter::new(<span class="self">self</span>))
-	}
-
 	<span class="doccomment">/// [`GetProcessHeap`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-getprocessheap)
 	/// function.
 	</span><span class="attr">#[must_use]
@@ -632,20 +589,29 @@
 	<span class="doccomment">/// [`HeapWalk`](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapwalk)
 	/// function.
 	///
-	/// Prefer using
-	/// [`iter_entries`](crate::prelude::kernel_Hheap::iter_entries), which is
-	/// simpler.
+	/// Returns an iterator over the heap memory blocks, exposing
+	/// [`PROCESS_HEAP_ENTRY`](crate::PROCESS_HEAP_ENTRY) structs.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HHEAP};
+	///
+	/// let heap = HHEAP::GetProcessHeap()?;
+	///
+	/// for block in heap.HeapWalk() {
+	///     let block = block?;
+	///     println!(&quot;Size: {}, overhead? {}&quot;,
+	///         block.cbData, block.cbOverhead);
+	/// }
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>HeapWalk(<span class="kw-2">&amp;</span><span class="self">self</span>, entry: <span class="kw-2">&amp;mut </span>PROCESS_HEAP_ENTRY) -&gt; SysResult&lt;bool&gt; {
-		<span class="kw">match unsafe </span>{
-			kernel::ffi::HeapWalk(<span class="self">self</span>.ptr(), entry <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
-		} {
-			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
-				co::ERROR::NO_MORE_ITEMS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-				err =&gt; <span class="prelude-val">Err</span>(err),
-			},
-			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-		}
+	</span><span class="kw">fn </span>HeapWalk(<span class="kw-2">&amp;</span><span class="self">self
+	</span>) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = SysResult&lt;<span class="kw-2">&amp;</span>PROCESS_HEAP_ENTRY&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;
+	{
+		Box::new(HheapHeapwalkIter::new(<span class="self">self</span>))
 	}
 }
 </code></pre></div></section></main></body></html>

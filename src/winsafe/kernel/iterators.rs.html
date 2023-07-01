@@ -435,12 +435,12 @@
 <a href="#435" id="435">435</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{co, kernel};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	HEAPLIST32, MODULEENTRY32, PROCESS_HEAP_ENTRY, PROCESSENTRY32, SysResult,
-	THREADENTRY32, WString,
+	GetLastError, HEAPLIST32, MODULEENTRY32, PROCESS_HEAP_ENTRY, PROCESSENTRY32,
+	SysResult, THREADENTRY32, WString,
 };
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{kernel_Hheap, kernel_Hkey, kernel_Hprocesslist};
 
-<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">struct </span>HheapIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">struct </span>HheapHeapwalkIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: kernel_Hheap,
 {
 	hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H,
@@ -448,7 +448,7 @@
 	has_more: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Iterator <span class="kw">for </span>HheapIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; Iterator <span class="kw">for </span>HheapHeapwalkIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="kw">type </span>Item = SysResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PROCESS_HEAP_ENTRY&gt;;
@@ -458,27 +458,27 @@
 			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
 
-		<span class="kw">match </span><span class="self">self</span>.hheap.HeapWalk(<span class="kw-2">&amp;mut </span><span class="self">self</span>.entry) {
-			<span class="prelude-val">Err</span>(e) =&gt; {
+		<span class="kw">match unsafe </span>{
+			kernel::ffi::HeapWalk(<span class="self">self</span>.hheap.ptr(), <span class="kw-2">&amp;mut </span><span class="self">self</span>.entry <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
+		} {
+			<span class="number">0 </span>=&gt; {
 				<span class="self">self</span>.has_more = <span class="bool-val">false</span>; <span class="comment">// no further iterations
-				</span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))
-			},
-			<span class="prelude-val">Ok</span>(found) =&gt; {
-				<span class="kw">if </span>found {
-					<span class="comment">// Returning a reference cannot be done until GATs
-					// stabilization, so we simply cheat the borrow checker.
-					</span><span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.entry <span class="kw">as </span><span class="kw-2">*const </span>PROCESS_HEAP_ENTRY;
-					<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>ptr }))
-				} <span class="kw">else </span>{
-					<span class="self">self</span>.has_more = <span class="bool-val">false</span>; <span class="comment">// no further iterations
-					</span><span class="prelude-val">None
+				</span><span class="kw">match </span>GetLastError() {
+					co::ERROR::NO_MORE_ITEMS =&gt; <span class="prelude-val">None</span>, <span class="comment">// search completed successfully
+					</span>err =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)), <span class="comment">// actual error
 				</span>}
+			},
+			<span class="kw">_ </span>=&gt; {
+				<span class="comment">// Returning a reference cannot be done until GATs
+				// stabilization, so we simply cheat the borrow checker.
+				</span><span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.entry <span class="kw">as </span><span class="kw-2">*const </span>PROCESS_HEAP_ENTRY;
+				<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>ptr }))
 			},
 		}
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; HheapIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, H&gt; HheapHeapwalkIter&lt;<span class="lifetime">&#39;a</span>, H&gt;
 	<span class="kw">where </span>H: kernel_Hheap,
 {
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">fn </span>new(hheap: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>H) -&gt; <span class="self">Self </span>{
