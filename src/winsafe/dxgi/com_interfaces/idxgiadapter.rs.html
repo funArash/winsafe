@@ -114,30 +114,15 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::{DXGI_ADAPTER_DESC, IDXGIOutput};
-<span class="kw">use </span><span class="kw">crate</span>::dxgi::iterators::IdxgiadapterOutputsIter;
+<span class="kw">use </span><span class="kw">crate</span>::dxgi::iterators::IdxgiadapterEnumoutputsIter;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::GUID;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{COMPTR, HRES, PCVOID, PVOID};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIObject, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::dxgi_IDXGIObject;
 <span class="kw">use </span><span class="kw">crate</span>::vt::IDXGIObjectVT;
 
 <span class="doccomment">/// [`IDXGIAdapter`](crate::IDXGIAdapter) virtual table.
@@ -170,33 +155,6 @@
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>dxgi_IDXGIAdapter: dxgi_IDXGIObject {
-	<span class="doccomment">/// Returns an iterator over the [`IDXGIOutput`](crate::IDXGIOutput)
-	/// elements which calls
-	/// [`IDXGIAdapter::EnumOutputs`](crate::prelude::dxgi_IDXGIAdapter::EnumOutputs)
-	/// internally.
-	///
-	/// # Examples
-	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::IDXGIAdapter;
-	///
-	/// let adapter: IDXGIAdapter; // initialized somewhere
-	/// # let adapter = unsafe { IDXGIAdapter::null() };
-	///
-	/// for output in adapter.iter_outputs() {
-	///     let output = output?;
-	///     // ...
-	/// }
-	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
-	/// ```
-	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>iter_outputs(<span class="kw-2">&amp;</span><span class="self">self</span>,
-	) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IDXGIOutput&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;
-	{
-		Box::new(IdxgiadapterOutputsIter::new(<span class="self">self</span>))
-	}
-
 	<span class="doccomment">/// [`IDXGIAdapter::CheckInterfaceSupport`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-checkinterfacesupport)
 	/// method.
 	</span><span class="attr">#[must_use]
@@ -216,21 +174,33 @@
 	<span class="doccomment">/// [`IDXGIAdapter::EnumOutputs`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-enumoutputs)
 	/// method.
 	///
-	/// Prefer using
-	/// [`IDXGIAdapter::iter_outputs`](crate::prelude::dxgi_IDXGIAdapter::iter_outputs),
-	/// which is simpler.
+	/// Returns an iterator over [`IDXGIOutput`](crate::IDXGIOutput) elements.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{HrResult, IDXGIAdapter, IDXGIOutput};
+	///
+	/// let adapter: IDXGIAdapter; // initialized somewhere
+	/// # let adapter = unsafe { IDXGIAdapter::null() };
+	///
+	/// for output in adapter.EnumOutputs() {
+	///     let output = output?;
+	///     // ...
+	/// }
+	///
+	/// // Collecting into a Vec
+	/// let outputs: Vec&lt;IDXGIOutput&gt; =
+	///     adapter.EnumOutputs()
+	///         .collect::&lt;HrResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
+	/// ```
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">fn </span>EnumOutputs(<span class="kw-2">&amp;</span><span class="self">self</span>, output: u32) -&gt; HrResult&lt;IDXGIOutput&gt; {
-		<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDXGIOutput::null() };
-		ok_to_hrresult(
-			<span class="kw">unsafe </span>{
-				(vt::&lt;IDXGIAdapterVT&gt;(<span class="self">self</span>).EnumOutputs)(
-					<span class="self">self</span>.ptr(),
-					output,
-					queried.as_mut(),
-				)
-			},
-		).map(|<span class="kw">_</span>| queried)
+	</span><span class="kw">fn </span>EnumOutputs(<span class="kw-2">&amp;</span><span class="self">self</span>,
+	) -&gt; Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = HrResult&lt;IDXGIOutput&gt;&gt; + <span class="lifetime">&#39;_</span>&gt;
+	{
+		Box::new(IdxgiadapterEnumoutputsIter::new(<span class="self">self</span>))
 	}
 
 	<span class="doccomment">/// [`IDXGIAdapter::GetDesc`](https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-getdesc)

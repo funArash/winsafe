@@ -86,19 +86,32 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::dxgi::decl::{IDXGIAdapter, IDXGIOutput};
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIAdapter, dxgi_IDXGIFactory};
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::{dxgi_IDXGIAdapter, dxgi_IDXGIFactory, ole_IUnknown};
+<span class="kw">use </span><span class="kw">crate</span>::vt::IDXGIAdapterVT;
 
-<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::dxgi) <span class="kw">struct </span>IdxgiadapterOutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::dxgi) <span class="kw">struct </span>IdxgiadapterEnumoutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
 	<span class="kw">where </span>I: dxgi_IDXGIAdapter,
 {
 	adapter: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I,
 	cur_index: u32,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>IdxgiadapterOutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Iterator <span class="kw">for </span>IdxgiadapterEnumoutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
 	<span class="kw">where </span>I: dxgi_IDXGIAdapter,
 {
 	<span class="kw">type </span>Item = HrResult&lt;IDXGIOutput&gt;;
@@ -107,7 +120,16 @@
 		<span class="kw">if </span><span class="self">self</span>.cur_index == <span class="number">0xffff_ffff </span>{
 			<span class="prelude-val">None
 		</span>} <span class="kw">else </span>{
-			<span class="kw">match </span><span class="self">self</span>.adapter.EnumOutputs(<span class="self">self</span>.cur_index) {
+			<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IDXGIOutput::null() };
+			<span class="kw">match </span>ok_to_hrresult(
+				<span class="kw">unsafe </span>{
+					(vt::&lt;IDXGIAdapterVT&gt;(<span class="self">self</span>.adapter).EnumOutputs)(
+						<span class="self">self</span>.adapter.ptr(),
+						<span class="self">self</span>.cur_index,
+						queried.as_mut(),
+					)
+				},
+			) {
 				<span class="prelude-val">Err</span>(err) =&gt; {
 					<span class="self">self</span>.cur_index = <span class="number">0xffff_ffff</span>; <span class="comment">// no further iterations will be made
 					</span><span class="kw">match </span>err {
@@ -115,16 +137,16 @@
 						</span><span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)), <span class="comment">// actual error
 					</span>}
 				},
-				<span class="prelude-val">Ok</span>(output) =&gt; {
+				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
 					<span class="self">self</span>.cur_index += <span class="number">1</span>;
-					<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(output))
+					<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(queried))
 				},
 			}
 		}
 	}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; IdxgiadapterOutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; IdxgiadapterEnumoutputsIter&lt;<span class="lifetime">&#39;a</span>, I&gt;
 	<span class="kw">where </span>I: dxgi_IDXGIAdapter,
 {
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::dxgi) <span class="kw">fn </span>new(adapter: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>I) -&gt; <span class="self">Self </span>{
