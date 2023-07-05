@@ -847,6 +847,51 @@
 <a href="#847" id="847">847</a>
 <a href="#848" id="848">848</a>
 <a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1450,6 +1495,22 @@
 	}
 }
 
+<span class="doccomment">/// [`SID_AND_ATTRIBUTES`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-sid_and_attributes)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
+	Sid: <span class="kw-2">*mut </span>SID,
+	<span class="kw">pub </span>Attributes: u32,
+
+	_Sid: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>SID&gt;,
+}
+
+<span class="macro">impl_default!</span>(SID_AND_ATTRIBUTES, <span class="lifetime">&#39;a</span>);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="macro">pub_fn_ptr_get_set!</span>(<span class="lifetime">&#39;a</span>, Sid, set_Sid, SID);
+}
+
 <span class="doccomment">/// [`SID_IDENTIFIER_AUTHORITY`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-sid_identifier_authority)
 /// struct.
 </span><span class="attr">#[repr(C)]
@@ -1600,6 +1661,27 @@
 	<span class="macro">pub_fn_string_arr_get_set!</span>(daylightName, set_daylightName);
 }
 
+<span class="doccomment">/// [`TOKEN_ELEVATION`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_elevation)
+/// struct.
+</span><span class="attr">#[repr(C)]
+#[derive(Default)]
+</span><span class="kw">pub struct </span>TOKEN_ELEVATION {
+	TokenIsElevated: u32,
+}
+
+<span class="kw">impl </span>TOKEN_ELEVATION {
+	<span class="macro">pub_fn_bool_get_set!</span>(TokenIsElevated, set_TokenIsElevated);
+}
+
+<span class="doccomment">/// [`TOKEN_ORIGIN`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_origin)
+/// struct.
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>TOKEN_ORIGIN {
+	<span class="kw">pub </span>OriginatingLogonSession: LUID,
+}
+
+<span class="macro">impl_default!</span>(TOKEN_ORIGIN);
+
 <span class="doccomment">/// [`TOKEN_PRIVILEGES`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_privileges)
 /// struct.
 ///
@@ -1643,6 +1725,14 @@
 			)
 		}
 	}
+}
+
+<span class="doccomment">/// [`TOKEN_USER`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_user)
+/// struct.
+</span><span class="attr">#[repr(C)]
+#[derive(Default)]
+</span><span class="kw">pub struct </span>TOKEN_USER&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub </span>User: SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
 <span class="doccomment">/// [`VALENT`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/ns-winreg-valentw)

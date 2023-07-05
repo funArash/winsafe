@@ -255,6 +255,7 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::{BOOL, HANDLE, PCSTR, PCVOID, PFUNC, PSTR, PVOID};
 
 <span class="macro">extern_sys! </span>{ <span class="string">&quot;advapi32&quot;</span>;
@@ -267,19 +268,24 @@
 	CopySid(u32, PVOID, PCVOID) -&gt; BOOL
 	CreateWellKnownSid(u32, PCVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	DecryptFileW(PCSTR, u32) -&gt; BOOL
+	DuplicateToken(HANDLE, u32, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
 	EncryptFileW(PCSTR) -&gt; BOOL
 	EncryptionDisable(PCSTR, BOOL) -&gt; BOOL
 	EqualDomainSid(PVOID, PVOID, <span class="kw-2">*mut </span>BOOL) -&gt; BOOL
 	EqualPrefixSid(PVOID, PVOID) -&gt; BOOL
 	EqualSid(PVOID, PVOID) -&gt; BOOL
 	FreeSid(PVOID)
+	GetCurrentProcessToken() -&gt; HANDLE
+	GetCurrentThreadEffectiveToken() -&gt; HANDLE
 	GetLengthSid(PVOID) -&gt; u32
 	GetSidLengthRequired(u8) -&gt; u32
+	GetTokenInformation(HANDLE, u32, PCVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	GetUserNameW(PSTR, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	GetWindowsAccountDomainSid(PCVOID, PVOID, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	InitializeSecurityDescriptor(PVOID, u32) -&gt; BOOL
 	InitiateSystemShutdownExW(PCSTR, PCSTR, u32, BOOL, BOOL, u32) -&gt; BOOL
 	InitiateSystemShutdownW(PCSTR, PCSTR, u32, BOOL, BOOL) -&gt; BOOL
+	IsTokenRestricted(HANDLE) -&gt; BOOL
 	IsValidSecurityDescriptor(PCVOID) -&gt; BOOL
 	IsValidSid(PVOID) -&gt; BOOL
 	IsWellKnownSid(PVOID, u32) -&gt; BOOL
@@ -287,6 +293,8 @@
 	LookupAccountSidW(PCSTR, PCVOID, PSTR, <span class="kw-2">*mut </span>u32, PSTR, <span class="kw-2">*mut </span>u32, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	LookupPrivilegeNameW(PCSTR, PCVOID, PSTR, <span class="kw-2">*mut </span>u32) -&gt; BOOL
 	LookupPrivilegeValueW(PCSTR, PCSTR, PVOID) -&gt; BOOL
+	OpenProcessToken(HANDLE, u32, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
+	OpenThreadToken(HANDLE, u32, BOOL, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
 	RegCloseKey(HANDLE) -&gt; i32
 	RegConnectRegistryW(PCSTR, HANDLE, <span class="kw-2">*mut </span>HANDLE) -&gt; i32
 	RegCopyTreeW(HANDLE, PCSTR, HANDLE) -&gt; i32
@@ -336,7 +344,6 @@
 	CreateThread(PVOID, usize, PVOID, PVOID, u32, <span class="kw-2">*mut </span>u32) -&gt; HANDLE
 	CreateToolhelp32Snapshot(u32, u32) -&gt; HANDLE
 	DeleteFileW(PCSTR) -&gt; BOOL
-	DuplicateToken(HANDLE, u32, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
 	EndUpdateResourceW(HANDLE, BOOL) -&gt; BOOL
 	EnumResourceLanguagesW(HANDLE, PCSTR, PCSTR, PFUNC, isize) -&gt; BOOL
 	EnumResourceNamesW(HANDLE, PCSTR, PFUNC, isize) -&gt; BOOL
@@ -363,9 +370,7 @@
 	GetCurrentDirectoryW(u32, PSTR) -&gt; u32
 	GetCurrentProcess() -&gt; HANDLE
 	GetCurrentProcessId() -&gt; u32
-	GetCurrentProcessToken() -&gt; HANDLE
 	GetCurrentThread() -&gt; HANDLE
-	GetCurrentThreadEffectiveToken() -&gt; HANDLE
 	GetCurrentThreadId() -&gt; u32
 	GetDiskFreeSpaceExW(PCSTR, <span class="kw-2">*mut </span>u64, <span class="kw-2">*mut </span>u64, <span class="kw-2">*mut </span>u64) -&gt; BOOL
 	GetDiskSpaceInformationW(PCSTR, PVOID) -&gt; u32
@@ -436,7 +441,6 @@
 	IsDebuggerPresent() -&gt; BOOL
 	IsNativeVhdBoot(<span class="kw-2">*mut </span>BOOL) -&gt; BOOL
 	IsProcessCritical(HANDLE, <span class="kw-2">*mut </span>BOOL) -&gt; BOOL
-	IsTokenRestricted(HANDLE) -&gt; BOOL
 	IsWow64Process(HANDLE, <span class="kw-2">*mut </span>BOOL) -&gt; BOOL
 	LoadLibraryW(PCSTR) -&gt; HANDLE
 	LoadResource(HANDLE, HANDLE) -&gt; HANDLE
@@ -457,8 +461,6 @@
 	MulDiv(i32, i32, i32) -&gt; i32
 	MultiByteToWideChar(u32, u32, <span class="kw-2">*const </span>u8, i32, PSTR, i32) -&gt; i32
 	OpenProcess(u32, BOOL, u32) -&gt; HANDLE
-	OpenProcessToken(HANDLE, u32, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
-	OpenThreadToken(HANDLE, u32, BOOL, <span class="kw-2">*mut </span>HANDLE) -&gt; BOOL
 	OutputDebugStringW(PCSTR)
 	Process32FirstW(HANDLE, PVOID) -&gt; BOOL
 	Process32NextW(HANDLE, PVOID) -&gt; BOOL
