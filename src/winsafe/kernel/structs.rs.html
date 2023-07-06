@@ -892,6 +892,52 @@
 <a href="#892" id="892">892</a>
 <a href="#893" id="893">893</a>
 <a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -901,7 +947,7 @@
 	ConvertSidToStringSid, HEVENT, HINSTANCE, HPIPE, HPROCESS, HTHREAD,
 	InitializeSecurityDescriptor, MAKEQWORD, WString,
 };
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::TokenPrivilegesGuard;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{TokenGroupsGuard, TokenPrivilegesGuard};
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{MAX_MODULE_NAME32, MAX_PATH};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{NativeBitflag, VariableSized};
 
@@ -1498,6 +1544,7 @@
 <span class="doccomment">/// [`SID_AND_ATTRIBUTES`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-sid_and_attributes)
 /// struct.
 </span><span class="attr">#[repr(C)]
+#[derive(Clone)]
 </span><span class="kw">pub struct </span>SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt; {
 	Sid: <span class="kw-2">*mut </span>SID,
 	<span class="kw">pub </span>Attributes: u32,
@@ -1671,6 +1718,51 @@
 
 <span class="kw">impl </span>TOKEN_ELEVATION {
 	<span class="macro">pub_fn_bool_get_set!</span>(TokenIsElevated, set_TokenIsElevated);
+}
+
+<span class="doccomment">/// [`TOKEN_GROUPS`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_groups)
+/// struct.
+///
+/// Note that you cannot directly instantiate this struct. This is a
+/// [`VariableSized`](crate::prelude::VariableSized) struct, managed by
+/// [`TokenGroupsGuard`](crate::guard::TokenGroupsGuard).
+</span><span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>TOKEN_GROUPS&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) GroupCount: u32,
+	Groups: [SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt;; <span class="number">1</span>],
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; VariableSized <span class="kw">for </span>TOKEN_GROUPS&lt;<span class="lifetime">&#39;a</span>&gt; {}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TOKEN_GROUPS&lt;<span class="lifetime">&#39;a</span>&gt; {
+	<span class="doccomment">/// Returns a dynamically allocated
+	/// [`TokenGroupsGuard`](crate::guard::TokenGroupsGuard).
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>new(groups: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt;]) -&gt; TokenGroupsGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+		TokenGroupsGuard::new(groups)
+	}
+
+	<span class="doccomment">/// Returns a constant slice over the `Groups` entries.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub const fn </span>Groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt;] {
+		<span class="kw">unsafe </span>{
+			std::slice::from_raw_parts(
+				<span class="self">self</span>.Groups.as_ptr(),
+				<span class="self">self</span>.GroupCount <span class="kw">as _</span>,
+			)
+		}
+	}
+
+	<span class="doccomment">/// Returns a mutable slice over the `Groups` entries.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>Groups_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[SID_AND_ATTRIBUTES&lt;<span class="lifetime">&#39;a</span>&gt;] {
+		<span class="kw">unsafe </span>{
+			std::slice::from_raw_parts_mut(
+				<span class="self">self</span>.Groups.as_mut_ptr(),
+				<span class="self">self</span>.GroupCount <span class="kw">as _</span>,
+			)
+		}
+	}
 }
 
 <span class="doccomment">/// [`TOKEN_ORIGIN`](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-token_origin)
