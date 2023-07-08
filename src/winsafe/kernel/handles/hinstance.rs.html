@@ -322,6 +322,31 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, kernel};
@@ -397,6 +422,27 @@
 
 	<span class="doccomment">/// [`EnumResourceTypes`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumresourcetypesw)
 	/// function.
+	///
+	/// # Examples
+	///
+	/// The
+	/// [Updating Resources](https://learn.microsoft.com/en-us/windows/win32/menurc/using-resources#updating-resources)
+	/// example:
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, HINSTANCE, RtStr};
+	///
+	/// let hexe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
+	///
+	/// hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
+	///     println!(&quot;Type {}&quot;, res_type);
+	///     true
+	/// })?;
+	///
+	/// // FreeLibrary() called automatically
+	/// # Ok::&lt;_, co::ERROR&gt;(())
+	/// ```
 	</span><span class="kw">fn </span>EnumResourceTypes&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, func: F) -&gt; SysResult&lt;()&gt;
 		<span class="kw">where </span>F: Fn(RtStr) -&gt; bool,
 	{
@@ -573,23 +619,27 @@
 	/// const IDD_HAND_ABOUTBOX: u16 = 103;
 	/// const IDD_FOOT_ABOUTBOX: u16 = 110;
 	///
-	/// let hExe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
+	/// let hexe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
 	///
-	/// let hRes = hExe.FindResource(
+	/// let hres = hexe.FindResource(
 	///     IdStr::Id(IDD_HAND_ABOUTBOX),
 	///     RtStr::Rt(co::RT::DIALOG),
 	/// )?;
 	///
-	/// let hResLoad = hExe.LoadResource(&amp;hRes)?;
-	/// let lpResLock = hExe.LockResource(&amp;hRes, &amp;hResLoad)?;
-	/// let hUpdateRes = HUPDATERSRC::BeginUpdateResource(&quot;foot.exe&quot;, false)?;
+	/// let hres_load = hexe.LoadResource(&amp;hres)?;
+	/// let hres_slice_lock = hexe.LockResource(&amp;hres, &amp;hres_load)?;
+	/// let hres_update = HUPDATERSRC::BeginUpdateResource(&quot;foot.exe&quot;, false)?;
 	///
-	/// hUpdateRes.UpdateResource(
+	/// hres_update.UpdateResource(
 	///     RtStr::Rt(co::RT::DIALOG),
 	///     IdStr::Id(IDD_FOOT_ABOUTBOX),
 	///     LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
-	///     lpResLock,
+	///     hres_slice_lock,
 	/// )?;
+	///
+	/// // EndUpdateResource() called automatically
+	///
+	/// // FreeLibrary() called automatically
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
