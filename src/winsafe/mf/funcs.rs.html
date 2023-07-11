@@ -22,10 +22,18 @@
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
-</span><span class="kw">use </span><span class="kw">crate</span>::mf;
+</span><span class="kw">use crate</span>::{co, mf};
 <span class="kw">use </span><span class="kw">crate</span>::mf::decl::IMFMediaSession;
+<span class="kw">use </span><span class="kw">crate</span>::mf::privs::MF_VERSION;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{mf_IMFAttributes, ole_IUnknown};
@@ -45,5 +53,11 @@
 			)
 		},
 	).map(|<span class="kw">_</span>| queried)
+}
+
+<span class="doccomment">/// [`MFStartup`](https://learn.microsoft.com/en-us/windows/win32/api/mfapi/nf-mfapi-mfstartup)
+/// function.
+</span><span class="kw">pub fn </span>MFStartup(flags: co::MFSTARTUP) -&gt; HrResult&lt;()&gt; {
+	ok_to_hrresult(<span class="kw">unsafe </span>{ mf::ffi::MFStartup(MF_VERSION, flags.raw()) })
 }
 </code></pre></div></section></main></body></html>
