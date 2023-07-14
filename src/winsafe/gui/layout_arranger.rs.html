@@ -162,6 +162,13 @@
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::UnsafeCell;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -207,14 +214,14 @@
 
 <span class="kw">struct </span>ChildInfo {
 	hchild: HWND,
-	rc_orig: RECT, <span class="comment">// original coordinates relative to parent
-	</span>horz: Horz,
+	horz: Horz,
 	vert: Vert,
-}
+	rc_orig: <span class="prelude-ty">Option</span>&lt;RECT&gt;, <span class="comment">// original coordinates relative to parent, filled at 1st WM_SIZE
+</span>}
 
 <span class="kw">struct </span>Obj { <span class="comment">// actual fields of LayoutArranger
 	</span>ctrls: UnsafeCell&lt;Vec&lt;ChildInfo&gt;&gt;,
-	sz_parent_orig: UnsafeCell&lt;SIZE&gt;, <span class="comment">// original parent client area
+	sz_parent_orig: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;SIZE&gt;&gt;, <span class="comment">// original parent client area, filled at 1st WM_SIZE
 	</span>_pin: PhantomPinned,
 }
 
@@ -230,7 +237,7 @@
 			Arc::pin(
 				Obj {
 					ctrls: UnsafeCell::new(Vec::with_capacity(<span class="number">10</span>)), <span class="comment">// arbitrary
-					</span>sz_parent_orig: UnsafeCell::new(SIZE::default()),
+					</span>sz_parent_orig: UnsafeCell::new(<span class="prelude-val">None</span>),
 					_pin: PhantomPinned,
 				},
 			),
@@ -250,28 +257,17 @@
 		}
 
 		<span class="kw">let </span>(horz, vert) = resize_behavior;
-		<span class="kw">if </span>horz == Horz::None &amp;&amp; vert == Vert::None {
-			<span class="kw">return </span><span class="prelude-val">Ok</span>(()); <span class="comment">// nothing to do, don&#39;t even add it
-		</span>}
+		<span class="kw">if </span>horz != Horz::None || vert != Vert::None { <span class="comment">// if nothing to do, don&#39;t even add it
+			</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.ctrls.get() }.push(
+				ChildInfo {
+					hchild: <span class="kw">unsafe </span>{ hchild.raw_copy() },
+					horz,
+					vert,
+					rc_orig: <span class="prelude-val">None</span>,
+				},
+			);
+		}
 
-		<span class="kw">let </span>ctrls = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.ctrls.get() };
-		<span class="kw">if </span>ctrls.is_empty() { <span class="comment">// first control being added?
-			</span><span class="kw">let </span>rc_parent = hparent.GetClientRect()<span class="question-mark">?</span>;
-			<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } =
-				SIZE::new(rc_parent.right, rc_parent.bottom); <span class="comment">// save original parent size
-		</span>}
-
-		<span class="kw">let </span><span class="kw-2">mut </span>rc_orig = hchild.GetWindowRect()<span class="question-mark">?</span>;
-		hparent.ScreenToClientRc(<span class="kw-2">&amp;mut </span>rc_orig)<span class="question-mark">?</span>; <span class="comment">// control client coordinates relative to parent
-
-		</span>ctrls.push(
-			ChildInfo {
-				hchild: <span class="kw">unsafe </span>{ hchild.raw_copy() },
-				rc_orig,
-				horz,
-				vert,
-			},
-		);
 		<span class="prelude-val">Ok</span>(())
 	}
 
@@ -284,9 +280,19 @@
 			</span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
 		}
 
+		<span class="kw">let </span>sz_parent_orig = <span class="kw">match unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } {
+			<span class="prelude-val">Some</span>(sz) =&gt; <span class="kw-2">*</span>sz,
+			<span class="prelude-val">None </span>=&gt; {
+				<span class="kw">let </span>rc_parent = ctrls[<span class="number">0</span>].hchild.GetParent()<span class="question-mark">?</span>.GetClientRect()<span class="question-mark">?</span>;
+				<span class="kw">let </span>sz = SIZE::new(rc_parent.right, rc_parent.bottom);
+				<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } = <span class="prelude-val">Some</span>(sz); <span class="comment">// save original parent size
+				</span>sz
+			},
+		};
+
 		<span class="kw">let </span><span class="kw-2">mut </span>hdwp = HDWP::BeginDeferWindowPos(ctrls.len() <span class="kw">as _</span>)<span class="question-mark">?</span>;
 
-		<span class="kw">for </span>ctrl <span class="kw">in </span>ctrls.iter() {
+		<span class="kw">for </span>ctrl <span class="kw">in </span>ctrls.iter_mut() {
 			<span class="kw">let </span><span class="kw-2">mut </span>uflags = co::SWP::NOZORDER;
 			<span class="kw">if </span>ctrl.horz == Horz::Repos &amp;&amp; ctrl.vert == Vert::Repos { <span class="comment">// reposition both vert &amp; horz
 				</span>uflags |= co::SWP::NOSIZE;
@@ -294,29 +300,37 @@
 				</span>uflags |= co::SWP::NOMOVE;
 			}
 
-			<span class="kw">let </span>sz_parent_orig = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() };
+			<span class="kw">let </span>rc_orig = <span class="kw">match </span><span class="kw-2">&amp;</span>ctrl.rc_orig {
+				<span class="prelude-val">Some</span>(rc) =&gt; <span class="kw-2">*</span>rc,
+				<span class="prelude-val">None </span>=&gt; {
+					<span class="kw">let </span><span class="kw-2">mut </span>rc = ctrl.hchild.GetWindowRect()<span class="question-mark">?</span>;
+					ctrl.hchild.GetParent()<span class="question-mark">?</span>.ScreenToClientRc(<span class="kw-2">&amp;mut </span>rc)<span class="question-mark">?</span>;
+					ctrl.rc_orig = <span class="prelude-val">Some</span>(rc); <span class="comment">// save control client coordinates relative to parent
+					</span>rc
+				},
+			};
 
 			hdwp.DeferWindowPos(
 				<span class="kw-2">&amp;</span>ctrl.hchild,
 				HwndPlace::None,
 				POINT::new(
 					<span class="kw">match </span>ctrl.horz {
-						Horz::Repos =&gt; p.client_area.cx - sz_parent_orig.cx + ctrl.rc_orig.left,
-						<span class="kw">_ </span>=&gt; ctrl.rc_orig.left <span class="comment">// keep original x pos
+						Horz::Repos =&gt; p.client_area.cx - sz_parent_orig.cx + rc_orig.left,
+						<span class="kw">_ </span>=&gt; rc_orig.left <span class="comment">// keep original x pos
 					</span>},
 					<span class="kw">match </span>ctrl.vert {
-						Vert::Repos =&gt; p.client_area.cy - sz_parent_orig.cy + ctrl.rc_orig.top,
-						<span class="kw">_ </span>=&gt; ctrl.rc_orig.top <span class="comment">// keep original y pos
+						Vert::Repos =&gt; p.client_area.cy - sz_parent_orig.cy + rc_orig.top,
+						<span class="kw">_ </span>=&gt; rc_orig.top <span class="comment">// keep original y pos
 					</span>},
 				),
 				SIZE::new(
 					<span class="kw">match </span>ctrl.horz {
-						Horz::Resize =&gt; p.client_area.cx - sz_parent_orig.cx + ctrl.rc_orig.right - ctrl.rc_orig.left,
-						<span class="kw">_ </span>=&gt; ctrl.rc_orig.right - ctrl.rc_orig.left <span class="comment">// keep original width
+						Horz::Resize =&gt; p.client_area.cx - sz_parent_orig.cx + rc_orig.right - rc_orig.left,
+						<span class="kw">_ </span>=&gt; rc_orig.right - rc_orig.left <span class="comment">// keep original width
 					</span>},
 					<span class="kw">match </span>ctrl.vert {
-						Vert::Resize =&gt; p.client_area.cy - sz_parent_orig.cy + ctrl.rc_orig.bottom - ctrl.rc_orig.top,
-						<span class="kw">_ </span>=&gt;ctrl.rc_orig.bottom - ctrl.rc_orig.top <span class="comment">// keep original height
+						Vert::Resize =&gt; p.client_area.cy - sz_parent_orig.cy + rc_orig.bottom - rc_orig.top,
+						<span class="kw">_ </span>=&gt; rc_orig.bottom - rc_orig.top <span class="comment">// keep original height
 					</span>},
 				),
 				uflags,
