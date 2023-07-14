@@ -55,6 +55,7 @@
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -62,6 +63,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::kernel::decl::SysResult;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::comctl_Himagelist;
 <span class="kw">use </span><span class="kw">crate</span>::shell::decl::SHGetFileInfo;
+<span class="kw">use </span><span class="kw">crate</span>::user::decl::SIZE;
 
 <span class="kw">impl </span>comctl_shell_Himagelist <span class="kw">for </span>HIMAGELIST {}
 
@@ -96,7 +98,7 @@
 		file_extensions: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">let </span>sz = <span class="self">self</span>.GetIconSize()<span class="question-mark">?</span>;
-		<span class="kw">if </span>!sz.is(<span class="number">16</span>, <span class="number">16</span>) &amp;&amp; !sz.is(<span class="number">32</span>, <span class="number">32</span>) {
+		<span class="kw">if </span>sz != SIZE::new(<span class="number">16</span>, <span class="number">16</span>) &amp;&amp; sz != SIZE::new(<span class="number">32</span>, <span class="number">32</span>) {
 			<span class="kw">return </span><span class="prelude-val">Err</span>(co::ERROR::NOT_SUPPORTED); <span class="comment">// only 16x16 or 32x32 icons can be loaded
 		</span>}
 
@@ -105,7 +107,7 @@
 				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;*.{}&quot;</span>, file_extension.as_ref()),
 				co::FILE_ATTRIBUTE::NORMAL,
 				co::SHGFI::USEFILEATTRIBUTES | co::SHGFI::ICON |
-				<span class="kw">if </span>sz.is(<span class="number">16</span>, <span class="number">16</span>) { co::SHGFI::SMALLICON } <span class="kw">else </span>{ co::SHGFI::LARGEICON },
+				<span class="kw">if </span>sz == SIZE::new(<span class="number">16</span>, <span class="number">16</span>) { co::SHGFI::SMALLICON } <span class="kw">else </span>{ co::SHGFI::LARGEICON },
 			)<span class="question-mark">?</span>;
 			<span class="self">self</span>.AddIcon(<span class="kw-2">&amp;</span>shfi.hIcon)<span class="question-mark">?</span>;
 		}
