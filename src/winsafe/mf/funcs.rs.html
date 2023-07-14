@@ -53,10 +53,23 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use crate</span>::{co, mf};
-<span class="kw">use </span><span class="kw">crate</span>::mf::decl::{IMFMediaSession, IMFTopology, IMFTopologyNode};
+<span class="kw">use </span><span class="kw">crate</span>::mf::decl::{
+	IMFMediaSession, IMFSourceResolver, IMFTopology, IMFTopologyNode,
+};
 <span class="kw">use </span><span class="kw">crate</span>::mf::privs::MF_VERSION;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::ok_to_hrresult;
@@ -77,6 +90,15 @@
 			)
 		},
 	).map(|<span class="kw">_</span>| queried)
+}
+
+<span class="doccomment">/// [`MFCreateSourceResolver`](https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatesourceresolver)
+/// function.
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>MFCreateSourceResolver() -&gt; HrResult&lt;IMFSourceResolver&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMFSourceResolver::null() };
+	ok_to_hrresult(<span class="kw">unsafe </span>{ mf::ffi::MFCreateSourceResolver(queried.as_mut()) })
+		.map(|<span class="kw">_</span>| queried)
 }
 
 <span class="doccomment">/// [`MFCreateTopology`](https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-mfcreatetopology)
