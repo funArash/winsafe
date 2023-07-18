@@ -117,6 +117,10 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::mem::ManuallyDrop;
@@ -156,7 +160,7 @@
 }
 
 <span class="kw">impl </span>oleaut_Variant <span class="kw">for </span>VARIANT {
-	<span class="kw">unsafe fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>] {
+	<span class="kw">fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>] {
 		<span class="kw-2">&amp;</span><span class="self">self</span>.data
 	}
 
@@ -178,8 +182,9 @@
 	<span class="doccomment">/// Creates a new object holding an [`IDispatch`](crate::IDispatch) COM
 	/// value.
 	///
-	/// Note that the `IDispatch` object will be cloned into the object, still
-	/// being able to be used thereafter.
+	/// Note that `val` will be cloned into the `VARIANT` – that is,
+	/// [`IUnknown::AddRef`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-addref)
+	/// will be called –, so `val` will remain valid to be used thereafter.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new_idispatch(val: <span class="kw-2">&amp;</span><span class="kw">impl </span>oleaut_IDispatch) -&gt; <span class="self">Self </span>{
 		<span class="kw">let </span><span class="kw-2">mut </span>cloned = val.clone();
@@ -190,17 +195,18 @@
 	<span class="doccomment">/// If the object holds an [`IDispatch`](crate::IDispatch) COM value,
 	/// returns it, otherwise `None`.
 	///
-	/// Note that the returned object will be a clone of the `IDispatch` being
-	/// held.
+	/// Note that the returned object will be a clone – that is,
+	/// [`IUnknown::AddRef`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-addref)
+	/// will be called.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>idispatch&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
 		<span class="kw">where </span>T: oleaut_IDispatch,
 	{
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::DISPATCH {
-			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
+			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="self">self</span>.raw()[..<span class="number">8</span>].try_into().unwrap());
 			<span class="kw">let </span>obj = ManuallyDrop::new(<span class="kw">unsafe </span>{ T::from_ptr(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }); <span class="comment">// won&#39;t release the stored pointer
-			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
-			<span class="prelude-val">Some</span>(cloned)
+			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj); <span class="comment">// call AddRef
+			</span><span class="prelude-val">Some</span>(cloned)
 		} <span class="kw">else </span>{
 			<span class="prelude-val">None
 		</span>}
@@ -208,8 +214,9 @@
 
 	<span class="doccomment">/// Creates a new object holding an [`IUnknown`](crate::IUnknown) COM value.
 	///
-	/// Note that the `IUnknown` object will be cloned into the object, still
-	/// being able to be used thereafter.
+	/// Note that `val` will be cloned into the `VARIANT` – that is,
+	/// [`IUnknown::AddRef`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-addref)
+	/// will be called –, so `val` will remain valid to be used thereafter.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new_iunknown&lt;T&gt;(val: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; <span class="self">Self </span>{
 		<span class="kw">let </span><span class="kw-2">mut </span>cloned = val.clone();
@@ -220,17 +227,18 @@
 	<span class="doccomment">/// If the object holds an [`IUnknown`](crate::IUnknown) COM value, returns
 	/// it, otherwise `None`.
 	///
-	/// Note that the returned object will be a clone of the `IUnknown` being
-	/// held.
+	/// Note that the returned object will be a clone – that is,
+	/// [`IUnknown::AddRef`](https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nf-unknwn-iunknown-addref)
+	/// will be called.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>iunknown&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
 		<span class="kw">where </span>T: ole_IUnknown,
 	{
 		<span class="kw">if </span><span class="self">self</span>.vt() == co::VT::UNKNOWN {
-			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="kw">unsafe </span>{ <span class="self">self</span>.raw() }[..<span class="number">8</span>].try_into().unwrap());
+			<span class="kw">let </span>ptr = usize::from_ne_bytes(<span class="self">self</span>.raw()[..<span class="number">8</span>].try_into().unwrap());
 			<span class="kw">let </span>obj = ManuallyDrop::new(<span class="kw">unsafe </span>{ T::from_ptr(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }); <span class="comment">// won&#39;t release the stored pointer
-			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
-			<span class="prelude-val">Some</span>(cloned)
+			</span><span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj); <span class="comment">// call AddRef
+			</span><span class="prelude-val">Some</span>(cloned)
 		} <span class="kw">else </span>{
 			<span class="prelude-val">None
 		</span>}

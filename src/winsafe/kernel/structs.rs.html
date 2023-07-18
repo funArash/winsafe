@@ -1025,6 +1025,16 @@
 <a href="#1025" id="1025">1025</a>
 <a href="#1026" id="1026">1026</a>
 <a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1100,6 +1110,9 @@
 
 <span class="doccomment">/// [`FILETIME`](https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime)
 /// struct.
+///
+/// Can be converted to [`SYSTEMTIME`](crate::SYSTEMTIME) with
+/// [`FileTimeToSystemTime`](crate::FileTimeToSystemTime) function.
 </span><span class="attr">#[repr(C)]
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>FILETIME {
@@ -1109,6 +1122,10 @@
 
 <span class="doccomment">/// [`GUID`](https://learn.microsoft.com/en-us/windows/win32/api/guiddef/ns-guiddef-guid)
 /// struct.
+///
+/// The
+/// [`Default`](https://doc.rust-lang.org/std/default/trait.Default.html)
+/// implementation returns the null `GUID` (all zeros).
 </span><span class="attr">#[repr(C)]
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>GUID {
@@ -1130,7 +1147,7 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>GUID {
 	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-		<span class="self">Self</span>::new(<span class="string">&quot;00000000-0000-0000-c000-000000000046&quot;</span>) <span class="comment">// IUnknown GUID
+		<span class="self">Self</span>::new(<span class="string">&quot;00000000-0000-0000-0000-000000000000&quot;</span>) <span class="comment">// NULL GUID
 	</span>}
 }
 
@@ -1748,6 +1765,9 @@
 
 <span class="doccomment">/// [`SYSTEMTIME`](https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime)
 /// struct.
+///
+/// Can be converted to [`FILETIME`](crate::FILETIME) with
+/// [`SystemTimeToFileTime`](crate::SystemTimeToFileTime) function.
 </span><span class="attr">#[repr(C)]
 #[derive(Default, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>SYSTEMTIME {
