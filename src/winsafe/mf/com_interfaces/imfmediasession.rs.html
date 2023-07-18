@@ -119,6 +119,41 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -126,6 +161,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::mf::decl::IMFTopology;
 <span class="kw">use </span><span class="kw">crate</span>::ole::decl::HrResult;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::{ok_to_hrresult, vt};
+<span class="kw">use </span><span class="kw">crate</span>::oleaut::decl::PROPVARIANT;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::{mf_IMFMediaEventGenerator, mf_IMFTopology, ole_IUnknown};
 <span class="kw">use </span><span class="kw">crate</span>::vt::IMFMediaEventGeneratorVT;
 
@@ -234,6 +270,40 @@
 		<span class="doccomment">/// [`IMFMediaSession::Shutdown`](https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-imfmediasession-shutdown)
 		/// method.
 	</span>}
+
+	<span class="doccomment">/// [`IMFMediaSession::Start`](https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-imfmediasession-start)
+	/// method.
+	///
+	/// # Examples
+	///
+	/// ```rust,no_run
+	/// use winsafe::prelude::*;
+	/// use winsafe::{co, IMFMediaSession, PROPVARIANT};
+	///
+	/// let session: IMFMediaSession; // initialized somewhere
+	/// # let session = unsafe { IMFMediaSession::null() };
+	///
+	/// session.Start(
+	///     co::MF_TIME_FORMAT::NULL,
+	///     &amp;PROPVARIANT::default(),
+	/// )?;
+	/// # Ok::&lt;_, co::HRESULT&gt;(())
+	/// ```
+	</span><span class="kw">fn </span>Start(<span class="kw-2">&amp;</span><span class="self">self</span>,
+		time_format: co::MF_TIME_FORMAT,
+		start_position: <span class="kw-2">&amp;</span>PROPVARIANT,
+	) -&gt; HrResult&lt;()&gt;
+	{
+		ok_to_hrresult(
+			<span class="kw">unsafe </span>{
+				(vt::&lt;IMFMediaSessionVT&gt;(<span class="self">self</span>).Start)(
+					<span class="self">self</span>.ptr(),
+					<span class="kw-2">&amp;</span>time_format <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+					start_position <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+				)
+			},
+		)
+	}
 
 	<span class="macro">fn_com_noparm! </span>{ Stop: IMFMediaSessionVT;
 		<span class="doccomment">/// [`IMFMediaSession::Stop`](https://learn.microsoft.com/en-us/windows/win32/api/mfidl/nf-mfidl-imfmediasession-stop)
