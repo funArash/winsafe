@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\handles\hkey.rs`."><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (474709a9a 2023-08-03)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-6d2c9675f3d09c26.css" data-theme-dark-css="dark-45ceb8f2e522f4d1.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../..\../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../..\../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-6d2c9675f3d09c26.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-45ceb8f2e522f4d1.css"><link rel="stylesheet" href="../../..\../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\handles\hkey.rs`."><title>hkey.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (03a119b0b 2023-08-07)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../..\../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../..\../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../..\../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1082,19 +1082,13 @@
 <a href="#1082" id="1082">1082</a>
 <a href="#1083" id="1083">1083</a>
 <a href="#1084" id="1084">1084</a>
-<a href="#1085" id="1085">1085</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{co, kernel};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	FILETIME, HTRANSACTION, RegistryValue, SECURITY_ATTRIBUTES, SysResult,
-	VALENT, WString,
-};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::RegCloseKeyGuard;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::iterators::{HkeyKeyIter, HkeyValueIter};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::error_to_sysresult;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::guard::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::{ffi, ffi_types::<span class="kw-2">*</span>, iterators::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="macro">impl_handle! </span>{ HKEY;
 	<span class="doccomment">/// Handle to a
@@ -1161,7 +1155,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegConnectRegistryW(
+				ffi::RegConnectRegistryW(
 					WString::from_opt_str(machine_name).as_ptr(),
 					predef_hkey.ptr(),
 					hkey.as_mut(),
@@ -1175,7 +1169,7 @@
 	</span><span class="kw">fn </span>RegCopyTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, dest: <span class="kw-2">&amp;</span>HKEY) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegCopyTreeW(
+				ffi::RegCopyTreeW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					dest.ptr(),
@@ -1200,7 +1194,7 @@
 
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegCreateKeyExW(
+				ffi::RegCreateKeyExW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
@@ -1232,7 +1226,7 @@
 
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegCreateKeyTransactedW(
+				ffi::RegCreateKeyTransactedW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					<span class="number">0</span>,
@@ -1254,10 +1248,7 @@
 	</span><span class="kw">fn </span>RegDeleteKey(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegDeleteKeyW(
-					<span class="self">self</span>.ptr(),
-					WString::from_str(sub_key).as_ptr(),
-				)
+				ffi::RegDeleteKeyW(<span class="self">self</span>.ptr(), WString::from_str(sub_key).as_ptr())
 			},
 		)
 	}
@@ -1271,7 +1262,9 @@
 	/// [`co::KEY::WOW64_32KEY`](crate::co::KEY::WOW64_32KEY) and
 	/// [`co::KEY::WOW64_64KEY`](crate::co::KEY::WOW64_64KEY).
 	</span><span class="kw">fn </span>RegDeleteKeyEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		sub_key: <span class="kw-2">&amp;</span>str, platform_view: co::KEY) -&gt; SysResult&lt;()&gt;
+		sub_key: <span class="kw-2">&amp;</span>str,
+		platform_view: co::KEY,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">if </span>platform_view != co::KEY::WOW64_32KEY
 			&amp;&amp; platform_view != co::KEY::WOW64_64KEY
@@ -1281,7 +1274,7 @@
 
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegDeleteKeyExW(
+				ffi::RegDeleteKeyExW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					platform_view.raw(),
@@ -1301,7 +1294,7 @@
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegDeleteKeyTransactedW(
+				ffi::RegDeleteKeyTransactedW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					access_rights.raw(),
@@ -1318,7 +1311,7 @@
 	</span><span class="kw">fn </span>RegDeleteTree(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegDeleteTreeW(
+				ffi::RegDeleteTreeW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 				)
@@ -1331,7 +1324,7 @@
 	</span><span class="kw">fn </span>RegDeleteValue(<span class="kw-2">&amp;</span><span class="self">self</span>, value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegDeleteValueW(
+				ffi::RegDeleteValueW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 				)
@@ -1342,29 +1335,25 @@
 	<span class="doccomment">/// [`RegDisablePredefinedCache`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablepredefinedcache)
 	/// function.
 	</span><span class="kw">fn </span>RegDisablePredefinedCache() -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::RegDisablePredefinedCache() })
+		error_to_sysresult(<span class="kw">unsafe </span>{ ffi::RegDisablePredefinedCache() })
 	}
 
 	<span class="doccomment">/// [`RegDisablePredefinedCacheEx`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablepredefinedcacheex)
 	/// function.
 	</span><span class="kw">fn </span>RegDisablePredefinedCacheEx() -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::RegDisablePredefinedCacheEx() })
+		error_to_sysresult(<span class="kw">unsafe </span>{ ffi::RegDisablePredefinedCacheEx() })
 	}
 
 	<span class="doccomment">/// [`RegDisableReflectionKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regdisablereflectionkey)
 	/// function.
 	</span><span class="kw">fn </span>RegDisableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::RegDisableReflectionKey(<span class="self">self</span>.ptr()) },
-		)
+		error_to_sysresult(<span class="kw">unsafe </span>{ ffi::RegDisableReflectionKey(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`RegEnableReflectionKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regenablereflectionkey)
 	/// function.
 	</span><span class="kw">fn </span>RegEnableReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::RegEnableReflectionKey(<span class="self">self</span>.ptr()) },
-		)
+		error_to_sysresult(<span class="kw">unsafe </span>{ ffi::RegEnableReflectionKey(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// Returns an iterator over the names of the keys, which calls
@@ -1433,7 +1422,7 @@
 	<span class="doccomment">/// [`RegFlushKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regflushkey)
 	/// function.
 	</span><span class="kw">fn </span>RegFlushKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;()&gt; {
-		error_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::RegFlushKey(<span class="self">self</span>.ptr()) })
+		error_to_sysresult(<span class="kw">unsafe </span>{ ffi::RegFlushKey(<span class="self">self</span>.ptr()) })
 	}
 
 	<span class="doccomment">/// [`RegGetValue`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-reggetvaluew)
@@ -1493,7 +1482,7 @@
 		<span class="comment">// Query data type and length.
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegGetValueW(
+				ffi::RegGetValueW(
 					<span class="self">self</span>.ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
@@ -1514,7 +1503,7 @@
 		<span class="comment">// Retrieve the value content.
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegGetValueW(
+				ffi::RegGetValueW(
 					<span class="self">self</span>.ptr(),
 					sub_key_w.as_ptr(),
 					value_name_w.as_ptr(),
@@ -1536,11 +1525,13 @@
 	<span class="doccomment">/// [`RegLoadKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regloadkeyw)
 	/// function.
 	</span><span class="kw">fn </span>RegLoadKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, file_path: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt;
+		sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		file_path: <span class="kw-2">&amp;</span>str,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegLoadKeyW(
+				ffi::RegLoadKeyW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_str(file_path).as_ptr(),
@@ -1553,12 +1544,13 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegOpenCurrentUser(
-		access_rights: co::KEY) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
+		access_rights: co::KEY,
+	) -&gt; SysResult&lt;RegCloseKeyGuard&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegOpenCurrentUser(access_rights.raw(), hkey.as_mut()),
+				ffi::RegOpenCurrentUser(access_rights.raw(), hkey.as_mut()),
 			).map(|<span class="kw">_</span>| RegCloseKeyGuard::new(hkey))
 		}
 	}
@@ -1589,7 +1581,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegOpenKeyExW(
+				ffi::RegOpenKeyExW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					options.raw(),
@@ -1613,7 +1605,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>hkey = HKEY::NULL;
 		<span class="kw">unsafe </span>{
 			error_to_sysresult(
-				kernel::ffi::RegOpenKeyTransactedW(
+				ffi::RegOpenKeyTransactedW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key).as_ptr(),
 					options.raw(),
@@ -1664,7 +1656,7 @@
 		<span class="kw">loop </span>{ <span class="comment">// until class is large enough
 			</span><span class="kw">match unsafe </span>{
 				co::ERROR::from_raw(
-					kernel::ffi::RegQueryInfoKeyW(
+					ffi::RegQueryInfoKeyW(
 						<span class="self">self</span>.ptr(),
 						class_ptr,
 						<span class="kw-2">&amp;mut </span>class_len,
@@ -1745,7 +1737,8 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegQueryMultipleValues(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		value_names: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; SysResult&lt;Vec&lt;RegistryValue&gt;&gt;
+		value_names: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;],
+	) -&gt; SysResult&lt;Vec&lt;RegistryValue&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>valents1 = <span class="macro">vec!</span>[VALENT::default(); value_names.len()];
 		<span class="kw">let </span>value_names_w = value_names.iter()
@@ -1761,7 +1754,7 @@
 		<span class="comment">// Query data types and lenghts.
 		</span><span class="kw">match unsafe </span>{
 			co::ERROR::from_raw(
-				kernel::ffi::RegQueryMultipleValuesW(
+				ffi::RegQueryMultipleValuesW(
 					<span class="self">self</span>.ptr(),
 					valents1.as_mut_ptr() <span class="kw">as _</span>,
 					value_names.len() <span class="kw">as _</span>,
@@ -1789,7 +1782,7 @@
 		<span class="comment">// Retrieve the values content.
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegQueryMultipleValuesW(
+				ffi::RegQueryMultipleValuesW(
 					<span class="self">self</span>.ptr(),
 					valents2.as_mut_ptr() <span class="kw">as _</span>,
 					value_names.len() <span class="kw">as _</span>,
@@ -1822,9 +1815,7 @@
 	</span><span class="kw">fn </span>RegQueryReflectionKey(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>is_disabled: BOOL = <span class="number">0</span>;
 		error_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::RegQueryReflectionKey(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>is_disabled)
-			},
+			<span class="kw">unsafe </span>{ ffi::RegQueryReflectionKey(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>is_disabled) },
 		).map(|<span class="kw">_</span>| is_disabled != <span class="number">0</span>)
 	}
 
@@ -1879,7 +1870,8 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>RegQueryValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;RegistryValue&gt;
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	) -&gt; SysResult&lt;RegistryValue&gt;
 	{
 		<span class="kw">let </span>value_name_w = WString::from_opt_str(value_name);
 		<span class="kw">let </span><span class="kw-2">mut </span>raw_data_type1 = u32::default();
@@ -1888,7 +1880,7 @@
 		<span class="comment">// Query data type and length.
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegQueryValueExW(
+				ffi::RegQueryValueExW(
 					<span class="self">self</span>.ptr(),
 					value_name_w.as_ptr(),
 					std::ptr::null_mut(),
@@ -1908,7 +1900,7 @@
 		<span class="comment">// Retrieve the value content.
 		</span>error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegQueryValueExW(
+				ffi::RegQueryValueExW(
 					<span class="self">self</span>.ptr(),
 					value_name_w.as_ptr(),
 					std::ptr::null_mut(),
@@ -1929,11 +1921,13 @@
 	<span class="doccomment">/// [`RegRenameKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regrenamekey)
 	/// function.
 	</span><span class="kw">fn </span>RegRenameKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		sub_key_name: <span class="kw-2">&amp;</span>str, new_key_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt;
+		sub_key_name: <span class="kw-2">&amp;</span>str,
+		new_key_name: <span class="kw-2">&amp;</span>str,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegRenameKey(
+				ffi::RegRenameKey(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(sub_key_name).as_ptr(),
 					WString::from_str(new_key_name).as_ptr(),
@@ -1952,7 +1946,7 @@
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegReplaceKeyW(
+				ffi::RegReplaceKeyW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_str(new_src_file).as_ptr(),
@@ -1965,11 +1959,13 @@
 	<span class="doccomment">/// [`RegRestoreKey`](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regrestorekeyw)
 	/// function.
 	</span><span class="kw">fn </span>RegRestoreKey(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		file_path: <span class="kw-2">&amp;</span>str, flags: co::REG_RESTORE) -&gt; SysResult&lt;()&gt;
+		file_path: <span class="kw-2">&amp;</span>str,
+		flags: co::REG_RESTORE,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegRestoreKeyW(
+				ffi::RegRestoreKeyW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(file_path).as_ptr(),
 					flags.raw(),
@@ -1987,7 +1983,7 @@
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegSaveKeyW(
+				ffi::RegSaveKeyW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(dest_file_path).as_ptr(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
@@ -2006,7 +2002,7 @@
 	{
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegSaveKeyExW(
+				ffi::RegSaveKeyExW(
 					<span class="self">self</span>.ptr(),
 					WString::from_str(dest_file_path).as_ptr(),
 					security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
@@ -2046,7 +2042,7 @@
 
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegSetKeyValueW(
+				ffi::RegSetKeyValueW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
@@ -2083,14 +2079,16 @@
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>RegSetValueEx(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, data: RegistryValue) -&gt; SysResult&lt;()&gt;
+		value_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+		data: RegistryValue,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>str_buf = WString::default();
 		<span class="kw">let </span>(data_ptr, data_len) = data.as_ptr_with_len(<span class="kw-2">&amp;mut </span>str_buf);
 
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegSetValueExW(
+				ffi::RegSetValueExW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(value_name).as_ptr(),
 					<span class="number">0</span>,
@@ -2107,7 +2105,7 @@
 	</span><span class="kw">fn </span>RegUnLoadKey(<span class="kw-2">&amp;</span><span class="self">self</span>, sub_key: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;()&gt; {
 		error_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::RegUnLoadKeyW(
+				ffi::RegUnLoadKeyW(
 					<span class="self">self</span>.ptr(),
 					WString::from_opt_str(sub_key).as_ptr(),
 				)

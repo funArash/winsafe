@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\funcs.rs`."><title>funcs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (474709a9a 2023-08-03)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-6d2c9675f3d09c26.css" data-theme-dark-css="dark-45ceb8f2e522f4d1.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-6d2c9675f3d09c26.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-45ceb8f2e522f4d1.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../winsafe/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\funcs.rs`."><title>funcs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (03a119b0b 2023-08-07)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../winsafe/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1749,44 +1749,15 @@
 <a href="#1749" id="1749">1749</a>
 <a href="#1750" id="1750">1750</a>
 <a href="#1751" id="1751">1751</a>
-<a href="#1752" id="1752">1752</a>
-<a href="#1753" id="1753">1753</a>
-<a href="#1754" id="1754">1754</a>
-<a href="#1755" id="1755">1755</a>
-<a href="#1756" id="1756">1756</a>
-<a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
-<a href="#1759" id="1759">1759</a>
-<a href="#1760" id="1760">1760</a>
-<a href="#1761" id="1761">1761</a>
-<a href="#1762" id="1762">1762</a>
-<a href="#1763" id="1763">1763</a>
-<a href="#1764" id="1764">1764</a>
-<a href="#1765" id="1765">1765</a>
-<a href="#1766" id="1766">1766</a>
-<a href="#1767" id="1767">1767</a>
-<a href="#1768" id="1768">1768</a>
-<a href="#1769" id="1769">1769</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use crate</span>::{co, kernel};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	DISK_SPACE_INFORMATION, FILETIME, HeapBlock, HLOCAL, LANGID, LUID,
-	MEMORYSTATUSEX, OSVERSIONINFOEX, SECURITY_ATTRIBUTES, SECURITY_DESCRIPTOR,
-	SID, SID_IDENTIFIER_AUTHORITY, STARTUPINFO, SysResult, SYSTEM_INFO,
-	SYSTEMTIME, TIME_ZONE_INFORMATION, WString,
-};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{
-	FreeSidGuard, LocalFreeGuard, LocalFreeSidGuard, SidGuard,
-};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, INVALID_FILE_ATTRIBUTES, MAX_COMPUTERNAME_LENGTH,
-	MAX_PATH, parse_multi_z_str, ptr_to_sysresult, SECURITY_DESCRIPTOR_REVISION,
-};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
+<span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::guard::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::{ffi, ffi_types::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// [`AllocateAndInitializeSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-allocateandinitializesid)
 /// function.
@@ -1841,7 +1812,7 @@
 
 	<span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::AllocateAndInitializeSid(
+			ffi::AllocateAndInitializeSid(
 				identifier_authority <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				sub_authorities.len() <span class="kw">as _</span>,
 				<span class="kw">if </span>sub_authorities.len() &gt;= <span class="number">1 </span>{ sub_authorities[<span class="number">0</span>].raw() } <span class="kw">else </span>{ <span class="number">0 </span>},
@@ -1868,9 +1839,7 @@
 </span><span class="kw">pub fn </span>ConvertSidToStringSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>pstr = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u16;
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::ConvertSidToStringSidW(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, <span class="kw-2">&amp;mut </span>pstr)
-		},
+		<span class="kw">unsafe </span>{ ffi::ConvertSidToStringSidW(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, <span class="kw-2">&amp;mut </span>pstr) },
 	)<span class="question-mark">?</span>;
 	<span class="kw">let </span>name = WString::from_wchars_nullt(pstr).to_string();
 	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pstr <span class="kw">as _</span>)) }; <span class="comment">// free returned pointer
@@ -1884,7 +1853,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>pbuf = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u8;
 	<span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::ConvertStringSidToSidW(
+			ffi::ConvertStringSidToSidW(
 				WString::from_str(str_sid).as_ptr(),
 				<span class="kw-2">&amp;mut </span>pbuf,
 			),
@@ -1895,11 +1864,14 @@
 <span class="doccomment">/// [`CopyFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-copyfilew)
 /// function.
 </span><span class="kw">pub fn </span>CopyFile(
-	existing_file: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str, fail_if_exists: bool) -&gt; SysResult&lt;()&gt;
+	existing_file: <span class="kw-2">&amp;</span>str,
+	new_file: <span class="kw-2">&amp;</span>str,
+	fail_if_exists: bool,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::CopyFileW(
+			ffi::CopyFileW(
 				WString::from_str(existing_file).as_ptr(),
 				WString::from_str(new_file).as_ptr(),
 				fail_if_exists <span class="kw">as _</span>,
@@ -1917,7 +1889,7 @@
 
 	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::CopySid(
+			ffi::CopySid(
 				sid_sz,
 				sid_buf.as_mut_ptr(),
 				src <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
@@ -1935,7 +1907,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::CreateDirectoryW(
+			ffi::CreateDirectoryW(
 				WString::from_str(path_name).as_ptr(),
 				security_attributes.map_or(std::ptr::null_mut(), |sa| sa <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 			)
@@ -1964,7 +1936,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_sz = u32::default();
 
 	<span class="kw">unsafe </span>{
-		kernel::ffi::CreateWellKnownSid( <span class="comment">// retrieve needed buffer sizes
+		ffi::CreateWellKnownSid( <span class="comment">// retrieve needed buffer sizes
 			</span>well_known_sid.raw(),
 			domain_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 			std::ptr::null_mut(),
@@ -1980,7 +1952,7 @@
 
 	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::CreateWellKnownSid(
+			ffi::CreateWellKnownSid(
 				well_known_sid.raw(),
 				domain_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				sid_buf.as_mut_ptr(),
@@ -1994,9 +1966,7 @@
 /// function.
 </span><span class="kw">pub fn </span>DeleteFile(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::DeleteFileW(WString::from_str(file_name).as_ptr())
-		},
+		<span class="kw">unsafe </span>{ ffi::DeleteFileW(WString::from_str(file_name).as_ptr()) },
 	)
 }
 
@@ -2004,9 +1974,7 @@
 /// function.
 </span><span class="kw">pub fn </span>DecryptFile(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::DecryptFileW(WString::from_str(file_name).as_ptr(), <span class="number">0</span>)
-		},
+		<span class="kw">unsafe </span>{ ffi::DecryptFileW(WString::from_str(file_name).as_ptr(), <span class="number">0</span>) },
 	)
 }
 
@@ -2014,9 +1982,7 @@
 /// function.
 </span><span class="kw">pub fn </span>EncryptFile(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::EncryptFileW(WString::from_str(file_name).as_ptr())
-		},
+		<span class="kw">unsafe </span>{ ffi::EncryptFileW(WString::from_str(file_name).as_ptr()) },
 	)
 }
 
@@ -2025,7 +1991,7 @@
 </span><span class="kw">pub fn </span>EncryptionDisable(dir_path: <span class="kw-2">&amp;</span>str, disable: bool) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::EncryptionDisable(
+			ffi::EncryptionDisable(
 				WString::from_str(dir_path).as_ptr(),
 				disable <span class="kw">as _</span>,
 			)
@@ -2040,7 +2006,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>is_equal: BOOL = <span class="number">0</span>;
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::EqualDomainSid(
+			ffi::EqualDomainSid(
 				sid1 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				sid2 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				<span class="kw-2">&amp;mut </span>is_equal,
@@ -2054,7 +2020,7 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>EqualPrefixSid(sid1: <span class="kw-2">&amp;</span>SID, sid2: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;bool&gt; {
 	<span class="kw">match unsafe </span>{
-		kernel::ffi::EqualPrefixSid(sid1 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sid2 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
+		ffi::EqualPrefixSid(sid1 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sid2 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
 	} {
 		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
@@ -2069,7 +2035,7 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>EqualSid(sid1: <span class="kw-2">&amp;</span>SID, sid2: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;bool&gt; {
 	<span class="kw">match unsafe </span>{
-		kernel::ffi::EqualSid(sid1 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sid2 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
+		ffi::EqualSid(sid1 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, sid2 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>)
 	} {
 		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
@@ -2082,13 +2048,13 @@
 <span class="doccomment">/// [`ExitProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitprocess)
 /// function.
 </span><span class="kw">pub fn </span>ExitProcess(exit_code: u32) {
-	<span class="kw">unsafe </span>{ kernel::ffi::ExitProcess(exit_code) }
+	<span class="kw">unsafe </span>{ ffi::ExitProcess(exit_code) }
 }
 
 <span class="doccomment">/// [`ExitThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitthread)
 /// function.
 </span><span class="kw">pub fn </span>ExitThread(exit_code: u32) {
-	<span class="kw">unsafe </span>{ kernel::ffi::ExitThread(exit_code) }
+	<span class="kw">unsafe </span>{ ffi::ExitThread(exit_code) }
 }
 
 <span class="doccomment">/// [`ExpandEnvironmentStrings`](https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-expandenvironmentstringsw)
@@ -2111,7 +2077,7 @@
 </span><span class="kw">pub fn </span>ExpandEnvironmentStrings(src: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span>wsrc = WString::from_str(src);
 	<span class="kw">let </span>len = <span class="kw">unsafe </span>{
-		kernel::ffi::ExpandEnvironmentStringsW(
+		ffi::ExpandEnvironmentStringsW(
 			wsrc.as_ptr(),
 			std::ptr::null_mut(),
 			<span class="number">0</span>,
@@ -2121,7 +2087,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as _</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::ExpandEnvironmentStringsW(
+			ffi::ExpandEnvironmentStringsW(
 				wsrc.as_ptr(),
 				buf.as_mut_ptr(),
 				len,
@@ -2133,11 +2099,13 @@
 <span class="doccomment">/// [`FileTimeToSystemTime`](https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-filetimetosystemtime)
 /// function.
 </span><span class="kw">pub fn </span>FileTimeToSystemTime(
-	file_time: <span class="kw-2">&amp;</span>FILETIME, system_time: <span class="kw-2">&amp;mut </span>SYSTEMTIME) -&gt; SysResult&lt;()&gt;
+	file_time: <span class="kw-2">&amp;</span>FILETIME,
+	system_time: <span class="kw-2">&amp;mut </span>SYSTEMTIME,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::FileTimeToSystemTime(
+			ffi::FileTimeToSystemTime(
 				file_time <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				system_time <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			)
@@ -2148,7 +2116,7 @@
 <span class="doccomment">/// [`FlushProcessWriteBuffers`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-flushprocesswritebuffers)
 /// function.
 </span><span class="kw">pub fn </span>FlushProcessWriteBuffers() {
-	<span class="kw">unsafe </span>{ kernel::ffi::FlushProcessWriteBuffers() }
+	<span class="kw">unsafe </span>{ ffi::FlushProcessWriteBuffers() }
 }
 
 <span class="doccomment">/// [`FormatMessage`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagew)
@@ -2168,7 +2136,7 @@
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>ptr_buf = std::ptr::null_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u16;
 
-	<span class="kw">let </span>nchars = <span class="kw">match </span>kernel::ffi::FormatMessageW(
+	<span class="kw">let </span>nchars = <span class="kw">match </span>ffi::FormatMessageW(
 		flags.raw(),
 		source.unwrap_or(std::ptr::null_mut()),
 		message_id,
@@ -2194,7 +2162,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>binary_type = co::SCS::default();
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetBinaryTypeW(
+			ffi::GetBinaryTypeW(
 				WString::from_str(application_name).as_ptr(),
 				binary_type.as_mut(),
 			)
@@ -2208,7 +2176,7 @@
 /// For an example, see [`CommandLineToArgv`](crate::CommandLineToArgv).
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetCommandLine() -&gt; String {
-	WString::from_wchars_nullt(<span class="kw">unsafe </span>{ kernel::ffi::GetCommandLineW() })
+	WString::from_wchars_nullt(<span class="kw">unsafe </span>{ ffi::GetCommandLineW() })
 		.to_string()
 }
 
@@ -2220,7 +2188,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sz = buf.buf_len() <span class="kw">as </span>u32;
 
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::GetComputerNameW(buf.as_mut_ptr(), <span class="kw-2">&amp;mut </span>sz) },
+		<span class="kw">unsafe </span>{ ffi::GetComputerNameW(buf.as_mut_ptr(), <span class="kw-2">&amp;mut </span>sz) },
 	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
@@ -2231,7 +2199,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetCurrentDirectoryW(
+			ffi::GetCurrentDirectoryW(
 				buf.buf_len() <span class="kw">as _</span>,
 				buf.as_mut_ptr(),
 			)
@@ -2243,14 +2211,14 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetCurrentProcessId() -&gt; u32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcessId() }
+	<span class="kw">unsafe </span>{ ffi::GetCurrentProcessId() }
 }
 
 <span class="doccomment">/// [`GetCurrentThreadId`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadid)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetCurrentThreadId() -&gt; u32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentThreadId() }
+	<span class="kw">unsafe </span>{ ffi::GetCurrentThreadId() }
 }
 
 <span class="doccomment">/// [`GetDriveType`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdrivetypew)
@@ -2259,9 +2227,7 @@
 </span><span class="kw">pub fn </span>GetDriveType(root_path_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; co::DRIVE {
 	<span class="kw">unsafe </span>{
 		co::DRIVE::from_raw(
-			kernel::ffi::GetDriveTypeW(
-				WString::from_opt_str(root_path_name).as_ptr(),
-			),
+			ffi::GetDriveTypeW(WString::from_opt_str(root_path_name).as_ptr()),
 		)
 	}
 }
@@ -2277,7 +2243,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetDiskFreeSpaceExW(
+			ffi::GetDiskFreeSpaceExW(
 				WString::from_opt_str(directory_name).as_ptr(),
 				free_bytes_available_to_caller.map_or(std::ptr::null_mut(), |n| n),
 				total_number_of_bytes.map_or(std::ptr::null_mut(), |n| n),
@@ -2296,7 +2262,7 @@
 {
 	<span class="kw">match unsafe </span>{
 		co::ERROR::from_raw(
-			kernel::ffi::GetDiskSpaceInformationW(
+			ffi::GetDiskSpaceInformationW(
 				WString::from_str(root_path).as_ptr(),
 				disk_space_info <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			),
@@ -2331,20 +2297,19 @@
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetEnvironmentStrings() -&gt; SysResult&lt;HashMap&lt;String, String&gt;&gt; {
-	ptr_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::GetEnvironmentStringsW() } <span class="kw">as _</span>,
-	).map(|ptr| {
-		<span class="kw">let </span>vec_env_strs = parse_multi_z_str(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>);
-		<span class="kw">unsafe </span>{ kernel::ffi::FreeEnvironmentStringsW(ptr); }
-		vec_env_strs.iter()
-			.map(|env_str| {
-				<span class="kw">let </span><span class="kw-2">mut </span>pair = env_str.split(<span class="string">&quot;=&quot;</span>); <span class="comment">// assumes correctly formatted pairs
-				</span><span class="kw">let </span>key = pair.next().unwrap();
-				<span class="kw">let </span>val = pair.next().unwrap();
-				(key.to_owned(), val.to_owned())
-			})
-			.collect()
-	})
+	ptr_to_sysresult(<span class="kw">unsafe </span>{ ffi::GetEnvironmentStringsW() } <span class="kw">as _</span>)
+		.map(|ptr| {
+			<span class="kw">let </span>vec_env_strs = parse_multi_z_str(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>);
+			<span class="kw">unsafe </span>{ ffi::FreeEnvironmentStringsW(ptr); }
+			vec_env_strs.iter()
+				.map(|env_str| {
+					<span class="kw">let </span><span class="kw-2">mut </span>pair = env_str.split(<span class="string">&quot;=&quot;</span>); <span class="comment">// assumes correctly formatted pairs
+					</span><span class="kw">let </span>key = pair.next().unwrap();
+					<span class="kw">let </span>val = pair.next().unwrap();
+					(key.to_owned(), val.to_owned())
+				})
+				.collect()
+		})
 }
 
 <span class="doccomment">/// [`GetFirmwareType`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfirmwaretype)
@@ -2352,7 +2317,7 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetFirmwareType() -&gt; SysResult&lt;co::FIRMWARE_TYPE&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>ft = u32::default();
-	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::GetFirmwareType(<span class="kw-2">&amp;mut </span>ft) })
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::GetFirmwareType(<span class="kw-2">&amp;mut </span>ft) })
 		.map(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ co::FIRMWARE_TYPE::from_raw(ft) })
 }
 
@@ -2360,7 +2325,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLargePageMinimum() -&gt; usize {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetLargePageMinimum() }
+	<span class="kw">unsafe </span>{ ffi::GetLargePageMinimum() }
 }
 
 <span class="doccomment">/// [`GetLastError`](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-getlasterror)
@@ -2371,21 +2336,21 @@
 /// you ever need to call it.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLastError() -&gt; co::ERROR {
-	<span class="kw">unsafe </span>{ co::ERROR::from_raw(kernel::ffi::GetLastError()) }
+	<span class="kw">unsafe </span>{ co::ERROR::from_raw(ffi::GetLastError()) }
 }
 
 <span class="doccomment">/// [`GetLengthSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getlengthsid)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLengthSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; u32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetLengthSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetLengthSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetLogicalDrives`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getlogicaldrives)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLogicalDrives() -&gt; u32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetLogicalDrives() }
+	<span class="kw">unsafe </span>{ ffi::GetLogicalDrives() }
 }
 
 <span class="doccomment">/// [`GetLogicalDriveStrings`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getlogicaldrivestringsw)
@@ -2393,7 +2358,7 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetLogicalDriveStrings() -&gt; SysResult&lt;Vec&lt;String&gt;&gt; {
 	<span class="kw">let </span>len = <span class="kw">match unsafe </span>{
-		kernel::ffi::GetLogicalDriveStringsW(<span class="number">0</span>, std::ptr::null_mut())
+		ffi::GetLogicalDriveStringsW(<span class="number">0</span>, std::ptr::null_mut())
 	} {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		len =&gt; <span class="prelude-val">Ok</span>(len),
@@ -2402,9 +2367,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(len <span class="kw">as </span>usize + <span class="number">1</span>); <span class="comment">// room for terminating null
 
 	</span>bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::GetLogicalDriveStringsW(len, buf.as_mut_ptr())
-		} <span class="kw">as _</span>,
+		<span class="kw">unsafe </span>{ ffi::GetLogicalDriveStringsW(len, buf.as_mut_ptr()) } <span class="kw">as _</span>,
 	).map(|<span class="kw">_</span>| parse_multi_z_str(buf.as_ptr()))
 }
 
@@ -2441,7 +2404,7 @@
 </span><span class="kw">pub fn </span>GetFileAttributes(file_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;co::FILE_ATTRIBUTE&gt; {
 	<span class="kw">const </span>INVALID: u32 = INVALID_FILE_ATTRIBUTES <span class="kw">as </span>u32;
 	<span class="kw">match unsafe </span>{
-		kernel::ffi::GetFileAttributesW(WString::from_str(file_name).as_ptr())
+		ffi::GetFileAttributesW(WString::from_str(file_name).as_ptr())
 	} {
 		INVALID =&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		flags =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::FILE_ATTRIBUTE::from_raw(flags) }),
@@ -2464,20 +2427,20 @@
 /// GetLocalTime(&amp;mut st);
 /// ```
 </span><span class="kw">pub fn </span>GetLocalTime(st: <span class="kw-2">&amp;mut </span>SYSTEMTIME) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetLocalTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetLocalTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetNativeSystemInfo`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getnativesysteminfo)
 /// function.
 </span><span class="kw">pub fn </span>GetNativeSystemInfo(si: <span class="kw-2">&amp;mut </span>SYSTEM_INFO) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetNativeSystemInfo(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetNativeSystemInfo(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSidLengthRequired`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-getsidlengthrequired)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetSidLengthRequired(sub_authority_count: u8) -&gt; u32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetSidLengthRequired(sub_authority_count) }
+	<span class="kw">unsafe </span>{ ffi::GetSidLengthRequired(sub_authority_count) }
 }
 
 <span class="doccomment">/// [`GetStartupInfo`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getstartupinfow)
@@ -2493,7 +2456,7 @@
 /// GetStartupInfo(&amp;mut si);
 /// ```
 </span><span class="kw">pub fn </span>GetStartupInfo(si: <span class="kw-2">&amp;mut </span>STARTUPINFO) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetStartupInfoW(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetStartupInfoW(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSystemDirectory`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemdirectoryw)
@@ -2503,7 +2466,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetSystemDirectoryW(buf.as_mut_ptr(), buf.buf_len() <span class="kw">as _</span>)
+			ffi::GetSystemDirectoryW(buf.as_mut_ptr(), buf.buf_len() <span class="kw">as _</span>)
 		} <span class="kw">as _</span>,
 	).map(|<span class="kw">_</span>| buf.to_string())
 }
@@ -2519,7 +2482,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>flags = co::FILE_CACHE::default();
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetSystemFileCacheSize(<span class="kw-2">&amp;mut </span>min, <span class="kw-2">&amp;mut </span>max, flags.as_mut())
+			ffi::GetSystemFileCacheSize(<span class="kw-2">&amp;mut </span>min, <span class="kw-2">&amp;mut </span>max, flags.as_mut())
 		},
 	).map(|<span class="kw">_</span>| (min, max, flags))
 }
@@ -2537,7 +2500,7 @@
 /// GetSystemInfo(&amp;mut si);
 /// ```
 </span><span class="kw">pub fn </span>GetSystemInfo(si: <span class="kw-2">&amp;mut </span>SYSTEM_INFO) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetSystemInfo(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetSystemInfo(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSystemTime`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtime)
@@ -2556,19 +2519,19 @@
 /// GetSystemTime(&amp;mut st);
 /// ```
 </span><span class="kw">pub fn </span>GetSystemTime(st: <span class="kw-2">&amp;mut </span>SYSTEMTIME) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetSystemTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetSystemTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSystemTimeAsFileTime`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimeasfiletime)
 /// function.
 </span><span class="kw">pub fn </span>GetSystemTimeAsFileTime(ft: <span class="kw-2">&amp;mut </span>FILETIME) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetSystemTimeAsFileTime(ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetSystemTimeAsFileTime(ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSystemTimePreciseAsFileTime`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime)
 /// function.
 </span><span class="kw">pub fn </span>GetSystemTimePreciseAsFileTime(ft: <span class="kw-2">&amp;mut </span>FILETIME) {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetSystemTimePreciseAsFileTime(ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
+	<span class="kw">unsafe </span>{ ffi::GetSystemTimePreciseAsFileTime(ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
 }
 
 <span class="doccomment">/// [`GetSystemTimes`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getsystemtimes)
@@ -2581,7 +2544,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetSystemTimes(
+			ffi::GetSystemTimes(
 				idle_time <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				kernel_time <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				user_time <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -2594,12 +2557,15 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetTempFileName(
-	path_name: <span class="kw-2">&amp;</span>str, prefix: <span class="kw-2">&amp;</span>str, unique: u32) -&gt; SysResult&lt;String&gt;
+	path_name: <span class="kw-2">&amp;</span>str,
+	prefix: <span class="kw-2">&amp;</span>str,
+	unique: u32,
+) -&gt; SysResult&lt;String&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetTempFileNameW(
+			ffi::GetTempFileNameW(
 				WString::from_str(path_name).as_ptr(),
 				WString::from_str(prefix).as_ptr(),
 				unique,
@@ -2615,9 +2581,7 @@
 </span><span class="kw">pub fn </span>GetTempPath() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{
-			kernel::ffi::GetTempPathW(buf.buf_len() <span class="kw">as _</span>, buf.as_mut_ptr())
-		} <span class="kw">as _</span>,
+		<span class="kw">unsafe </span>{ ffi::GetTempPathW(buf.buf_len() <span class="kw">as _</span>, buf.as_mut_ptr()) } <span class="kw">as _</span>,
 	).map(|<span class="kw">_</span>| buf.to_string())
 }
 
@@ -2625,7 +2589,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetTickCount64() -&gt; u64 {
-	<span class="kw">unsafe </span>{ kernel::ffi::GetTickCount64() }
+	<span class="kw">unsafe </span>{ ffi::GetTickCount64() }
 }
 
 <span class="doccomment">/// [`GetUserName`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getusernamew)
@@ -2634,7 +2598,7 @@
 </span><span class="kw">pub fn </span>GetUserName() -&gt; SysResult&lt;String&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>name_sz = u32::default();
 
-	<span class="kw">unsafe </span>{ kernel::ffi::GetUserNameW(std::ptr::null_mut(), <span class="kw-2">&amp;mut </span>name_sz); }
+	<span class="kw">unsafe </span>{ ffi::GetUserNameW(std::ptr::null_mut(), <span class="kw-2">&amp;mut </span>name_sz); }
 	<span class="kw">let </span>get_size_err = GetLastError();
 	<span class="kw">if </span>get_size_err != co::ERROR::INSUFFICIENT_BUFFER {
 		<span class="kw">return </span><span class="prelude-val">Err</span>(get_size_err);
@@ -2643,7 +2607,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>name_buf = WString::new_alloc_buf(name_sz <span class="kw">as _</span>);
 
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::GetUserNameW(name_buf.as_mut_ptr(), <span class="kw-2">&amp;mut </span>name_sz) },
+		<span class="kw">unsafe </span>{ ffi::GetUserNameW(name_buf.as_mut_ptr(), <span class="kw-2">&amp;mut </span>name_sz) },
 	).map(|<span class="kw">_</span>| name_buf.to_string())
 }
 
@@ -2694,7 +2658,7 @@
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetVolumeInformationW(
+			ffi::GetVolumeInformationW(
 				WString::from_opt_str(root_path_name).as_ptr(),
 				<span class="kw">match </span>name {
 					<span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; name_buf.<span class="number">0</span>.as_mut_ptr(),
@@ -2728,7 +2692,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::GetVolumePathNameW(
+			ffi::GetVolumePathNameW(
 				WString::from_str(file_name).as_ptr(),
 				buf.as_mut_ptr(),
 				buf.buf_len() <span class="kw">as _</span>,
@@ -2744,7 +2708,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>ad_sid_sz = u32::default();
 
 	<span class="kw">unsafe </span>{
-		kernel::ffi::GetWindowsAccountDomainSid(
+		ffi::GetWindowsAccountDomainSid(
 			sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 			std::ptr::null_mut(),
 			<span class="kw-2">&amp;mut </span>ad_sid_sz,
@@ -2759,7 +2723,7 @@
 
 	</span><span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::GetWindowsAccountDomainSid(
+			ffi::GetWindowsAccountDomainSid(
 				sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				ad_sid_buf.as_mut_ptr(),
 				<span class="kw-2">&amp;mut </span>ad_sid_sz,
@@ -2772,7 +2736,7 @@
 /// function.
 </span><span class="kw">pub fn </span>GlobalMemoryStatusEx(msx: <span class="kw-2">&amp;mut </span>MEMORYSTATUSEX) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::GlobalMemoryStatusEx(msx <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
+		<span class="kw">unsafe </span>{ ffi::GlobalMemoryStatusEx(msx <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) },
 	)
 }
 
@@ -2807,7 +2771,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sd = <span class="kw">unsafe </span>{ std::mem::zeroed::&lt;SECURITY_DESCRIPTOR&gt;() };
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::InitializeSecurityDescriptor(
+			ffi::InitializeSecurityDescriptor(
 				<span class="kw-2">&amp;mut </span>sd <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 				SECURITY_DESCRIPTOR_REVISION,
 			)
@@ -2827,7 +2791,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::InitiateSystemShutdownW(
+			ffi::InitiateSystemShutdownW(
 				WString::from_opt_str(machine_name).as_ptr(),
 				WString::from_opt_str(message).as_ptr(),
 				timeout,
@@ -2851,7 +2815,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::InitiateSystemShutdownExW(
+			ffi::InitiateSystemShutdownExW(
 				WString::from_opt_str(machine_name).as_ptr(),
 				WString::from_opt_str(message).as_ptr(),
 				timeout,
@@ -2867,7 +2831,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsDebuggerPresent() -&gt; bool {
-	<span class="kw">unsafe </span>{ kernel::ffi::IsDebuggerPresent() != <span class="number">0 </span>}
+	<span class="kw">unsafe </span>{ ffi::IsDebuggerPresent() != <span class="number">0 </span>}
 }
 
 <span class="doccomment">/// [`IsNativeVhdBoot`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-isnativevhdboot)
@@ -2875,23 +2839,22 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsNativeVhdBoot() -&gt; SysResult&lt;bool&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>is_native: BOOL = <span class="number">0</span>;
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::IsNativeVhdBoot(<span class="kw-2">&amp;mut </span>is_native) },
-	).map(|<span class="kw">_</span>| is_native != <span class="number">0</span>)
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::IsNativeVhdBoot(<span class="kw-2">&amp;mut </span>is_native) })
+		.map(|<span class="kw">_</span>| is_native != <span class="number">0</span>)
 }
 
 <span class="doccomment">/// [`IsValidSecurityDescriptor`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-isvalidsecuritydescriptor)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsValidSecurityDescriptor(sd: <span class="kw-2">&amp;</span>SECURITY_DESCRIPTOR) -&gt; bool {
-	<span class="kw">unsafe </span>{ kernel::ffi::IsValidSecurityDescriptor(sd <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) != <span class="number">0 </span>}
+	<span class="kw">unsafe </span>{ ffi::IsValidSecurityDescriptor(sd <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) != <span class="number">0 </span>}
 }
 
 <span class="doccomment">/// [`IsValidSid`](https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-isvalidsid)
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsValidSid(sid: <span class="kw-2">&amp;</span>SID) -&gt; SysResult&lt;bool&gt; {
-	<span class="kw">match unsafe </span>{ kernel::ffi::IsValidSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) } {
+	<span class="kw">match unsafe </span>{ ffi::IsValidSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>) } {
 		<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {
 			co::ERROR::SUCCESS =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
 			err =&gt; <span class="prelude-val">Err</span>(err),
@@ -2904,11 +2867,12 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>IsWellKnownSid(
-	sid: <span class="kw-2">&amp;</span>SID, well_known_sid: co::WELL_KNOWN_SID_TYPE) -&gt; bool
+	sid: <span class="kw-2">&amp;</span>SID,
+	well_known_sid: co::WELL_KNOWN_SID_TYPE,
+) -&gt; bool
 {
 	<span class="kw">unsafe </span>{
-		kernel::ffi::IsWellKnownSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, well_known_sid.raw())
-			!= <span class="number">0
+		ffi::IsWellKnownSid(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, well_known_sid.raw()) != <span class="number">0
 	</span>}
 }
 
@@ -3047,7 +3011,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::default();
 
 	<span class="kw">unsafe </span>{
-		kernel::ffi::LookupAccountNameW( <span class="comment">// retrieve needed buffer sizes
+		ffi::LookupAccountNameW( <span class="comment">// retrieve needed buffer sizes
 			</span>WString::from_opt_str(system_name).as_ptr(),
 			WString::from_str(account_name).as_ptr(),
 			std::ptr::null_mut(),
@@ -3067,7 +3031,7 @@
 
 	<span class="kw">unsafe </span>{
 		bool_to_sysresult(
-			kernel::ffi::LookupAccountNameW(
+			ffi::LookupAccountNameW(
 				WString::from_opt_str(system_name).as_ptr(),
 				WString::from_str(account_name).as_ptr(),
 				sid_buf.as_mut_ptr(),
@@ -3095,7 +3059,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>sid_name_use = co::SID_NAME_USE::default();
 
 	<span class="kw">unsafe </span>{
-		kernel::ffi::LookupAccountSidW( <span class="comment">// retrieve needed buffer sizes
+		ffi::LookupAccountSidW( <span class="comment">// retrieve needed buffer sizes
 			</span>WString::from_opt_str(system_name).as_ptr(),
 			sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 			std::ptr::null_mut(),
@@ -3115,7 +3079,7 @@
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::LookupAccountSidW(
+			ffi::LookupAccountSidW(
 				WString::from_opt_str(system_name).as_ptr(),
 				sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				account_buf.as_mut_ptr(),
@@ -3132,13 +3096,15 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>LookupPrivilegeName(
-	system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, luid: LUID) -&gt; SysResult&lt;co::SE_PRIV&gt;
+	system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	luid: LUID,
+) -&gt; SysResult&lt;co::SE_PRIV&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>cch_name = u32::default();
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::LookupPrivilegeNameW(
+			ffi::LookupPrivilegeNameW(
 				WString::from_opt_str(system_name).as_ptr(),
 				<span class="kw-2">&amp;</span>luid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				std::ptr::null_mut(),
@@ -3151,7 +3117,7 @@
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::LookupPrivilegeNameW(
+			ffi::LookupPrivilegeNameW(
 				WString::from_opt_str(system_name).as_ptr(),
 				<span class="kw-2">&amp;</span>luid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				buf.as_mut_ptr(),
@@ -3178,12 +3144,14 @@
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>LookupPrivilegeValue(
-	system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: co::SE_PRIV) -&gt; SysResult&lt;LUID&gt;
+	system_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	name: co::SE_PRIV,
+) -&gt; SysResult&lt;LUID&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>luid = LUID::new(<span class="number">0</span>, <span class="number">0</span>);
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::LookupPrivilegeValueW(
+			ffi::LookupPrivilegeValueW(
 				WString::from_opt_str(system_name).as_ptr(),
 				WString::from(name).as_ptr(),
 				<span class="kw-2">&amp;mut </span>luid <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -3228,7 +3196,7 @@
 </span><span class="kw">pub fn </span>MoveFile(existing_file: <span class="kw-2">&amp;</span>str, new_file: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::MoveFileW(
+			ffi::MoveFileW(
 				WString::from_str(existing_file).as_ptr(),
 				WString::from_str(new_file).as_ptr(),
 			)
@@ -3240,7 +3208,7 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>MulDiv(number: i32, numerator: i32, denominator: i32) -&gt; i32 {
-	<span class="kw">unsafe </span>{ kernel::ffi::MulDiv(number, numerator, denominator) }
+	<span class="kw">unsafe </span>{ ffi::MulDiv(number, numerator, denominator) }
 }
 
 <span class="doccomment">/// [`MultiByteToWideChar`](https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar)
@@ -3255,7 +3223,7 @@
 ) -&gt; SysResult&lt;Vec&lt;u16&gt;&gt;
 {
 	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
-		kernel::ffi::MultiByteToWideChar(
+		ffi::MultiByteToWideChar(
 			code_page.raw() <span class="kw">as _</span>,
 			flags.raw(),
 			multi_byte_str.as_ptr(),
@@ -3272,7 +3240,7 @@
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::MultiByteToWideChar(
+			ffi::MultiByteToWideChar(
 				code_page.raw() <span class="kw">as _</span>,
 				flags.raw(),
 				multi_byte_str.as_ptr(),
@@ -3287,9 +3255,7 @@
 <span class="doccomment">/// [`OutputDebugString`](https://learn.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw)
 /// function.
 </span><span class="kw">pub fn </span>OutputDebugString(output_string: <span class="kw-2">&amp;</span>str) {
-	<span class="kw">unsafe </span>{
-		kernel::ffi::OutputDebugStringW(WString::from_str(output_string).as_ptr())
-	}
+	<span class="kw">unsafe </span>{ ffi::OutputDebugStringW(WString::from_str(output_string).as_ptr()) }
 }
 
 <span class="doccomment">/// [`QueryPerformanceCounter`](https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter)
@@ -3315,9 +3281,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>QueryPerformanceCounter() -&gt; SysResult&lt;i64&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>perf_count = i64::default();
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::QueryPerformanceCounter(<span class="kw-2">&amp;mut </span>perf_count) },
-	).map(|<span class="kw">_</span>| perf_count)
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::QueryPerformanceCounter(<span class="kw-2">&amp;mut </span>perf_count) })
+		.map(|<span class="kw">_</span>| perf_count)
 }
 
 <span class="doccomment">/// [`QueryPerformanceFrequency`](https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter)
@@ -3328,9 +3293,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>QueryPerformanceFrequency() -&gt; SysResult&lt;i64&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>freq = i64::default();
-	bool_to_sysresult(
-		<span class="kw">unsafe </span>{ kernel::ffi::QueryPerformanceFrequency(<span class="kw-2">&amp;mut </span>freq) },
-	).map(|<span class="kw">_</span>| freq)
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::QueryPerformanceFrequency(<span class="kw-2">&amp;mut </span>freq) })
+		.map(|<span class="kw">_</span>| freq)
 }
 
 <span class="doccomment">/// [`ReplaceFile`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilew)
@@ -3344,7 +3308,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::ReplaceFileW(
+			ffi::ReplaceFileW(
 				WString::from_str(replaced).as_ptr(),
 				WString::from_str(replacement).as_ptr(),
 				WString::from_opt_str(backup).as_ptr(),
@@ -3361,7 +3325,7 @@
 </span><span class="kw">pub fn </span>SetCurrentDirectory(path_name: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::SetCurrentDirectoryW(WString::from_str(path_name).as_ptr())
+			ffi::SetCurrentDirectoryW(WString::from_str(path_name).as_ptr())
 		},
 	)
 }
@@ -3369,11 +3333,13 @@
 <span class="doccomment">/// [`SetFileAttributes`](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileattributesw)
 /// function.
 </span><span class="kw">pub fn </span>SetFileAttributes(
-	file_name: <span class="kw-2">&amp;</span>str, attributes: co::FILE_ATTRIBUTE) -&gt; SysResult&lt;()&gt;
+	file_name: <span class="kw-2">&amp;</span>str,
+	attributes: co::FILE_ATTRIBUTE,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::SetFileAttributesW(
+			ffi::SetFileAttributesW(
 				WString::from_str(file_name).as_ptr(),
 				attributes.raw(),
 			)
@@ -3384,7 +3350,7 @@
 <span class="doccomment">/// [`SetLastError`](https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-setlasterror)
 /// function.
 </span><span class="kw">pub fn </span>SetLastError(err_code: co::ERROR) {
-	<span class="kw">unsafe </span>{ kernel::ffi::SetLastError(err_code.raw()) }
+	<span class="kw">unsafe </span>{ ffi::SetLastError(err_code.raw()) }
 }
 
 <span class="doccomment">/// [`SetThreadStackGuarantee`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadstackguarantee)
@@ -3393,33 +3359,32 @@
 /// Returns the size of the previous stack.
 </span><span class="kw">pub fn </span>SetThreadStackGuarantee(stack_size_in_bytes: u32) -&gt; SysResult&lt;u32&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>sz = stack_size_in_bytes;
-	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SetThreadStackGuarantee(<span class="kw-2">&amp;mut </span>sz) })
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::SetThreadStackGuarantee(<span class="kw-2">&amp;mut </span>sz) })
 		.map(|<span class="kw">_</span>| sz)
 }
 
 <span class="doccomment">/// [`Sleep`](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep)
 /// function.
 </span><span class="kw">pub fn </span>Sleep(milliseconds: u32) {
-	<span class="kw">unsafe </span>{ kernel::ffi::Sleep(milliseconds) }
+	<span class="kw">unsafe </span>{ ffi::Sleep(milliseconds) }
 }
 
 <span class="doccomment">/// [`SwitchToThread`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-switchtothread)
 /// function.
 </span><span class="kw">pub fn </span>SwitchToThread() -&gt; SysResult&lt;()&gt; {
-	bool_to_sysresult(<span class="kw">unsafe </span>{ kernel::ffi::SwitchToThread() })
+	bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::SwitchToThread() })
 }
 
 <span class="doccomment">/// [`SystemTimeToFileTime`](https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-systemtimetofiletime)
 /// function.
 </span><span class="kw">pub fn </span>SystemTimeToFileTime(
-	st: <span class="kw-2">&amp;</span>SYSTEMTIME, ft: <span class="kw-2">&amp;mut </span>FILETIME) -&gt; SysResult&lt;()&gt;
+	st: <span class="kw-2">&amp;</span>SYSTEMTIME,
+	ft: <span class="kw-2">&amp;mut </span>FILETIME,
+) -&gt; SysResult&lt;()&gt;
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::SystemTimeToFileTime(
-				st <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
-			)
+			ffi::SystemTimeToFileTime(st <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, ft <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>)
 		},
 	)
 }
@@ -3434,7 +3399,7 @@
 {
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::SystemTimeToTzSpecificLocalTime(
+			ffi::SystemTimeToTzSpecificLocalTime(
 				time_zone.map_or(std::ptr::null(), |lp| lp <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				universal_time <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 				local_time <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -3453,7 +3418,7 @@
 ) -&gt; SysResult&lt;bool&gt;
 {
 	<span class="kw">match unsafe </span>{
-		kernel::ffi::VerifyVersionInfoW(
+		ffi::VerifyVersionInfoW(
 			osvix <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 			type_mask.raw(),
 			condition_mask,
@@ -3471,14 +3436,13 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>VerSetConditionMask(
-	condition_mask: u64, type_mask: co::VER_MASK, condition: co::VER_COND) -&gt; u64
+	condition_mask: u64,
+	type_mask: co::VER_MASK,
+	condition: co::VER_COND,
+) -&gt; u64
 {
 	<span class="kw">unsafe </span>{
-		kernel::ffi::VerSetConditionMask(
-			condition_mask,
-			type_mask.raw(),
-			condition.raw(),
-		)
+		ffi::VerSetConditionMask(condition_mask, type_mask.raw(), condition.raw())
 	}
 }
 
@@ -3498,7 +3462,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>default_char_buf = default_char.unwrap_or_default();
 
 	<span class="kw">let </span>num_bytes = <span class="kw">match unsafe </span>{
-		kernel::ffi::WideCharToMultiByte(
+		ffi::WideCharToMultiByte(
 			code_page.raw() <span class="kw">as _</span>,
 			flags.raw(),
 			wide_char_str.as_ptr(),
@@ -3518,7 +3482,7 @@
 
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{
-			kernel::ffi::WideCharToMultiByte(
+			ffi::WideCharToMultiByte(
 				code_page.raw() <span class="kw">as _</span>,
 				flags.raw(),
 				wide_char_str.as_ptr(),

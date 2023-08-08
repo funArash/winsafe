@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\handles\hprocess.rs`."><title>hprocess.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (474709a9a 2023-08-03)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-6d2c9675f3d09c26.css" data-theme-dark-css="dark-45ceb8f2e522f4d1.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../..\../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../..\../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-6d2c9675f3d09c26.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-45ceb8f2e522f4d1.css"><link rel="stylesheet" href="../../..\../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src\kernel\handles\hprocess.rs`."><title>hprocess.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../..\../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../..\../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../..\../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../..\../" data-static-root-path="../../..\../static.files/" data-current-crate="winsafe" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (03a119b0b 2023-08-07)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../..\../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../..\../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../..\../src-files.js"></script><script defer src="../../..\../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../..\../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../..\../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../..\../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../..\../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../..\../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../..\../winsafe/index.html"><img class="rust-logo" src="../../..\../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../..\../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../..\../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../..\../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -341,37 +341,13 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
-</span><span class="kw">use crate</span>::{co, kernel};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::decl::{
-	FILETIME, GetLastError, HACCESSTOKEN, PROCESS_INFORMATION,
-	SECURITY_ATTRIBUTES, STARTUPINFO, SysResult, WString,
-};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::BOOL;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::guard::{CloseHandleGuard, CloseHandlePiGuard};
-<span class="kw">use </span><span class="kw">crate</span>::kernel::privs::{
-	bool_to_sysresult, INFINITE, MAX_PATH, ptr_to_sysresult_handle,
-};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::{Handle, IntUnderlying};
+</span><span class="kw">use </span><span class="kw">crate</span>::co;
+<span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::guard::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::{ffi, ffi_types::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="macro">impl_handle! </span>{ HPROCESS;
 	<span class="doccomment">/// Handle to a
@@ -396,9 +372,7 @@
 	</span><span class="kw">fn </span>CheckRemoteDebuggerPresent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>present: BOOL = <span class="number">0</span>;
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::CheckRemoteDebuggerPresent(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>present)
-			},
+			<span class="kw">unsafe </span>{ ffi::CheckRemoteDebuggerPresent(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>present) },
 		).map(|<span class="kw">_</span>| present != <span class="number">0</span>)
 	}
 
@@ -422,7 +396,7 @@
 
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
-				kernel::ffi::CreateProcessW(
+				ffi::CreateProcessW(
 					WString::from_opt_str(application_name).as_ptr(),
 					buf_cmd_line.as_mut_ptr(),
 					process_attrs.map_or(std::ptr::null_mut(), |lp| lp <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>),
@@ -447,14 +421,12 @@
 	<span class="doccomment">/// [`FlushInstructionCache`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-flushinstructioncache)
 	/// function.
 	</span><span class="kw">fn </span>FlushInstructionCache(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		base_address: <span class="kw-2">*mut </span>std::ffi::c_void, size: usize) -&gt; SysResult&lt;()&gt;
+		base_address: <span class="kw-2">*mut </span>std::ffi::c_void,
+		size: usize,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::FlushInstructionCache(
-					<span class="self">self</span>.ptr(), base_address, size,
-				)
-			},
+			<span class="kw">unsafe </span>{ ffi::FlushInstructionCache(<span class="self">self</span>.ptr(), base_address, size) },
 		)
 	}
 
@@ -462,7 +434,7 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetCurrentProcess() -&gt; HPROCESS {
-		HPROCESS(<span class="kw">unsafe </span>{ kernel::ffi::GetCurrentProcess() })
+		HPROCESS(<span class="kw">unsafe </span>{ ffi::GetCurrentProcess() })
 	}
 
 	<span class="doccomment">/// [`GetExitCodeProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getexitcodeprocess)
@@ -471,9 +443,7 @@
 	</span><span class="kw">fn </span>GetExitCodeProcess(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>exit_code = u32::default();
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::GetExitCodeProcess(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>exit_code)
-			},
+			<span class="kw">unsafe </span>{ ffi::GetExitCodeProcess(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>exit_code) },
 		).map(|<span class="kw">_</span>| exit_code)
 	}
 
@@ -481,9 +451,7 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetGuiResources(<span class="kw-2">&amp;</span><span class="self">self</span>, flags: co::GR) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{
-			kernel::ffi::GetGuiResources(<span class="self">self</span>.ptr(), flags.raw())
-		} {
+		<span class="kw">match unsafe </span>{ ffi::GetGuiResources(<span class="self">self</span>.ptr(), flags.raw()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			count =&gt; <span class="prelude-val">Ok</span>(count),
 		}
@@ -493,7 +461,7 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetPriorityClass(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;co::PRIORITY_CLASS&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetPriorityClass(<span class="self">self</span>.ptr()) } {
+		<span class="kw">match unsafe </span>{ ffi::GetPriorityClass(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			pc =&gt; <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ co::PRIORITY_CLASS::from_raw(pc) }),
 		}
@@ -505,9 +473,7 @@
 	</span><span class="kw">fn </span>GetProcessHandleCount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>count = u32::default();
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::GetProcessHandleCount(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count)
-			},
+			<span class="kw">unsafe </span>{ ffi::GetProcessHandleCount(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>count) },
 		).map(|<span class="kw">_</span>| count)
 	}
 
@@ -515,7 +481,7 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>GetProcessId(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;u32&gt; {
-		<span class="kw">match unsafe </span>{ kernel::ffi::GetProcessId(<span class="self">self</span>.ptr()) } {
+		<span class="kw">match unsafe </span>{ ffi::GetProcessId(<span class="self">self</span>.ptr()) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			id =&gt; <span class="prelude-val">Ok</span>(id),
 		}
@@ -532,7 +498,7 @@
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::GetProcessTimes(
+				ffi::GetProcessTimes(
 					<span class="self">self</span>.ptr(),
 					creation <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
 					exit <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>,
@@ -549,9 +515,7 @@
 	</span><span class="kw">fn </span>IsProcessCritical(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>critical: BOOL = <span class="number">0</span>;
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::IsProcessCritical(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>critical)
-			},
+			<span class="kw">unsafe </span>{ ffi::IsProcessCritical(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>critical) },
 		).map(|<span class="kw">_</span>| critical != <span class="number">0</span>)
 	}
 
@@ -560,7 +524,7 @@
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>IsWow64Process(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;bool&gt; {
 		<span class="kw">let </span><span class="kw-2">mut </span>wow64: BOOL = <span class="number">0</span>;
-		<span class="kw">match unsafe </span>{ kernel::ffi::IsWow64Process(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>wow64) } {
+		<span class="kw">match unsafe </span>{ ffi::IsWow64Process(<span class="self">self</span>.ptr(), <span class="kw-2">&amp;mut </span>wow64) } {
 			<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 			<span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(wow64 != <span class="number">0</span>),
 		}
@@ -581,7 +545,7 @@
 	{
 		<span class="kw">unsafe </span>{
 			ptr_to_sysresult_handle(
-				kernel::ffi::OpenProcess(
+				ffi::OpenProcess(
 					desired_access.raw(),
 					inherit_handle <span class="kw">as _</span>,
 					process_id,
@@ -605,12 +569,13 @@
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>OpenProcessToken(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		desired_access: co::TOKEN) -&gt; SysResult&lt;CloseHandleGuard&lt;HACCESSTOKEN&gt;&gt;
+		desired_access: co::TOKEN,
+	) -&gt; SysResult&lt;CloseHandleGuard&lt;HACCESSTOKEN&gt;&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>handle = HACCESSTOKEN::NULL;
 		<span class="kw">unsafe </span>{
 			bool_to_sysresult(
-				kernel::ffi::OpenProcessToken(
+				ffi::OpenProcessToken(
 					<span class="self">self</span>.ptr(),
 					desired_access.raw(),
 					handle.as_mut(),
@@ -623,14 +588,15 @@
 	/// function.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">fn </span>QueryFullProcessImageName(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		flags: co::PROCESS_NAME) -&gt; SysResult&lt;String&gt;
+		flags: co::PROCESS_NAME,
+	) -&gt; SysResult&lt;String&gt;
 	{
 		<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH + <span class="number">1</span>);
 		<span class="kw">let </span><span class="kw-2">mut </span>sz = buf.buf_len() <span class="kw">as </span>u32;
 
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::QueryFullProcessImageNameW(
+				ffi::QueryFullProcessImageNameW(
 					<span class="self">self</span>.ptr(),
 					flags.raw(),
 					buf.as_mut_ptr(),
@@ -647,7 +613,7 @@
 		<span class="kw">let </span><span class="kw-2">mut </span>affinity = co::PROCESS_AFFINITY::default();
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::QueryProcessAffinityUpdateMode(
+				ffi::QueryProcessAffinityUpdateMode(
 					<span class="self">self</span>.ptr(),
 					affinity.as_mut(),
 				)
@@ -658,35 +624,34 @@
 	<span class="doccomment">/// [`SetPriorityClass`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setpriorityclass)
 	/// function.
 	</span><span class="kw">fn </span>SetPriorityClass(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		prority_class: co::PRIORITY_CLASS) -&gt; SysResult&lt;()&gt;
+		prority_class: co::PRIORITY_CLASS,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::SetPriorityClass(<span class="self">self</span>.ptr(), prority_class.raw())
-			},
+			<span class="kw">unsafe </span>{ ffi::SetPriorityClass(<span class="self">self</span>.ptr(), prority_class.raw()) },
 		)
 	}
 
 	<span class="doccomment">/// [`SetProcessAffinityUpdateMode`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setprocessaffinityupdatemode)
 	/// function.
 	</span><span class="kw">fn </span>SetProcessAffinityUpdateMode(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		flags: co::PROCESS_AFFINITY) -&gt; SysResult&lt;()&gt;
+		flags: co::PROCESS_AFFINITY,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{
-				kernel::ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.ptr(), flags.raw())
-			},
+			<span class="kw">unsafe </span>{ ffi::SetProcessAffinityUpdateMode(<span class="self">self</span>.ptr(), flags.raw()) },
 		)
 	}
 
 	<span class="doccomment">/// [`SetProcessPriorityBoost`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setprocesspriorityboost)
 	/// function.
 	</span><span class="kw">fn </span>SetProcessPriorityBoost(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		disable_priority_boost: bool) -&gt; SysResult&lt;()&gt;
+		disable_priority_boost: bool,
+	) -&gt; SysResult&lt;()&gt;
 	{
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				kernel::ffi::SetProcessPriorityBoost(
+				ffi::SetProcessPriorityBoost(
 					<span class="self">self</span>.ptr(),
 					disable_priority_boost <span class="kw">as _</span>,
 				)
@@ -697,19 +662,18 @@
 	<span class="doccomment">/// [`TerminateProcess`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-terminateprocess)
 	/// function.
 	</span><span class="kw">fn </span>TerminateProcess(<span class="kw-2">&amp;</span><span class="self">self</span>, exit_code: u32) -&gt; SysResult&lt;()&gt; {
-		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ kernel::ffi::TerminateProcess(<span class="self">self</span>.ptr(), exit_code) },
-		)
+		bool_to_sysresult(<span class="kw">unsafe </span>{ ffi::TerminateProcess(<span class="self">self</span>.ptr(), exit_code) })
 	}
 
 	<span class="doccomment">/// [`WaitForSingleObject`](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject)
 	/// function.
 	</span><span class="kw">fn </span>WaitForSingleObject(<span class="kw-2">&amp;</span><span class="self">self</span>,
-		milliseconds: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; SysResult&lt;co::WAIT&gt;
+		milliseconds: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+	) -&gt; SysResult&lt;co::WAIT&gt;
 	{
 		<span class="kw">match unsafe </span>{
 			co::WAIT::from_raw(
-				kernel::ffi::WaitForSingleObject(
+				ffi::WaitForSingleObject(
 					<span class="self">self</span>.ptr(),
 					milliseconds.unwrap_or(INFINITE),
 				),
