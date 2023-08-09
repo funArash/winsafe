@@ -1024,6 +1024,11 @@
 <a href="#1024" id="1024">1024</a>
 <a href="#1025" id="1025">1025</a>
 <a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1120,14 +1125,19 @@
 	data4: u64,
 }
 
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>GUID {
-	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>GUID {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
 		<span class="macro">write!</span>(f, <span class="string">&quot;{:08x}-{:04x}-{:04x}-{:04x}-{:012x}&quot;</span>,
 			<span class="self">self</span>.data1, <span class="self">self</span>.data2, <span class="self">self</span>.data3,
 			<span class="self">self</span>.data4.swap_bytes() &gt;&gt; <span class="number">48</span>,
 			<span class="self">self</span>.data4.swap_bytes() &amp; <span class="number">0x0000_ffff_ffff_ffff</span>,
 		)
 	}
+}
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>GUID {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+		&lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="self">self</span>, f) <span class="comment">// delegate to Debug trait
+	</span>}
 }
 
 <span class="kw">impl </span>GUID {
