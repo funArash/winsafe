@@ -1024,15 +1024,6 @@
 <a href="#1024" id="1024">1024</a>
 <a href="#1025" id="1025">1025</a>
 <a href="#1026" id="1026">1026</a>
-<a href="#1027" id="1027">1027</a>
-<a href="#1028" id="1028">1028</a>
-<a href="#1029" id="1029">1029</a>
-<a href="#1030" id="1030">1030</a>
-<a href="#1031" id="1031">1031</a>
-<a href="#1032" id="1032">1032</a>
-<a href="#1033" id="1033">1033</a>
-<a href="#1034" id="1034">1034</a>
-<a href="#1035" id="1035">1035</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -1121,7 +1112,7 @@
 /// The [`Default`](std::default::Default) implementation returns `GUID::NULL`
 /// (all zeros).
 </span><span class="attr">#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 </span><span class="kw">pub struct </span>GUID {
 	data1: u32,
 	data2: u16,
@@ -1139,16 +1130,7 @@
 	}
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>GUID {
-	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-		<span class="self">Self</span>::NULL
-	}
-}
-
 <span class="kw">impl </span>GUID {
-	<span class="doccomment">/// The null `GUID` contains only zeros.
-	</span><span class="kw">pub const </span>NULL: <span class="self">Self </span>= <span class="self">Self</span>::new(<span class="string">&quot;00000000-0000-0000-0000-000000000000&quot;</span>);
-
 	<span class="doccomment">/// Creates a new `GUID` from a representative hex string, which can be
 	/// copied straight from standard `GUID` declarations.
 	///
@@ -1161,7 +1143,7 @@
 	/// ```no_run
 	/// use winsafe::{self as w, prelude::*};
 	///
-	/// let g = w::GUID::new(&quot;00000000-0000-0000-c000-000000000046&quot;);
+	/// let g = w::GUID::new(&quot;43826d1e-e718-42ee-bc55-a1e261c37bfe&quot;);
 	/// ```
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub const fn </span>new(guid_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
