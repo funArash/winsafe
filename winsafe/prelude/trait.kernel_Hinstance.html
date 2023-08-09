@@ -50,41 +50,46 @@
 ) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<span class="where fmt-newline">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="struct" href="../struct.LANGID.html" title="struct winsafe::LANGID">LANGID</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,</span></h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumresourcelanguagesw"><code>EnumResourceLanguages</code></a>
 function.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.EnumResourceNames" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#71-87">source</a><h4 class="code-header">fn <a href="#method.EnumResourceNames" class="fn">EnumResourceNames</a>&lt;F&gt;(&amp;self, resource_type: <a class="enum" href="../enum.RtStr.html" title="enum winsafe::RtStr">RtStr</a>, func: F) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<span class="where fmt-newline">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.EnumResourceNames" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#75-91">source</a><h4 class="code-header">fn <a href="#method.EnumResourceNames" class="fn">EnumResourceNames</a>&lt;F&gt;(&amp;self, resource_type: <a class="enum" href="../enum.RtStr.html" title="enum winsafe::RtStr">RtStr</a>, func: F) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<span class="where fmt-newline">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="enum" href="../enum.IdStr.html" title="enum winsafe::IdStr">IdStr</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,</span></h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-enumresourcenamesw"><code>EnumResourceNames</code></a>
 function.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{co, HINSTANCE, IdStr, RtStr};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>, co};
 
-<span class="kw">let </span>hexe = HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>hexe = w::HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
 
-hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
-    <span class="kw">let </span>res_type2 = res_type.clone();
-    hexe.EnumResourceNames(res_type, |name: IdStr| -&gt; bool {
-        <span class="macro">println!</span>(<span class="string">&quot;Type: {}, name: {}&quot;</span>, res_type2, name);
+hexe.EnumResourceTypes(
+    |res_type: w::RtStr| -&gt; bool {
+        <span class="kw">let </span>res_type2 = res_type.clone();
+        hexe.EnumResourceNames(
+            res_type,
+            |name: w::IdStr| -&gt; bool {
+                <span class="macro">println!</span>(<span class="string">&quot;Type: {}, name: {}&quot;</span>, res_type2, name);
+                <span class="bool-val">true
+            </span>},
+        ).unwrap();
         <span class="bool-val">true
-    </span>}).unwrap();
-    <span class="bool-val">true
-</span>})<span class="question-mark">?</span>;
+    </span>},
+)<span class="question-mark">?</span>;
 
 <span class="comment">// FreeLibrary() called automatically</span></code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.EnumResourceTypes" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#108-120">source</a><h4 class="code-header">fn <a href="#method.EnumResourceTypes" class="fn">EnumResourceTypes</a>&lt;F&gt;(&amp;self, func: F) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<span class="where fmt-newline">where
+</div></details><details class="toggle method-toggle" open><summary><section id="method.EnumResourceTypes" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#113-125">source</a><h4 class="code-header">fn <a href="#method.EnumResourceTypes" class="fn">EnumResourceTypes</a>&lt;F&gt;(&amp;self, func: F) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<span class="where fmt-newline">where
     F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="enum" href="../enum.RtStr.html" title="enum winsafe::RtStr">RtStr</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,</span></h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-enumresourcetypesw"><code>EnumResourceTypes</code></a>
 function.</p>
 <h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{co, HINSTANCE, RtStr};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>, co};
 
-<span class="kw">let </span>hexe = HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>hexe = w::HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
 
-hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
-    <span class="macro">println!</span>(<span class="string">&quot;Type {}&quot;</span>, res_type);
-    <span class="bool-val">true
-</span>})<span class="question-mark">?</span>;
+hexe.EnumResourceTypes(
+    |res_type: w::RtStr| -&gt; bool {
+        <span class="macro">println!</span>(<span class="string">&quot;Type {}&quot;</span>, res_type);
+        <span class="bool-val">true
+    </span>},
+)<span class="question-mark">?</span>;
 
 <span class="comment">// FreeLibrary() called automatically</span></code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.FindResource" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#128-142">source</a><h4 class="code-header">fn <a href="#method.FindResource" class="fn">FindResource</a>(
+</div></details><details class="toggle method-toggle" open><summary><section id="method.FindResource" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#133-147">source</a><h4 class="code-header">fn <a href="#method.FindResource" class="fn">FindResource</a>(
     &amp;self,
     resource_id: <a class="enum" href="../enum.IdStr.html" title="enum winsafe::IdStr">IdStr</a>,
     resource_type: <a class="enum" href="../enum.RtStr.html" title="enum winsafe::RtStr">RtStr</a>
@@ -92,7 +97,7 @@ hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
 function.</p>
 <p>For an example, see
 <a href="trait.kernel_Hinstance.html#method.LockResource" title="method winsafe::prelude::kernel_Hinstance::LockResource"><code>HINSTANCE::LockResource</code></a>.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.FindResourceEx" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#150-166">source</a><h4 class="code-header">fn <a href="#method.FindResourceEx" class="fn">FindResourceEx</a>(
+</div></details><details class="toggle method-toggle" open><summary><section id="method.FindResourceEx" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#155-171">source</a><h4 class="code-header">fn <a href="#method.FindResourceEx" class="fn">FindResourceEx</a>(
     &amp;self,
     resource_id: <a class="enum" href="../enum.IdStr.html" title="enum winsafe::IdStr">IdStr</a>,
     resource_type: <a class="enum" href="../enum.RtStr.html" title="enum winsafe::RtStr">RtStr</a>,
@@ -101,31 +106,29 @@ function.</p>
 function.</p>
 <p>For an example, see
 <a href="trait.kernel_Hinstance.html#method.LockResource" title="method winsafe::prelude::kernel_Hinstance::LockResource"><code>HINSTANCE::LockResource</code></a>.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.GetModuleFileName" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#185-196">source</a><h4 class="code-header">fn <a href="#method.GetModuleFileName" class="fn">GetModuleFileName</a>(&amp;self) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulefilenamew"><code>GetModuleFileName</code></a>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.GetModuleFileName" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#189-200">source</a><h4 class="code-header">fn <a href="#method.GetModuleFileName" class="fn">GetModuleFileName</a>(&amp;self) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulefilenamew"><code>GetModuleFileName</code></a>
 function.</p>
 <h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <p>Retrieving the full path of currently running .exe file:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::HINSTANCE;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>};
 
-<span class="kw">let </span>exe_name = HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>;
+<span class="kw">let </span>exe_name = w::HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>;
 
 <span class="macro">println!</span>(<span class="string">&quot;EXE: {}&quot;</span>, exe_name);</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.GetModuleHandle" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#213-219">source</a><h4 class="code-header">fn <a href="#method.GetModuleHandle" class="fn">GetModuleHandle</a>(module_name: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../struct.HINSTANCE.html" title="struct winsafe::HINSTANCE">HINSTANCE</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulehandlew"><code>GetModuleHandle</code></a>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.GetModuleHandle" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#216-222">source</a><h4 class="code-header">fn <a href="#method.GetModuleHandle" class="fn">GetModuleHandle</a>(module_name: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../struct.HINSTANCE.html" title="struct winsafe::HINSTANCE">HINSTANCE</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getmodulehandlew"><code>GetModuleHandle</code></a>
 function.</p>
 <h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <p>Retrieving current module instance:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::HINSTANCE;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>};
 
-<span class="kw">let </span>hinstance = HINSTANCE::GetModuleHandle(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.GetProcAddress" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#224-236">source</a><h4 class="code-header">fn <a href="#method.GetProcAddress" class="fn">GetProcAddress</a>(&amp;self, proc_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="https://doc.rust-lang.org/nightly/core/ffi/enum.c_void.html" title="enum core::ffi::c_void">c_void</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress"><code>GetProcAddress</code></a>
+<span class="kw">let </span>hinstance = w::HINSTANCE::GetModuleHandle(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;</code></pre></div>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.GetProcAddress" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#227-239">source</a><h4 class="code-header">fn <a href="#method.GetProcAddress" class="fn">GetProcAddress</a>(&amp;self, proc_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="https://doc.rust-lang.org/nightly/core/ffi/enum.c_void.html" title="enum core::ffi::c_void">c_void</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress"><code>GetProcAddress</code></a>
 function.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.LoadLibrary" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#241-247">source</a><h4 class="code-header">fn <a href="#method.LoadLibrary" class="fn">LoadLibrary</a>(lib_file_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../guard/struct.FreeLibraryGuard.html" title="struct winsafe::guard::FreeLibraryGuard">FreeLibraryGuard</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw"><code>LoadLibrary</code></a>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.LoadLibrary" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#244-250">source</a><h4 class="code-header">fn <a href="#method.LoadLibrary" class="fn">LoadLibrary</a>(lib_file_name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../guard/struct.FreeLibraryGuard.html" title="struct winsafe::guard::FreeLibraryGuard">FreeLibraryGuard</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw"><code>LoadLibrary</code></a>
 function.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.LoadResource" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#255-259">source</a><h4 class="code-header">fn <a href="#method.LoadResource" class="fn">LoadResource</a>(&amp;self, res_info: &amp;<a class="struct" href="../struct.HRSRC.html" title="struct winsafe::HRSRC">HRSRC</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../struct.HRSRCMEM.html" title="struct winsafe::HRSRCMEM">HRSRCMEM</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadresource"><code>LoadResource</code></a>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.LoadResource" class="method"><a class="src rightside" href="../../src/winsafe/kernel\handles/hinstance.rs.html#258-262">source</a><h4 class="code-header">fn <a href="#method.LoadResource" class="fn">LoadResource</a>(&amp;self, res_info: &amp;<a class="struct" href="../struct.HRSRC.html" title="struct winsafe::HRSRC">HRSRC</a>) -&gt; <a class="type" href="../type.SysResult.html" title="type winsafe::SysResult">SysResult</a>&lt;<a class="struct" href="../struct.HRSRCMEM.html" title="struct winsafe::HRSRCMEM">HRSRCMEM</a>&gt;</h4></section></summary><div class="docblock"><p><a href="https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadresource"><code>LoadResource</code></a>
 function.</p>
 <p>For an example, see
 <a href="trait.kernel_Hinstance.html#method.LockResource" title="method winsafe::prelude::kernel_Hinstance::LockResource"><code>HINSTANCE::LockResource</code></a>.</p>
@@ -144,29 +147,26 @@ so it’s implemented here.</p>
 <a href="https://learn.microsoft.com/en-us/windows/win32/menurc/using-resources#updating-resources">Updating Resources</a>
 example:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{
-    co, HINSTANCE, HUPDATERSRC, IdStr, LANGID, RtStr,
-};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>, co};
 
 <span class="kw">const </span>IDD_HAND_ABOUTBOX: u16 = <span class="number">103</span>;
 <span class="kw">const </span>IDD_FOOT_ABOUTBOX: u16 = <span class="number">110</span>;
 
-<span class="kw">let </span>hexe = HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>hexe = w::HINSTANCE::LoadLibrary(<span class="string">&quot;hand.exe&quot;</span>)<span class="question-mark">?</span>;
 
 <span class="kw">let </span>hres = hexe.FindResource(
-    IdStr::Id(IDD_HAND_ABOUTBOX),
-    RtStr::Rt(co::RT::DIALOG),
+    w::IdStr::Id(IDD_HAND_ABOUTBOX),
+    w::RtStr::Rt(co::RT::DIALOG),
 )<span class="question-mark">?</span>;
 
 <span class="kw">let </span>hres_load = hexe.LoadResource(<span class="kw-2">&amp;</span>hres)<span class="question-mark">?</span>;
 <span class="kw">let </span>hres_slice_lock = hexe.LockResource(<span class="kw-2">&amp;</span>hres, <span class="kw-2">&amp;</span>hres_load)<span class="question-mark">?</span>;
-<span class="kw">let </span>hres_update = HUPDATERSRC::BeginUpdateResource(<span class="string">&quot;foot.exe&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+<span class="kw">let </span>hres_update = w::HUPDATERSRC::BeginUpdateResource(<span class="string">&quot;foot.exe&quot;</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
 
 hres_update.UpdateResource(
-    RtStr::Rt(co::RT::DIALOG),
-    IdStr::Id(IDD_FOOT_ABOUTBOX),
-    LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
+    w::RtStr::Rt(co::RT::DIALOG),
+    w::IdStr::Id(IDD_FOOT_ABOUTBOX),
+    w::LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
     hres_slice_lock,
 )<span class="question-mark">?</span>;
 

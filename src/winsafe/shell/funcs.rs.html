@@ -327,8 +327,6 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -344,11 +342,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{CommandLineToArgv, GetCommandLine};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let args = CommandLineToArgv(&amp;GetCommandLine())?;
+/// let args = w::CommandLineToArgv(&amp;w::GetCommandLine())?;
 /// for arg in args.iter() {
 ///     println!(&quot;{}&quot;, arg);
 /// }
@@ -381,17 +378,21 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::PathCombine;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let full = PathCombine(Some(&quot;C:&quot;), Some(&quot;One\\Two\\Three&quot;))?;
+/// let full = w::PathCombine(
+///     Some(&quot;C:&quot;),
+///     Some(&quot;One\\Two\\Three&quot;),
+/// )?;
 ///
 /// // full = &quot;C:\\One\\Two\\Three&quot;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
 </span><span class="kw">pub fn </span>PathCombine(
-	str_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, str_file: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;String&gt;
+	str_dir: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+	str_file: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+) -&gt; SysResult&lt;String&gt;
 {
 	<span class="kw">let </span><span class="kw-2">mut </span>buf = WString::new_alloc_buf(MAX_PATH);
 	ptr_to_sysresult(
@@ -410,11 +411,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::PathCommonPrefix;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// if let Some(common_prefix) = PathCommonPrefix(
+/// if let Some(common_prefix) = w::PathCommonPrefix(
 ///     &quot;C:\\temp\\one\\foo.txt&quot;,
 ///     &quot;C:\\temp\\two\\bar.txt&quot;,
 /// ) {
@@ -495,13 +495,12 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{IBindCtx, IShellItem2, SHCreateItemFromParsingName};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let shi = SHCreateItemFromParsingName::&lt;IShellItem2&gt;(
+/// let shi = w::SHCreateItemFromParsingName::&lt;w::IShellItem2&gt;(
 ///     &quot;C:\\Temp\\foo.txt&quot;,
-///     None::&lt;&amp;IBindCtx&gt;,
+///     None::&lt;&amp;w::IBindCtx&gt;,
 /// )?;
 /// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 /// ```
@@ -532,14 +531,13 @@
 ///
 /// Loading from a `Vec`:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::SHCreateMemStream;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
 /// let raw_data: Vec&lt;u8&gt;; // initialized somewhere
 /// # let raw_data = Vec::&lt;u8&gt;::default();
 ///
-/// let stream = SHCreateMemStream(&amp;raw_data)?;
+/// let stream = w::SHCreateMemStream(&amp;raw_data)?;
 /// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
@@ -588,11 +586,10 @@
 ///
 /// Retrieving documents folder:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, SHGetKnownFolderPath};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let docs_folder = SHGetKnownFolderPath(
+/// let docs_folder = w::SHGetKnownFolderPath(
 ///     &amp;co::KNOWNFOLDERID::Documents,
 ///     co::KF::DEFAULT,
 ///     None,
@@ -632,11 +629,10 @@
 ///
 /// Loading the small (16x16 pixels) camera icon from the system:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, SHGetStockIconInfo};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let sii = SHGetStockIconInfo(
+/// let sii = w::SHGetStockIconInfo(
 ///     co::SIID::DEVICECAMERA,
 ///     co::SHGSI::ICON | co::SHGSI::SMALLICON,
 /// )?;

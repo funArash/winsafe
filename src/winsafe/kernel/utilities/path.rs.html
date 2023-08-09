@@ -431,12 +431,6 @@
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! File path utilities.
 //!
 //! Some of the functions are similar to [`std::path::Path`] ones, but here they
@@ -457,11 +451,10 @@
 ///
 /// Listing all text files in a directory:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// for file_path in path::dir_list(&quot;C:\\temp&quot;, Some(&quot;*.txt&quot;)) {
+/// for file_path in w::path::dir_list(&quot;C:\\temp&quot;, Some(&quot;*.txt&quot;)) {
 ///     let file_path = file_path?;
 ///     println!(&quot;{}&quot;, file_path);
 /// }
@@ -470,7 +463,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>dir_list&lt;<span class="lifetime">&#39;a</span>&gt;(
 	dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-	filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a
+	filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+) -&gt; <span class="kw">impl </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a
 </span>{
 	DirListIter::new(dir_path.to_owned(), filter)
 }
@@ -483,40 +477,40 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{path, SysResult};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
 /// // Ordinary for loop
-/// for file_path in path::dir_walk(&quot;C:\\Temp&quot;) {
+/// for file_path in w::path::dir_walk(&quot;C:\\Temp&quot;) {
 ///     let file_path = file_path?;
 ///     println!(&quot;{}&quot;, file_path);
 /// }
 ///
 /// // Closure with try_for_each
-/// path::dir_walk(&quot;C:\\Temp&quot;)
-///     .try_for_each(|file_path| -&gt; SysResult&lt;_&gt; {
+/// w::path::dir_walk(&quot;C:\\Temp&quot;)
+///     .try_for_each(|file_path| -&gt; w::SysResult&lt;_&gt; {
 ///         let file_path = file_path?;
 ///         println!(&quot;{}&quot;, file_path);
 ///         Ok(())
 ///     })?;
 ///
 /// // Collecting into a Vec
-/// let all = path::dir_walk(&quot;C:\\Temp&quot;)
-///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+/// let all = w::path::dir_walk(&quot;C:\\Temp&quot;)
+///     .collect::&lt;w::SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 ///
 /// // Transforming and collecting into a Vec
-/// let all = path::dir_walk(&quot;C:\\Temp&quot;)
-///     .map(|file_path| -&gt; SysResult&lt;_&gt; {
+/// let all = w::path::dir_walk(&quot;C:\\Temp&quot;)
+///     .map(|file_path| -&gt; w::SysResult&lt;_&gt; {
 ///         let file_path = file_path?;
 ///         Ok(format!(&quot;PATH: {}&quot;, file_path))
 ///     })
-///     .collect::&lt;SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
+///     .collect::&lt;w::SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>dir_walk&lt;<span class="lifetime">&#39;a</span>&gt;(
-	dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="kw">impl </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a
+	dir_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+) -&gt; <span class="kw">impl </span>Iterator&lt;Item = SysResult&lt;String&gt;&gt; + <span class="lifetime">&#39;a
 </span>{
 	DirWalkIter::new(dir_path.to_owned())
 }
@@ -562,11 +556,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let f = path::get_file_name(&quot;C:\\Temp\\foo.txt&quot;); // foo.txt
+/// let f = w::path::get_file_name(&quot;C:\\Temp\\foo.txt&quot;); // foo.txt
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>get_file_name(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -584,13 +577,12 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let p = path::get_path(&quot;C:\\Temp\\xx\\a.txt&quot;); // C:\Temp\xx
-/// let q = path::get_path(&quot;C:\\Temp\\xx\\&quot;);      // C:\Temp\xx
-/// let r = path::get_path(&quot;C:\\Temp\\xx&quot;);        // C:\Temp&quot;
+/// let p = w::path::get_path(&quot;C:\\Temp\\xx\\a.txt&quot;); // C:\Temp\xx
+/// let q = w::path::get_path(&quot;C:\\Temp\\xx\\&quot;);      // C:\Temp\xx
+/// let r = w::path::get_path(&quot;C:\\Temp\\xx&quot;);        // C:\Temp&quot;
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>get_path(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -603,12 +595,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
 /// println!(&quot;{}&quot;,
-///     path::has_extension(&quot;file.txt&quot;, &amp;[&quot;.txt&quot;, &quot;.bat&quot;]));
+///     w::path::has_extension(&quot;file.txt&quot;, &amp;[&quot;.txt&quot;, &quot;.bat&quot;]));
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>has_extension(full_path: <span class="kw-2">&amp;</span>str, extensions: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;]) -&gt; bool {
@@ -647,11 +638,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let p = path::replace_extension(
+/// let p = w::path::replace_extension(
 ///     &quot;C:\\Temp\\something.txt&quot;, &quot;.sh&quot;); // C:\Temp\something.sh
 /// ```
 </span><span class="attr">#[must_use]
@@ -690,11 +680,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let p = path::replace_path( // C:\another\foo.txt
+/// let p = w::path::replace_path( // C:\another\foo.txt
 ///     &quot;C:\\Temp\\foo.txt&quot;,
 ///     &quot;C:\\another&quot;,
 /// );
@@ -712,11 +701,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::path;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let p = path::rtrim_backslash(&quot;C:\\Temp\\&quot;); // C:\Temp
+/// let p = w::path::rtrim_backslash(&quot;C:\\Temp\\&quot;); // C:\Temp
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>rtrim_backslash(full_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {

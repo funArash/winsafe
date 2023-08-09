@@ -11,16 +11,16 @@ wrong, you’re likely to cause a buffer overrun.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
 <p>Reading version information from resource:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>winsafe::{
-    GetFileVersionInfo, HINSTANCE, VarQueryValue, VS_FIXEDFILEINFO,
-};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>winsafe::{<span class="self">self </span><span class="kw">as </span>w, prelude::<span class="kw-2">*</span>};
 
-<span class="kw">let </span>exe_name = HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>;
-<span class="kw">let </span>res_buf = GetFileVersionInfo(<span class="kw-2">&amp;</span>exe_name)<span class="question-mark">?</span>;
+<span class="kw">let </span>exe_name = w::HINSTANCE::NULL.GetModuleFileName()<span class="question-mark">?</span>;
+<span class="kw">let </span>res_buf = w::GetFileVersionInfo(<span class="kw-2">&amp;</span>exe_name)<span class="question-mark">?</span>;
 
 <span class="kw">let </span>(pvsf, sz_data) = <span class="kw">unsafe </span>{
-    VarQueryValue::&lt;VS_FIXEDFILEINFO&gt;(res_buf.as_slice(), <span class="string">&quot;\\&quot;</span>)<span class="question-mark">?
+    w::VarQueryValue::&lt;w::VS_FIXEDFILEINFO&gt;(
+        res_buf.as_slice(),
+        <span class="string">&quot;\\&quot;</span>,
+    )<span class="question-mark">?
 </span>};
 
 <span class="kw">let </span>ver = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>pvsf }.dwFileVersion();

@@ -297,6 +297,10 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -324,7 +328,7 @@
 ///
 /// Prefer importing this trait through the prelude:
 ///
-/// ```rust,no_run
+/// ```no_run
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>kernel_Hheap: Handle {
@@ -387,11 +391,10 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let heap = HHEAP::GetProcessHeap()?;
+	/// let heap = w::HHEAP::GetProcessHeap()?;
 	///
 	/// let mut block = heap.HeapAlloc(Some(co::HEAP_ALLOC::ZERO_MEMORY), 40)?;
 	/// block.as_mut_slice()[0] = 10;
@@ -453,15 +456,19 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let heap = HHEAP::HeapCreate(Some(co::HEAP_CREATE::NO_SERIALIZE), 0, 0)?;
+	/// let heap = w::HHEAP::HeapCreate(
+	///     Some(co::HEAP_CREATE::NO_SERIALIZE), 0, 0)?;
 	///
 	/// let _lock = heap.HeapLock()?;
 	///
 	/// // heap operations...
+	///
+	/// // HeapUnlock() automatically called
+	///
+	/// // HeapDestroy() automatically called
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -482,14 +489,15 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let heap = HHEAP::GetProcessHeap()?;
+	/// let heap = w::HHEAP::GetProcessHeap()?;
 	/// let mut array = heap.HeapAlloc(Some(co::HEAP_ALLOC::ZERO_MEMORY), 40)?;
 	///
 	/// heap.HeapReAlloc(Some(co::HEAP_REALLOC::ZERO_MEMORY), &amp;mut array, 65)?;
+	///
+	/// // HeapFree() automatically called
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>HeapReAlloc&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
@@ -542,14 +550,15 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let heap = HHEAP::GetProcessHeap()?;
+	/// let heap = w::HHEAP::GetProcessHeap()?;
 	/// let mut array = heap.HeapAlloc(Some(co::HEAP_ALLOC::ZERO_MEMORY), 40)?;
 	///
 	/// let is_ok = heap.HeapValidate(None, Some(&amp;array));
+	///
+	/// // HeapFree() automatically called
 	/// # Ok::&lt;_, co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -576,11 +585,10 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HHEAP};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let heap = HHEAP::GetProcessHeap()?;
+	/// let heap = w::HHEAP::GetProcessHeap()?;
 	///
 	/// for block in heap.HeapWalk() {
 	///     let block = block?;

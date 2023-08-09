@@ -1745,10 +1745,6 @@
 <a href="#1745" id="1745">1745</a>
 <a href="#1746" id="1746">1746</a>
 <a href="#1747" id="1747">1747</a>
-<a href="#1748" id="1748">1748</a>
-<a href="#1749" id="1749">1749</a>
-<a href="#1750" id="1750">1750</a>
-<a href="#1751" id="1751">1751</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1770,32 +1766,34 @@
 ///
 /// Create a well-known SID for the Everyone group:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{AllocateAndInitializeSid, co, SID_IDENTIFIER_AUTHORITY};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let sid_everyone = AllocateAndInitializeSid(
-///     &amp;SID_IDENTIFIER_AUTHORITY::WORLD,
+/// let sid_everyone = w::AllocateAndInitializeSid(
+///     &amp;w::SID_IDENTIFIER_AUTHORITY::WORLD,
 ///     &amp;[
 ///         co::RID::SECURITY_WORLD,
 ///     ],
 /// )?;
+///
+/// // FreeSid() automatically called
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
 ///
 /// Create a SID for the BUILTIN\Administrators group:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{AllocateAndInitializeSid, co, SID_IDENTIFIER_AUTHORITY};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let sid_builtin_administrators = AllocateAndInitializeSid(
-///     &amp;SID_IDENTIFIER_AUTHORITY::NT,
+/// let sid_builtin_administrators = w::AllocateAndInitializeSid(
+///     &amp;w::SID_IDENTIFIER_AUTHORITY::NT,
 ///     &amp;[
 ///         co::RID::SECURITY_BUILTIN_DOMAIN,
 ///         co::RID::DOMAIN_ALIAS_ADMINS,
 ///     ],
 /// )?;
+///
+/// // FreeSid() automatically called
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
@@ -1920,11 +1918,13 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, CreateWellKnownSid};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let sid = CreateWellKnownSid(co::WELL_KNOWN_SID_TYPE::LocalSystem, None)?;
+/// let sid = w::CreateWellKnownSid(
+///     co::WELL_KNOWN_SID_TYPE::LocalSystem,
+///     None,
+/// )?;
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
@@ -2062,11 +2062,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::ExpandEnvironmentStrings;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let expanded = ExpandEnvironmentStrings(
+/// let expanded = w::ExpandEnvironmentStrings(
 ///     &quot;Os %OS%, home %HOMEPATH% and temp %TEMP%&quot;,
 /// )?;
 ///
@@ -2285,11 +2284,10 @@
 ///
 /// Retrieving and printing the key/value pairs of all environment strings:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::GetEnvironmentStrings;
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let env_vars = GetEnvironmentStrings()?;
+/// let env_vars = w::GetEnvironmentStrings()?;
 /// for (k, v) in env_vars.iter() {
 ///     println!(&quot;{} = {}&quot;, k, v);
 /// }
@@ -2378,20 +2376,18 @@
 ///
 /// Checking whether a file or folder exists:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, GetFileAttributes};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let file_exists = GetFileAttributes(&quot;C:\\Temp\\test.txt&quot;).is_ok();
+/// let file_exists = w::GetFileAttributes(&quot;C:\\Temp\\test.txt&quot;).is_ok();
 /// ```
 ///
 /// Retrieving various information about a file or folder path:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, GetFileAttributes};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let flags = GetFileAttributes(&quot;C:\\Temp\\test.txt&quot;)?;
+/// let flags = w::GetFileAttributes(&quot;C:\\Temp\\test.txt&quot;)?;
 ///
 /// let is_compressed = flags.has(co::FILE_ATTRIBUTE::COMPRESSED);
 /// let is_directory  = flags.has(co::FILE_ATTRIBUTE::DIRECTORY);
@@ -2419,12 +2415,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetLocalTime, SYSTEMTIME};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut st = SYSTEMTIME::default();
-/// GetLocalTime(&amp;mut st);
+/// let mut st = w::SYSTEMTIME::default();
+/// w::GetLocalTime(&amp;mut st);
 /// ```
 </span><span class="kw">pub fn </span>GetLocalTime(st: <span class="kw-2">&amp;mut </span>SYSTEMTIME) {
 	<span class="kw">unsafe </span>{ ffi::GetLocalTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
@@ -2448,12 +2443,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetStartupInfo, STARTUPINFO};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut si = STARTUPINFO::default();
-/// GetStartupInfo(&amp;mut si);
+/// let mut si = w::STARTUPINFO::default();
+/// w::GetStartupInfo(&amp;mut si);
 /// ```
 </span><span class="kw">pub fn </span>GetStartupInfo(si: <span class="kw-2">&amp;mut </span>STARTUPINFO) {
 	<span class="kw">unsafe </span>{ ffi::GetStartupInfoW(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
@@ -2492,12 +2486,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetSystemInfo, SYSTEM_INFO};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut si = SYSTEM_INFO::default();
-/// GetSystemInfo(&amp;mut si);
+/// let mut si = w::SYSTEM_INFO::default();
+/// w::GetSystemInfo(&amp;mut si);
 /// ```
 </span><span class="kw">pub fn </span>GetSystemInfo(si: <span class="kw-2">&amp;mut </span>SYSTEM_INFO) {
 	<span class="kw">unsafe </span>{ ffi::GetSystemInfo(si <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
@@ -2511,12 +2504,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetSystemTime, SYSTEMTIME};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut st = SYSTEMTIME::default();
-/// GetSystemTime(&amp;mut st);
+/// let mut st = w::SYSTEMTIME::default();
+/// w::GetSystemTime(&amp;mut st);
 /// ```
 </span><span class="kw">pub fn </span>GetSystemTime(st: <span class="kw-2">&amp;mut </span>SYSTEMTIME) {
 	<span class="kw">unsafe </span>{ ffi::GetSystemTime(st <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as _</span>) }
@@ -2616,8 +2608,8 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::{co, GetVolumeInformation};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
 /// let mut name = String::default();
 /// let mut serial_no = u32::default();
@@ -2625,10 +2617,13 @@
 /// let mut sys_flags = co::FILE_VOL::default();
 /// let mut sys_name = String::default();
 ///
-/// GetVolumeInformation(
+/// w::GetVolumeInformation(
 ///     Some(&quot;C:\\&quot;),
-///     Some(&amp;mut name), Some(&amp;mut serial_no), Some(&amp;mut max_comp_len),
-///     Some(&amp;mut sys_flags), Some(&amp;mut sys_name),
+///     Some(&amp;mut name),
+///     Some(&amp;mut serial_no),
+///     Some(&amp;mut max_comp_len),
+///     Some(&amp;mut sys_flags),
+///     Some(&amp;mut sys_name),
 /// )?;
 ///
 /// println!(&quot;Name: {}&quot;, name);
@@ -2992,12 +2987,11 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetUserName, LookupAccountName};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let user_name = GetUserName()?;
-/// let (domain_name, sid, kind) = LookupAccountName(None, &amp;user_name)?;
+/// let user_name = w::GetUserName()?;
+/// let (domain_name, sid, kind) = w::LookupAccountName(None, &amp;user_name)?;
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
@@ -3132,14 +3126,13 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, HPROCESS, LookupPrivilegeValue};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let htoken = HPROCESS::GetCurrentProcess()
+/// let htoken = w::HPROCESS::GetCurrentProcess()
 ///     .OpenProcessToken(co::TOKEN::ADJUST_PRIVILEGES | co::TOKEN::QUERY)?;
 ///
-/// let luid = LookupPrivilegeValue(None, co::SE_PRIV::SHUTDOWN_NAME)?;
+/// let luid = w::LookupPrivilegeValue(None, co::SE_PRIV::SHUTDOWN_NAME)?;
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
 </span><span class="attr">#[must_use]
@@ -3263,17 +3256,16 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{QueryPerformanceCounter, QueryPerformanceFrequency};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let freq = QueryPerformanceFrequency()?;
-/// let t0 = QueryPerformanceCounter()?;
+/// let freq = w::QueryPerformanceFrequency()?;
+/// let t0 = w::QueryPerformanceCounter()?;
 ///
 /// // perform some operation...
 ///
 /// let duration_ms =
-///     ((QueryPerformanceCounter()? - t0) as f64 / freq as f64) * 1000.0;
+///     ((w::QueryPerformanceCounter()? - t0) as f64 / freq as f64) * 1000.0;
 ///
 /// println!(&quot;Operation lasted {:.2} ms&quot;, duration_ms);
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())

@@ -378,7 +378,7 @@
 ///
 /// Prefer importing this trait through the prelude:
 ///
-/// ```rust,no_run
+/// ```no_run
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>kernel_Hinstance: Handle {
@@ -409,20 +409,24 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HINSTANCE, IdStr, RtStr};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let hexe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
+	/// let hexe = w::HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
 	///
-	/// hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
-	///     let res_type2 = res_type.clone();
-	///     hexe.EnumResourceNames(res_type, |name: IdStr| -&gt; bool {
-	///         println!(&quot;Type: {}, name: {}&quot;, res_type2, name);
+	/// hexe.EnumResourceTypes(
+	///     |res_type: w::RtStr| -&gt; bool {
+	///         let res_type2 = res_type.clone();
+	///         hexe.EnumResourceNames(
+	///             res_type,
+	///             |name: w::IdStr| -&gt; bool {
+	///                 println!(&quot;Type: {}, name: {}&quot;, res_type2, name);
+	///                 true
+	///             },
+	///         ).unwrap();
 	///         true
-	///     }).unwrap();
-	///     true
-	/// })?;
+	///     },
+	/// )?;
 	///
 	/// // FreeLibrary() called automatically
 	/// # Ok::&lt;_, co::ERROR&gt;(())
@@ -450,16 +454,17 @@
 	///
 	/// # Examples
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{co, HINSTANCE, RtStr};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
-	/// let hexe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
+	/// let hexe = w::HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
 	///
-	/// hexe.EnumResourceTypes(|res_type: RtStr| -&gt; bool {
-	///     println!(&quot;Type {}&quot;, res_type);
-	///     true
-	/// })?;
+	/// hexe.EnumResourceTypes(
+	///     |res_type: w::RtStr| -&gt; bool {
+	///         println!(&quot;Type {}&quot;, res_type);
+	///         true
+	///     },
+	/// )?;
 	///
 	/// // FreeLibrary() called automatically
 	/// # Ok::&lt;_, co::ERROR&gt;(())
@@ -531,11 +536,10 @@
 	///
 	/// Retrieving the full path of currently running .exe file:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::HINSTANCE;
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*};
 	///
-	/// let exe_name = HINSTANCE::NULL.GetModuleFileName()?;
+	/// let exe_name = w::HINSTANCE::NULL.GetModuleFileName()?;
 	///
 	/// println!(&quot;EXE: {}&quot;, exe_name);
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
@@ -561,11 +565,10 @@
 	///
 	/// Retrieving current module instance:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::HINSTANCE;
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*};
 	///
-	/// let hinstance = HINSTANCE::GetModuleHandle(None)?;
+	/// let hinstance = w::HINSTANCE::GetModuleHandle(None)?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="attr">#[must_use]
@@ -631,30 +634,27 @@
 	/// [Updating Resources](https://learn.microsoft.com/en-us/windows/win32/menurc/using-resources#updating-resources)
 	/// example:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{
-	///     co, HINSTANCE, HUPDATERSRC, IdStr, LANGID, RtStr,
-	/// };
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, co};
 	///
 	/// const IDD_HAND_ABOUTBOX: u16 = 103;
 	/// const IDD_FOOT_ABOUTBOX: u16 = 110;
 	///
-	/// let hexe = HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
+	/// let hexe = w::HINSTANCE::LoadLibrary(&quot;hand.exe&quot;)?;
 	///
 	/// let hres = hexe.FindResource(
-	///     IdStr::Id(IDD_HAND_ABOUTBOX),
-	///     RtStr::Rt(co::RT::DIALOG),
+	///     w::IdStr::Id(IDD_HAND_ABOUTBOX),
+	///     w::RtStr::Rt(co::RT::DIALOG),
 	/// )?;
 	///
 	/// let hres_load = hexe.LoadResource(&amp;hres)?;
 	/// let hres_slice_lock = hexe.LockResource(&amp;hres, &amp;hres_load)?;
-	/// let hres_update = HUPDATERSRC::BeginUpdateResource(&quot;foot.exe&quot;, false)?;
+	/// let hres_update = w::HUPDATERSRC::BeginUpdateResource(&quot;foot.exe&quot;, false)?;
 	///
 	/// hres_update.UpdateResource(
-	///     RtStr::Rt(co::RT::DIALOG),
-	///     IdStr::Id(IDD_FOOT_ABOUTBOX),
-	///     LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
+	///     w::RtStr::Rt(co::RT::DIALOG),
+	///     w::IdStr::Id(IDD_FOOT_ABOUTBOX),
+	///     w::LANGID::new(co::LANG::NEUTRAL, co::SUBLANG::NEUTRAL),
 	///     hres_slice_lock,
 	/// )?;
 	///

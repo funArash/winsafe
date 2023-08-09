@@ -992,15 +992,6 @@
 <a href="#992" id="992">992</a>
 <a href="#993" id="993">993</a>
 <a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
-<a href="#1001" id="1001">1001</a>
-<a href="#1002" id="1002">1002</a>
-<a href="#1003" id="1003">1003</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -1173,22 +1164,21 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, ChooseColor, CHOOSECOLOR, COLORREF, HWND};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let parent_hwnd: HWND; // initialized somewhere
-/// # let parent_hwnd = HWND::NULL;
+/// let parent_hwnd: w::HWND; // initialized somewhere
+/// # let parent_hwnd = w::HWND::NULL;
 ///
-/// let mut cc = CHOOSECOLOR::default();
-/// let mut custom_colors = [COLORREF::new(255, 255, 255); 16];
+/// let mut cc = w::CHOOSECOLOR::default();
+/// let mut custom_colors = [w::COLORREF::new(255, 255, 255); 16];
 ///
 /// cc.hwndOwner = parent_hwnd;
 /// cc.Flags = co::CC::ANYCOLOR | co::CC::FULLOPEN | co::CC::RGBINIT;
-/// cc.rgbResult = COLORREF::new(255, 0, 0); // color initially chosen
+/// cc.rgbResult = w::COLORREF::new(255, 0, 0); // color initially chosen
 /// cc.set_lpCustColors(Some(&amp;mut custom_colors));
 ///
-/// if ChooseColor(&amp;mut cc)? {
+/// if w::ChooseColor(&amp;mut cc)? {
 ///     println!(&quot;The color: {} {} {}&quot;,
 ///         cc.rgbResult.GetRValue(),
 ///         cc.rgbResult.GetGValue(),
@@ -1251,15 +1241,14 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, DISPLAY_DEVICE, EnumDisplayDevices};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut dide = DISPLAY_DEVICE::default();
-/// let mut dev_num: u32 = 0;
+/// let mut dide = w::DISPLAY_DEVICE::default();
+/// let mut dev_num = u32::default();
 ///
 /// loop {
-///     let is_good = EnumDisplayDevices(None, dev_num, &amp;mut dide, None)?;
+///     let is_good = w::EnumDisplayDevices(None, dev_num, &amp;mut dide, None)?;
 ///
 ///     if !is_good {
 ///         break;
@@ -1305,17 +1294,16 @@
 ///
 /// Iterating graphics modes.
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{DEVMODE, EnumDisplaySettings, GmidxEnum};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let mut dm = DEVMODE::default();
-/// let mut graphics_mode_idx: u32 = 0;
+/// let mut dm = w::DEVMODE::default();
+/// let mut graphics_mode_idx = u32::default();
 ///
 /// loop {
-///     let is_good = EnumDisplaySettings(
+///     let is_good = w::EnumDisplaySettings(
 ///         None,
-///         GmidxEnum::Gmidx(graphics_mode_idx),
+///         w::GmidxEnum::Gmidx(graphics_mode_idx),
 ///         &amp;mut dm,
 ///     )?;
 ///
@@ -1334,15 +1322,14 @@
 ///
 /// Retrieving from the predefined enum.
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, DEVMODE, EnumDisplaySettings, GmidxEnum};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let mut dm = DEVMODE::default();
+/// let mut dm = w::DEVMODE::default();
 ///
-/// EnumDisplaySettings(
+/// w::EnumDisplaySettings(
 ///     None,
-///     GmidxEnum::Enum(co::ENUM_SETTINGS::CURRENT),
+///     w::GmidxEnum::Enum(co::ENUM_SETTINGS::CURRENT),
 ///     &amp;mut dm,
 /// )?;
 ///
@@ -1401,13 +1388,12 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{EnumThreadWindows, GetCurrentThreadId, HWND};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// EnumThreadWindows(
-///     GetCurrentThreadId(),
-///     |hwnd: HWND| -&gt; bool {
+/// w::EnumThreadWindows(
+///     w::GetCurrentThreadId(),
+///     |hwnd: w::HWND| -&gt; bool {
 ///         println!(&quot;HWND: {}&quot;, hwnd);
 ///         true
 ///     },
@@ -1440,11 +1426,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{EnumWindows, HWND};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// EnumWindows(|hwnd: HWND| -&gt; bool {
+/// w::EnumWindows(|hwnd: w::HWND| -&gt; bool {
 ///     println!(&quot;HWND: {}&quot;, hwnd);
 ///     true
 /// })?;
@@ -1484,11 +1469,10 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, GetAsyncKeyState};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// let esc_is_down = GetAsyncKeyState(co::VK::ESCAPE);
+/// let esc_is_down = w::GetAsyncKeyState(co::VK::ESCAPE);
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetAsyncKeyState(virt_key: co::VK) -&gt; bool {
@@ -1552,17 +1536,16 @@
 ///
 /// # Examples
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{GetGUIThreadInfo, GUITHREADINFO, HWND};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
 ///
-/// let hwnd: HWND; // initialized somewhere
-/// # let hwnd = HWND::NULL;
+/// let hwnd: w::HWND; // initialized somewhere
+/// # let hwnd = w::HWND::NULL;
 ///
 /// let (thread_id, _) = hwnd.GetWindowThreadProcessId();
 ///
-/// let mut gti = GUITHREADINFO::default();
-/// GetGUIThreadInfo(thread_id, &amp;mut gti)?;
+/// let mut gti = w::GUITHREADINFO::default();
+/// w::GetGUIThreadInfo(thread_id, &amp;mut gti)?;
 ///
 /// println!(&quot;Caret rect: {}&quot;, gti.rcCaret);
 /// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
@@ -1809,32 +1792,31 @@
 ///
 /// Sending Win+D to toggle the desktop:
 ///
-/// ```rust,no_run
-/// use winsafe::prelude::*;
-/// use winsafe::{co, HwKbMouse, KEYBDINPUT, SendInput};
+/// ```no_run
+/// use winsafe::{self as w, prelude::*, co};
 ///
-/// SendInput(&amp;[
-///     HwKbMouse::Kb(
-///         KEYBDINPUT {
+/// w::SendInput(&amp;[
+///     w::HwKbMouse::Kb(
+///         w::KEYBDINPUT {
 ///             wVk: co::VK::LWIN,
 ///             ..Default::default()
 ///         },
 ///     ),
-///     HwKbMouse::Kb(
-///         KEYBDINPUT {
+///     w::HwKbMouse::Kb(
+///         w::KEYBDINPUT {
 ///             wVk: co::VK::CHAR_D,
 ///             ..Default::default()
 ///         },
 ///     ),
-///     HwKbMouse::Kb(
-///         KEYBDINPUT {
+///     w::HwKbMouse::Kb(
+///         w::KEYBDINPUT {
 ///             wVk: co::VK::CHAR_D,
 ///             dwFlags: co::KEYEVENTF::KEYUP,
 ///             ..Default::default()
 ///         },
 ///     ),
-///     HwKbMouse::Kb(
-///         KEYBDINPUT {
+///     w::HwKbMouse::Kb(
+///         w::KEYBDINPUT {
 ///             wVk: co::VK::LWIN,
 ///             dwFlags: co::KEYEVENTF::KEYUP,
 ///             ..Default::default()

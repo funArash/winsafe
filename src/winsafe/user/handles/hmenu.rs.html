@@ -543,9 +543,6 @@
 <a href="#543" id="543">543</a>
 <a href="#544" id="544">544</a>
 <a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -567,7 +564,7 @@
 ///
 /// Prefer importing this trait through the prelude:
 ///
-/// ```rust,no_run
+/// ```no_run
 /// use winsafe::prelude::*;
 /// ```
 </span><span class="kw">pub trait </span>user_Hmenu: Handle {
@@ -601,9 +598,8 @@
 	///
 	/// Adding multiple entries at once, with their command IDs:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{HMENU, MenuEnum, seq_ids};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, seq_ids};
 	///
 	/// seq_ids! {
 	///     ID_FILE_OPEN = 2001;
@@ -611,14 +607,14 @@
 	///     ID_FILE_EXIT
 	/// }
 	///
-	/// let hmenu: HMENU; // initialized somewhere
-	/// # let hmenu = HMENU::NULL;
+	/// let hmenu: w::HMENU; // initialized somewhere
+	/// # let hmenu = w::HMENU::NULL;
 	///
 	/// hmenu.AppendMenuEnum(&amp;[
-	///     MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Open&quot;),
-	///     MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Save&quot;),
-	///     MenuEnum::Separator,
-	///     MenuEnum::Entry(ID_FILE_EXIT, &quot;E&amp;xit&quot;),
+	///     w::MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Open&quot;),
+	///     w::MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Save&quot;),
+	///     w::MenuEnum::Separator,
+	///     w::MenuEnum::Entry(ID_FILE_EXIT, &quot;E&amp;xit&quot;),
 	/// ])?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
@@ -755,19 +751,18 @@
 	///
 	/// Disabling a menu item:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{HMENU, IdPos, seq_ids};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, seq_ids};
 	///
 	/// seq_ids! {
 	///     ID_FILE_OPEN = 101;
 	/// }
 	///
-	/// let hmenu: HMENU; // initialized somewhere
-	/// # let hmenu = HMENU::NULL;
+	/// let hmenu: w::HMENU; // initialized somewhere
+	/// # let hmenu = w::HMENU::NULL;
 	///
 	/// hmenu.EnableMenuItem(
-	///     IdPos::Id(ID_FILE_OPEN),
+	///     w::IdPos::Id(ID_FILE_OPEN),
 	///     false,
 	/// )?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
@@ -775,27 +770,26 @@
 	///
 	/// Disabling multiple menu items at once:
 	///
-	/// ```rust,no_run
-	/// use winsafe::prelude::*;
-	/// use winsafe::{HMENU, IdPos, seq_ids};
+	/// ```no_run
+	/// use winsafe::{self as w, prelude::*, seq_ids};
 	///
 	/// seq_ids! {
 	///     ID_FILE_OPEN = 201;
 	///     ID_FILE_SAVE
 	/// }
 	///
-	/// let hmenu: HMENU; // initialized somewhere
-	/// # let hmenu = HMENU::NULL;
+	/// let hmenu: w::HMENU; // initialized somewhere
+	/// # let hmenu = w::HMENU::NULL;
 	///
 	/// [
 	///     (ID_FILE_OPEN, &quot;Open\tCtrl+O&quot;),
 	///     (ID_FILE_SAVE, &quot;&amp;Save&quot;),
 	/// ].iter()
 	///     .map(|(id, txt)| hmenu.EnableMenuItem(
-	///         IdPos::Id(*id),
+	///         w::IdPos::Id(*id),
 	///         false,
 	///     ))
-	///     .collect::&lt;Result&lt;Vec&lt;_&gt;, _&gt;&gt;()?;
+	///     .collect::&lt;w::SysResult&lt;Vec&lt;_&gt;&gt;&gt;()?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
 	</span><span class="kw">fn </span>EnableMenuItem(<span class="kw-2">&amp;</span><span class="self">self</span>,
