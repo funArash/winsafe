@@ -2928,9 +2928,36 @@
 <a href="#2928" id="2928">2928</a>
 <a href="#2929" id="2929">2929</a>
 <a href="#2930" id="2930">2930</a>
+<a href="#2931" id="2931">2931</a>
+<a href="#2932" id="2932">2932</a>
+<a href="#2933" id="2933">2933</a>
+<a href="#2934" id="2934">2934</a>
+<a href="#2935" id="2935">2935</a>
+<a href="#2936" id="2936">2936</a>
+<a href="#2937" id="2937">2937</a>
+<a href="#2938" id="2938">2938</a>
+<a href="#2939" id="2939">2939</a>
+<a href="#2940" id="2940">2940</a>
+<a href="#2941" id="2941">2941</a>
+<a href="#2942" id="2942">2942</a>
+<a href="#2943" id="2943">2943</a>
+<a href="#2944" id="2944">2944</a>
+<a href="#2945" id="2945">2945</a>
+<a href="#2946" id="2946">2946</a>
+<a href="#2947" id="2947">2947</a>
+<a href="#2948" id="2948">2948</a>
+<a href="#2949" id="2949">2949</a>
+<a href="#2950" id="2950">2950</a>
+<a href="#2951" id="2951">2951</a>
+<a href="#2952" id="2952">2952</a>
+<a href="#2953" id="2953">2953</a>
+<a href="#2954" id="2954">2954</a>
+<a href="#2955" id="2955">2955</a>
+<a href="#2956" id="2956">2956</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::msg::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ole::privs::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::user::privs::<span class="kw-2">*</span>;
 
@@ -5368,6 +5395,31 @@
 			msg_id: co::LVM::SETITEMCOUNT.into(),
 			wparam: <span class="self">self</span>.count <span class="kw">as _</span>,
 			lparam: <span class="self">self</span>.behavior.raw() <span class="kw">as _</span>,
+		}
+	}
+}
+
+<span class="doccomment">/// [`LVM_SETITEMINDEXSTATE`](https://learn.microsoft.com/en-us/windows/win32/controls/lvm-setitemindexstate)
+/// message parameters.
+///
+/// Return type: `HrResult&lt;()&gt;`.
+</span><span class="kw">pub struct </span>SetItemIndexState&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; {
+	<span class="kw">pub </span>lvitemindex: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LVITEMINDEX,
+	<span class="kw">pub </span>lvitem: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span>LVITEM&lt;<span class="lifetime">&#39;b</span>&gt;,
+}
+
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; MsgSend <span class="kw">for </span>SetItemIndexState&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;c</span>&gt; {
+	<span class="kw">type </span>RetType = HrResult&lt;()&gt;;
+
+	<span class="kw">fn </span>convert_ret(<span class="kw-2">&amp;</span><span class="self">self</span>, v: isize) -&gt; <span class="self">Self</span>::RetType {
+		ok_to_hrresult(v <span class="kw">as _</span>)
+	}
+
+	<span class="kw">fn </span>as_generic_wm(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; WndMsg {
+		WndMsg {
+			msg_id: co::LVM::SETITEMINDEXSTATE.into(),
+			wparam: <span class="self">self</span>.lvitemindex <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
+			lparam: <span class="self">self</span>.lvitem <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
 		}
 	}
 }
