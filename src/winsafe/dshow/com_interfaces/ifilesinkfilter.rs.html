@@ -98,9 +98,12 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::guard::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
@@ -142,12 +145,13 @@
 	/// If you pass an [`AM_MEDIA_TYPE`](crate::AM_MEDIA_TYPE) reference to
 	/// `pmt`, its `pbFormat` field may return a valid reference to a format
 	/// block. If so, you must free it with
-	/// [`CoTaskMemFree`](crate::CoTaskMemFree), or you&#39;ll have a memory leak.
+	/// [`CoTaskMemFree`](crate::guard::CoTaskMemFreeGuard), or you&#39;ll have a
+	/// memory leak.
 	///
 	/// # Examples
 	///
 	/// ```no_run
-	/// use winsafe::{self as w, prelude::*};
+	/// use winsafe::{self as w, prelude::*, guard};
 	///
 	/// let sinkf: w::IFileSinkFilter; // initialized somewhere
 	/// # let sinkf = unsafe { w::IFileSinkFilter::null() };
@@ -156,7 +160,7 @@
 	/// unsafe {
 	///     sinkf.GetCurFile(Some(&amp;mut ammt))?;
 	///     if let Some(pb_format) = ammt.pbFormat::&lt;w::DVINFO&gt;() { // valid reference?
-	///         w::CoTaskMemFree(pb_format as *mut _ as _);
+	///         let _ = guard::CoTaskMemFreeGuard::new(pb_format as *mut _  as _, 0);
 	///     }
 	/// }
 	/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
@@ -175,7 +179,7 @@
 			),
 		).map(|<span class="kw">_</span>| {
 			<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
-			CoTaskMemFree(pstr <span class="kw">as _</span>);
+			<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ CoTaskMemFreeGuard::new(pstr <span class="kw">as _</span>, <span class="number">0</span>) };
 			name.to_string()
 		})
 	}

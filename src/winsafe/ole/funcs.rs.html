@@ -336,6 +336,11 @@
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -548,40 +553,58 @@
 <span class="doccomment">/// [`CoTaskMemAlloc`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemalloc)
 /// function.
 ///
-/// # Safety
+/// # Examples
 ///
-/// This function manually allocates a memory block, which must be freed with
-/// [`CoTaskMemFree`](crate::CoTaskMemFree).
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
+///
+/// let pmem = w::CoTaskMemAlloc(100)?;
+///
+/// // use memory block...
+///
+/// // CoTaskMemFree() automatically called
+/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 </span><span class="attr">#[must_use]
-</span><span class="kw">pub unsafe fn </span>CoTaskMemAlloc(cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
+</span><span class="kw">pub fn </span>CoTaskMemAlloc(cb: usize) -&gt; HrResult&lt;CoTaskMemFreeGuard&gt; {
 	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ffi::CoTaskMemAlloc(cb) };
 	<span class="kw">if </span>p.is_null() {
 		<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
 	} <span class="kw">else </span>{
-		<span class="prelude-val">Ok</span>(p <span class="kw">as _</span>)
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ CoTaskMemFreeGuard::new(p, cb) })
 	}
-}
-
-<span class="doccomment">/// [`CoTaskMemFree`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree)
-/// function.
-</span><span class="kw">pub fn </span>CoTaskMemFree(pv: <span class="kw-2">*mut </span>u8) {
-	<span class="kw">unsafe </span>{ ffi::CoTaskMemFree(pv <span class="kw">as _</span>) }
 }
 
 <span class="doccomment">/// [`CoTaskMemRealloc`](https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cotaskmemfree)
 /// function.
 ///
-/// # Safety
+/// Originally this method returns a pointer to the reallocated memory block;
+/// here the original pointer is automatically updated.
 ///
-/// This function manually allocates a memory block, which must be freed with
-/// [`CoTaskMemFree`](crate::CoTaskMemFree).
+/// # Examples
+///
+/// ```no_run
+/// use winsafe::{self as w, prelude::*};
+///
+/// let mut pmem = w::CoTaskMemAlloc(100)?;
+/// w::CoTaskMemRealloc(&amp;mut pmem, 120)?;
+///
+/// // use memory block...
+///
+/// // CoTaskMemFree() automatically called
+/// # Ok::&lt;_, winsafe::co::HRESULT&gt;(())
 </span><span class="attr">#[must_use]
-</span><span class="kw">pub unsafe fn </span>CoTaskMemRealloc(pv: <span class="kw-2">*mut </span>u8, cb: usize) -&gt; HrResult&lt;<span class="kw-2">*mut </span>u8&gt; {
-	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ffi::CoTaskMemRealloc(pv <span class="kw">as _</span>, cb) };
+</span><span class="kw">pub fn </span>CoTaskMemRealloc(
+	pv: <span class="kw-2">&amp;mut </span>CoTaskMemFreeGuard,
+	cb: usize,
+) -&gt; HrResult&lt;()&gt;
+{
+	<span class="kw">let </span>(old_pmem, <span class="kw">_</span>) = pv.leak();
+	<span class="kw">let </span>p = <span class="kw">unsafe </span>{ ffi::CoTaskMemRealloc(old_pmem, cb) };
 	<span class="kw">if </span>p.is_null() {
 		<span class="prelude-val">Err</span>(co::HRESULT::E_OUTOFMEMORY)
 	} <span class="kw">else </span>{
-		<span class="prelude-val">Ok</span>(p <span class="kw">as _</span>)
+		<span class="kw-2">*</span>pv = <span class="kw">unsafe </span>{ CoTaskMemFreeGuard::new(p, cb) };
+		<span class="prelude-val">Ok</span>(())
 	}
 }
 
@@ -592,10 +615,7 @@
 	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
 	ok_to_hrresult(
 		<span class="kw">unsafe </span>{
-			ffi::CreateClassMoniker(
-				clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-				queried.as_mut(),
-			)
+			ffi::CreateClassMoniker(clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, queried.as_mut())
 		},
 	).map(|<span class="kw">_</span>| queried)
 }
@@ -637,12 +657,7 @@
 </span><span class="kw">pub fn </span>CreateObjrefMoniker(unk: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; HrResult&lt;IMoniker&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
 	ok_to_hrresult(
-		<span class="kw">unsafe </span>{
-			ffi::CreateObjrefMoniker(
-				unk.ptr(),
-				queried.as_mut(),
-			)
-		},
+		<span class="kw">unsafe </span>{ ffi::CreateObjrefMoniker(unk.ptr(), queried.as_mut()) },
 	).map(|<span class="kw">_</span>| queried)
 }
 
@@ -652,12 +667,7 @@
 </span><span class="kw">pub fn </span>CreatePointerMoniker(unk: <span class="kw-2">&amp;</span><span class="kw">impl </span>ole_IUnknown) -&gt; HrResult&lt;IMoniker&gt; {
 	<span class="kw">let </span><span class="kw-2">mut </span>queried = <span class="kw">unsafe </span>{ IMoniker::null() };
 	ok_to_hrresult(
-		<span class="kw">unsafe </span>{
-			ffi::CreatePointerMoniker(
-				unk.ptr(),
-				queried.as_mut(),
-			)
-		},
+		<span class="kw">unsafe </span>{ ffi::CreatePointerMoniker(unk.ptr(), queried.as_mut()) },
 	).map(|<span class="kw">_</span>| queried)
 }
 
@@ -670,7 +680,7 @@
 		<span class="kw">unsafe </span>{ ffi::StringFromCLSID(clsid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, <span class="kw-2">&amp;mut </span>pstr) },
 	).map(|<span class="kw">_</span>| {
 		<span class="kw">let </span>name = WString::from_wchars_nullt(pstr);
-		CoTaskMemFree(pstr <span class="kw">as _</span>);
+		<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ CoTaskMemFreeGuard::new(pstr <span class="kw">as _</span>, <span class="number">0</span>) };
 		name.to_string()
 	})
 }
