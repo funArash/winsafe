@@ -431,6 +431,9 @@
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! File path utilities.
 //!
 //! Some of the functions are similar to [`std::path::Path`] ones, but here they
@@ -729,7 +732,7 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">struct </span>DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	dir_path: String,
 	filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
 	hfind: <span class="prelude-ty">Option</span>&lt;FindCloseGuard&gt;,
@@ -789,7 +792,10 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DirListIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(dir_path: String, filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">fn </span>new(
+		dir_path: String,
+		filter: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+	) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			dir_path: rtrim_backslash(<span class="kw-2">&amp;</span>dir_path).to_owned(),
 			filter,
@@ -802,7 +808,7 @@
 
 <span class="comment">//------------------------------------------------------------------------------
 
-</span><span class="kw">struct </span>DirWalkIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">struct </span>DirWalkIter&lt;<span class="lifetime">&#39;a</span>&gt; {
 	runner: DirListIter&lt;<span class="lifetime">&#39;a</span>&gt;,
 	subdir_runner: <span class="prelude-ty">Option</span>&lt;Box&lt;DirWalkIter&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
 	no_more: bool,
@@ -856,7 +862,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DirWalkIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-	<span class="kw">fn </span>new(dir_path: String) -&gt; <span class="self">Self </span>{
+	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::kernel) <span class="kw">fn </span>new(dir_path: String) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{
 			runner: DirListIter::new(dir_path, <span class="prelude-val">None</span>),
 			subdir_runner: <span class="prelude-val">None</span>,
