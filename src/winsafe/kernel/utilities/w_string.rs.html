@@ -498,7 +498,6 @@
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -523,15 +522,14 @@
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>WString {
-	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.buf.to_string_checked().unwrap())
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+		std::fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.buf.to_string_checked().unwrap(), f)
 	}
 }
-
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>WString {
 	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-		&lt;Buffer <span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.buf, f) <span class="comment">// simply delegate
-	</span>}
+		std::fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.buf, f)
+	}
 }
 
 <span class="kw">impl </span>std::cmp::PartialEq <span class="kw">for </span>WString {
@@ -850,7 +848,7 @@
 				<span class="macro">format!</span>(<span class="string">&quot;HEAP({}) \&quot;{}\&quot;&quot;</span>,
 					block.len() / std::mem::size_of::&lt;u16&gt;(), <span class="self">self</span>.to_string_checked().unwrap()),
 			<span class="self">Self</span>::Unallocated =&gt;
-				<span class="string">&quot;(UNALLOCATED)&quot;</span>.to_owned(),
+				<span class="string">&quot;UNALLOCATED \&quot;\&quot;&quot;</span>.to_owned(),
 		})
 	}
 }

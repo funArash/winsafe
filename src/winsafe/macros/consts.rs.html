@@ -564,6 +564,11 @@
 			$( <span class="attr">#[<span class="macro-nonterminal">$doc</span>] </span>)*
 		}
 
+		<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+				<span class="macro">write!</span>(f, <span class="string">&quot;{:#010x}&quot;</span>, <span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize)
+			}
+		}
 		<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
 				<span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize &gt; <span class="number">0xffff </span>{
@@ -573,11 +578,6 @@
 					<span class="macro">write!</span>(f, <span class="string">&quot;[{:#06x} {}] {}&quot;</span>,
 						<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>))
 				}
-			}
-		}
-		<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-				<span class="macro">write!</span>(f, <span class="string">&quot;{:#010x}&quot;</span>, <span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize)
 			}
 		}
 
@@ -931,15 +931,15 @@
 			}
 		}
 
-		<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-				<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="kw">crate</span>::kernel::decl::WString::from(<span class="kw-2">*</span><span class="self">self</span>))
-			}
-		}
 		<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
 			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-				&lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Debug&gt;::fmt(<span class="self">self</span>, f) <span class="comment">// delegate to Debug trait
-			</span>}
+				std::fmt::Display::fmt(<span class="self">self</span>.<span class="number">0</span>, f)
+			}
+		}
+		<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+			<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+				<span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{}\&quot; {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>))
+			}
 		}
 
 		<span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
