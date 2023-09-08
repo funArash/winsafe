@@ -304,6 +304,9 @@
 <a href="#304" id="304">304</a>
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::gui::{<span class="kw-2">*</span>, spec::<span class="kw-2">*</span>};
@@ -329,6 +332,11 @@
 	///
 	/// The texts are relative to each column.
 	///
+	/// # Panics
+	///
+	/// Panics if `texts` is empty, or if the number of texts is greater than
+	/// the number of columns.
+	///
 	/// # Examples
 	///
 	/// ```no_run
@@ -346,11 +354,6 @@
 	///     None, // no icon; requires a previous set_image_list()
 	/// );
 	/// ```
-	///
-	/// # Panics
-	///
-	/// Panics if `texts` is empty, or if the number of texts is greater than
-	/// the number of columns.
 	</span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;</span><span class="self">self</span>,
 		texts: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;],
 		icon_index: <span class="prelude-ty">Option</span>&lt;u32&gt;,
@@ -358,6 +361,9 @@
 	{
 		<span class="kw">if </span>texts.is_empty() {
 			<span class="macro">panic!</span>(<span class="string">&quot;No texts passed when adding a ListView item.&quot;</span>);
+		} <span class="kw">else if </span>texts.len() &gt; <span class="self">self</span>.owner.columns().count() <span class="kw">as </span>usize {
+			<span class="macro">panic!</span>(<span class="string">&quot;Cannot set {} text(s) to {} column(s).&quot;</span>,
+				texts.len(), <span class="self">self</span>.owner.columns().count());
 		}
 
 		<span class="kw">let </span><span class="kw-2">mut </span>lvi = LVITEM::default();
@@ -369,10 +375,10 @@
 			lvi.iImage = icon_index <span class="kw">as _</span>;
 		}
 
-		<span class="kw">let </span><span class="kw-2">mut </span>wtext = WString::from_str(texts[<span class="number">0</span>].as_ref());
-		lvi.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wtext));
+		<span class="kw">let </span><span class="kw-2">mut </span>wtext = WString::from_str(texts[<span class="number">0</span>].as_ref()); <span class="comment">// text of 1st column
+		</span>lvi.set_pszText(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wtext));
 
-		<span class="kw">let </span>new_item = <span class="self">self</span>.get( <span class="comment">// retrieve the item newly added
+		<span class="kw">let </span>new_item = <span class="self">self</span>.get( <span class="comment">// insert new item; retrieve newly added
 			</span><span class="self">self</span>.owner.hwnd()
 				.SendMessage(lvm::InsertItem { item: <span class="kw-2">&amp;</span>lvi })
 				.unwrap(),
