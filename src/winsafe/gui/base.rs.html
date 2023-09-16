@@ -267,8 +267,8 @@
 		p: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent,
 	) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self
 	</span>{
-		<span class="kw">let </span>ptr = NonNull::new_unchecked(p.as_base() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
-		ptr.as_ref()
+		<span class="kw">let </span>ptr = p.as_base() <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>;
+		ptr.as_ref().unwrap()
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>new(
@@ -309,10 +309,10 @@
 	}
 
 	<span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::gui) <span class="kw">fn </span>parent_hinstance(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SysResult&lt;HINSTANCE&gt; {
-		<span class="self">self</span>.parent().map_or_else(
-			|| HINSTANCE::GetModuleHandle(<span class="prelude-val">None</span>),
-			|parent| <span class="prelude-val">Ok</span>(parent.hwnd().hinstance()),
-		)
+		<span class="kw">match </span><span class="self">self</span>.parent() {
+			<span class="prelude-val">Some</span>(parent) =&gt; <span class="prelude-val">Ok</span>(parent.hwnd().hinstance()),
+			<span class="prelude-val">None </span>=&gt; HINSTANCE::GetModuleHandle(<span class="prelude-val">None</span>),
+		}
 	}
 
 	<span class="doccomment">/// User events can be overriden; only the last one is executed.

@@ -210,6 +210,10 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::ops::Index;
 <span class="kw">use </span>std::pin::Pin;
@@ -268,13 +272,15 @@
 	/// dynamically create a `RadioGroup` in an event closure.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new(
-		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: <span class="kw-2">&amp;</span>[RadioButtonOpts]) -&gt; <span class="self">Self
+		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent,
+		opts: <span class="kw-2">&amp;</span>[RadioButtonOpts],
+	) -&gt; <span class="self">Self
 	</span>{
 		<span class="kw">if </span>opts.is_empty() {
 			<span class="macro">panic!</span>(<span class="string">&quot;RadioGroup needs at least one RadioButton.&quot;</span>);
 		}
 
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
 		<span class="kw">let </span>radios = opts.iter().enumerate()
 			.map(|(i, opt)| {
@@ -297,16 +303,16 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					parent_ptr: NonNull::from(parent_ref),
+					parent_ptr: NonNull::from(parent_base_ref),
 					radios,
-					events: RadioGroupEvents::new(parent_ref, ctrl_ids),
+					events: RadioGroupEvents::new(parent_base_ref, ctrl_ids),
 					_pin: PhantomPinned,
 				},
 			),
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm(parent_base_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(<span class="kw-2">&amp;</span>opts_resz_s)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
@@ -326,13 +332,15 @@
 	/// dynamically create a `RadioGroup` in an event closure.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new_dlg(
-		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, ctrls: <span class="kw-2">&amp;</span>[(u16, Horz, Vert)]) -&gt; <span class="self">Self
+		parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent,
+		ctrls: <span class="kw-2">&amp;</span>[(u16, Horz, Vert)],
+	) -&gt; <span class="self">Self
 	</span>{
 		<span class="kw">if </span>ctrls.is_empty() {
 			<span class="macro">panic!</span>(<span class="string">&quot;RadioGroup needs at least one RadioButton.&quot;</span>);
 		}
 
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
 		<span class="kw">let </span>radios = ctrls.iter()
 			.map(|(ctrl_id, <span class="kw">_</span>, <span class="kw">_</span>)| RadioButton::new_dlg(parent, <span class="kw-2">*</span>ctrl_id))
@@ -349,16 +357,16 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					parent_ptr: NonNull::from(parent_ref),
+					parent_ptr: NonNull::from(parent_base_ref),
 					radios,
-					events: RadioGroupEvents::new(parent_ref, ctrl_ids),
+					events: RadioGroupEvents::new(parent_base_ref, ctrl_ids),
 					_pin: PhantomPinned,
 				},
 			),
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(<span class="kw-2">&amp;</span>opts_resz_s)<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});

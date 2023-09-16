@@ -178,6 +178,7 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -241,7 +242,7 @@
 	<span class="kw">fn </span>default_message_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Base) {
 		<span class="kw">let </span>self2 = <span class="self">self</span>.clone();
 		parent.privileged_on().wm(parent.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
-			<span class="kw">let </span>parent_ref = self2.<span class="number">0</span>.raw_base.parent().unwrap();
+			<span class="kw">let </span>parent_base_ref = self2.<span class="number">0</span>.raw_base.parent().unwrap();
 			<span class="kw">let </span>opts = <span class="kw-2">&amp;</span>self2.<span class="number">0</span>.opts;
 
 			<span class="kw">let </span>parent_hinst = self2.<span class="number">0</span>.raw_base.parent_hinstance()<span class="question-mark">?</span>;
@@ -255,12 +256,13 @@
 			<span class="kw">let </span>atom = self2.<span class="number">0</span>.raw_base.register_class(<span class="kw-2">&amp;mut </span>wcx)<span class="question-mark">?</span>;
 
 			<span class="kw">let </span>wnd_pos = adjust_modeless_pos(
-				parent_ref, POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>))<span class="question-mark">?</span>;
+				parent_base_ref, POINT::new(opts.position.<span class="number">0</span>, opts.position.<span class="number">1</span>))<span class="question-mark">?</span>;
 
 			<span class="kw">let </span><span class="kw-2">mut </span>wnd_sz = SIZE::new(opts.size.<span class="number">0 </span><span class="kw">as _</span>, opts.size.<span class="number">1 </span><span class="kw">as _</span>);
-			multiply_dpi_or_dtu(parent_ref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_sz))<span class="question-mark">?</span>;
+			multiply_dpi_or_dtu(parent_base_ref, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>wnd_sz))<span class="question-mark">?</span>;
 
 			self2.<span class="number">0</span>.raw_base.create_window(
+				<span class="prelude-val">Some</span>(parent_base_ref.hwnd()),
 				atom,
 				<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>opts.title),
 				IdMenu::Menu(<span class="kw-2">&amp;</span>HMENU::NULL),

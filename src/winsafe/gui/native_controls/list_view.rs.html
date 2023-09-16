@@ -498,7 +498,7 @@
 	/// dynamically create a `ListView` in an event closure.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: ListViewOpts) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 		<span class="kw">let </span>opts = ListViewOpts::define_ctrl_id(opts);
 		<span class="kw">let </span>ctrl_id = opts.ctrl_id;
 		<span class="kw">let </span>context_menu = opts.context_menu.as_ref().map(|h| <span class="kw">unsafe </span>{ h.raw_copy() });
@@ -506,8 +506,8 @@
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref, ctrl_id),
-					events: ListViewEvents::new(parent_ref, ctrl_id),
+					base: BaseNativeControl::new(parent_base_ref, ctrl_id),
+					events: ListViewEvents::new(parent_base_ref, ctrl_id),
 					context_menu,
 					_pin: PhantomPinned,
 				},
@@ -515,12 +515,12 @@
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm(parent_base_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(OptsResz::Wnd(<span class="kw-2">&amp;</span>opts))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
 
-		new_self.default_message_handlers(parent_ref, ctrl_id);
+		new_self.default_message_handlers(parent_base_ref, ctrl_id);
 		new_self
 	}
 
@@ -544,13 +544,13 @@
 		context_menu: <span class="prelude-ty">Option</span>&lt;HMENU&gt;,
 	) -&gt; <span class="self">Self
 	</span>{
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref, ctrl_id),
-					events: ListViewEvents::new(parent_ref, ctrl_id),
+					base: BaseNativeControl::new(parent_base_ref, ctrl_id),
+					events: ListViewEvents::new(parent_base_ref, ctrl_id),
 					context_menu,
 					_pin: PhantomPinned,
 				},
@@ -558,12 +558,12 @@
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(OptsResz::Dlg(resize_behavior))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});
 
-		new_self.default_message_handlers(parent_ref, ctrl_id);
+		new_self.default_message_handlers(parent_base_ref, ctrl_id);
 		new_self
 	}
 

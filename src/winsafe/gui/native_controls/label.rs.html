@@ -342,22 +342,22 @@
 	/// dynamically create a `Label` in an event closure.
 	</span><span class="attr">#[must_use]
 	</span><span class="kw">pub fn </span>new(parent: <span class="kw-2">&amp;</span><span class="kw">impl </span>GuiParent, opts: LabelOpts) -&gt; <span class="self">Self </span>{
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 		<span class="kw">let </span>opts = LabelOpts::define_ctrl_id(opts);
 		<span class="kw">let </span>ctrl_id = opts.ctrl_id;
 
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref, ctrl_id),
-					events: LabelEvents::new(parent_ref, ctrl_id),
+					base: BaseNativeControl::new(parent_base_ref, ctrl_id),
+					events: LabelEvents::new(parent_base_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
 			),
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm(parent_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm(parent_base_ref.wm_create_or_initdialog(), <span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(OptsResz::Wnd(<span class="kw-2">&amp;</span>opts))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="comment">// not meaningful
 		</span>});
@@ -380,20 +380,20 @@
 		resize_behavior: (Horz, Vert)
 	) -&gt; <span class="self">Self
 	</span>{
-		<span class="kw">let </span>parent_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
+		<span class="kw">let </span>parent_base_ref = <span class="kw">unsafe </span>{ Base::from_guiparent(parent) };
 
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
 			Arc::pin(
 				Obj {
-					base: BaseNativeControl::new(parent_ref, ctrl_id),
-					events: LabelEvents::new(parent_ref, ctrl_id),
+					base: BaseNativeControl::new(parent_base_ref, ctrl_id),
+					events: LabelEvents::new(parent_base_ref, ctrl_id),
 					_pin: PhantomPinned,
 				},
 			),
 		);
 
 		<span class="kw">let </span>self2 = new_self.clone();
-		parent_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
+		parent_base_ref.privileged_on().wm_init_dialog(<span class="kw">move </span>|<span class="kw">_</span>| {
 			self2.create(OptsResz::Dlg(resize_behavior))<span class="question-mark">?</span>;
 			<span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="comment">// not meaningful
 		</span>});

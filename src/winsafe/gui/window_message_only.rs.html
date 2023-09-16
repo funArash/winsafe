@@ -66,6 +66,18 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::pin::Pin;
 <span class="kw">use </span>std::sync::Arc;
@@ -74,6 +86,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::gui::{<span class="kw-2">*</span>, events::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::user::privs::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A
 /// [message-only](https://learn.microsoft.com/en-us/windows/win32/winmsg/window-features#message-only-windows)
@@ -108,9 +121,14 @@
 	/// with
 	/// [`HWND::CreateWindowEx`](crate::prelude::user_Hwnd::CreateWindowEx).
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+	</span><span class="kw">pub fn </span>new(parent: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WindowMessageOnly&gt;) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span>parent_base_ref = parent.map(|parent| {
+			<span class="kw">let </span>base_ptr = <span class="kw">unsafe </span>{ parent.as_base() } <span class="kw">as </span><span class="kw-2">*mut </span>Base;
+			<span class="kw">unsafe </span>{ base_ptr.as_ref() }.unwrap()
+		});
+
 		<span class="kw">let </span>new_self = <span class="self">Self</span>(
-			Arc::pin(RawBase::new(<span class="prelude-val">None</span>)),
+			Arc::pin(RawBase::new(parent_base_ref)),
 		);
 		new_self.create();
 		new_self
@@ -127,7 +145,13 @@
 			<span class="kw-2">&amp;mut </span>class_name_buf).unwrap();
 		<span class="kw">let </span>atom = <span class="self">self</span>.<span class="number">0</span>.register_class(<span class="kw-2">&amp;mut </span>wcx).unwrap();
 
+		<span class="kw">let </span>hparent_msg = <span class="kw">unsafe </span>{ HWND::from_ptr(HWND_MESSAGE <span class="kw">as _</span>) };
+
 		<span class="self">self</span>.<span class="number">0</span>.create_window(
+			<span class="prelude-val">Some</span>(<span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.parent() {
+				<span class="prelude-val">Some</span>(parent) =&gt; parent.hwnd(),
+				<span class="prelude-val">None </span>=&gt; <span class="kw-2">&amp;</span>hparent_msg, <span class="comment">// special case: message-only window with no parent
+			</span>}),
 			atom, <span class="prelude-val">None</span>, IdMenu::None,
 			POINT::default(), SIZE::default(),
 			co::WS_EX::NoValue, co::WS::NoValue,

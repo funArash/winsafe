@@ -646,8 +646,8 @@
 				<span class="kw">let </span>obj = std::mem::ManuallyDrop::new( <span class="comment">// won&#39;t release the stored pointer
 					</span><span class="kw">unsafe </span>{ T::from_ptr(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>) },
 				);
-				<span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj);
-				<span class="prelude-val">Some</span>(cloned)
+				<span class="kw">let </span>cloned = T::clone(<span class="kw-2">&amp;</span>obj); <span class="comment">// the cloned will release the stored pointer
+				</span><span class="prelude-val">Some</span>(cloned)
 			}
 		}
 
@@ -656,13 +656,13 @@
 			<span class="kw">where </span>T: <span class="macro-nonterminal">$</span><span class="kw">trait</span>,
 		{
 			<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ <span class="macro-nonterminal">T::from_ptr</span>(<span class="self">self</span>.<span class="macro-nonterminal">$field</span>) }; <span class="comment">// if already set, call Release() immediately
-			</span><span class="self">self</span>.<span class="macro-nonterminal">$field </span>= obj.map_or_else(
-				|| std::ptr::null_mut(),
-				|obj| {
+			</span><span class="self">self</span>.<span class="macro-nonterminal">$field </span>= <span class="kw">match </span>obj {
+				<span class="prelude-val">Some</span>(obj) =&gt; {
 					<span class="kw">let </span><span class="kw-2">mut </span>cloned = T::clone(obj);
-					cloned.leak()
-				},
-			);
+					cloned.leak() <span class="comment">// so the cloned pointer won&#39;t be released here
+				</span>},
+				<span class="prelude-val">None </span>=&gt; std::ptr::null_mut(),
+			};
 		}
 	};
 }
