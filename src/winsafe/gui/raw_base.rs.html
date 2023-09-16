@@ -305,6 +305,12 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::gui::{events::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
@@ -320,6 +326,8 @@
 	</span>Color(co::COLOR),
 	<span class="doccomment">/// A brush handle, previously created by you.
 	</span>Handle(HBRUSH),
+	<span class="doccomment">/// No brush.
+	</span><span class="prelude-val">None</span>,
 }
 
 <span class="kw">impl </span>Brush {
@@ -328,6 +336,7 @@
 		<span class="kw">match </span><span class="self">self </span>{
 			Brush::Color(c) =&gt; HBRUSH::from_sys_color(<span class="kw-2">*</span>c),
 			Brush::Handle(h) =&gt; <span class="kw">unsafe </span>{ h.raw_copy() },
+			Brush::None =&gt; HBRUSH::NULL,
 		}
 	}
 }
@@ -343,6 +352,8 @@
 	</span>Id(u16),
 	<span class="doccomment">/// A [`co::IDC`](crate::co::IDC) constant for a stock system cursor.
 	</span>Idc(co::IDC),
+	<span class="doccomment">/// No cursor.
+	</span><span class="prelude-val">None</span>,
 	<span class="doccomment">/// A resource string identifier.
 	</span>Str(WString),
 }
@@ -355,6 +366,7 @@
 				Cursor::Handle(h) =&gt; h.raw_copy(),
 				Cursor::Id(id) =&gt; hinst.LoadCursor(IdIdcStr::Id(<span class="kw-2">*</span>id))<span class="question-mark">?</span>.leak(),
 				Cursor::Idc(idc) =&gt; HINSTANCE::NULL.LoadCursor(IdIdcStr::Idc(<span class="kw-2">*</span>idc))<span class="question-mark">?</span>.leak(),
+				Cursor::None =&gt; HCURSOR::NULL,
 				Cursor::Str(s) =&gt; hinst.LoadCursor(IdIdcStr::Str(s.clone()))<span class="question-mark">?</span>.leak(),
 			})
 		}
