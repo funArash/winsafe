@@ -1823,6 +1823,9 @@
 <a href="#1823" id="1823">1823</a>
 <a href="#1824" id="1824">1824</a>
 <a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -3510,7 +3513,10 @@
 	</span><span class="kw">fn </span>SetWindowText(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
-				ffi::SetWindowTextW(<span class="self">self</span>.ptr(), WString::from_str(text).as_ptr())
+				ffi::SetWindowTextW(
+					<span class="self">self</span>.ptr(),
+					WString::from_str(text).as_ptr(),
+				)
 			},
 		)
 	}
@@ -3537,7 +3543,7 @@
 	/// function.
 	</span><span class="kw">fn </span>ShowWindowAsync(<span class="kw-2">&amp;</span><span class="self">self</span>, show_cmd: co::SW) -&gt; SysResult&lt;()&gt; {
 		bool_to_sysresult(
-			<span class="kw">unsafe </span>{ ffi::ShowWindowAsync(<span class="self">self</span>.ptr(), show_cmd.raw()) }
+			<span class="kw">unsafe </span>{ ffi::ShowWindowAsync(<span class="self">self</span>.ptr(), show_cmd.raw()) },
 		)
 	}
 
@@ -3555,7 +3561,7 @@
 				how.raw(),
 				rect.map_or(std::ptr::null(), |rc| <span class="kw-2">&amp;</span>rc <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 				kids.map_or(<span class="number">0</span>, |s| s.len() <span class="kw">as _</span>),
-				kids.map_or(std::ptr::null(), |s| s.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
+				kids.map_or(std::ptr::null(), |hs| vec_ptr(hs) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
 			)
 		} {
 			<span class="number">0 </span>=&gt; <span class="kw">match </span>GetLastError() {

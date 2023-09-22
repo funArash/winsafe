@@ -91,16 +91,11 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::kernel::ffi_types::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::kernel::{ffi_types::<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
 <span class="kw">use </span><span class="kw">crate</span>::ole::privs::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::vt::<span class="kw-2">*</span>;
@@ -143,12 +138,7 @@
 		lcid: LCID,
 	) -&gt; HrResult&lt;Vec&lt;i32&gt;&gt;
 	{
-		<span class="kw">let </span>wnames = names.iter()
-			.map(|name| WString::from_str(name.as_ref()))
-			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-		<span class="kw">let </span>wptrs = wnames.iter()
-			.map(|wname| wname.as_ptr())
-			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+		<span class="kw">let </span>(_wstrs, pwstrs) = create_wstr_ptr_vecs(<span class="prelude-val">Some</span>(names));
 		<span class="kw">let </span><span class="kw-2">mut </span>ids = <span class="macro">vec!</span>[i32::default(); names.len()];
 
 		ok_to_hrresult(
@@ -156,7 +146,7 @@
 				(vt::&lt;IDispatchVT&gt;(<span class="self">self</span>).GetIDsOfNames)(
 					<span class="self">self</span>.ptr(),
 					<span class="kw-2">&amp;</span>co::IID::default() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>,
-					wptrs.as_ptr(),
+					vec_ptr(<span class="kw-2">&amp;</span>pwstrs),
 					names.len() <span class="kw">as _</span>,
 					lcid.into(),
 					ids.as_mut_ptr() <span class="kw">as _</span>,

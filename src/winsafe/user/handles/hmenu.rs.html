@@ -660,27 +660,27 @@
 	/// # let hmenu = w::HMENU::NULL;
 	///
 	/// hmenu.append_item(&amp;[
-	///     w::MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Open&quot;),
-	///     w::MenuEnum::Entry(ID_FILE_OPEN, &quot;&amp;Save&quot;),
-	///     w::MenuEnum::Separator,
-	///     w::MenuEnum::Entry(ID_FILE_EXIT, &quot;E&amp;xit&quot;),
+	///     w::MenuItem::Entry(ID_FILE_OPEN, &quot;&amp;Open&quot;),
+	///     w::MenuItem::Entry(ID_FILE_OPEN, &quot;&amp;Save&quot;),
+	///     w::MenuItem::Separator,
+	///     w::MenuItem::Entry(ID_FILE_EXIT, &quot;E&amp;xit&quot;),
 	/// ])?;
 	/// # Ok::&lt;_, winsafe::co::ERROR&gt;(())
 	/// ```
-	</span><span class="kw">fn </span>append_item(<span class="kw-2">&amp;</span><span class="self">self</span>, items: <span class="kw-2">&amp;</span>[MenuEnum]) -&gt; SysResult&lt;()&gt; {
+	</span><span class="kw">fn </span>append_item(<span class="kw-2">&amp;</span><span class="self">self</span>, items: <span class="kw-2">&amp;</span>[MenuItem]) -&gt; SysResult&lt;()&gt; {
 		items.iter().map(|item| {
 			<span class="kw">match </span>item {
-				MenuEnum::Entry(cmd_id, text) =&gt; <span class="self">self</span>.AppendMenu(
+				MenuItem::Entry(cmd_id, text) =&gt; <span class="self">self</span>.AppendMenu(
 					co::MF::STRING,
 					IdMenu::Id(<span class="kw-2">*</span>cmd_id),
 					BmpPtrStr::from_str(<span class="kw-2">*</span>text),
 				),
-				MenuEnum::Separator =&gt; <span class="self">self</span>.AppendMenu(
+				MenuItem::Separator =&gt; <span class="self">self</span>.AppendMenu(
 					co::MF::SEPARATOR,
 					IdMenu::None,
 					BmpPtrStr::None,
 				),
-				MenuEnum::Submenu(hmenu, text) =&gt; <span class="self">self</span>.AppendMenu(
+				MenuItem::Submenu(hmenu, text) =&gt; <span class="self">self</span>.AppendMenu(
 					co::MF::POPUP,
 					IdMenu::Menu(hmenu),
 					BmpPtrStr::from_str(<span class="kw-2">*</span>text),

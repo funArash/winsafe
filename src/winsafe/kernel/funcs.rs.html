@@ -1745,6 +1745,8 @@
 <a href="#1745" id="1745">1745</a>
 <a href="#1746" id="1746">1746</a>
 <a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -3219,7 +3221,7 @@
 		ffi::MultiByteToWideChar(
 			code_page.raw() <span class="kw">as _</span>,
 			flags.raw(),
-			multi_byte_str.as_ptr(),
+			vec_ptr(multi_byte_str),
 			multi_byte_str.len() <span class="kw">as _</span>,
 			std::ptr::null_mut(),
 			<span class="number">0</span>,
@@ -3236,7 +3238,7 @@
 			ffi::MultiByteToWideChar(
 				code_page.raw() <span class="kw">as _</span>,
 				flags.raw(),
-				multi_byte_str.as_ptr(),
+				vec_ptr(multi_byte_str),
 				multi_byte_str.len() <span class="kw">as _</span>,
 				buf.as_mut_ptr(),
 				num_bytes <span class="kw">as _</span>,
@@ -3248,7 +3250,9 @@
 <span class="doccomment">/// [`OutputDebugString`](https://learn.microsoft.com/en-us/windows/win32/api/debugapi/nf-debugapi-outputdebugstringw)
 /// function.
 </span><span class="kw">pub fn </span>OutputDebugString(output_string: <span class="kw-2">&amp;</span>str) {
-	<span class="kw">unsafe </span>{ ffi::OutputDebugStringW(WString::from_str(output_string).as_ptr()) }
+	<span class="kw">unsafe </span>{
+		ffi::OutputDebugStringW(WString::from_str(output_string).as_ptr())
+	}
 }
 
 <span class="doccomment">/// [`QueryPerformanceCounter`](https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter)
@@ -3457,7 +3461,7 @@
 		ffi::WideCharToMultiByte(
 			code_page.raw() <span class="kw">as _</span>,
 			flags.raw(),
-			wide_char_str.as_ptr(),
+			vec_ptr(wide_char_str),
 			wide_char_str.len() <span class="kw">as _</span>,
 			std::ptr::null_mut(),
 			<span class="number">0</span>,
@@ -3477,7 +3481,7 @@
 			ffi::WideCharToMultiByte(
 				code_page.raw() <span class="kw">as _</span>,
 				flags.raw(),
-				wide_char_str.as_ptr(),
+				vec_ptr(wide_char_str),
 				wide_char_str.len() <span class="kw">as _</span>,
 				u8_buf.as_mut_ptr() <span class="kw">as _</span>,
 				num_bytes <span class="kw">as _</span>,

@@ -357,6 +357,8 @@
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
 <a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -575,7 +577,9 @@
 	</span><span class="kw">fn </span>GetModuleHandle(module_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; SysResult&lt;HINSTANCE&gt; {
 		ptr_to_sysresult_handle(
 			<span class="kw">unsafe </span>{
-				ffi::GetModuleHandleW(WString::from_opt_str(module_name).as_ptr())
+				ffi::GetModuleHandleW(
+					WString::from_opt_str(module_name).as_ptr(),
+				)
 			},
 		)
 	}
@@ -591,7 +595,7 @@
 			<span class="kw">unsafe </span>{
 				ffi::GetProcAddress(
 					<span class="self">self</span>.ptr(),
-					str_to_iso88591(proc_name).as_ptr(),
+					vec_ptr(<span class="kw-2">&amp;</span>str_to_iso88591(proc_name)),
 				) <span class="kw">as _
 			</span>},
 		).map(|ptr| ptr <span class="kw">as _</span>)

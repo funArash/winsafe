@@ -987,6 +987,15 @@
 <a href="#987" id="987">987</a>
 <a href="#988" id="988">988</a>
 <a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -1769,7 +1778,9 @@
 /// function.
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>RegisterWindowMessage(s: <span class="kw-2">&amp;</span>str) -&gt; SysResult&lt;u32&gt; {
-	<span class="kw">match unsafe </span>{ ffi::RegisterWindowMessageW(WString::from_str(s).as_ptr()) } {
+	<span class="kw">match unsafe </span>{
+		ffi::RegisterWindowMessageW(WString::from_str(s).as_ptr())
+	} {
 		<span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(GetLastError()),
 		id =&gt; <span class="prelude-val">Ok</span>(id),
 	}
@@ -1816,11 +1827,14 @@
 /// # Ok::&lt;_, co::ERROR&gt;(())
 /// ```
 </span><span class="kw">pub fn </span>SendInput(inputs: <span class="kw-2">&amp;</span>[HwKbMouse]) -&gt; SysResult&lt;u32&gt; {
-	<span class="kw">let </span>objs = inputs.iter().map(|ipt| INPUT::new(<span class="kw-2">*</span>ipt)).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+	<span class="kw">let </span>objs = inputs.iter()
+		.map(|ipt| INPUT::new(<span class="kw-2">*</span>ipt))
+		.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
 	<span class="kw">match unsafe </span>{
 		ffi::SendInput(
 			objs.len() <span class="kw">as _</span>,
-			objs.as_ptr() <span class="kw">as _</span>,
+			vec_ptr(<span class="kw-2">&amp;</span>objs) <span class="kw">as _</span>,
 			std::mem::size_of::&lt;INPUT&gt;() <span class="kw">as _</span>,
 		)
 	} {
@@ -1965,7 +1979,11 @@
 
 <span class="doccomment">/// [`UnregisterClass`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unregisterclassw)
 /// function.
-</span><span class="kw">pub fn </span>UnregisterClass(class_name: AtomStr, hinst: <span class="kw-2">&amp;</span>HINSTANCE) -&gt; SysResult&lt;()&gt; {
+</span><span class="kw">pub fn </span>UnregisterClass(
+	class_name: AtomStr,
+	hinst: <span class="kw-2">&amp;</span>HINSTANCE,
+) -&gt; SysResult&lt;()&gt;
+{
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{ ffi::UnregisterClassW(class_name.as_ptr(), hinst.ptr()) },
 	)

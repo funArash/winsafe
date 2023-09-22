@@ -69,6 +69,7 @@
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::co;
@@ -123,6 +124,7 @@
 		raw_data: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
 	) -&gt; SysResult&lt;()&gt;
 	{
+		<span class="kw">let </span>(_wstrs, pwstrs) = create_wstr_ptr_vecs(strings);
 		bool_to_sysresult(
 			<span class="kw">unsafe </span>{
 				ffi::ReportEventW(
@@ -131,10 +133,10 @@
 					category,
 					event_id,
 					user_sid.map_or(std::ptr::null(), |s| s <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>),
-					strings.map_or(<span class="number">0</span>, |s| s.len() <span class="kw">as _</span>),
+					strings.map_or(<span class="number">0</span>, |ss| ss.len() <span class="kw">as _</span>),
 					raw_data.map_or(<span class="number">0</span>, |d| d.len() <span class="kw">as _</span>),
-					strings.map_or(std::ptr::null(), |s| WString::from_str_vec(s).as_ptr() <span class="kw">as _</span>),
-					raw_data.map_or(std::ptr::null(), |d| d.as_ptr() <span class="kw">as _</span>),
+					vec_ptr(<span class="kw-2">&amp;</span>pwstrs),
+					raw_data.map_or(std::ptr::null(), |d| vec_ptr(d) <span class="kw">as _</span>),
 				)
 			},
 		)
