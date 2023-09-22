@@ -166,8 +166,6 @@
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::UnsafeCell;
 <span class="kw">use </span>std::marker::PhantomPinned;
 <span class="kw">use </span>std::pin::Pin;
@@ -281,10 +279,8 @@
 		<span class="kw">let </span>sz_parent_orig = <span class="kw">match unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } {
 			<span class="prelude-val">Some</span>(sz) =&gt; <span class="kw-2">*</span>sz,
 			<span class="prelude-val">None </span>=&gt; {
-				<span class="kw">let </span>rc_parent = ctrls[<span class="number">0</span>].hchild.GetParent()<span class="question-mark">?</span>.GetClientRect()<span class="question-mark">?</span>;
-				<span class="kw">let </span>sz = SIZE::new(rc_parent.right, rc_parent.bottom);
-				<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } = <span class="prelude-val">Some</span>(sz); <span class="comment">// save original parent size
-				</span>sz
+				<span class="kw-2">*</span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.<span class="number">0</span>.sz_parent_orig.get() } = <span class="prelude-val">Some</span>(p.client_area); <span class="comment">// save original parent size
+				</span>p.client_area
 			},
 		};
 

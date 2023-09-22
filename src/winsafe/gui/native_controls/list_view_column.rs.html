@@ -120,6 +120,8 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::gui::{<span class="kw-2">*</span>, privs::<span class="kw-2">*</span>};
@@ -201,21 +203,23 @@
 	/// width will be calculated to fill the remaining space.
 	</span><span class="kw">pub fn </span>set_width_to_fill(<span class="kw-2">&amp;</span><span class="self">self</span>) {
 		<span class="kw">let </span>num_cols = <span class="self">self</span>.owner.columns().count();
-		<span class="kw">let </span><span class="kw-2">mut </span>cx_used = <span class="number">0</span>;
+		<span class="kw">if </span>num_cols &gt; <span class="number">0 </span>{
+			<span class="kw">let </span><span class="kw-2">mut </span>cx_used = <span class="number">0</span>;
 
-		<span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..num_cols {
-			<span class="kw">if </span>i != <span class="self">self</span>.index {
-				cx_used += <span class="self">self</span>.owner.columns().get(i).width(); <span class="comment">// retrieve cx of each column, but us
-			</span>}
+			<span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..num_cols {
+				<span class="kw">if </span>i != <span class="self">self</span>.index {
+					cx_used += <span class="self">self</span>.owner.columns().get(i).width(); <span class="comment">// retrieve cx of each column, but us
+				</span>}
+			}
+
+			<span class="kw">let </span>rc = <span class="self">self</span>.owner.hwnd().GetClientRect().unwrap(); <span class="comment">// list view client area
+			</span><span class="self">self</span>.owner.hwnd()
+				.SendMessage(lvm::SetColumnWidth {
+					index: <span class="self">self</span>.index,
+					width: rc.right <span class="kw">as </span>u32 - cx_used,
+				})
+				.unwrap();
 		}
-
-		<span class="kw">let </span>rc = <span class="self">self</span>.owner.hwnd().GetClientRect().unwrap(); <span class="comment">// list view client area
-		</span><span class="self">self</span>.owner.hwnd()
-			.SendMessage(lvm::SetColumnWidth {
-				index: <span class="self">self</span>.index,
-				width: rc.right <span class="kw">as </span>u32 - cx_used,
-			})
-			.unwrap();
 	}
 
 	<span class="doccomment">/// Retrieves the title of the column by calling

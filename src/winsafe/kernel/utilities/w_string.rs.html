@@ -497,7 +497,6 @@
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -870,7 +869,6 @@
 			</span><span class="kw">let </span><span class="kw-2">mut </span>new_self = <span class="self">Self</span>::new_alloc_buf(num_chars);
 			s.as_ref()
 				.encode_utf16()
-				.into_iter()
 				.zip(new_self.as_mut_slice())
 				.for_each(|(src, dest)| <span class="kw-2">*</span>dest = src);
 			new_self
@@ -886,8 +884,8 @@
 			.map(|s| {
 				s.as_ref()
 					.encode_utf16()
-					.into_iter()
-			})
+					.chain(std::iter::once(<span class="number">0x0000</span>)) <span class="comment">// append terminating null on each string
+			</span>})
 			.flatten()
 			.zip(new_self.as_mut_slice())
 			.for_each(|(src, dest)| <span class="kw-2">*</span>dest = src);
