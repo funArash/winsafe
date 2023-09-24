@@ -771,6 +771,8 @@
 <a href="#771" id="771">771</a>
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
 
@@ -1490,14 +1492,16 @@
 	<span class="kw">where </span>H: kernel_Hfile,
 {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">unsafe </span>{
-			ffi::UnlockFile( <span class="comment">// ignore errors
-				</span><span class="self">self</span>.hfile.ptr(),
-				LODWORD(<span class="self">self</span>.offset),
-				HIDWORD(<span class="self">self</span>.offset),
-				LODWORD(<span class="self">self</span>.num_bytes_to_lock),
-				HIDWORD(<span class="self">self</span>.num_bytes_to_lock),
-			);
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(h) = <span class="self">self</span>.hfile.as_opt() {
+			<span class="kw">unsafe </span>{
+				ffi::UnlockFile( <span class="comment">// ignore errors
+					</span>h.ptr(),
+					LODWORD(<span class="self">self</span>.offset),
+					HIDWORD(<span class="self">self</span>.offset),
+					LODWORD(<span class="self">self</span>.num_bytes_to_lock),
+					HIDWORD(<span class="self">self</span>.num_bytes_to_lock),
+				);
+			}
 		}
 	}
 }

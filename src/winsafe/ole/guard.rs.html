@@ -117,6 +117,8 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::ole::ffi;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
@@ -167,7 +169,9 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>CoTaskMemFreeGuard {
 	<span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-		<span class="kw">unsafe </span>{ ffi::CoTaskMemFree(<span class="self">self</span>.pmem); }
+		<span class="kw">if </span>!<span class="self">self</span>.pmem.is_null() {
+			<span class="kw">unsafe </span>{ ffi::CoTaskMemFree(<span class="self">self</span>.pmem); }
+		}
 	}
 }
 
