@@ -1841,7 +1841,7 @@
 	bool_to_sysresult(
 		<span class="kw">unsafe </span>{ ffi::ConvertSidToStringSidW(sid <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as _</span>, <span class="kw-2">&amp;mut </span>pstr) },
 	)<span class="question-mark">?</span>;
-	<span class="kw">let </span>name = WString::from_wchars_nullt(pstr).to_string();
+	<span class="kw">let </span>name = <span class="kw">unsafe </span>{ WString::from_wchars_nullt(pstr) }.to_string();
 	<span class="kw">let _ </span>= <span class="kw">unsafe </span>{ LocalFreeGuard::new(HLOCAL::from_ptr(pstr <span class="kw">as _</span>)) }; <span class="comment">// free returned pointer
 	</span><span class="prelude-val">Ok</span>(name)
 }
@@ -2177,7 +2177,7 @@
 /// For an example, see [`CommandLineToArgv`](crate::CommandLineToArgv).
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>GetCommandLine() -&gt; String {
-	WString::from_wchars_nullt(<span class="kw">unsafe </span>{ ffi::GetCommandLineW() })
+	<span class="kw">unsafe </span>{ WString::from_wchars_nullt(ffi::GetCommandLineW()) }
 		.to_string()
 }
 

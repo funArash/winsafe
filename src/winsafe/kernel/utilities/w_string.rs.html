@@ -497,6 +497,11 @@
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 
 <span class="kw">use </span><span class="kw">crate</span>::co;
@@ -594,8 +599,13 @@
 	<span class="doccomment">/// Stores an UTF-16 null-terminated string by copying from a
 	/// null-terminated buffer. The string length is retrieved with
 	/// [`lstrlen`](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lstrlenw).
+	///
+	/// # Safety
+	///
+	/// Be sure the string is null-terminated, otherwise `lstrlen` will get
+	/// lost, possibly reading an invalid memory location.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
+	</span><span class="kw">pub unsafe fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
 		<span class="self">Self </span>{ buf: Buffer::from_wchars_nullt(src) }
 	}
 
@@ -902,7 +912,7 @@
 		}
 	}
 
-	<span class="kw">fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
+	<span class="kw">unsafe fn </span>from_wchars_nullt(src: <span class="kw-2">*const </span>u16) -&gt; <span class="self">Self </span>{
 		<span class="self">Self</span>::from_wchars_count(src, <span class="kw">unsafe </span>{ ffi::lstrlenW(src) <span class="kw">as _ </span>})
 	}
 

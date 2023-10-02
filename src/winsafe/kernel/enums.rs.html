@@ -266,6 +266,16 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::co;
 <span class="kw">use </span><span class="kw">crate</span>::decl::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::kernel::privs::<span class="kw-2">*</span>;
@@ -319,8 +329,13 @@
 	}
 
 	<span class="doccomment">/// Constructs the enum from a raw pointer.
+	///
+	/// # Safety
+	///
+	/// If string, be sure it is null-terminated, otherwise an invalid memory
+	/// location might be read.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; IdStr {
+	</span><span class="kw">pub unsafe fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; IdStr {
 		<span class="kw">if </span>IS_INTRESOURCE(ptr) {
 			<span class="self">Self</span>::Id(ptr <span class="kw">as _</span>)
 		} <span class="kw">else </span>{
@@ -516,8 +531,13 @@
 	}
 
 	<span class="doccomment">/// Constructs the enum from a pointer to raw data.
+	///
+	/// # Safety
+	///
+	/// If string, be sure it is null-terminated, otherwise an invalid memory
+	/// location might be read.
 	</span><span class="attr">#[must_use]
-	</span><span class="kw">pub fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; RtStr {
+	</span><span class="kw">pub unsafe fn </span>from_ptr(ptr: <span class="kw-2">*const </span>u16) -&gt; RtStr {
 		<span class="kw">if </span>IS_INTRESOURCE(ptr) {
 			<span class="self">Self</span>::Rt(<span class="kw">unsafe </span>{ co::RT::from_raw(ptr <span class="kw">as _</span>) })
 		} <span class="kw">else </span>{
