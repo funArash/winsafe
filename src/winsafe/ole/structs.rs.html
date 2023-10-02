@@ -231,6 +231,28 @@
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(non_camel_case_types, non_snake_case)]
 
 </span><span class="kw">use </span>std::marker::PhantomData;
@@ -420,8 +442,8 @@
 		<span class="kw">let </span>tot_bytes_wstrs = ( num_valid_chars + strs.len() ) <span class="comment">// plus one null for each string
 			</span>* std::mem::size_of::&lt;u16&gt;();
 
-		<span class="kw">let </span><span class="kw-2">mut </span>block = CoTaskMemAlloc(tot_bytes_ptrs + tot_bytes_wstrs)<span class="question-mark">?</span>;
-		<span class="kw">let </span>ptr_block = block.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8;
+		<span class="kw">let </span><span class="kw-2">mut </span>block = CoTaskMemAlloc(tot_bytes_ptrs + tot_bytes_wstrs)<span class="question-mark">?</span>; <span class="comment">// alloc block for pointers and strings
+		</span><span class="kw">let </span>ptr_block = block.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8;
 		<span class="kw">let </span>ptr_block_wstrs = <span class="kw">unsafe </span>{ ptr_block.add(tot_bytes_ptrs) } <span class="kw">as </span><span class="kw-2">*mut </span>u16; <span class="comment">// start of strings block
 
 		</span><span class="kw">let </span><span class="kw-2">mut </span>idx_cur_wstr = <span class="number">0</span>; <span class="comment">// current string to be copied to block
@@ -435,7 +457,7 @@
 			.for_each(|(idx, ch)| {
 				<span class="kw">if </span><span class="kw-2">*</span>ch == <span class="number">0x0000 </span>&amp;&amp; idx_cur_wstr &lt; strs.len() {
 					<span class="kw">unsafe </span>{
-						<span class="kw-2">*</span>block.as_mut_slice_aligned::&lt;<span class="kw-2">*mut </span>u16&gt;() <span class="comment">// copy pointer to each string in the block
+						<span class="kw-2">*</span>block.as_mut_slice_aligned::&lt;<span class="kw-2">*mut </span>u16&gt;() <span class="comment">// copy pointer to subsequent strings in the block
 							</span>.get_mut(idx_cur_wstr).unwrap() = ptr_block_wstrs.add(idx + <span class="number">1</span>);
 					}
 					idx_cur_wstr += <span class="number">1</span>;
@@ -445,7 +467,7 @@
 		<span class="kw-2">*</span><span class="kw">unsafe </span>{ block.as_mut_slice_aligned::&lt;<span class="kw-2">*mut </span>u16&gt;() }
 			.get_mut(idx_cur_wstr).unwrap() = std::ptr::null_mut(); <span class="comment">// null pointer after string pointers
 
-		</span>wstrs.copy_to_slice( <span class="comment">// copy sequential strings block, beyond pointers
+		</span>wstrs.copy_to_slice( <span class="comment">// beyond pointers, copy each null-terminated string sequentially
 			</span><span class="kw">unsafe </span>{
 				std::slice::from_raw_parts_mut(
 					ptr_block_wstrs,
@@ -463,5 +485,27 @@
 	</span><span class="kw">pub const fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut *mut </span>u16 {
 		<span class="self">self</span>.<span class="number">0
 	</span>}
+
+	<span class="doccomment">/// Converts the internal UTF-16 blocks into strings.
+	</span><span class="attr">#[must_use]
+	</span><span class="kw">pub fn </span>to_strings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>vec = Vec::&lt;String&gt;::default();
+		<span class="kw">if </span>!<span class="self">self</span>.<span class="number">0</span>.is_null() {
+			<span class="kw">let </span><span class="kw-2">mut </span>idx_ptr = <span class="number">0</span>;
+			<span class="kw">loop </span>{
+				<span class="kw">let </span>ptr_ws = <span class="kw">unsafe </span>{
+					<span class="kw">let </span>sli_ptrs = std::slice::from_raw_parts(<span class="self">self</span>.<span class="number">0</span>, idx_ptr + <span class="number">1</span>);
+					<span class="kw-2">*</span>sli_ptrs.get_unchecked(idx_ptr) <span class="comment">// get nth pointer to string
+				</span>};
+				<span class="kw">if </span>ptr_ws.is_null() { <span class="comment">// a null pointer means the end of pointers block
+					</span><span class="kw">break</span>;
+				}
+				<span class="kw">let </span>ws = <span class="kw">unsafe </span>{ WString::from_wchars_nullt(ptr_ws) };
+				vec.push(ws.to_string());
+				idx_ptr += <span class="number">1</span>;
+			}
+		}
+		vec
+	}
 }
 </code></pre></div></section></main></body></html>
