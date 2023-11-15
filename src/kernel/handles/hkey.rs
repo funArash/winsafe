@@ -1039,7 +1039,7 @@ fn validate_retrieved_reg_val(
 	data_type1: co::REG,
 	data_len1: u32,
 	data_type2: co::REG,
-	data_len2: u32,
+	_data_len2: u32,
 	buf: Vec<u8>,
 ) -> SysResult<RegistryValue>
 {
@@ -1048,10 +1048,10 @@ fn validate_retrieved_reg_val(
 		return Err(co::ERROR::TRANSACTION_REQUEST_NOT_VALID);
 	}
 
-	if data_len1 != data_len2 {
-		// Race condition: someone modified the data content in between our calls.
-		return Err(co::ERROR::TRANSACTION_REQUEST_NOT_VALID);
-	}
+	// if data_len1 != _data_len2 {
+	// 	// Race condition: someone modified the data content in between our calls.
+	// 	return Err(co::ERROR::TRANSACTION_REQUEST_NOT_VALID);
+	// }
 
 	if data_type1 == co::REG::DWORD && data_len1 != 4
 		|| data_type1 == co::REG::QWORD && data_len1 != 8
